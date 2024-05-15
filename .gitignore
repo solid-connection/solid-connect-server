@@ -38,3 +38,4 @@ out/
 
 ### YML ###
 *.yml
+!docker-compose.yml
