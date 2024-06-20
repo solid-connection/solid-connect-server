@@ -14,20 +14,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@RestController
-@RequestMapping("/application")
 @RequiredArgsConstructor
+@RequestMapping("/application")
+@RestController
 public class ApplicationController {
+
     private final ApplicationService applicationService;
 
     @PostMapping("/score")
-    public CustomResponse submitScore(Principal principal, @Valid @RequestBody ScoreRequestDto scoreRequestDto) {
+    public CustomResponse submitScore(
+            Principal principal,
+            @Valid @RequestBody ScoreRequestDto scoreRequestDto) {
         boolean result = applicationService.submitScore(principal.getName(), scoreRequestDto);
         return new StatusResponse(result);
     }
 
     @PostMapping("/university")
-    public CustomResponse submitUniversityChoice(Principal principal, @Valid @RequestBody UniversityRequestDto universityRequestDto) {
+    public CustomResponse submitUniversityChoice(
+            Principal principal,
+            @Valid @RequestBody UniversityRequestDto universityRequestDto) {
         boolean result = applicationService.submitUniversityChoice(principal.getName(), universityRequestDto);
         return new StatusResponse(result);
     }
@@ -42,7 +47,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/status")
-    public CustomResponse getVerifyStatus(Principal principal) {
+    public CustomResponse getApplicationVerifyStatus(Principal principal) {
         VerifyStatusDto result = applicationService.getVerifyStatus(principal.getName());
         return new DataResponse<>(result);
     }

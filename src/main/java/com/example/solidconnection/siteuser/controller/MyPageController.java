@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-@RestController
-@RequestMapping("/my-page")
 @RequiredArgsConstructor
+@RequestMapping("/my-page")
+@RestController
 class MyPageController {
+
     private final MyPageService myPageService;
 
     @GetMapping
@@ -33,13 +34,15 @@ class MyPageController {
     }
 
     @PatchMapping("/update")
-    public CustomResponse update(Principal principal, @Valid @RequestBody MyPageUpdateDto myPageUpdateDto) {
+    public CustomResponse updateMyPageInfo(
+            Principal principal,
+            @Valid @RequestBody MyPageUpdateDto myPageUpdateDto) {
         myPageService.update(principal.getName(), myPageUpdateDto);
         return new StatusResponse(true);
     }
 
     @GetMapping("/wish-university")
-    public CustomResponse getWishUniversity(Principal principal) {
+    public CustomResponse getMyWishUniversity(Principal principal) {
         List<UniversityPreviewDto> wishUniversities = myPageService.getWishUniversity(principal.getName());
         return new DataResponse<>(wishUniversities);
     }

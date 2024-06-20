@@ -12,15 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-@RestController
-@RequestMapping("/university")
 @RequiredArgsConstructor
+@RequestMapping("/university")
+@RestController
 public class UniversityController {
 
     private final UniversityService universityService;
 
     @GetMapping("/detail/{universityInfoForApplyId}")
-    public CustomResponse getDetails(Principal principal, @PathVariable Long universityInfoForApplyId) {
+    public CustomResponse getUniversityDetails(
+            Principal principal,
+            @PathVariable Long universityInfoForApplyId) {
         UniversityDetailDto universityDetailDto = universityService.getDetail(universityInfoForApplyId);
         if (principal != null) {
             boolean isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
@@ -30,16 +32,19 @@ public class UniversityController {
     }
 
     @GetMapping("/search")
-    public CustomResponse search(@RequestParam(required = false, defaultValue = "") String region,
-                                 @RequestParam(required = false, defaultValue = "") List<String> keyword,
-                                 @RequestParam(required = false, defaultValue = "") String testType,
-                                 @RequestParam(required = false, defaultValue = "") String testScore) {
+    public CustomResponse searchUniversity(
+            @RequestParam(required = false, defaultValue = "") String region,
+            @RequestParam(required = false, defaultValue = "") List<String> keyword,
+            @RequestParam(required = false, defaultValue = "") String testType,
+            @RequestParam(required = false, defaultValue = "") String testScore) {
         List<UniversityPreviewDto> universityPreviewDto = universityService.search(region, keyword, testType, testScore);
         return new DataResponse<>(universityPreviewDto);
     }
 
     @PostMapping("/{universityInfoForApplyId}/like")
-    public CustomResponse like(Principal principal, @PathVariable Long universityInfoForApplyId) {
+    public CustomResponse addWishUniversity(
+            Principal principal,
+            @PathVariable Long universityInfoForApplyId) {
         LikedResultDto likedResultDto = universityService.like(principal.getName(), universityInfoForApplyId);
         return new DataResponse<>(likedResultDto);
     }

@@ -16,15 +16,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@RestController
-@RequestMapping("auth")
 @RequiredArgsConstructor
+@RequestMapping("/auth")
+@RestController
 public class AuthController {
+
     private final KakaoOAuthService kakaoOAuthService;
     private final AuthService authService;
 
     @PostMapping("/kakao")
-    public CustomResponse kakaoOauth(@RequestBody KakaoCodeDto kakaoCodeDto) {
+    public CustomResponse processKakaoOauth(@RequestBody KakaoCodeDto kakaoCodeDto) {
         KakaoOauthResponseDto kakaoOauthResponseDto = kakaoOAuthService.processOauth(kakaoCodeDto.getCode());
         return new DataResponse<>(kakaoOauthResponseDto);
     }
@@ -48,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public CustomResponse reissue(Principal principal) {
+    public CustomResponse reissueToken(Principal principal) {
         ReissueResponseDto reissueResponseDto = authService.reissue(principal.getName());
         return new DataResponse<>(reissueResponseDto);
     }
