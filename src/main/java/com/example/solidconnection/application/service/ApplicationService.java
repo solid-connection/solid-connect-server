@@ -8,7 +8,7 @@ import com.example.solidconnection.entity.Application;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.entity.University;
 import com.example.solidconnection.entity.UniversityInfoForApply;
-import com.example.solidconnection.siteuser.service.SiteUserValidator;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ApplicationStatusResponse;
 import com.example.solidconnection.type.CountryCode;
 import com.example.solidconnection.type.RegionCode;
@@ -29,23 +29,23 @@ import static com.example.solidconnection.constants.Constants.APPLICATION_UPDATE
 import static com.example.solidconnection.constants.Constants.TERM;
 import static com.example.solidconnection.custom.exception.ErrorCode.*;
 
-@Service
 @RequiredArgsConstructor
 @Transactional
+@Service
 public class ApplicationService {
+
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final UniversityValidator universityValidator;
-    private final SiteUserValidator siteUserValidator;
-    private final ApplicationValidator applicationValidator;
+    private final SiteUserRepository siteUserRepository;
     private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
 
     public boolean submitScore(String email, ScoreRequestDto scoreRequestDto) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
 
         // 수정
         if (applicationRepository.existsBySiteUser_Email(email)) {
-            Application application = applicationValidator.getValidatedApplicationBySiteUser_Email(email);
+            Application application = applicationRepository.getBySiteUser_Email(email);
             application.setGpa(scoreRequestDto.getGpa());
             application.setGpaCriteria(scoreRequestDto.getGpaCriteria());
             application.setGpaReportUrl(scoreRequestDto.getGpaReportUrl());
@@ -63,7 +63,7 @@ public class ApplicationService {
     }
 
     public boolean submitUniversityChoice(String email, UniversityRequestDto universityRequestDto) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
 
         // 저장에 필요한 엔티티 불러오기 or 생성
         UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityRequestDto.getFirstChoiceUniversityId());
@@ -90,7 +90,7 @@ public class ApplicationService {
         }
 
         // 수정 횟수 초과 에러 처리
-        application = applicationValidator.getValidatedApplicationBySiteUser_Email(email);
+        application = applicationRepository.getBySiteUser_Email(email);
         if (application.getUpdateCount() > APPLICATION_UPDATE_COUNT_LIMIT) {
             throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
         }
@@ -125,9 +125,9 @@ public class ApplicationService {
 
     public ApplicationsDto getApplicants(String email, String region, String keyword) {
         // 유저 검증
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         // 지원했는지 검증
-        Application application = applicationValidator.getValidatedApplicationBySiteUser_Email(email);
+        Application application = applicationRepository.getBySiteUser_Email(email);
         // 승인되었는지 확인
         validateApproved(application);
 
@@ -196,7 +196,7 @@ public class ApplicationService {
     }
 
     public VerifyStatusDto getVerifyStatus(String email) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         Optional<Application> application = applicationRepository.findBySiteUser_Email(siteUser.getEmail());
 
         // 아무것도 제출 안함

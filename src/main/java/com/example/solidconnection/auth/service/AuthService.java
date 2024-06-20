@@ -14,7 +14,6 @@ import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.siteuser.service.SiteUserValidator;
 import com.example.solidconnection.type.CountryCode;
 import com.example.solidconnection.type.RegionCode;
 import com.example.solidconnection.type.Role;
@@ -41,7 +40,6 @@ public class AuthService {
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenValidator tokenValidator;
     private final TokenService tokenService;
-    private final SiteUserValidator siteUserValidator;
     private final SiteUserRepository siteUserRepository;
     private final RegionRepository regionRepository;
     private final InterestedRegionRepository interestedRegionRepository;
@@ -82,7 +80,7 @@ public class AuthService {
     }
 
     public boolean quit(String email){
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         siteUser.setQuitedAt(LocalDate.now().plusDays(1));
         return true;
     }

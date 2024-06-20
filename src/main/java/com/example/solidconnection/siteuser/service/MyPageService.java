@@ -24,25 +24,24 @@ import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_AL
 @Service
 @RequiredArgsConstructor
 public class MyPageService {
-    private final SiteUserValidator siteUserValidator;
     private final SiteUserRepository siteUserRepository;
     private final LikedUniversityRepository likedUniversityRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     public MyPageDto getMyPageInfo(String email) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         int likedUniversityCount = likedUniversityRepository.countBySiteUser_Email(email);
         return MyPageDto.fromEntity(siteUser, likedUniversityCount);
     }
 
     public MyPageUpdateDto getMyPageInfoToUpdate(String email) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         return MyPageUpdateDto.fromEntity(siteUser);
     }
 
     @Transactional
     public void update(String email, MyPageUpdateDto myPageUpdateDto) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         validateNicknameDuplicated(myPageUpdateDto.getNickname());
         validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
         siteUser.setNickname(myPageUpdateDto.getNickname());
@@ -68,7 +67,7 @@ public class MyPageService {
     }
 
     public List<UniversityPreviewDto> getWishUniversity(String email) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Email(siteUser.getEmail());
         return likedUniversities.stream()
                 .map(likedUniversity -> UniversityPreviewDto.fromEntity(likedUniversity.getUniversityInfoForApply()))

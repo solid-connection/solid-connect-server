@@ -9,7 +9,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.siteuser.service.SiteUserValidator;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ImgType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +31,8 @@ public class S3Service {
     private String bucket;
 
     private final AmazonS3Client amazonS3;
-    private final SiteUserValidator siteUserValidator;
-
+    private final SiteUserRepository siteUserRepository;
+    
     public UploadedFileURLDto uploadFile(MultipartFile multipartFile, ImgType imageFile) {
         validateImgFile(multipartFile);
         String contentType = multipartFile.getContentType();
@@ -97,7 +97,7 @@ public class S3Service {
     }
 
     private String getExProfileImageUrl(String email){
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         String fileName = siteUser.getProfileImageUrl();
         int domainStartIndex = fileName.indexOf(".com");
         return fileName.substring(domainStartIndex + 5);

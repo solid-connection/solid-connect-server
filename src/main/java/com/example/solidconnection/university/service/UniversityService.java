@@ -9,7 +9,7 @@ import com.example.solidconnection.home.dto.RecommendedUniversityDto;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
-import com.example.solidconnection.siteuser.service.SiteUserValidator;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.CountryCode;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.RegionCode;
@@ -43,13 +43,13 @@ public class UniversityService {
     private final InterestedCountyRepository interestedCountyRepository;
     private final InterestedRegionRepository interestedRegionRepository;
     private final LikedUniversityRepository likedUniversityRepository;
-    private final SiteUserValidator siteUserValidator;
     private final GeneralRecommendUniversities generalRecommendUniversities;
     private final UniversityValidator universityValidator;
     private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
+    private final SiteUserRepository siteUserRepository;
 
     public List<RecommendedUniversityDto> getPersonalRecommends(String email) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         List<CountryCode> interestedCountries = interestedCountyRepository.findAllBySiteUser(siteUser)
                 .stream().map(interestedCountry -> interestedCountry.getCountry().getCode())
                 .toList();
@@ -168,7 +168,7 @@ public class UniversityService {
     }
 
     public LikedResultDto like(String email, Long universityInfoForApplyId) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyById(universityInfoForApplyId);
 
         Optional<LikedUniversity> alreadyLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
@@ -190,7 +190,7 @@ public class UniversityService {
     }
 
     public boolean getIsLiked(String email, Long universityInfoForApplyId) {
-        SiteUser siteUser = siteUserValidator.getValidatedSiteUserByEmail(email);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyById(universityInfoForApplyId);
         return likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply)
                 .isPresent();
