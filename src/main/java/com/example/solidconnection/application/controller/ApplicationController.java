@@ -4,7 +4,8 @@ import com.example.solidconnection.application.dto.ApplicationsDto;
 import com.example.solidconnection.application.dto.ScoreRequestDto;
 import com.example.solidconnection.application.dto.UniversityRequestDto;
 import com.example.solidconnection.application.dto.VerifyStatusDto;
-import com.example.solidconnection.application.service.ApplicationService;
+import com.example.solidconnection.application.service.ApplicationQueryService;
+import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import com.example.solidconnection.custom.response.CustomResponse;
 import com.example.solidconnection.custom.response.DataResponse;
 import com.example.solidconnection.custom.response.StatusResponse;
@@ -19,13 +20,14 @@ import java.security.Principal;
 @RestController
 public class ApplicationController {
 
-    private final ApplicationService applicationService;
+    private final ApplicationSubmissionService applicationSubmissionService;
+    private final ApplicationQueryService applicationQueryService;
 
     @PostMapping("/score")
     public CustomResponse submitScore(
             Principal principal,
             @Valid @RequestBody ScoreRequestDto scoreRequestDto) {
-        boolean result = applicationService.submitScore(principal.getName(), scoreRequestDto);
+        boolean result = applicationSubmissionService.submitScore(principal.getName(), scoreRequestDto);
         return new StatusResponse(result);
     }
 
@@ -33,7 +35,7 @@ public class ApplicationController {
     public CustomResponse submitUniversityChoice(
             Principal principal,
             @Valid @RequestBody UniversityRequestDto universityRequestDto) {
-        boolean result = applicationService.submitUniversityChoice(principal.getName(), universityRequestDto);
+        boolean result = applicationSubmissionService.submitUniversityChoice(principal.getName(), universityRequestDto);
         return new StatusResponse(result);
     }
 
@@ -42,13 +44,13 @@ public class ApplicationController {
             Principal principal,
             @RequestParam(required = false, defaultValue = "") String region,
             @RequestParam(required = false, defaultValue = "") String keyword) {
-        ApplicationsDto result = applicationService.getApplicants(principal.getName(), region, keyword);
+        ApplicationsDto result = applicationQueryService.getApplicants(principal.getName(), region, keyword);
         return new DataResponse<>(result);
     }
 
     @GetMapping("/status")
     public CustomResponse getApplicationVerifyStatus(Principal principal) {
-        VerifyStatusDto result = applicationService.getVerifyStatus(principal.getName());
+        VerifyStatusDto result = applicationQueryService.getVerifyStatus(principal.getName());
         return new DataResponse<>(result);
     }
 }

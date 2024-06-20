@@ -15,6 +15,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @DynamicInsert
 public class Application {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -61,25 +62,49 @@ public class Application {
     @JoinColumn(name = "site_user_id")
     private SiteUser siteUser;
 
-    public static Application saveScore(SiteUser siteUser, ScoreRequestDto scoreRequestDto) {
-        return Application.builder()
-                .siteUser(siteUser)
-                .languageTestType(scoreRequestDto.getLanguageTestType())
-                .languageTestScore(scoreRequestDto.getLanguageTestScore())
-                .languageTestReportUrl(scoreRequestDto.getLanguageTestReportUrl())
-                .gpa(scoreRequestDto.getGpa())
-                .gpaCriteria(scoreRequestDto.getGpaCriteria())
-                .gpaReportUrl(scoreRequestDto.getGpaReportUrl())
-                .verifyStatus(VerifyStatus.PENDING)
-                .build();
+    private Application(SiteUser siteUser, String nicknameForApply) {
+        this.siteUser = siteUser;
+        this.nicknameForApply = nicknameForApply;
     }
 
-    public static Application saveUniversity(SiteUser siteUser, UniversityInfoForApply firstChoiceUniversity,
-                                             UniversityInfoForApply secondChoiceUniversity) {
-        return Application.builder()
-                .siteUser(siteUser)
-                .firstChoiceUniversity(firstChoiceUniversity)
-                .secondChoiceUniversity(secondChoiceUniversity)
-                .build();
+    public static Application createWithScore(
+            SiteUser siteUser,
+            ScoreRequestDto scoreRequestDto,
+            String nicknameForApply) {
+        Application application = new Application(siteUser, nicknameForApply);
+        application.updateWithScore(scoreRequestDto);
+        return application;
+    }
+
+    public void updateWithScore(ScoreRequestDto scoreRequestDto) {
+        this.languageTestType = scoreRequestDto.getLanguageTestType();
+        this.languageTestScore = scoreRequestDto.getLanguageTestScore();
+        this.languageTestReportUrl = scoreRequestDto.getLanguageTestReportUrl();
+        this.gpa = scoreRequestDto.getGpa();
+        this.gpaCriteria = scoreRequestDto.getGpaCriteria();
+        this.gpaReportUrl = scoreRequestDto.getGpaReportUrl();
+        this.verifyStatus = VerifyStatus.PENDING;
+    }
+
+    public static Application createWithUniversityChoice(
+            SiteUser siteUser,
+            UniversityInfoForApply firstChoiceUniversity,
+            UniversityInfoForApply secondChoiceUniversity,
+            String nicknameForApply) {
+        Application application = new Application(siteUser, nicknameForApply);
+        application.updateWithUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, nicknameForApply);
+        return application;
+    }
+
+    public void updateWithUniversityChoice(
+            UniversityInfoForApply firstChoiceUniversity,
+            UniversityInfoForApply secondChoiceUniversity,
+            String nicknameForApply) {
+        if(this.firstChoiceUniversity != null) {
+            this.updateCount++;
+        }
+        this.firstChoiceUniversity = firstChoiceUniversity;
+        this.secondChoiceUniversity = secondChoiceUniversity;
+        this.nicknameForApply = nicknameForApply;
     }
 }

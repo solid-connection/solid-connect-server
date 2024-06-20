@@ -1,8 +1,10 @@
 package com.example.solidconnection.application.service;
 
-import com.example.solidconnection.application.dto.*;
+import com.example.solidconnection.application.dto.ApplicantDto;
+import com.example.solidconnection.application.dto.ApplicationsDto;
+import com.example.solidconnection.application.dto.UniversityApplicantsDto;
+import com.example.solidconnection.application.dto.VerifyStatusDto;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.constants.NicknameForApplyWords;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.Application;
 import com.example.solidconnection.entity.SiteUser;
@@ -23,105 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 
-import static com.example.solidconnection.constants.Constants.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.constants.Constants.TERM;
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class ApplicationService {
+public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final UniversityValidator universityValidator;
     private final SiteUserRepository siteUserRepository;
     private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
-
-    public boolean submitScore(String email, ScoreRequestDto scoreRequestDto) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
-        // 수정
-        if (applicationRepository.existsBySiteUser_Email(email)) {
-            Application application = applicationRepository.getBySiteUser_Email(email);
-            application.setGpa(scoreRequestDto.getGpa());
-            application.setGpaCriteria(scoreRequestDto.getGpaCriteria());
-            application.setGpaReportUrl(scoreRequestDto.getGpaReportUrl());
-            application.setLanguageTestScore(scoreRequestDto.getLanguageTestScore());
-            application.setLanguageTestType(scoreRequestDto.getLanguageTestType());
-            application.setLanguageTestReportUrl(scoreRequestDto.getLanguageTestReportUrl());
-            application.setVerifyStatus(VerifyStatus.PENDING);
-            return true;
-        }
-
-        // 최초 등록
-        Application application = Application.saveScore(siteUser, scoreRequestDto);
-        applicationRepository.save(application);
-        return true;
-    }
-
-    public boolean submitUniversityChoice(String email, UniversityRequestDto universityRequestDto) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
-        // 저장에 필요한 엔티티 불러오기 or 생성
-        UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityRequestDto.getFirstChoiceUniversityId());
-        UniversityInfoForApply secondChoiceUniversity;
-        try {
-            secondChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityRequestDto.getSecondChoiceUniversityId());
-        } catch (Exception e) {
-            secondChoiceUniversity = null;
-        }
-
-        // 1,2 동일한 대학교 지망 에러 처리
-        if (secondChoiceUniversity != null && Objects.equals(secondChoiceUniversity.getId(), firstChoiceUniversity.getId())) {
-            throw new CustomException(CANT_APPLY_FOR_SAME_UNIVERSITY);
-        }
-
-        Application application;
-
-        // 대학 최초 등록이면
-        if (applicationRepository.findBySiteUser_Email(siteUser.getEmail()).isEmpty()) {
-            application = Application.saveUniversity(siteUser, firstChoiceUniversity, secondChoiceUniversity);
-            application.setNicknameForApply(makeRandomNickname());
-            applicationRepository.save(application);
-            return true;
-        }
-
-        // 수정 횟수 초과 에러 처리
-        application = applicationRepository.getBySiteUser_Email(email);
-        if (application.getUpdateCount() > APPLICATION_UPDATE_COUNT_LIMIT) {
-            throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
-        }
-
-        // 수정이면 update count 1 증가
-        if (application.getFirstChoiceUniversity() != null) {
-            application.setUpdateCount(application.getUpdateCount() + 1);
-        }
-
-        // 수정
-        application.setFirstChoiceUniversity(firstChoiceUniversity);
-        application.setSecondChoiceUniversity(secondChoiceUniversity);
-
-        // 새로운 닉네임 부여
-        String randomNickname = makeRandomNickname();
-        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
-            randomNickname = makeRandomNickname();
-        }
-        application.setNicknameForApply(randomNickname);
-
-        return true;
-    }
-
-    private String makeRandomNickname() {
-        Random random = new Random();
-        int randomIndex1 = random.nextInt(NicknameForApplyWords.adjectives.size());
-        String randomAdjective = NicknameForApplyWords.adjectives.get(randomIndex1);
-        int randomIndex2 = random.nextInt(NicknameForApplyWords.nouns.size());
-        String randomNoun = NicknameForApplyWords.nouns.get(randomIndex2);
-        return randomAdjective + " " + randomNoun;
-    }
 
     public ApplicationsDto getApplicants(String email, String region, String keyword) {
         // 유저 검증
