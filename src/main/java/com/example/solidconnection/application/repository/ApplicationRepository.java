@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.repository;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.Application;
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.entity.UniversityInfoForApply;
 import com.example.solidconnection.type.VerifyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.application.dto;
 
-import com.example.solidconnection.entity.Application;
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.type.LanguageTestType;
 import lombok.*;
 
@@ -19,9 +19,9 @@ public class ApplicantDto {
     public static ApplicantDto fromEntity(Application application, boolean isMine) {
         return ApplicantDto.builder()
                 .nicknameForApply(application.getNicknameForApply())
-                .gpa(application.getGpa())
-                .testType(application.getLanguageTestType())
-                .testScore(application.getLanguageTestScore())
+                .gpa(application.getGpa().getGpa())
+                .testType(application.getLanguageTest().getLanguageTestType())
+                .testScore(application.getLanguageTest().getLanguageTestScore())
                 .isMine(isMine)
                 .build();
     }

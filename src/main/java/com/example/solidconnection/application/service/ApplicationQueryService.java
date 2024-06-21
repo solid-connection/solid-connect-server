@@ -6,7 +6,7 @@ import com.example.solidconnection.application.dto.UniversityApplicantsDto;
 import com.example.solidconnection.application.dto.VerifyStatusDto;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.Application;
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.entity.University;
 import com.example.solidconnection.entity.UniversityInfoForApply;
@@ -125,7 +125,7 @@ public class ApplicationQueryService {
         // 제출한 상태
         if (application.get().getVerifyStatus() == VerifyStatus.PENDING) {
             // 지망 대학만 제출
-            if (application.get().getGpaReportUrl() == null) {
+            if (application.get().getGpa().getGpaReportUrl() == null) {
                 return new VerifyStatusDto(ApplicationStatusResponse.COLLEGE_SUBMITTED.name(), updateCount);
             }
             // 성적만 제출

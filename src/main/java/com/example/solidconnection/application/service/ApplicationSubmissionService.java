@@ -1,10 +1,12 @@
 package com.example.solidconnection.application.service;
 
+import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.dto.ScoreRequestDto;
 import com.example.solidconnection.application.dto.UniversityRequestDto;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.Application;
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.entity.UniversityInfoForApply;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -34,24 +36,26 @@ public class ApplicationSubmissionService {
 
     public boolean submitScore(String email, ScoreRequestDto scoreRequestDto) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
+        Gpa gpa = scoreRequestDto.toGpa();
+        LanguageTest languageTest = scoreRequestDto.toLanguageTest();
 
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(
                         // 수정
-                        application -> application.updateWithScore(scoreRequestDto),
+                        application -> application.updateGpaAndLanguageTest(gpa, languageTest),
 
                         // 최초 등록
-                        () -> {
-                            Application newApplication = Application.createWithScore(siteUser, scoreRequestDto, getRandomNickname());
-                            applicationRepository.save(newApplication);
-                        });
+                        () -> applicationRepository.save(
+                                new Application(siteUser, gpa, languageTest, getRandomNickname())
+                        )
+                );
         return true;
     }
 
     public boolean submitUniversityChoice(String email, UniversityRequestDto universityRequestDto) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
         validateFirstAndSecondChoiceIdDifferent(universityRequestDto);
 
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityRequestDto.getFirstChoiceUniversityId());
         UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository.findByIdAndTerm(universityRequestDto.getSecondChoiceUniversityId(), TERM).orElse(null);
 
@@ -60,13 +64,12 @@ public class ApplicationSubmissionService {
                         // 수정
                         application -> {
                             validateUpdateLimitNotExceed(application);
-                            application.updateWithUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, getRandomNickname());
+                            application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, getRandomNickname());
                         },
 
                         // 최초 등록
                         () -> applicationRepository.save(
-                                Application.createWithUniversityChoice(siteUser, firstChoiceUniversity,
-                                        secondChoiceUniversity, getRandomNickname())
+                                new Application(siteUser, firstChoiceUniversity, secondChoiceUniversity, getRandomNickname())
                         )
                 );
 

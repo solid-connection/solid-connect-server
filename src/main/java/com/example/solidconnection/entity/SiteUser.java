@@ -1,5 +1,6 @@
 package com.example.solidconnection.entity;
 
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
