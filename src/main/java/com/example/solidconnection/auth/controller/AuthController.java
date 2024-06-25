@@ -6,13 +6,18 @@ import com.example.solidconnection.auth.dto.SignUpResponseDto;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeDto;
 import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponseDto;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.KakaoOAuthService;
+import com.example.solidconnection.auth.service.SignInService;
+import com.example.solidconnection.auth.service.SignUpService;
 import com.example.solidconnection.custom.response.CustomResponse;
 import com.example.solidconnection.custom.response.DataResponse;
 import com.example.solidconnection.custom.response.StatusResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
@@ -21,18 +26,19 @@ import java.security.Principal;
 @RestController
 public class AuthController {
 
-    private final KakaoOAuthService kakaoOAuthService;
     private final AuthService authService;
+    private final SignUpService signUpService;
+    private final SignInService signInService;
 
-    @PostMapping("/kakao")
+    @PostMapping("/kakao") //TODO: 추후 OAuth 추가를 염두에 둔다면 "/sign-in/kakao" 로 바꿔야 할 것 같다.
     public CustomResponse processKakaoOauth(@RequestBody KakaoCodeDto kakaoCodeDto) {
-        KakaoOauthResponseDto kakaoOauthResponseDto = kakaoOAuthService.processOauth(kakaoCodeDto.getCode());
+        KakaoOauthResponseDto kakaoOauthResponseDto = signInService.signIn(kakaoCodeDto);
         return new DataResponse<>(kakaoOauthResponseDto);
     }
 
     @PostMapping("/sign-up")
     public CustomResponse signUp(@Valid @RequestBody SignUpRequestDto signUpRequestDto) {
-        SignUpResponseDto signUpResponseDto = authService.signUp(signUpRequestDto);
+        SignUpResponseDto signUpResponseDto = signUpService.signUp(signUpRequestDto);
         return new DataResponse<>(signUpResponseDto);
     }
 

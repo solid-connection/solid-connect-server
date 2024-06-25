@@ -1,15 +1,15 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.auth.dto.SignInResponseDto;
-import com.example.solidconnection.auth.dto.kakao.*;
-import com.example.solidconnection.config.token.TokenService;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.dto.kakao.KakaoTokenDto;
+import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -17,7 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_KAKAO_AUTH_CODE;
+import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
+import static com.example.solidconnection.custom.exception.ErrorCode.REDIRECT_URI_MISMATCH;
 
 @Service
 @Transactional
@@ -25,8 +27,6 @@ import static com.example.solidconnection.custom.exception.ErrorCode.*;
 public class KakaoOAuthService {
 
     private final RestTemplate restTemplate;
-    private final TokenService tokenService;
-    private final SiteUserRepository siteUserRepository;
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -37,17 +37,14 @@ public class KakaoOAuthService {
     @Value("${kakao.user_info_url}")
     private String userInfoUrl;
 
-    public KakaoOauthResponseDto processOauth(String code) throws CustomException {
+    /*
+    * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인증 코드'를 받아, 서버에 넘겨준다.
+    * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 액세스 토큰'을 받아온다.
+    * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
+    * */
+    public KakaoUserInfoDto processOauth(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
-        KakaoUserInfoDto kakaoUserInfoDto = getKakaoUserInfo(kakaoAccessToken);
-        String email = kakaoUserInfoDto.getKakaoAccount().getEmail();
-        boolean isAlreadyRegistered = siteUserRepository.existsByEmail(email);
-        if (isAlreadyRegistered) {
-            resetQuitedAt(email);
-            return kakaoSignIn(email);
-        }
-        String kakaoOauthToken = tokenService.generateToken(email, TokenType.KAKAO_OAUTH);
-        return FirstAccessResponseDto.fromKakaoUserInfo(kakaoUserInfoDto, kakaoOauthToken);
+        return getKakaoUserInfo(kakaoAccessToken);
     }
 
     private String getKakaoAccessToken(String code) {
@@ -98,21 +95,5 @@ public class KakaoOAuthService {
         } else {
             throw new CustomException(KAKAO_USER_INFO_FAIL);
         }
-    }
-
-    private SignInResponseDto kakaoSignIn(String email) {
-        String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
-        return SignInResponseDto.builder()
-                .registered(true)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    public void resetQuitedAt(String email) {
-        SiteUser siteUser = siteUserRepository.findByEmail(email).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        siteUser.setQuitedAt(null);
     }
 }
