@@ -24,7 +24,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                           AuthenticationException authException) throws IOException {
-
         ErrorResponse errorResponse = new ErrorResponse(AUTHENTICATION_FAILED, authException.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
@@ -34,7 +33,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     public void expiredCommence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-
         ErrorResponse errorResponse = new ErrorResponse(new CustomException(ACCESS_TOKEN_EXPIRED));
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");

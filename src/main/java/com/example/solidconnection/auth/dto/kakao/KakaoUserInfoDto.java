@@ -13,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KakaoUserInfoDto {
+
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 }

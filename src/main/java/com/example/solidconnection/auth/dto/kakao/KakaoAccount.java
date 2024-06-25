@@ -13,7 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KakaoAccount {
+
     @JsonProperty("profile")
     private KakaoProfile profile;
+
     private String email;
 }
