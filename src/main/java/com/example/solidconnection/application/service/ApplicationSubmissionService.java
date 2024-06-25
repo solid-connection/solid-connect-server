@@ -34,6 +34,11 @@ public class ApplicationSubmissionService {
     private final UniversityValidator universityValidator;
     private final SiteUserRepository siteUserRepository;
 
+    /*
+    * 학점과 영어 성적을 제출한다.
+    * - 기존에 제출한 적이 있다면, 수정한다.
+    * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
+    * */
     public boolean submitScore(String email, ScoreRequestDto scoreRequestDto) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Gpa gpa = scoreRequestDto.toGpa();
@@ -52,6 +57,14 @@ public class ApplicationSubmissionService {
         return true;
     }
 
+    /*
+     * 지망 대학교를 제출한다.
+     * - 첫번째 지망과 두번째 지망이 같은지 검증한다.
+     * - 기존에 제출한 적이 있다면, 수정한다.
+     *   - 이때 수정 횟수 제한을 초과하지 않았는지 검증한다.
+     *   - 그리고 새로운 '제출 닉네임'을 부여한다. (악의적으로 타인의 변경 기록을 추적하는 것을 막기 위해)
+     * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
+     * */
     public boolean submitUniversityChoice(String email, UniversityRequestDto universityRequestDto) {
         validateFirstAndSecondChoiceIdDifferent(universityRequestDto);
 
