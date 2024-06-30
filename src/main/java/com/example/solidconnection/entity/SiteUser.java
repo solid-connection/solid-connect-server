@@ -11,12 +11,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
+@NoArgsConstructor
+@Entity
 public class SiteUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,4 +61,20 @@ public class SiteUser {
 
     @OneToMany(mappedBy = "siteUser")
     private Set<Application> applications;
+
+    public SiteUser(
+            String email, String nickname, String profileImageUrl,
+            String birth, PreparationStatus preparationStage, Role role,
+            Gender gender, Set<InterestedRegion> interestedRegions,
+            Set<InterestedCountry> interestedCountries) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.birth = birth;
+        this.preparationStage = preparationStage;
+        this.role = role;
+        this.gender = gender;
+        this.interestedRegions = interestedRegions;
+        this.interestedCountries = interestedCountries;
+    }
 }
