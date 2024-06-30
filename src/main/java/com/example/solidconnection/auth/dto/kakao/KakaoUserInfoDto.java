@@ -2,18 +2,15 @@ package com.example.solidconnection.auth.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class KakaoUserInfoDto {
+public record KakaoUserInfoDto(@JsonProperty("kakao_account") KakaoAccountDto kakaoAccountDto) {
 
-    @JsonProperty("kakao_account")
-    private KakaoAccount kakaoAccount;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record KakaoAccountDto(@JsonProperty("profile") KakaoProfileDto profile, String email) {
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record KakaoProfileDto(@JsonProperty("profile_image_url") String profileImageUrl, String nickname) {
+        }
+    }
 }
