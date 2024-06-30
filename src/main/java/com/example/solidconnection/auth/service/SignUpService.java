@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.auth.dto.SignUpRequestDto;
-import com.example.solidconnection.auth.dto.SignUpResponseDto;
+import com.example.solidconnection.auth.dto.SignUpRequest;
+import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.config.token.TokenService;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.config.token.TokenValidator;
@@ -18,7 +18,6 @@ import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.CountryCode;
 import com.example.solidconnection.type.RegionCode;
-import com.example.solidconnection.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,31 +43,28 @@ public class SignUpService {
     private final CountryRepository countryRepository;
     private final InterestedCountyRepository interestedCountyRepository;
 
-    public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-        tokenValidator.validateKakaoToken(signUpRequestDto.getKakaoOauthToken());
-        validateUserNotDuplicated(signUpRequestDto);
-        validateNicknameDuplicated(signUpRequestDto.getNickname());
-        validateBirthFormat(signUpRequestDto.getBirth());
+    public SignUpResponse signUp(SignUpRequest signUpRequest) {
+        tokenValidator.validateKakaoToken(signUpRequest.kakaoOauthToken());
+        validateUserNotDuplicated(signUpRequest);
+        validateNicknameDuplicated(signUpRequest.nickname());
+        validateBirthFormat(signUpRequest.birth());
 
-        SiteUser siteUser = makeSiteUserEntity(signUpRequestDto);
+        SiteUser siteUser = makeSiteUserEntity(signUpRequest);
         SiteUser savedSiteUser = siteUserRepository.save(siteUser);
 
-        saveInterestedRegion(signUpRequestDto, savedSiteUser);
-        saveInterestedCountry(signUpRequestDto, savedSiteUser);
+        saveInterestedRegion(signUpRequest, savedSiteUser);
+        saveInterestedCountry(signUpRequest, savedSiteUser);
 
         String email = savedSiteUser.getEmail();
         String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
         String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
         tokenService.saveToken(refreshToken, TokenType.REFRESH);
 
-        return SignUpResponseDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new SignUpResponse(accessToken, refreshToken);
     }
 
-    private void validateUserNotDuplicated(SignUpRequestDto signUpRequestDto){
-        String email = tokenService.getEmail(signUpRequestDto.getKakaoOauthToken());
+    private void validateUserNotDuplicated(SignUpRequest signUpRequest){
+        String email = tokenService.getEmail(signUpRequest.kakaoOauthToken());
         if(siteUserRepository.existsByEmail(email)){
             throw new CustomException(USER_ALREADY_EXISTED);
         }
@@ -89,20 +85,23 @@ public class SignUpService {
         }
     }
 
-    private SiteUser makeSiteUserEntity(SignUpRequestDto signUpRequestDto) {
-        return SiteUser.builder()
-                .email(tokenService.getEmail(signUpRequestDto.getKakaoOauthToken()))
-                .nickname(signUpRequestDto.getNickname())
-                .preparationStage(signUpRequestDto.getPreparationStatus())
-                .profileImageUrl(signUpRequestDto.getProfileImageUrl())
-                .gender(signUpRequestDto.getGender())
-                .birth(signUpRequestDto.getBirth())
-                .role(Role.MENTEE)
-                .build();
+    private SiteUser makeSiteUserEntity(SignUpRequest signUpRequest) {
+        signUpRequest.interestedCountries();
+
+        return /*new SiteUser(
+                tokenService.getEmail(signUpRequestDto.getKakaoOauthToken()),
+                signUpRequestDto.getNickname(),
+                signUpRequestDto.getProfileImageUrl(),
+                signUpRequestDto.getBirth(),
+                signUpRequestDto.getPreparationStatus(),
+                Role.MENTEE,
+                signUpRequestDto.getGender(),
+                null,
+                null);*/ null;
     }
 
-    private void saveInterestedCountry(SignUpRequestDto signUpRequestDto, SiteUser savedSiteUser) {
-        List<InterestedCountry> interestedCountries = signUpRequestDto.getInterestedCountries().stream()
+    private void saveInterestedCountry(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
+        List<InterestedCountry> interestedCountries = signUpRequest.interestedCountries().stream()
                 .map(CountryCode::getCountryCodeByKoreanName)
                 .map(countryCode -> {
                     Country country = countryRepository.findByCode(countryCode)
@@ -116,8 +115,8 @@ public class SignUpService {
         interestedCountyRepository.saveAll(interestedCountries);
     }
 
-    private void saveInterestedRegion(SignUpRequestDto signUpRequestDto, SiteUser savedSiteUser) {
-        List<InterestedRegion> interestedRegions = signUpRequestDto.getInterestedRegions().stream()
+    private void saveInterestedRegion(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
+        List<InterestedRegion> interestedRegions = signUpRequest.interestedRegions().stream()
                 .map(RegionCode::getRegionCodeByKoreanName)
                 .map(regionCode -> {
                     Region region = regionRepository.findByCode(regionCode)

@@ -1,10 +1,9 @@
 package com.example.solidconnection.auth.service;
 
 
-import com.example.solidconnection.auth.dto.ReissueResponseDto;
+import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.config.token.TokenService;
 import com.example.solidconnection.config.token.TokenType;
-import com.example.solidconnection.config.token.TokenValidator;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -25,7 +24,6 @@ import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOK
 public class AuthService {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final TokenValidator tokenValidator;
     private final TokenService tokenService;
     private final SiteUserRepository siteUserRepository;
 
@@ -45,7 +43,7 @@ public class AuthService {
         return true;
     }
 
-    public ReissueResponseDto reissue(String email) {
+    public ReissueResponse reissue(String email) {
         // 리프레시 토큰 만료 확인
         String refreshTokenKey= TokenType.REFRESH.getPrefix() + email;
         String refreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
@@ -54,9 +52,6 @@ public class AuthService {
         }
         // 엑세스 토큰 재발급
         String newAccessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        return ReissueResponseDto.builder()
-                .accessToken(newAccessToken)
-                .build();
+        return new ReissueResponse(newAccessToken);
     }
 }
-

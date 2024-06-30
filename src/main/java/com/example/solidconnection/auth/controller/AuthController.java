@@ -1,10 +1,10 @@
 package com.example.solidconnection.auth.controller;
 
-import com.example.solidconnection.auth.dto.ReissueResponseDto;
-import com.example.solidconnection.auth.dto.SignUpRequestDto;
-import com.example.solidconnection.auth.dto.SignUpResponseDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoCodeDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponseDto;
+import com.example.solidconnection.auth.dto.ReissueResponse;
+import com.example.solidconnection.auth.dto.SignUpRequest;
+import com.example.solidconnection.auth.dto.SignUpResponse;
+import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
+import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.auth.service.SignUpService;
@@ -30,15 +30,16 @@ public class AuthController {
     private final SignUpService signUpService;
     private final SignInService signInService;
 
-    @PostMapping("/kakao") //TODO: 추후 OAuth 추가를 염두에 둔다면 "/sign-in/kakao" 로 바꿔야 할 것 같다.
-    public CustomResponse processKakaoOauth(@RequestBody KakaoCodeDto kakaoCodeDto) {
-        KakaoOauthResponseDto kakaoOauthResponseDto = signInService.signIn(kakaoCodeDto);
-        return new DataResponse<>(kakaoOauthResponseDto);
+    //TODO: 추후 OAuth 추가를 염두에 둔다면 "/sign-in/kakao" 로 바꿔야 할 것 같다.
+    @PostMapping("/kakao")
+    public CustomResponse processKakaoOauth(@RequestBody KakaoCodeRequest kakaoCodeRequest) {
+        KakaoOauthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);
+        return new DataResponse<>(kakaoOauthResponse);
     }
 
     @PostMapping("/sign-up")
-    public CustomResponse signUp(@Valid @RequestBody SignUpRequestDto signUpRequestDto) {
-        SignUpResponseDto signUpResponseDto = signUpService.signUp(signUpRequestDto);
+    public CustomResponse signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
+        SignUpResponse signUpResponseDto = signUpService.signUp(signUpRequest);
         return new DataResponse<>(signUpResponseDto);
     }
 
@@ -56,7 +57,7 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public CustomResponse reissueToken(Principal principal) {
-        ReissueResponseDto reissueResponseDto = authService.reissue(principal.getName());
-        return new DataResponse<>(reissueResponseDto);
+        ReissueResponse reissueResponse = authService.reissue(principal.getName());
+        return new DataResponse<>(reissueResponse);
     }
 }

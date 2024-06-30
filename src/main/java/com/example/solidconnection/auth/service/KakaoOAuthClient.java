@@ -10,8 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,10 +20,9 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_KAK
 import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
 import static com.example.solidconnection.custom.exception.ErrorCode.REDIRECT_URI_MISMATCH;
 
-@Service
-@Transactional
+@Component
 @RequiredArgsConstructor
-public class KakaoOAuthService {
+public class KakaoOAuthClient {
 
     private final RestTemplate restTemplate;
 
@@ -38,17 +36,20 @@ public class KakaoOAuthService {
     private String userInfoUrl;
 
     /*
-    * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인증 코드'를 받아, 서버에 넘겨준다.
-    * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 액세스 토큰'을 받아온다.
+    * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인가 코드'를 받아, 서버에 넘겨준다.
+    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
+    * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 토큰'을 받아온다.
+    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
     * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
+    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
     * */
     public KakaoUserInfoDto processOauth(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);
     }
 
+    // 카카오 토큰 요청
     private String getKakaoAccessToken(String code) {
-        // 카카오 엑세스 토큰 요청
         try {
             ResponseEntity<KakaoTokenDto> response = restTemplate.exchange(
                     buildTokenUri(code),
@@ -56,7 +57,7 @@ public class KakaoOAuthService {
                     null,
                     KakaoTokenDto.class
             );
-            return Objects.requireNonNull(response.getBody()).getAccessToken();
+            return Objects.requireNonNull(response.getBody()).accessToken();
         } catch (Exception e) {
             if (e.getMessage().contains("KOE303")) {
                 throw new CustomException(REDIRECT_URI_MISMATCH);
@@ -65,7 +66,7 @@ public class KakaoOAuthService {
         }
     }
 
-    // 카카오에게 엑세스 토큰 발급 요청하는 URI 생성
+    // 카카오 엑세스 토큰 요청하는 URI 생성
     private String buildTokenUri(String code) {
         return UriComponentsBuilder.fromHttpUrl(tokenUrl)
                 .queryParam("grant_type", "authorization_code")
@@ -75,17 +76,17 @@ public class KakaoOAuthService {
                 .toUriString();
     }
 
+    // 카카오 사용자 정보 요청
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
         // 카카오 엑세스 토큰을 헤더에 담은 HttpEntity
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        HttpEntity<?> entity = new HttpEntity<>(headers);
 
         // 사용자의 정보 요청
         ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(
                 userInfoUrl,
                 HttpMethod.GET,
-                entity,
+                new HttpEntity<>(headers),
                 KakaoUserInfoDto.class
         );
 

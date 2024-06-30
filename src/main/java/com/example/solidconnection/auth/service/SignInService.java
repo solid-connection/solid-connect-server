@@ -1,9 +1,9 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.auth.dto.SignInResponseDto;
-import com.example.solidconnection.auth.dto.kakao.FirstAccessResponseDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoCodeDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponseDto;
+import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
+import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
+import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
 import com.example.solidconnection.config.token.TokenService;
 import com.example.solidconnection.config.token.TokenType;
@@ -18,7 +18,7 @@ public class SignInService {
 
     private final TokenService tokenService;
     private final SiteUserRepository siteUserRepository;
-    private final KakaoOAuthService kakaoOAuthService;
+    private final KakaoOAuthClient kakaoOAuthClient;
 
     /*
     * 카카오에서 받아온 사용자 정보에 있는 이메일을 통해 기존 회원인지, 신규 회원인지 판별하고, 이에 따라 다르게 응답한다.
@@ -31,9 +31,9 @@ public class SignInService {
     * - 회원가입할 때 클라이언트는 이때 발급받은 kakaoOauthToken 를 요청에 포함해 요청한다.
     * */
     @Transactional(readOnly = true)
-    public KakaoOauthResponseDto signIn(KakaoCodeDto kakaoCodeDto) {
-        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthService.processOauth(kakaoCodeDto.getCode());
-        String email = kakaoUserInfoDto.getKakaoAccount().getEmail();
+    public KakaoOauthResponse signIn(KakaoCodeRequest kakaoCodeRequest) {
+        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.processOauth(kakaoCodeRequest.code());
+        String email = kakaoUserInfoDto.kakaoAccountDto().email();
         boolean isAlreadyRegistered = siteUserRepository.existsByEmail(email);
 
         if (isAlreadyRegistered) {
@@ -50,20 +50,16 @@ public class SignInService {
                 .setQuitedAt(null);
     }
 
-    private SignInResponseDto getSignInInfo(String email) {
+    private SignInResponse getSignInInfo(String email) {
         String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
         String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
         tokenService.saveToken(refreshToken, TokenType.REFRESH);
-        return SignInResponseDto.builder()
-                .registered(true)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new SignInResponse(true, accessToken, refreshToken);
     }
 
-    private FirstAccessResponseDto getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
+    private FirstAccessResponse getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
         String kakaoOauthToken = tokenService.generateToken(
-                kakaoUserInfoDto.getKakaoAccount().getEmail(), TokenType.KAKAO_OAUTH);
-        return FirstAccessResponseDto.of(kakaoUserInfoDto, kakaoOauthToken);
+                kakaoUserInfoDto.kakaoAccountDto().email(), TokenType.KAKAO_OAUTH);
+        return FirstAccessResponse.of(kakaoUserInfoDto, kakaoOauthToken);
     }
 }
