@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.client;
 
 import com.example.solidconnection.auth.dto.kakao.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
@@ -16,9 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_KAKAO_AUTH_CODE;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
 import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
-import static com.example.solidconnection.custom.exception.ErrorCode.REDIRECT_URI_MISMATCH;
+import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
 
 @Component
 @RequiredArgsConstructor
@@ -60,9 +60,12 @@ public class KakaoOAuthClient {
             return Objects.requireNonNull(response.getBody()).accessToken();
         } catch (Exception e) {
             if (e.getMessage().contains("KOE303")) {
-                throw new CustomException(REDIRECT_URI_MISMATCH);
+                throw new CustomException(KAKAO_REDIRECT_URI_MISMATCH);
             }
-            throw new CustomException(INVALID_KAKAO_AUTH_CODE);
+            if (e.getMessage().contains("KOE320")) {
+                throw new CustomException(INVALID_OR_EXPIRED_KAKAO_AUTH_CODE);
+            }
+            throw new CustomException(INVALID_OR_EXPIRED_KAKAO_AUTH_CODE);
         }
     }
 
@@ -78,7 +81,6 @@ public class KakaoOAuthClient {
 
     // 카카오 사용자 정보 요청
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
-        // 카카오 엑세스 토큰을 헤더에 담은 HttpEntity
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 

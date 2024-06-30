@@ -9,6 +9,13 @@ import static com.example.solidconnection.constants.Constants.MIN_DAYS_BETWEEN_N
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    // kakao
+    KAKAO_REDIRECT_URI_MISMATCH(HttpStatus.BAD_REQUEST.value(), "리다이렉트 uri가 잘못되었습니다."),
+    INVALID_OR_EXPIRED_KAKAO_AUTH_CODE(HttpStatus.BAD_REQUEST.value(),"사용할 수 없는 카카오 인증 코드입니다. 카카오 인증 코드는 일회용이며, 인증 만료 시간은 10분입니다."),
+    KAKAO_ACCESS_TOKEN_FAIL(HttpStatus.UNAUTHORIZED.value(),"카카오 엑세스 토큰 발급에 실패했습니다"),
+    KAKAO_USER_INFO_FAIL(HttpStatus.BAD_REQUEST.value(),"카카오 사용자 정보 조회에 실패했습니다."),
+    INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN(HttpStatus.BAD_REQUEST.value(), "우리 서비스에서 발급한 카카오 토큰이 아닙니다"),
+
     INVALID_TEST_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않은 어학 시험 종류입니다."),
     APPLICATION_NOT_APPROVED(HttpStatus.BAD_REQUEST.value(), "성적표가 인증되지 않았습니다."),
     APPLY_UPDATE_LIMIT_EXCEED(HttpStatus.BAD_REQUEST.value(), "지원 정보 수정은 3회까지만 가능합니다."),
@@ -18,7 +25,6 @@ public enum ErrorCode {
     CAN_NOT_CHANGE_NICKNAME_YET(HttpStatus.BAD_REQUEST.value(), "마지막 닉네임 변경으로부터 "+MIN_DAYS_BETWEEN_NICKNAME_CHANGES+"일이 지나지 않았습니다."),
     UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 대학교 지원 정보입니다."),
     UNIVERSITY_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 대학교입니다."),
-    REDIRECT_URI_MISMATCH(HttpStatus.BAD_REQUEST.value(), "리다이렉트 uri가 잘못되었습니다."),
     NOT_DEFINED_ERROR(HttpStatus.BAD_REQUEST.value(), "에러가 발생했습니다."),
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),
     S3_CLIENT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 클라이언트 에러 발생"),
@@ -35,10 +41,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "토큰이 필요한 경로에 빈 토큰으로 요청했습니다."),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED.value(), "인증이 필요한 접근입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원 정보를 찾을 수 없습니다."),
-    INVALID_KAKAO_AUTH_CODE(HttpStatus.BAD_REQUEST.value(),"사용할 수 없는 카카오 인증 코드입니다. 카카오 인증 코드는 일회용이며, 인증 만료 시간은 10분입니다."),
-    KAKAO_USER_INFO_FAIL(HttpStatus.BAD_REQUEST.value(),"카카오 사용자 정보 조회에 실패했습니다."),
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(),"액세스 토큰이 만료되었습니다. 재발급 api를 호출해주세요."),
-    INVALID_KAKAO_TOKEN(HttpStatus.UNAUTHORIZED.value(),"사용할 수 없는 카카오 로그인 토큰입니다."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(),"리프레시 토큰이 만료되었습니다. 다시 로그인을 진행해주세요."),
     ;
 
