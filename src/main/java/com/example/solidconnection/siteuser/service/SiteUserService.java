@@ -13,8 +13,8 @@ import java.util.List;
 public class SiteUserService {
     private final SiteUserRepository siteUserRepository;
 
-    public void deleteUsersNeverVisitedAfterQuited() {
-        LocalDate cutoffDate = LocalDate.now().minusDays(30);
+    public void deleteUsersNeverVisitedAfterQuited(int days) {
+        LocalDate cutoffDate = LocalDate.now().minusDays(days);
         List<SiteUser> usersToRemove = siteUserRepository.findUsersToBeRemoved(cutoffDate);
         siteUserRepository.deleteAll(usersToRemove);
     }

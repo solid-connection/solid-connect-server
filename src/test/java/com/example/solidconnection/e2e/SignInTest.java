@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
+
+import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
@@ -62,39 +65,13 @@ class SignInTest extends BaseEndToEndTest {
     }
 
     @Test
-    void 기존_회원이_카카오로_로그인한다() {
-        String kakaoCode = "kakaoCode";
-        String email = "email@email.com";
-        siteUserRepository.save(createSiteUserFixture(email));
-        given(kakaoOAuthClient.processOauth(kakaoCode))
-                .willReturn(createKakaoUserInfoDto(email));
-        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
-
-        SignInResponse response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(kakaoCodeRequest)
-                .when().post("/auth/kakao")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().as(new TypeRef<DataResponse<SignInResponse>>() {})
-                .getData();
-
-        assertAll(
-                "리프레스 토큰, 엑세스 토큰을 응답한다.",
-                () -> assertThat(response.isRegistered()).isTrue(),
-                () -> assertThat(response.accessToken()).isNotNull(),
-                () -> assertThat(response.refreshToken()).isNotNull()
-        );
-    }
-
-    @Test
     void 신규_회원이_카카오로_로그인한다() {
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
         given(kakaoOAuthClient.processOauth(kakaoCode))
                 .willReturn(createKakaoUserInfoDto(email));
-        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
 
+        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
         FirstAccessResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(kakaoCodeRequest)
@@ -111,6 +88,62 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.nickname()).isNotNull(),
                 () -> assertThat(response.profileImageUrl()).isNotNull(),
                 () -> assertThat(response.kakaoOauthToken()).isNotNull()
+        );
+    }
+
+    @Test
+    void 기존_회원이_카카오로_로그인한다() {
+        String kakaoCode = "kakaoCode";
+        String email = "email@email.com";
+        siteUserRepository.save(createSiteUserFixture(email));
+        given(kakaoOAuthClient.processOauth(kakaoCode))
+                .willReturn(createKakaoUserInfoDto(email));
+
+        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
+        SignInResponse response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(kakaoCodeRequest)
+                .when().post("/auth/kakao")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(new TypeRef<DataResponse<SignInResponse>>() {})
+                .getData();
+
+        assertAll(
+                "리프레스 토큰과 엑세스 토큰을 응답한다.",
+                () -> assertThat(response.isRegistered()).isTrue(),
+                () -> assertThat(response.accessToken()).isNotNull(),
+                () -> assertThat(response.refreshToken()).isNotNull()
+        );
+    }
+
+    @Test
+    void 탈퇴한_회원이_계정_복구_기간_안에_다시_로그인하면_탈퇴가_무효화된다() {
+        String kakaoCode = "kakaoCode";
+        String email = "email@email.com";
+        SiteUser siteUserFixture = createSiteUserFixture(email);
+        LocalDate justBeforeRemoval = LocalDate.now().minusDays(ACCOUNT_RECOVER_DURATION - 1);
+        siteUserFixture.setQuitedAt(justBeforeRemoval);
+        siteUserRepository.save(siteUserFixture);
+        given(kakaoOAuthClient.processOauth(kakaoCode))
+                .willReturn(createKakaoUserInfoDto(email));
+
+        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
+        SignInResponse response = RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(kakaoCodeRequest)
+                .when().post("/auth/kakao")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(new TypeRef<DataResponse<SignInResponse>>() {})
+                .getData();
+
+        assertAll(
+                "리프레스 토큰와 엑세스 토큰을 응답하고, 탈퇴 날짜를 초기화한다.",
+                () -> assertThat(response.isRegistered()).isTrue(),
+                () -> assertThat(response.accessToken()).isNotNull(),
+                () -> assertThat(response.refreshToken()).isNotNull(),
+                () -> assertThat(siteUserRepository.getByEmail(email).getQuitedAt()).isNull()
         );
     }
 }
