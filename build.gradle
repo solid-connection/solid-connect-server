@@ -21,7 +21,7 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
+dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.mysql:mysql-connector-j:8.2.0'
@@ -40,6 +40,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'io.rest-assured:rest-assured:5.4.0'
 
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor(
