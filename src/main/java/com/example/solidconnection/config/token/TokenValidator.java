@@ -31,14 +31,14 @@ public class TokenValidator {
 
     private void validateRefreshToken(String token) {
         String email = getClaim(token).getSubject();
-        if (redisTemplate.opsForValue().get(TokenType.REFRESH.getPrefix() + email) == null) {
+        if (redisTemplate.opsForValue().get(TokenType.REFRESH.createTokenKey(email)) == null) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
     }
 
     private void validateNotSignOut(String token) {
         String email = getClaim(token).getSubject();
-        if ("signOut".equals(redisTemplate.opsForValue().get(TokenType.REFRESH.getPrefix() + email))) {
+        if ("signOut".equals(redisTemplate.opsForValue().get(TokenType.REFRESH.createTokenKey(email)))) {
             throw new CustomException(USER_ALREADY_SIGN_OUT);
         }
     }
@@ -51,7 +51,7 @@ public class TokenValidator {
 
     private void validateKakaoTokenNotUsed(String token) {
         String email = getClaim(token).getSubject();
-        if (Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.getPrefix() + email), token)) {
+        if (Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.createTokenKey(email)), token)) {
             throw new CustomException(INVALID_KAKAO_TOKEN);
         }
     }

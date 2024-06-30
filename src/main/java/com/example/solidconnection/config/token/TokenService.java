@@ -41,7 +41,7 @@ public class TokenService {
 
     public void saveToken(String token, TokenType tokenType) {
         redisTemplate.opsForValue().set(
-                tokenType.getPrefix() + getClaim(token).getSubject(),
+                tokenType.createTokenKey(getClaim(token).getSubject()),
                 token,
                 tokenType.getExpireTime(),
                 TimeUnit.MILLISECONDS

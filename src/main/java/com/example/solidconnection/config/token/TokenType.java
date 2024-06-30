@@ -15,4 +15,8 @@ public enum TokenType {
         this.prefix = prefix;
         this.expireTime = expireTime;
     }
+
+    public String createTokenKey(String subject) {
+        return prefix + subject;
+    }
 }

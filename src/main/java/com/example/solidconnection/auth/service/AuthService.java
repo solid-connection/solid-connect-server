@@ -29,7 +29,7 @@ public class AuthService {
 
     public boolean signOut(String email){
         redisTemplate.opsForValue().set(
-                TokenType.REFRESH.getPrefix() + email,
+                TokenType.REFRESH.createTokenKey(email),
                 "signOut",
                 TokenType.REFRESH.getExpireTime(),
                 TimeUnit.MILLISECONDS
@@ -45,7 +45,7 @@ public class AuthService {
 
     public ReissueResponse reissue(String email) {
         // 리프레시 토큰 만료 확인
-        String refreshTokenKey= TokenType.REFRESH.getPrefix() + email;
+        String refreshTokenKey= TokenType.REFRESH.createTokenKey(email);
         String refreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
         if (ObjectUtils.isEmpty(refreshToken)) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
