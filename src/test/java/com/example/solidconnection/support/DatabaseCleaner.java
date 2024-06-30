@@ -2,15 +2,21 @@ package com.example.solidconnection.support;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @ActiveProfiles("test")
 @Component
 public class DatabaseCleaner {
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @PersistenceContext
     private EntityManager em;
@@ -19,6 +25,10 @@ public class DatabaseCleaner {
     public void clear() {
         em.clear();
         truncate();
+        Objects.requireNonNull(redisTemplate.getConnectionFactory())
+                .getConnection()
+                .serverCommands()
+                .flushDb();
     }
 
     private void truncate() {

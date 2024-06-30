@@ -4,6 +4,7 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto.KakaoAccountDto.KakaoProfileDto;
 import com.example.solidconnection.auth.service.KakaoOAuthClient;
 import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.custom.response.DataResponse;
@@ -15,9 +16,11 @@ import com.example.solidconnection.type.Role;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
@@ -27,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
+@DisplayName("카카오 로그인 테스트")
 class SignInTest extends BaseEndToEndTest {
 
     @Autowired
@@ -34,6 +38,9 @@ class SignInTest extends BaseEndToEndTest {
 
     @Autowired
     SiteUserRepository siteUserRepository;
+
+    @Autowired
+    RedisTemplate<String, String> redisTemplate;
 
     @MockBean
     KakaoOAuthClient kakaoOAuthClient;
@@ -55,7 +62,7 @@ class SignInTest extends BaseEndToEndTest {
     private KakaoUserInfoDto createKakaoUserInfoDto(String email) {
         return new KakaoUserInfoDto(
                 new KakaoUserInfoDto.KakaoAccountDto(
-                        new KakaoUserInfoDto.KakaoAccountDto.KakaoProfileDto(
+                        new KakaoProfileDto(
                                 "nickname",
                                 "profileImageUrl"
                         ),
@@ -68,8 +75,9 @@ class SignInTest extends BaseEndToEndTest {
     void 신규_회원이_카카오로_로그인한다() {
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
+        KakaoUserInfoDto kakaoUserInfoDto = createKakaoUserInfoDto(email);
         given(kakaoOAuthClient.processOauth(kakaoCode))
-                .willReturn(createKakaoUserInfoDto(email));
+                .willReturn(kakaoUserInfoDto);
 
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
         FirstAccessResponse response = RestAssured.given().log().all()
@@ -81,12 +89,13 @@ class SignInTest extends BaseEndToEndTest {
                 .extract().as(new TypeRef<DataResponse<FirstAccessResponse>>() {})
                 .getData();
 
+        KakaoProfileDto kakaoProfileDto = kakaoUserInfoDto.kakaoAccountDto().profile();
         assertAll(
                 "카카오톡 사용자 정보를 응답한다.",
                 () -> assertThat(response.isRegistered()).isFalse(),
                 () -> assertThat(response.email()).isEqualTo(email),
-                () -> assertThat(response.nickname()).isNotNull(),
-                () -> assertThat(response.profileImageUrl()).isNotNull(),
+                () -> assertThat(response.nickname()).isEqualTo(kakaoProfileDto.nickname()),
+                () -> assertThat(response.profileImageUrl()).isEqualTo(kakaoProfileDto.profileImageUrl()),
                 () -> assertThat(response.kakaoOauthToken()).isNotNull()
         );
     }
@@ -139,7 +148,7 @@ class SignInTest extends BaseEndToEndTest {
                 .getData();
 
         assertAll(
-                "리프레스 토큰와 엑세스 토큰을 응답하고, 탈퇴 날짜를 초기화한다.",
+                "리프레스 토큰과 엑세스 토큰을 응답하고, 탈퇴 날짜를 초기화한다.",
                 () -> assertThat(response.isRegistered()).isTrue(),
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull(),
