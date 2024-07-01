@@ -12,16 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class InterestedCountry {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 연관 관계
     @ManyToOne
-    @JoinColumn(name = "site_user_id")
     private SiteUser siteUser;
 
     @ManyToOne
-    @JoinColumn(name = "country_code")
     private Country country;
 }

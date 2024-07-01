@@ -1,15 +1,21 @@
 package com.example.solidconnection.entity;
 
-import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -34,15 +40,15 @@ public class SiteUser {
     @Column(nullable = false, length = 20)
     private String birth;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PreparationStatus preparationStage;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -52,21 +58,14 @@ public class SiteUser {
     @Setter
     private LocalDate quitedAt;
 
-    // 연관관계
-    @OneToMany(mappedBy = "siteUser")
-    private Set<InterestedRegion> interestedRegions;
-
-    @OneToMany(mappedBy = "siteUser")
-    private Set<InterestedCountry> interestedCountries;
-
-    @OneToMany(mappedBy = "siteUser")
-    private Set<Application> applications;
-
     public SiteUser(
-            String email, String nickname, String profileImageUrl,
-            String birth, PreparationStatus preparationStage, Role role,
-            Gender gender, Set<InterestedRegion> interestedRegions,
-            Set<InterestedCountry> interestedCountries) {
+            String email,
+            String nickname,
+            String profileImageUrl,
+            String birth,
+            PreparationStatus preparationStage,
+            Role role,
+            Gender gender) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -74,7 +73,5 @@ public class SiteUser {
         this.preparationStage = preparationStage;
         this.role = role;
         this.gender = gender;
-        this.interestedRegions = interestedRegions;
-        this.interestedCountries = interestedCountries;
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 @Entity
 @Getter
 public class University {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,12 +38,9 @@ public class University {
     @Column(length = 1000)
     private String detailsForLocal;
 
-    // 연관 관계
     @ManyToOne
-    @JoinColumn(name = "country_code")
     private Country country;
 
     @ManyToOne
-    @JoinColumn(name = "region_code")
     private Region region;
 }

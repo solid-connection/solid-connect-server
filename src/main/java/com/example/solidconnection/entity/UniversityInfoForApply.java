@@ -10,34 +10,35 @@ import java.util.Set;
 @Entity
 @Getter
 public class UniversityInfoForApply {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 10)
+    @Column(length = 50, nullable = false)
     private String term;
 
-    @Column(nullable = false)
+    @Column
     private Integer studentCapacity;
 
-    @Column(nullable = false, length = 50)
+    @Column
     @Enumerated(EnumType.STRING)
     private TuitionFeeType tuitionFeeType;
 
-    @Column(nullable = false, length = 50)
+    @Column
     @Enumerated(EnumType.STRING)
     private SemesterAvailableForDispatch semesterAvailableForDispatch;
 
-    @Column(length = 10)
+    @Column(length = 100)
     private String semesterRequirement;
 
     @Column(length = 1000)
     private String detailsForLanguage;
 
-    @Column(length = 20)
+    @Column(length = 100)
     private String gpaRequirement;
 
-    @Column(length = 20)
+    @Column(length = 100)
     private String gpaRequirementCriteria;
 
     @Column(length = 1000)
@@ -55,11 +56,9 @@ public class UniversityInfoForApply {
     @Column(length = 500)
     private String details;
 
-    // 연관 관계
     @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.LAZY)
     private Set<LanguageRequirement> languageRequirements;
 
     @OneToOne
-    @JoinColumn(name = "university_id")
     private University university;
 }

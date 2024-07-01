@@ -1,14 +1,18 @@
 package com.example.solidconnection.type;
 
 import com.example.solidconnection.custom.exception.CustomException;
+import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COUNTRY_NAME;
 
+@Getter
 public enum CountryCode {
     BN("브루나이"),
     SG("싱가포르"),
@@ -42,31 +46,33 @@ public enum CountryCode {
     TH("태국"),
     UZ("우즈베키스탄");
 
+    private static final Map<String, CountryCode> CACHE = new HashMap<>();
+
     private final String koreanName;
+
+    static {
+        for (CountryCode countryCode : CountryCode.values()) {
+            CACHE.put(countryCode.getKoreanName(), countryCode);
+        }
+    }
 
     CountryCode(String koreanName) {
         this.koreanName = koreanName;
     }
 
     public static CountryCode getCountryCodeByKoreanName(String koreanName) {
-        Optional<CountryCode> matchingCountryCode = Arrays.stream(CountryCode.values())
-                .filter(countryCode -> countryCode.getKoreanName().equals(koreanName))
-                .findFirst();
-        return matchingCountryCode.orElseThrow(() -> new CustomException(INVALID_COUNTRY_NAME, koreanName));
+        return Optional.ofNullable(CACHE.get(koreanName))
+                .orElseThrow(() -> new CustomException(INVALID_COUNTRY_NAME));
     }
 
     public static List<CountryCode> getCountryCodeMatchesToKeyword(List<String> keywords) {
         List<CountryCode> matchedCountryCodes = new LinkedList<>();
-        keywords.forEach( keyword -> {
+        keywords.forEach(keyword -> {
             List<CountryCode> countryCodes = Arrays.stream(CountryCode.values())
                     .filter(country -> country.koreanName.contains(keyword))
                     .toList();
             matchedCountryCodes.addAll(countryCodes);
         });
         return matchedCountryCodes;
-    }
-
-    public String getKoreanName() {
-        return koreanName;
     }
 }

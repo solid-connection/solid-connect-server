@@ -1,32 +1,36 @@
 package com.example.solidconnection.type;
 
 import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.custom.exception.ErrorCode;
+import lombok.Getter;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_REGION_NAME;
-
+@Getter
 public enum RegionCode {
     ASIA("아시아권"),
     AMERICAS("미주권"),
     CHINA("중국권"),
     EUROPE("유럽권");
 
+    private static final Map<String, RegionCode> CACHE = new HashMap<>();
+
     private final String koreanName;
+
+    static {
+        for (RegionCode region : RegionCode.values()) {
+            CACHE.put(region.getKoreanName(), region);
+        }
+    }
 
     RegionCode(String koreanName) {
         this.koreanName = koreanName;
     }
 
     public static RegionCode getRegionCodeByKoreanName(String koreanName) {
-        Optional<RegionCode> matchingRegionCode = Arrays.stream(RegionCode.values())
-                .filter(regionCode -> regionCode.getKoreanName().equals(koreanName))
-                .findFirst();
-        return matchingRegionCode.orElseThrow(() -> new CustomException(INVALID_REGION_NAME, koreanName));
-    }
-
-    public String getKoreanName() {
-        return koreanName;
+        return Optional.ofNullable(CACHE.get(koreanName))
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_REGION_NAME));
     }
 }
