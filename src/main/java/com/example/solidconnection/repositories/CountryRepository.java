@@ -1,13 +1,24 @@
 package com.example.solidconnection.repositories;
 
 import com.example.solidconnection.entity.Country;
-import com.example.solidconnection.type.CountryCode;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Long> {
-    Optional<Country> findByCode(CountryCode countryCode);
+
+    Optional<Country> findByKoreanName(String koreanName);
+
+/*    default Country getByKoreanName(String koreanName) {
+        return findByKoreanName(koreanName)
+                .orElseThrow(() -> new CustomException(COUNTRY_NOT_FOUND_BY_KOREAN_NAME));
+    }*/
+
+    @Query("SELECT c FROM Country c WHERE c.koreanName IN :names")
+    List<Country> findByKoreanNames(@Param(value = "names") List<String> names);
 }

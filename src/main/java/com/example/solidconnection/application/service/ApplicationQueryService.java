@@ -40,6 +40,10 @@ public class ApplicationQueryService {
     private final SiteUserRepository siteUserRepository;
     private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
 
+    /*
+    * 지원자들의 성적을 조회한다.
+    * - 지역과 키워드를 통해 필터링한다.
+    * */
     public ApplicationsDto getApplicants(String email, String region, String keyword) {
         // 유저 검증
         SiteUser siteUser = siteUserRepository.getByEmail(email);
@@ -48,12 +52,9 @@ public class ApplicationQueryService {
         // 승인되었는지 확인
         validateApproved(application);
 
-        RegionCode regionCode = null;
-        if (region != null && !region.isBlank()) {
-            regionCode = RegionCode.getRegionCodeByKoreanName(region);
-        }
+        RegionCode regionCode = RegionCode.getRegionCodeByKoreanName(region);
         List<CountryCode> countryCodes = null;
-        if (keyword != null && !keyword.isBlank()) {
+        if (!keyword.isBlank()) {
             countryCodes = CountryCode.getCountryCodeMatchesToKeyword(List.of(keyword));
         }
 
@@ -84,8 +85,8 @@ public class ApplicationQueryService {
                     return UniversityApplicantsDto.builder()
                             .koreanName(university.getKoreanName())
                             .studentCapacity(universityInfoForApply.getStudentCapacity())
-                            .region(university.getRegion().getCode().getKoreanName())
-                            .country(university.getCountry().getCode().getKoreanName())
+                            .region(university.getRegion().getKoreanName())
+                            .country(university.getCountry().getKoreanName())
                             .applicants(firstChoiceApplicant)
                             .build();
                 })
@@ -104,14 +105,17 @@ public class ApplicationQueryService {
                     return UniversityApplicantsDto.builder()
                             .koreanName(university.getKoreanName())
                             .studentCapacity(universityInfoForApply.getStudentCapacity())
-                            .region(university.getRegion().getCode().getKoreanName())
-                            .country(university.getCountry().getCode().getKoreanName())
+                            .region(university.getRegion().getKoreanName())
+                            .country(university.getCountry().getKoreanName())
                             .applicants(secondChoiceApplicant)
                             .build();
                 })
                 .toList();
     }
 
+    /*
+     * 지원 상태를 조회한다.
+     * */
     public VerifyStatusDto getVerifyStatus(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Optional<Application> application = applicationRepository.findBySiteUser_Email(siteUser.getEmail());

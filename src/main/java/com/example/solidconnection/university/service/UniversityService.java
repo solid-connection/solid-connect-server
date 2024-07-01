@@ -50,13 +50,13 @@ public class UniversityService {
 
     public List<RecommendedUniversityDto> getPersonalRecommends(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        List<CountryCode> interestedCountries = interestedCountyRepository.findAllBySiteUser(siteUser)
+        List<String> interestedCountryCodes = interestedCountyRepository.findAllBySiteUser(siteUser)
                 .stream().map(interestedCountry -> interestedCountry.getCountry().getCode())
                 .toList();
-        List<RegionCode> interestedRegions = interestedRegionRepository.findAllBySiteUser(siteUser)
+        List<String> interestedRegionCodes = interestedRegionRepository.findAllBySiteUser(siteUser)
                 .stream().map(interestedRegion -> interestedRegion.getRegion().getCode())
                 .toList();
-        List<UniversityInfoForApply> recommendedUniversities = new java.util.ArrayList<>(universityRepository.findByCountryCodeInOrRegionCodeIn(interestedCountries, interestedRegions)
+        List<UniversityInfoForApply> recommendedUniversities = new java.util.ArrayList<>(universityRepository.findByCountryCodeInOrRegionCodeIn(interestedCountryCodes, interestedRegionCodes)
                 .stream()
                 .map(universityValidator::getValidatedUniversityInfoForApplyByUniversityAndTermNoException)
                 .filter(Objects::nonNull)
@@ -98,10 +98,10 @@ public class UniversityService {
         String countryKoreanName = null;
         String regionKoreanName = null;
         if (university.getCountry() != null) {
-            countryKoreanName = university.getCountry().getCode().getKoreanName();
+            countryKoreanName = university.getCountry().getKoreanName();
         }
         if (university.getCountry() != null) {
-            regionKoreanName = university.getRegion().getCode().getKoreanName();
+            regionKoreanName = university.getRegion().getKoreanName();
         }
 
         return UniversityDetailDto.builder()
