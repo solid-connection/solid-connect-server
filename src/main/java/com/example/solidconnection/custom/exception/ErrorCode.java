@@ -16,6 +16,13 @@ public enum ErrorCode {
     KAKAO_USER_INFO_FAIL(HttpStatus.BAD_REQUEST.value(),"카카오 사용자 정보 조회에 실패했습니다."),
     INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN(HttpStatus.BAD_REQUEST.value(), "우리 서비스에서 발급한 카카오 토큰이 아닙니다"),
 
+    // data not found by id
+    UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원 정보를 찾을 수 없습니다."),
+    UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교입니다."),
+    REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
+    COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
+
     INVALID_TEST_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않은 어학 시험 종류입니다."),
     APPLICATION_NOT_APPROVED(HttpStatus.BAD_REQUEST.value(), "성적표가 인증되지 않았습니다."),
     APPLY_UPDATE_LIMIT_EXCEED(HttpStatus.BAD_REQUEST.value(), "지원 정보 수정은 3회까지만 가능합니다."),
@@ -23,8 +30,6 @@ public enum ErrorCode {
     APPLICATION_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "성적을 입력하지 않았습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "값을 입력할 수 없습니다."),
     CAN_NOT_CHANGE_NICKNAME_YET(HttpStatus.BAD_REQUEST.value(), "마지막 닉네임 변경으로부터 "+MIN_DAYS_BETWEEN_NICKNAME_CHANGES+"일이 지나지 않았습니다."),
-    UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 대학교 지원 정보입니다."),
-    UNIVERSITY_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 대학교입니다."),
     NOT_DEFINED_ERROR(HttpStatus.BAD_REQUEST.value(), "에러가 발생했습니다."),
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),
     S3_CLIENT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 클라이언트 에러 발생"),
@@ -40,7 +45,6 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTED(HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "토큰이 필요한 경로에 빈 토큰으로 요청했습니다."),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED.value(), "인증이 필요한 접근입니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원 정보를 찾을 수 없습니다."),
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(),"액세스 토큰이 만료되었습니다. 재발급 api를 호출해주세요."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(),"리프레시 토큰이 만료되었습니다. 다시 로그인을 진행해주세요."),
     ;

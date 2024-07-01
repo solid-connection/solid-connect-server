@@ -6,26 +6,23 @@ import com.example.solidconnection.config.token.TokenService;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.config.token.TokenValidator;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
-import com.example.solidconnection.entity.Region;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.repositories.CountryRepository;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.CountryCode;
-import com.example.solidconnection.type.RegionCode;
+import com.example.solidconnection.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BIRTH_FORMAT;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
@@ -43,19 +40,29 @@ public class SignUpService {
     private final CountryRepository countryRepository;
     private final InterestedCountyRepository interestedCountyRepository;
 
+    /*
+    * 회원가입을 한다.
+    * - 카카오로 최초 로그인 시 우리 서비스에서 발급한 카카오 토큰을 검증한다.
+    *   - 이는 '카카오 인증을 하지 않고 회원가입 api 만으로 회원가입 하는 상황'을 방지하기 위함이다.
+    *   - 만약 api 만으로 회원가입을 한다면, 이메일에 대한 검증 없이 회원가입이 가능해진다.
+    *   - 이메일은 우리 서비스에서 사용자를 식별하는 중요한 정보이기 때문에 '우리 서비스에서 발급한 카카오 토큰 검증'단계가 필요하다.
+    * - 관심 국가와 지역을 DB에 저장한다.
+    *   - 관심 국가와 지역은 site_user_id를 참조하므로, 사용자 저장 후 저장한다.
+    * */
+    @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         tokenValidator.validateKakaoToken(signUpRequest.kakaoOauthToken());
-        validateUserNotDuplicated(signUpRequest);
+        String email = tokenService.getEmail(signUpRequest.kakaoOauthToken());
+        validateUserNotDuplicated(email);
         validateNicknameDuplicated(signUpRequest.nickname());
-        validateBirthFormat(signUpRequest.birth());
+        // validateBirthFormat(signUpRequest.birth());
 
-        SiteUser siteUser = makeSiteUserEntity(signUpRequest);
+        SiteUser siteUser = signUpRequest.toSiteUser(email, Role.MENTEE);
         SiteUser savedSiteUser = siteUserRepository.save(siteUser);
 
         saveInterestedRegion(signUpRequest, savedSiteUser);
         saveInterestedCountry(signUpRequest, savedSiteUser);
 
-        String email = savedSiteUser.getEmail();
         String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
         String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
         tokenService.saveToken(refreshToken, TokenType.REFRESH);
@@ -63,8 +70,7 @@ public class SignUpService {
         return new SignUpResponse(accessToken, refreshToken);
     }
 
-    private void validateUserNotDuplicated(SignUpRequest signUpRequest){
-        String email = tokenService.getEmail(signUpRequest.kakaoOauthToken());
+    private void validateUserNotDuplicated(String email){
         if(siteUserRepository.existsByEmail(email)){
             throw new CustomException(USER_ALREADY_EXISTED);
         }
@@ -85,48 +91,19 @@ public class SignUpService {
         }
     }
 
-    private SiteUser makeSiteUserEntity(SignUpRequest signUpRequest) {
-        signUpRequest.interestedCountries();
-
-        return /*new SiteUser(
-                tokenService.getEmail(signUpRequestDto.getKakaoOauthToken()),
-                signUpRequestDto.getNickname(),
-                signUpRequestDto.getProfileImageUrl(),
-                signUpRequestDto.getBirth(),
-                signUpRequestDto.getPreparationStatus(),
-                Role.MENTEE,
-                signUpRequestDto.getGender(),
-                null,
-                null);*/ null;
+    private void saveInterestedRegion(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
+        List<String> interestedRegionNames = signUpRequest.interestedRegions();
+        List<InterestedRegion> interestedRegions = regionRepository.findByKoreanNames(interestedRegionNames).stream()
+                .map(region -> new InterestedRegion(savedSiteUser, region))
+                .toList();
+        interestedRegionRepository.saveAll(interestedRegions);
     }
 
     private void saveInterestedCountry(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
-        List<InterestedCountry> interestedCountries = signUpRequest.interestedCountries().stream()
-                .map(CountryCode::getCountryCodeByKoreanName)
-                .map(countryCode -> {
-                    Country country = countryRepository.findByCode(countryCode)
-                            .orElseThrow(() -> new RuntimeException("Country Code enum이랑 table이랑 다름 : " + countryCode.name()));
-                    return InterestedCountry.builder()
-                            .siteUser(savedSiteUser)
-                            .country(country)
-                            .build();
-                })
-                .collect(Collectors.toList());
+        List<String> interestedCountryNames = signUpRequest.interestedCountries();
+        List<InterestedCountry> interestedCountries = countryRepository.findByKoreanNames(interestedCountryNames).stream()
+                .map(country -> new InterestedCountry(savedSiteUser, country))
+                .toList();
         interestedCountyRepository.saveAll(interestedCountries);
-    }
-
-    private void saveInterestedRegion(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
-        List<InterestedRegion> interestedRegions = signUpRequest.interestedRegions().stream()
-                .map(RegionCode::getRegionCodeByKoreanName)
-                .map(regionCode -> {
-                    Region region = regionRepository.findByCode(regionCode)
-                            .orElseThrow(() -> new RuntimeException("Region Code enum이랑 table이랑 다름 : " + regionCode.name()));
-                    return InterestedRegion.builder()
-                            .siteUser(savedSiteUser)
-                            .region(region)
-                            .build();
-                })
-                .collect(Collectors.toList());
-        interestedRegionRepository.saveAll(interestedRegions);
     }
 }

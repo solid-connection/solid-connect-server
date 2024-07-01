@@ -1,16 +1,14 @@
 package com.example.solidconnection.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
+@Entity
 public class InterestedRegion {
 
     @Id
@@ -22,4 +20,12 @@ public class InterestedRegion {
 
     @ManyToOne
     private Region region;
+
+    public InterestedRegion(SiteUser siteUser, Region region) {
+        this.siteUser = siteUser;
+        this.region = region;
+    }
+
+    protected InterestedRegion() {
+    }
 }

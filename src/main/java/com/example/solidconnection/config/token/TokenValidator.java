@@ -51,7 +51,7 @@ public class TokenValidator {
 
     private void validateKakaoTokenNotUsed(String token) {
         String email = getClaim(token).getSubject();
-        if (Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.createTokenKey(email)), token)) {
+        if (!Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.createTokenKey(email)), token)) {
             throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
         }
     }
