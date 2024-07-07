@@ -1,12 +1,12 @@
 package com.example.solidconnection.application.service;
 
-import com.example.solidconnection.application.dto.ApplicantDto;
-import com.example.solidconnection.application.dto.ApplicationsDto;
-import com.example.solidconnection.application.dto.UniversityApplicantsDto;
+import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.dto.ApplicantResponse;
+import com.example.solidconnection.application.dto.ApplicationsResponse;
+import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.dto.VerifyStatusDto;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.entity.SiteUser;
 import com.example.solidconnection.entity.University;
 import com.example.solidconnection.entity.UniversityInfoForApply;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.example.solidconnection.constants.Constants.TERM;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
@@ -41,80 +42,72 @@ public class ApplicationQueryService {
     private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
 
     /*
-    * 지원자들의 성적을 조회한다.
-    * - 지역과 키워드를 통해 필터링한다.
-    * */
-    public ApplicationsDto getApplicants(String email, String region, String keyword) {
-        // 유저 검증
+     * 다른 지원자들의 성적을 조회한다.
+     * - 유저가 다른 지원자들을 볼 수 있는지 검증한다.
+     * - 지역과 키워드를 통해 대학을 필터링한다.
+     * - 대학에 따른 '지원을 위한 대학 정보(university for apply)'를 조회하고, 그 대학에 지원한 다른 지원자들의 정보를 조회한다.
+     * */
+    public ApplicationsResponse getApplicants(String email, String region, String keyword) {
+        // 유저가 다른 지원자들을 볼 수 있는지 검증
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        // 지원했는지 검증
-        Application application = applicationRepository.getBySiteUser_Email(email);
-        // 승인되었는지 확인
-        validateApproved(application);
+        validateSiteUserCanViewApplicants(siteUser);
 
+        // 한국어 키워드를 통해 국가를 조회
         RegionCode regionCode = RegionCode.getRegionCodeByKoreanName(region);
         List<CountryCode> countryCodes = null;
         if (!keyword.isBlank()) {
             countryCodes = CountryCode.getCountryCodeMatchesToKeyword(List.of(keyword));
         }
 
+        // 국가와 키워드와 지역을 통해 대학 정보를 판별
         List<University> universities = universityRepositoryForFilter.findByRegionAndCountryAndKeyword(regionCode, countryCodes, List.of(keyword));
-        List<UniversityApplicantsDto> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser);
-        List<UniversityApplicantsDto> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser);
-        return ApplicationsDto.builder()
+
+        // 1지망, 2지망 지원자들을 조회
+        List<UniversityApplicantsResponse> firstChoiceApplicants = getApplicantsByChoice(
+                universities,
+                siteUser,
+                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+        );
+        List<UniversityApplicantsResponse> secondChoiceApplicants = getApplicantsByChoice(
+                universities,
+                siteUser,
+                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+        );
+
+        return ApplicationsResponse.builder()
                 .firstChoice(firstChoiceApplicants)
                 .secondChoice(secondChoiceApplicants)
                 .build();
     }
 
-    private void validateApproved(Application application) {
-        if (application.getVerifyStatus() != VerifyStatus.APPROVED) {
+    private void validateSiteUserCanViewApplicants(SiteUser siteUser) {
+        VerifyStatus verifyStatus = applicationRepository.getBySiteUser(siteUser).getVerifyStatus();
+        if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);
         }
     }
 
-    private List<UniversityApplicantsDto> getFirstChoiceApplicants(List<University> universities, SiteUser siteUser) {
-        return universities.stream()
-                .filter(university -> universityInfoForApplyRepository.existsByUniversityAndTerm(university, TERM))
-                .map(university -> {
-                    UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyByUniversityAndTerm(university);
-                    List<Application> firstChoiceApplication = applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatus(universityInfoForApply, VerifyStatus.APPROVED);
-                    List<ApplicantDto> firstChoiceApplicant = firstChoiceApplication.stream()
-                            .map(ap -> ApplicantDto.fromEntity(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                            .toList();
-                    return UniversityApplicantsDto.builder()
-                            .koreanName(university.getKoreanName())
-                            .studentCapacity(universityInfoForApply.getStudentCapacity())
-                            .region(university.getRegion().getKoreanName())
-                            .country(university.getCountry().getKoreanName())
-                            .applicants(firstChoiceApplicant)
-                            .build();
-                })
-                .toList();
-    }
-
-    private List<UniversityApplicantsDto> getSecondChoiceApplicants(List<University> universities, SiteUser siteUser) {
-        return universities.stream()
-                .filter(university -> universityInfoForApplyRepository.existsByUniversityAndTerm(university, TERM))
-                .map(university -> {
-                    UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyByUniversityAndTerm(university);
-                    List<Application> secondChoiceApplication = applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatus(universityInfoForApply, VerifyStatus.APPROVED);
-                    List<ApplicantDto> secondChoiceApplicant = secondChoiceApplication.stream()
-                            .map(ap -> ApplicantDto.fromEntity(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                            .toList();
-                    return UniversityApplicantsDto.builder()
-                            .koreanName(university.getKoreanName())
-                            .studentCapacity(universityInfoForApply.getStudentCapacity())
-                            .region(university.getRegion().getKoreanName())
-                            .country(university.getCountry().getKoreanName())
-                            .applicants(secondChoiceApplicant)
-                            .build();
-                })
+    private List<UniversityApplicantsResponse> getApplicantsByChoice(List<University> searchedUniversities, SiteUser siteUser, Function<UniversityInfoForApply, List<Application>> findApplicationsByChoice) {
+        return universityInfoForApplyRepository.findByUniversitiesAndTerm(searchedUniversities, TERM).stream()
+                .map(universityInfoForApply ->
+                        UniversityApplicantsResponse.of(
+                                universityInfoForApply,
+                                findApplicationsByChoice.apply(universityInfoForApply).stream()
+                                        .map(ap -> ApplicantResponse.fromEntity(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
+                                        .toList()
+                        ))
                 .toList();
     }
 
     /*
      * 지원 상태를 조회한다.
+     * - 아무것도 제출하지 않았으면 NOT_SUBMITTED 를 반환한다.
+     * - 제출한 상태라면,
+     *   - 지망 대학만 제출했으면 COLLEGE_SUBMITTED 를 반환한다.
+     *   - 성적만 제출했으면 SCORE_SUBMITTED 를 반환한다.
+     *   - 둘 다 제출했으나, 성적 승인 대기 중이면 SUBMITTED_PENDING 를 반환한다.
+     * - 성적 승인 반려 상태라면 SUBMITTED_REJECTED 를 반환한다.
+     * - 성적 승인 완료 상태라면 SUBMITTED_APPROVED 를 반환한다.
      * */
     public VerifyStatusDto getVerifyStatus(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
