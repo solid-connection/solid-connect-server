@@ -4,7 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
-import com.example.solidconnection.application.dto.VerifyStatusDto;
+import com.example.solidconnection.application.dto.VerifyStatusResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.SiteUser;
@@ -74,10 +74,7 @@ public class ApplicationQueryService {
                 uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
         );
 
-        return ApplicationsResponse.builder()
-                .firstChoice(firstChoiceApplicants)
-                .secondChoice(secondChoiceApplicants)
-                .build();
+        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants);
     }
 
     private void validateSiteUserCanViewApplicants(SiteUser siteUser) {
@@ -93,7 +90,7 @@ public class ApplicationQueryService {
                         UniversityApplicantsResponse.of(
                                 universityInfoForApply,
                                 findApplicationsByChoice.apply(universityInfoForApply).stream()
-                                        .map(ap -> ApplicantResponse.fromEntity(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
+                                        .map(ap -> ApplicantResponse.of(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
                                         .toList()
                         ))
                 .toList();
@@ -109,13 +106,13 @@ public class ApplicationQueryService {
      * - 성적 승인 반려 상태라면 SUBMITTED_REJECTED 를 반환한다.
      * - 성적 승인 완료 상태라면 SUBMITTED_APPROVED 를 반환한다.
      * */
-    public VerifyStatusDto getVerifyStatus(String email) {
+    public VerifyStatusResponse getVerifyStatus(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Optional<Application> application = applicationRepository.findBySiteUser_Email(siteUser.getEmail());
 
         // 아무것도 제출 안함
         if (application.isEmpty()) {
-            return new VerifyStatusDto(ApplicationStatusResponse.NOT_SUBMITTED.name());
+            return new VerifyStatusResponse(ApplicationStatusResponse.NOT_SUBMITTED.name(), 0);
         }
 
         int updateCount = application.get().getUpdateCount();
@@ -123,20 +120,20 @@ public class ApplicationQueryService {
         if (application.get().getVerifyStatus() == VerifyStatus.PENDING) {
             // 지망 대학만 제출
             if (application.get().getGpa().getGpaReportUrl() == null) {
-                return new VerifyStatusDto(ApplicationStatusResponse.COLLEGE_SUBMITTED.name(), updateCount);
+                return new VerifyStatusResponse(ApplicationStatusResponse.COLLEGE_SUBMITTED.name(), updateCount);
             }
             // 성적만 제출
             if (application.get().getFirstChoiceUniversity() == null) {
-                return new VerifyStatusDto(ApplicationStatusResponse.SCORE_SUBMITTED.name(), 0);
+                return new VerifyStatusResponse(ApplicationStatusResponse.SCORE_SUBMITTED.name(), 0);
             }
             // 성적 승인 대기 중
-            return new VerifyStatusDto(ApplicationStatusResponse.SUBMITTED_PENDING.name(), updateCount);
+            return new VerifyStatusResponse(ApplicationStatusResponse.SUBMITTED_PENDING.name(), updateCount);
         }
         // 성적 승인 반려
         if (application.get().getVerifyStatus() == VerifyStatus.REJECTED) {
-            return new VerifyStatusDto(ApplicationStatusResponse.SUBMITTED_REJECTED.name(), updateCount);
+            return new VerifyStatusResponse(ApplicationStatusResponse.SUBMITTED_REJECTED.name(), updateCount);
         }
         // 성적 승인 완료
-        return new VerifyStatusDto(ApplicationStatusResponse.SUBMITTED_APPROVED.name(), updateCount);
+        return new VerifyStatusResponse(ApplicationStatusResponse.SUBMITTED_APPROVED.name(), updateCount);
     }
 }

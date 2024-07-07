@@ -1,15 +1,18 @@
 package com.example.solidconnection.siteuser.controller;
 
-import com.example.solidconnection.custom.response.CustomResponse;
-import com.example.solidconnection.custom.response.DataResponse;
-import com.example.solidconnection.custom.response.StatusResponse;
-import com.example.solidconnection.siteuser.dto.MyPageDto;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateDto;
+import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.MyPageUpdateRequest;
+import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.university.dto.UniversityPreviewDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,28 +25,28 @@ class MyPageController {
     private final MyPageService myPageService;
 
     @GetMapping
-    public CustomResponse getMyPageInfo(Principal principal) {
-        MyPageDto myPageDto = myPageService.getMyPageInfo(principal.getName());
-        return new DataResponse<>(myPageDto);
+    public ResponseEntity<MyPageResponse> getMyPageInfo(Principal principal) {
+        MyPageResponse myPageResponse = myPageService.getMyPageInfo(principal.getName());
+        return ResponseEntity.ok(myPageResponse);
     }
 
     @GetMapping("/update")
-    public CustomResponse getMyPageInfoToUpdate(Principal principal) {
-        MyPageUpdateDto myPageUpdateDto = myPageService.getMyPageInfoToUpdate(principal.getName());
-        return new DataResponse<>(myPageUpdateDto);
+    public ResponseEntity<MyPageUpdateResponse> getMyPageInfoToUpdate(Principal principal) {
+        MyPageUpdateResponse myPageUpdateDto = myPageService.getMyPageInfoToUpdate(principal.getName());
+        return ResponseEntity.ok(myPageUpdateDto);
     }
 
     @PatchMapping("/update")
-    public CustomResponse updateMyPageInfo(
+    public ResponseEntity<MyPageUpdateResponse> updateMyPageInfo(
             Principal principal,
-            @Valid @RequestBody MyPageUpdateDto myPageUpdateDto) {
-        myPageService.update(principal.getName(), myPageUpdateDto);
-        return new StatusResponse(true);
+            @Valid @RequestBody MyPageUpdateRequest myPageUpdateDto) {
+        MyPageUpdateResponse myPageUpdateResponse = myPageService.update(principal.getName(), myPageUpdateDto);
+        return ResponseEntity.ok(myPageUpdateResponse);
     }
 
     @GetMapping("/wish-university")
-    public CustomResponse getMyWishUniversity(Principal principal) {
+    public ResponseEntity<List<UniversityPreviewDto>> getMyWishUniversity(Principal principal) {
         List<UniversityPreviewDto> wishUniversities = myPageService.getWishUniversity(principal.getName());
-        return new DataResponse<>(wishUniversities);
+        return ResponseEntity.ok(wishUniversities);
     }
 }

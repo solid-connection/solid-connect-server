@@ -2,8 +2,8 @@ package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.application.dto.ScoreRequestDto;
-import com.example.solidconnection.application.dto.UniversityRequestDto;
+import com.example.solidconnection.application.dto.ScoreRequest;
+import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.application.domain.Application;
@@ -39,10 +39,10 @@ public class ApplicationSubmissionService {
     * - 기존에 제출한 적이 있다면, 수정한다.
     * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
     * */
-    public boolean submitScore(String email, ScoreRequestDto scoreRequestDto) {
+    public boolean submitScore(String email, ScoreRequest scoreRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        Gpa gpa = scoreRequestDto.toGpa();
-        LanguageTest languageTest = scoreRequestDto.toLanguageTest();
+        Gpa gpa = scoreRequest.toGpa();
+        LanguageTest languageTest = scoreRequest.toLanguageTest();
 
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(
@@ -65,12 +65,12 @@ public class ApplicationSubmissionService {
      *   - 그리고 새로운 '제출 닉네임'을 부여한다. (악의적으로 타인의 변경 기록을 추적하는 것을 막기 위해)
      * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
      * */
-    public boolean submitUniversityChoice(String email, UniversityRequestDto universityRequestDto) {
-        validateFirstAndSecondChoiceIdDifferent(universityRequestDto);
+    public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
+        validateFirstAndSecondChoiceIdDifferent(universityChoiceRequest);
 
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityRequestDto.getFirstChoiceUniversityId());
-        UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository.findByIdAndTerm(universityRequestDto.getSecondChoiceUniversityId(), TERM).orElse(null);
+        UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId());
+        UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository.findByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), TERM).orElse(null);
 
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(
@@ -103,10 +103,10 @@ public class ApplicationSubmissionService {
         }
     }
 
-    private void validateFirstAndSecondChoiceIdDifferent(UniversityRequestDto universityRequestDto) {
+    private void validateFirstAndSecondChoiceIdDifferent(UniversityChoiceRequest universityChoiceRequest) {
         if (Objects.equals(
-                universityRequestDto.getFirstChoiceUniversityId(),
-                universityRequestDto.getSecondChoiceUniversityId())) {
+                universityChoiceRequest.firstChoiceUniversityId(),
+                universityChoiceRequest.secondChoiceUniversityId())) {
             throw new CustomException(CANT_APPLY_FOR_SAME_UNIVERSITY);
         }
     }

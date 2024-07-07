@@ -1,15 +1,16 @@
 package com.example.solidconnection.home.controller;
 
-import com.example.solidconnection.custom.response.CustomResponse;
-import com.example.solidconnection.custom.response.DataResponse;
-import com.example.solidconnection.home.dto.PersonalHomeInfoDto;
+import com.example.solidconnection.home.dto.PersonalHomeInfoResponse;
+import com.example.solidconnection.home.dto.RecommendedUniversityResponse;
 import com.example.solidconnection.university.service.UniversityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/home")
@@ -19,13 +20,13 @@ public class HomeController {
     private final UniversityService universityService;
 
     @GetMapping
-    public CustomResponse getHomeInfo(Principal principal) {
-        PersonalHomeInfoDto personalHomeInfoDto = new PersonalHomeInfoDto();
+    public ResponseEntity<PersonalHomeInfoResponse> getHomeInfo(Principal principal) {
+        List<RecommendedUniversityResponse> recommendedUniversities;
         if (principal == null) {
-            personalHomeInfoDto.setRecommendedUniversities(universityService.getGeneralRecommends());
+            recommendedUniversities = universityService.getGeneralRecommends();
         } else {
-            personalHomeInfoDto.setRecommendedUniversities(universityService.getPersonalRecommends(principal.getName()));
+            recommendedUniversities = universityService.getPersonalRecommends(principal.getName());
         }
-        return new DataResponse<>(personalHomeInfoDto);
+        return ResponseEntity.ok(new PersonalHomeInfoResponse(recommendedUniversities));
     }
 }

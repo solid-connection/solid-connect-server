@@ -1,25 +1,16 @@
 package com.example.solidconnection.application.dto;
 
 import com.example.solidconnection.entity.UniversityInfoForApply;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class UniversityApplicantsResponse {
-    private String koreanName;
-    private int studentCapacity;
-    private String region;
-    private String country;
-    private List<ApplicantResponse> applicants;
+public record UniversityApplicantsResponse(
+        String koreanName,
+        int studentCapacity,
+        String region,
+        String country,
+        List<ApplicantResponse> applicants
+) {
 
     public static UniversityApplicantsResponse of(UniversityInfoForApply universityInfoForApply, List<ApplicantResponse> applicant) {
         return new UniversityApplicantsResponse(

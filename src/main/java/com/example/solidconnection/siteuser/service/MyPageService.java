@@ -3,12 +3,12 @@ package com.example.solidconnection.siteuser.service;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.LikedUniversity;
 import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.siteuser.dto.MyPageDto;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateDto;
+import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.MyPageUpdateRequest;
+import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.dto.UniversityPreviewDto;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,32 +21,48 @@ import static com.example.solidconnection.constants.Constants.MIN_DAYS_BETWEEN_N
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class MyPageService {
+
     private final SiteUserRepository siteUserRepository;
     private final LikedUniversityRepository likedUniversityRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
-    public MyPageDto getMyPageInfo(String email) {
+    /*
+    * 마이페이지 정보를 조회한다.
+    * */
+    @Transactional(readOnly = true)
+    public MyPageResponse getMyPageInfo(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         int likedUniversityCount = likedUniversityRepository.countBySiteUser_Email(email);
-        return MyPageDto.fromEntity(siteUser, likedUniversityCount);
+        return MyPageResponse.of(siteUser, likedUniversityCount);
     }
 
-    public MyPageUpdateDto getMyPageInfoToUpdate(String email) {
+    /*
+    * 내 정보를 수정하기 위한 마이페이지 정보를 조회한다. (닉네임, 프로필 사진)
+    * */
+    @Transactional(readOnly = true)
+    public MyPageUpdateResponse getMyPageInfoToUpdate(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        return MyPageUpdateDto.fromEntity(siteUser);
+        return MyPageUpdateResponse.of(siteUser);
     }
 
+    /*
+    * 마이페이지 정보를 수정한다.
+    * - 정보를 수정하기 전에 닉네임 중복, 닉네임 변경 최소 기간을 검증한다.
+    * */
     @Transactional
-    public void update(String email, MyPageUpdateDto myPageUpdateDto) {
+    public MyPageUpdateResponse update(String email, MyPageUpdateRequest pageUpdateRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        validateNicknameDuplicated(myPageUpdateDto.getNickname());
+
+        validateNicknameDuplicated(pageUpdateRequest.nickname());
         validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-        siteUser.setNickname(myPageUpdateDto.getNickname());
-        siteUser.setProfileImageUrl(myPageUpdateDto.getProfileImageUrl());
+
+        siteUser.setNickname(pageUpdateRequest.nickname());
+        siteUser.setProfileImageUrl(pageUpdateRequest.profileImageUrl());
         siteUser.setNicknameModifiedAt(LocalDateTime.now());
+        siteUserRepository.save(siteUser);
+        return MyPageUpdateResponse.of(siteUser);
     }
 
     private void validateNicknameDuplicated(String nickname) {
