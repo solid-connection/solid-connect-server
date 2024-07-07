@@ -7,6 +7,7 @@ import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.dto.VerifyStatusResponse;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
+import com.example.solidconnection.application.service.VerifyStatusQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class ApplicationController {
 
     private final ApplicationSubmissionService applicationSubmissionService;
     private final ApplicationQueryService applicationQueryService;
+    private final VerifyStatusQueryService verifyStatusQueryService;
 
     @PostMapping("/score")
     public ResponseEntity<ApplicationSubmissionResponse> submitScore(
@@ -57,7 +59,7 @@ public class ApplicationController {
 
     @GetMapping("/status")
     public ResponseEntity<VerifyStatusResponse> getApplicationVerifyStatus(Principal principal) {
-        VerifyStatusResponse result = applicationQueryService.getVerifyStatus(principal.getName());
+        VerifyStatusResponse result = verifyStatusQueryService.getVerifyStatus(principal.getName());
         return ResponseEntity.ok(result);
     }
 }
