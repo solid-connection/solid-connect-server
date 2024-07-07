@@ -9,15 +9,15 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApplicantDto {
+public class ApplicantResponse {
     private String nicknameForApply;
     private float gpa;
     private LanguageTestType testType;
     private String testScore;
     private boolean isMine;
 
-    public static ApplicantDto fromEntity(Application application, boolean isMine) {
-        return ApplicantDto.builder()
+    public static ApplicantResponse fromEntity(Application application, boolean isMine) {
+        return ApplicantResponse.builder()
                 .nicknameForApply(application.getNicknameForApply())
                 .gpa(application.getGpa().getGpa())
                 .testType(application.getLanguageTest().getLanguageTestType())

@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApplicationsDto {
-    private List<UniversityApplicantsDto> firstChoice;
-    private List<UniversityApplicantsDto> secondChoice;
+public class ApplicationsResponse {
+    private List<UniversityApplicantsResponse> firstChoice;
+    private List<UniversityApplicantsResponse> secondChoice;
 }

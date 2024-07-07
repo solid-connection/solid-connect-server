@@ -8,7 +8,7 @@ import static com.example.solidconnection.constants.validMessage.FIRST_CHOICE_UN
 
 @Getter
 @Setter
-public class UniversityRequestDto {
+public class UniversityChoiceRequest {
     @NotNull(message = FIRST_CHOICE_UNIVERSITY_ID_NOT_BLANK)
     private Long firstChoiceUniversityId;
     private Long secondChoiceUniversityId;

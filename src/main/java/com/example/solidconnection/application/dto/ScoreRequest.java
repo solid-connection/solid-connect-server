@@ -16,7 +16,7 @@ import static com.example.solidconnection.constants.validMessage.LANGUAGE_TEST_S
 import static com.example.solidconnection.constants.validMessage.LANGUAGE_TEST_TYPE_NOT_BLANK;
 
 @Getter
-public class ScoreRequestDto {
+public class ScoreRequest {
 
     @NotNull(message = LANGUAGE_TEST_TYPE_NOT_BLANK)
     private LanguageTestType languageTestType;
