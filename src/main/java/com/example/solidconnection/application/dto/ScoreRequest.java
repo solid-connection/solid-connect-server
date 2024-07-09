@@ -7,25 +7,18 @@ import com.example.solidconnection.type.LanguageTestType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import static com.example.solidconnection.constants.validMessage.GPA_CRITERIA_NOT_BLANK;
-import static com.example.solidconnection.constants.validMessage.GPA_NOT_BLANK;
-import static com.example.solidconnection.constants.validMessage.GPA_REPORT_URL_NOT_BLANK;
-import static com.example.solidconnection.constants.validMessage.LANGUAGE_TEST_REPORT_URL_NOT_BLANK;
-import static com.example.solidconnection.constants.validMessage.LANGUAGE_TEST_SCORE_NOT_BLANK;
-import static com.example.solidconnection.constants.validMessage.LANGUAGE_TEST_TYPE_NOT_BLANK;
-
 public record ScoreRequest(
-        @NotNull(message = LANGUAGE_TEST_TYPE_NOT_BLANK)
+        @NotNull(message = "어학 종류를 입력해주세요.")
         LanguageTestType languageTestType,
-        @NotBlank(message = LANGUAGE_TEST_SCORE_NOT_BLANK)
+        @NotBlank(message = "어학 점수를 입력해주세요.")
         String languageTestScore,
-        @NotBlank(message = LANGUAGE_TEST_REPORT_URL_NOT_BLANK)
+        @NotBlank(message = "어학 증명서를 첨부해주세요.")
         String languageTestReportUrl,
-        @NotNull(message = GPA_NOT_BLANK)
+        @NotNull(message = "학점을 입력해주세요.")
         Float gpa,
-        @NotNull(message = GPA_CRITERIA_NOT_BLANK)
+        @NotNull(message = "학점 기준을 입력해주세요.")
         Float gpaCriteria,
-        @NotBlank(message = GPA_REPORT_URL_NOT_BLANK)
+        @NotBlank(message = "대학 성적 증명서를 첨부해주세요.")
         String gpaReportUrl) {
 
     public Gpa toGpa() {

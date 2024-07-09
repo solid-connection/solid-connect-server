@@ -3,20 +3,13 @@ package com.example.solidconnection.custom.response;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.exception.ErrorCode;
 
-public record ErrorResponse(
-        Boolean success,
-        ErrorDetail error) implements CustomResponse {
-
-    private record ErrorDetail(
-            int code,
-            String message) {
-    }
+public record ErrorResponse(String message) { // todo: 이 부분 바뀌었다고 말씀드리기
 
     public ErrorResponse(CustomException e) {
-        this(false, new ErrorDetail(e.getCode(), e.getMessage()));
+        this(e.getMessage());
     }
 
-    public ErrorResponse(ErrorCode e, String detail){
-        this(false, new ErrorDetail(e.getCode(), e.getMessage() + " : " + detail));
+    public ErrorResponse(ErrorCode e, String detail) {
+        this(e.getMessage() + " : " + detail);
     }
 }

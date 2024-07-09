@@ -1,6 +1,11 @@
-package com.example.solidconnection.entity;
+package com.example.solidconnection.university.domain;
 
-import jakarta.persistence.*;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,16 +17,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LikedUniversity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 연관 관계
     @ManyToOne
-    @JoinColumn(name = "university_info_for_apply_id")
     private UniversityInfoForApply universityInfoForApply;
 
     @ManyToOne
-    @JoinColumn(name = "site_user_id")
     private SiteUser siteUser;
 }

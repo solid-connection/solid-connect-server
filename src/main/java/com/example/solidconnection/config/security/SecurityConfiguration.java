@@ -29,7 +29,7 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://www.solid-connect.net", "http://localhost:8080", "https://www.api.solid-connect.net", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));        
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -49,9 +49,9 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/", "/index.html", "/favicon.ico",
                                 "/file/profile/pre",
-                                "/auth/kakao",  "/auth/sign-up", "/auth/reissue",
+                                "/auth/kakao", "/auth/sign-up", "/auth/reissue",
                                 "/university/detail/**", "/university/search/**", "/home"
-                                )
+                        )
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

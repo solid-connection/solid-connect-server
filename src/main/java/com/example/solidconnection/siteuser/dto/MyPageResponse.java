@@ -1,6 +1,6 @@
 package com.example.solidconnection.siteuser.dto;
 
-import com.example.solidconnection.entity.SiteUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Role;
 
 public record MyPageResponse(
@@ -12,7 +12,7 @@ public record MyPageResponse(
         int likedMentorCount,
         int likedUniversityCount) {
 
-    public static MyPageResponse of(SiteUser siteUser, int likedUniversityCount){
+    public static MyPageResponse of(SiteUser siteUser, int likedUniversityCount) {
         return new MyPageResponse(
                 siteUser.getNickname(),
                 siteUser.getProfileImageUrl(),

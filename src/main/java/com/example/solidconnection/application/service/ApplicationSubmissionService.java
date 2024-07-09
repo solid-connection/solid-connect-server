@@ -1,29 +1,27 @@
 package com.example.solidconnection.application.service;
 
+import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.dto.ScoreRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.entity.UniversityInfoForApply;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import com.example.solidconnection.university.service.UniversityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
-import static com.example.solidconnection.constants.Constants.TERM;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
 import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
+import static com.example.solidconnection.university.service.UniversityService.TERM;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class ApplicationSubmissionService {
 
@@ -31,14 +29,14 @@ public class ApplicationSubmissionService {
 
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final UniversityValidator universityValidator;
     private final SiteUserRepository siteUserRepository;
 
     /*
-    * 학점과 영어 성적을 제출한다.
-    * - 기존에 제출한 적이 있다면, 수정한다.
-    * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
-    * */
+     * 학점과 영어 성적을 제출한다.
+     * - 기존에 제출한 적이 있다면, 수정한다.
+     * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
+     * */
+    @Transactional
     public boolean submitScore(String email, ScoreRequest scoreRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Gpa gpa = scoreRequest.toGpa();
@@ -65,12 +63,15 @@ public class ApplicationSubmissionService {
      *   - 그리고 새로운 '제출 닉네임'을 부여한다. (악의적으로 타인의 변경 기록을 추적하는 것을 막기 위해)
      * - 처음 제출한다면, 랜덤한 '제출 닉네임'을 부여하고 DB 에 저장한다.
      * */
+    @Transactional
     public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
         validateFirstAndSecondChoiceIdDifferent(universityChoiceRequest);
 
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        UniversityInfoForApply firstChoiceUniversity = universityValidator.getValidatedUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId());
-        UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository.findByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), TERM).orElse(null);
+        UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), TERM);
+        UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), TERM);
 
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(

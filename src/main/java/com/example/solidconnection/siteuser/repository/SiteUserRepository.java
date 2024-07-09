@@ -1,7 +1,7 @@
 package com.example.solidconnection.siteuser.repository;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.SiteUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

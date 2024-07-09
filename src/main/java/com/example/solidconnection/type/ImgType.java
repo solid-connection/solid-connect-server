@@ -8,7 +8,7 @@ public enum ImgType {
 
     private final String type;
 
-    ImgType(String type){
+    ImgType(String type) {
         this.type = type;
     }
 }

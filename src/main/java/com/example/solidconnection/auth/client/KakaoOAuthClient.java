@@ -17,8 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Objects;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
-import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
 import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
+import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
 
 @Component
 @RequiredArgsConstructor
@@ -36,13 +36,13 @@ public class KakaoOAuthClient {
     private String userInfoUrl;
 
     /*
-    * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인가 코드'를 받아, 서버에 넘겨준다.
-    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
-    * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 토큰'을 받아온다.
-    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
-    * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
-    *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
-    * */
+     * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인가 코드'를 받아, 서버에 넘겨준다.
+     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
+     * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 토큰'을 받아온다.
+     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
+     * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
+     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+     * */
     public KakaoUserInfoDto processOauth(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);

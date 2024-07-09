@@ -3,11 +3,14 @@ package com.example.solidconnection.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode(of = {"code", "koreanName"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Region {
 
@@ -17,9 +20,6 @@ public class Region {
 
     @Column(nullable = false, length = 100)
     private String koreanName;
-
-    protected Region() {
-    }
 
     public Region(String code, String koreanName) {
         this.code = code;

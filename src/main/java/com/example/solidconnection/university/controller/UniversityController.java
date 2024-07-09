@@ -1,13 +1,21 @@
 package com.example.solidconnection.university.controller;
 
-import com.example.solidconnection.custom.response.CustomResponse;
-import com.example.solidconnection.custom.response.DataResponse;
-import com.example.solidconnection.university.dto.LikedResultDto;
-import com.example.solidconnection.university.dto.UniversityDetailDto;
-import com.example.solidconnection.university.dto.UniversityPreviewDto;
+import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.LikeResultResponse;
+import com.example.solidconnection.university.dto.UniversityDetailResponse;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.service.UniversityRecommendService;
 import com.example.solidconnection.university.service.UniversityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
@@ -18,34 +26,51 @@ import java.util.List;
 public class UniversityController {
 
     private final UniversityService universityService;
+    private final UniversityRecommendService universityRecommendService;
 
-    @GetMapping("/detail/{universityInfoForApplyId}")
-    public CustomResponse getUniversityDetails(
-            Principal principal,
-            @PathVariable Long universityInfoForApplyId) {
-        UniversityDetailDto universityDetailDto = universityService.getDetail(universityInfoForApplyId);
-        if (principal != null) {
-            boolean isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
-            universityDetailDto.setLiked(isLiked);
+    //todo: uri 를 "/home" 에서 "/university/recommends" 로 변경하고, 위백님께 알리기
+    @GetMapping("/recommends")
+    public ResponseEntity<UniversityRecommendsResponse> getUniversityRecommends(
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.ok(universityRecommendService.getGeneralRecommends());
+        } else {
+            return ResponseEntity.ok(universityRecommendService.getPersonalRecommends(principal.getName()));
         }
-        return new DataResponse<>(universityDetailDto);
-    }
-
-    @GetMapping("/search")
-    public CustomResponse searchUniversity(
-            @RequestParam(required = false, defaultValue = "") String region,
-            @RequestParam(required = false, defaultValue = "") List<String> keyword,
-            @RequestParam(required = false, defaultValue = "") String testType,
-            @RequestParam(required = false, defaultValue = "") String testScore) {
-        List<UniversityPreviewDto> universityPreviewDto = universityService.search(region, keyword, testType, testScore);
-        return new DataResponse<>(universityPreviewDto);
     }
 
     @PostMapping("/{universityInfoForApplyId}/like")
-    public CustomResponse addWishUniversity(
+    public ResponseEntity<LikeResultResponse> addWishUniversity(
             Principal principal,
             @PathVariable Long universityInfoForApplyId) {
-        LikedResultDto likedResultDto = universityService.like(principal.getName(), universityInfoForApplyId);
-        return new DataResponse<>(likedResultDto);
+        LikeResultResponse likeResultResponse = universityService.likeUniversity(principal.getName(), universityInfoForApplyId);
+        return ResponseEntity
+                .ok(likeResultResponse);
+    }
+
+    @GetMapping("/detail/{universityInfoForApplyId}")
+    public ResponseEntity<UniversityDetailResponse> getUniversityDetails(
+            @PathVariable Long universityInfoForApplyId) {
+        UniversityDetailResponse universityDetailResponse = universityService.getUniversityDetail(universityInfoForApplyId);
+        return ResponseEntity.ok(universityDetailResponse);
+    }
+
+    @GetMapping("/{universityInfoForApplyId}/like")
+    public ResponseEntity<IsLikeResponse> getIsLiked(
+            Principal principal,
+            @PathVariable Long universityInfoForApplyId) {
+        IsLikeResponse isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
+        return ResponseEntity.ok(isLiked);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> searchUniversity(
+            @RequestParam(required = false, defaultValue = "") String region,
+            @RequestParam(required = false, defaultValue = "") List<String> keyword,
+            @RequestParam(required = false, defaultValue = "") LanguageTestType testType,
+            @RequestParam(required = false, defaultValue = "") String testScore) {
+        List<UniversityInfoForApplyPreviewResponse> universityInfoForApplyPreviewResponse
+                = universityService.searchUniversity(region, keyword, testType, testScore);
+        return ResponseEntity.ok(universityInfoForApplyPreviewResponse);
     }
 }

@@ -1,6 +1,6 @@
 package com.example.solidconnection.application.dto;
 
-import com.example.solidconnection.entity.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
 
 import java.util.List;
 
@@ -9,8 +9,7 @@ public record UniversityApplicantsResponse(
         int studentCapacity,
         String region,
         String country,
-        List<ApplicantResponse> applicants
-) {
+        List<ApplicantResponse> applicants) {
 
     public static UniversityApplicantsResponse of(UniversityInfoForApply universityInfoForApply, List<ApplicantResponse> applicant) {
         return new UniversityApplicantsResponse(

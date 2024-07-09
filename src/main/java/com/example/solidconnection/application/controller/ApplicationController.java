@@ -35,7 +35,8 @@ public class ApplicationController {
             Principal principal,
             @Valid @RequestBody ScoreRequest scoreRequest) {
         boolean result = applicationSubmissionService.submitScore(principal.getName(), scoreRequest);
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(new ApplicationSubmissionResponse(result));
     }
 
@@ -44,7 +45,8 @@ public class ApplicationController {
             Principal principal,
             @Valid @RequestBody UniversityChoiceRequest universityChoiceRequest) {
         boolean result = applicationSubmissionService.submitUniversityChoice(principal.getName(), universityChoiceRequest);
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(new ApplicationSubmissionResponse(result));
     }
 
@@ -54,12 +56,14 @@ public class ApplicationController {
             @RequestParam(required = false, defaultValue = "") String region,
             @RequestParam(required = false, defaultValue = "") String keyword) {
         ApplicationsResponse result = applicationQueryService.getApplicants(principal.getName(), region, keyword);
-        return ResponseEntity.ok(result);
+        return ResponseEntity
+                .ok(result);
     }
 
     @GetMapping("/status")
     public ResponseEntity<VerifyStatusResponse> getApplicationVerifyStatus(Principal principal) {
         VerifyStatusResponse result = verifyStatusQueryService.getVerifyStatus(principal.getName());
-        return ResponseEntity.ok(result);
+        return ResponseEntity
+                .ok(result);
     }
 }

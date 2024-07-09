@@ -12,11 +12,18 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_TOKEN_EXPIRED;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
+import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
+import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 
 @Component
 @RequiredArgsConstructor
 public class TokenValidator {
+
+    public static final String SIGN_OUT_VALUE = "signOut";
+
     private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt.secret}")
@@ -31,14 +38,14 @@ public class TokenValidator {
 
     private void validateRefreshToken(String token) {
         String email = getClaim(token).getSubject();
-        if (redisTemplate.opsForValue().get(TokenType.REFRESH.createTokenKey(email)) == null) {
+        if (redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)) == null) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
     }
 
     private void validateNotSignOut(String token) {
         String email = getClaim(token).getSubject();
-        if ("signOut".equals(redisTemplate.opsForValue().get(TokenType.REFRESH.createTokenKey(email)))) {
+        if (SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))) {
             throw new CustomException(USER_ALREADY_SIGN_OUT);
         }
     }
@@ -51,7 +58,7 @@ public class TokenValidator {
 
     private void validateKakaoTokenNotUsed(String token) {
         String email = getClaim(token).getSubject();
-        if (!Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.createTokenKey(email)), token)) {
+        if (!Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.addTokenPrefixToSubject(email)), token)) {
             throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
         }
     }

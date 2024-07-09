@@ -1,7 +1,7 @@
 package com.example.solidconnection.custom.userdetails;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.SiteUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +13,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FO
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final SiteUserRepository siteUserRepository;
 
     @Override

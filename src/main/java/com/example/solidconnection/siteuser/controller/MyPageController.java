@@ -4,7 +4,7 @@ import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;
-import com.example.solidconnection.university.dto.UniversityPreviewDto;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +27,15 @@ class MyPageController {
     @GetMapping
     public ResponseEntity<MyPageResponse> getMyPageInfo(Principal principal) {
         MyPageResponse myPageResponse = myPageService.getMyPageInfo(principal.getName());
-        return ResponseEntity.ok(myPageResponse);
+        return ResponseEntity
+                .ok(myPageResponse);
     }
 
     @GetMapping("/update")
     public ResponseEntity<MyPageUpdateResponse> getMyPageInfoToUpdate(Principal principal) {
         MyPageUpdateResponse myPageUpdateDto = myPageService.getMyPageInfoToUpdate(principal.getName());
-        return ResponseEntity.ok(myPageUpdateDto);
+        return ResponseEntity
+                .ok(myPageUpdateDto);
     }
 
     @PatchMapping("/update")
@@ -41,12 +43,14 @@ class MyPageController {
             Principal principal,
             @Valid @RequestBody MyPageUpdateRequest myPageUpdateDto) {
         MyPageUpdateResponse myPageUpdateResponse = myPageService.update(principal.getName(), myPageUpdateDto);
-        return ResponseEntity.ok(myPageUpdateResponse);
+        return ResponseEntity
+                .ok(myPageUpdateResponse);
     }
 
     @GetMapping("/wish-university")
-    public ResponseEntity<List<UniversityPreviewDto>> getMyWishUniversity(Principal principal) {
-        List<UniversityPreviewDto> wishUniversities = myPageService.getWishUniversity(principal.getName());
-        return ResponseEntity.ok(wishUniversities);
+    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity(Principal principal) {
+        List<UniversityInfoForApplyPreviewResponse> wishUniversities = myPageService.getWishUniversity(principal.getName());
+        return ResponseEntity
+                .ok(wishUniversities);
     }
 }

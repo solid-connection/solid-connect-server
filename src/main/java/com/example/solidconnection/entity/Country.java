@@ -4,11 +4,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode(of = {"code", "koreanName"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Country {
 
@@ -21,9 +24,6 @@ public class Country {
 
     @ManyToOne
     private Region region;
-
-    protected Country() {
-    }
 
     public Country(String code, String koreanName, Region region) {
         this.code = code;

@@ -17,15 +17,15 @@ public class RedisConfig {
 
     private final int redisPort;
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisHost, redisPort);
-    }
-
     public RedisConfig(@Value("${spring.data.redis.host}") final String redisHost,
                        @Value("${spring.data.redis.port}") final int redisPort) {
         this.redisHost = redisHost;
         this.redisPort = redisPort;
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
     @Bean

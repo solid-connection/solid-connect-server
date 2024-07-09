@@ -1,4 +1,4 @@
-package com.example.solidconnection.entity;
+package com.example.solidconnection.siteuser.domain;
 
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class SiteUser {
 
@@ -29,12 +30,12 @@ public class SiteUser {
     @Column(nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false, length = 100)
     @Setter
+    @Column(nullable = false, length = 100)
     private String nickname;
 
-    @Column(length = 500)
     @Setter
+    @Column(length = 500)
     private String profileImageUrl;
 
     @Column(nullable = false, length = 20)

@@ -1,8 +1,8 @@
 package com.example.solidconnection.application.domain;
 
-import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.entity.UniversityInfoForApply;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,13 +11,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 @Getter
 @DynamicInsert
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Entity
 public class Application {
 
@@ -41,20 +42,14 @@ public class Application {
     @Column(nullable = false)
     private Integer updateCount;
 
-    // 연관 관계
     @ManyToOne
-    @JoinColumn(name = "first_choice_univ_id")
     private UniversityInfoForApply firstChoiceUniversity;
 
     @ManyToOne
-    @JoinColumn(name = "second_choice_univ_id")
     private UniversityInfoForApply secondChoiceUniversity;
 
     @ManyToOne
-    @JoinColumn(name = "site_user_id")
     private SiteUser siteUser;
-
-    protected Application() {}
 
     public Application(
             SiteUser siteUser,
@@ -90,7 +85,7 @@ public class Application {
             UniversityInfoForApply firstChoiceUniversity,
             UniversityInfoForApply secondChoiceUniversity,
             String nicknameForApply) {
-        if(this.firstChoiceUniversity != null) {
+        if (this.firstChoiceUniversity != null) {
             this.updateCount++;
         }
         this.firstChoiceUniversity = firstChoiceUniversity;

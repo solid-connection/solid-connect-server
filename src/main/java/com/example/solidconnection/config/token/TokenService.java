@@ -1,7 +1,6 @@
 package com.example.solidconnection.config.token;
 
 import com.example.solidconnection.custom.userdetails.CustomUserDetailsService;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -17,11 +16,11 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class TokenService {
+
     private final RedisTemplate<String, String> redisTemplate;
-    private final SiteUserRepository siteUserRepository;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${jwt.secret}")
@@ -41,7 +40,7 @@ public class TokenService {
 
     public void saveToken(String token, TokenType tokenType) {
         redisTemplate.opsForValue().set(
-                tokenType.createTokenKey(getClaim(token).getSubject()),
+                tokenType.addTokenPrefixToSubject(getClaim(token).getSubject()),
                 token,
                 tokenType.getExpireTime(),
                 TimeUnit.MILLISECONDS
