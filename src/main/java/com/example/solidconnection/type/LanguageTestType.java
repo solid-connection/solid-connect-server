@@ -1,18 +1,37 @@
 package com.example.solidconnection.type;
 
-import com.example.solidconnection.custom.exception.CustomException;
-
-import java.util.Arrays;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TEST_TYPE;
+import java.util.Comparator;
 
 public enum LanguageTestType {
-    TOEFL_IBT, TOEFL_ITP, TOEIC, IELTS, NEW_HSK, JLPT, DUOLINGO, CEFR, DELF, TCF, TEF, DALF;
 
-    public static LanguageTestType getLanguageTestTypeForString(String name) {
-        return Arrays.stream(LanguageTestType.values())
-                .filter(lt -> lt.toString().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(INVALID_TEST_TYPE, name));
+    CEFR((s1, s2) -> s1.compareTo(s2)),
+    JLPT((s1, s2) -> s2.compareTo(s1)),
+    DALF(LanguageTestType::compareIntegerScores),
+    DELF(LanguageTestType::compareIntegerScores),
+    DUOLINGO(LanguageTestType::compareIntegerScores),
+    IELTS(LanguageTestType::compareDoubleScores),
+    NEW_HSK(LanguageTestType::compareIntegerScores),
+    TCF(LanguageTestType::compareIntegerScores),
+    TEF(LanguageTestType::compareIntegerScores),
+    TOEFL_IBT(LanguageTestType::compareIntegerScores),
+    TOEFL_ITP(LanguageTestType::compareIntegerScores),
+    TOEIC(LanguageTestType::compareIntegerScores);
+
+    private final Comparator<String> comparator;
+
+    LanguageTestType(Comparator<String> comparator) {
+        this.comparator = comparator;
+    }
+
+    private static int compareIntegerScores(String s1, String s2) {
+        return Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2));
+    }
+
+    private static int compareDoubleScores(String s1, String s2) {
+        return Double.compare(Double.parseDouble(s1), Double.parseDouble(s2));
+    }
+
+    public int compare(String s1, String s2) {
+        return comparator.compare(s1, s2);
     }
 }
