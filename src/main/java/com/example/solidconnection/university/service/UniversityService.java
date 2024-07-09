@@ -1,182 +1,80 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.constants.GeneralRecommendUniversities;
-import com.example.solidconnection.entity.LikedUniversity;
-import com.example.solidconnection.entity.SiteUser;
-import com.example.solidconnection.entity.University;
-import com.example.solidconnection.entity.UniversityInfoForApply;
-import com.example.solidconnection.home.dto.RecommendedUniversityDto;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.CountryCode;
 import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.RegionCode;
-import com.example.solidconnection.university.dto.LanguageRequirementDto;
-import com.example.solidconnection.university.dto.LikedResultDto;
-import com.example.solidconnection.university.dto.UniversityDetailDto;
-import com.example.solidconnection.university.dto.UniversityPreviewDto;
-import com.example.solidconnection.university.repository.LanguageRequirementRepository;
+import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.LikeResultResponse;
+import com.example.solidconnection.university.dto.UniversityDetailResponse;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import com.example.solidconnection.university.repository.UniversityRepository;
-import com.example.solidconnection.university.repository.custom.UniversityRepositoryForFilterImpl;
+import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static com.example.solidconnection.constants.Constants.RECOMMEND_UNIVERSITY_NUM;
-import static com.example.solidconnection.constants.Constants.TERM;
-
-@Service
 @RequiredArgsConstructor
+@Service
 public class UniversityService {
 
+    public static final String TERM = "2024-2-a";
+    public static final String LIKE_SUCCESS_MESSAGE = "LIKE_SUCCESS";
+    public static final String LIKE_CANCELED_MESSAGE = "LIKE_CANCELED";
+
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final UniversityRepository universityRepository;
-    private final LanguageRequirementRepository languageRequirementRepository;
-    private final InterestedCountyRepository interestedCountyRepository;
-    private final InterestedRegionRepository interestedRegionRepository;
     private final LikedUniversityRepository likedUniversityRepository;
-    private final GeneralRecommendUniversities generalRecommendUniversities;
-    private final UniversityValidator universityValidator;
-    private final UniversityRepositoryForFilterImpl universityRepositoryForFilter;
+    private final UniversityFilterRepositoryImpl universityFilterRepository;
     private final SiteUserRepository siteUserRepository;
 
-    public List<RecommendedUniversityDto> getPersonalRecommends(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-        List<String> interestedCountryCodes = interestedCountyRepository.findAllBySiteUser(siteUser)
-                .stream().map(interestedCountry -> interestedCountry.getCountry().getCode())
-                .toList();
-        List<String> interestedRegionCodes = interestedRegionRepository.findAllBySiteUser(siteUser)
-                .stream().map(interestedRegion -> interestedRegion.getRegion().getCode())
-                .toList();
-        List<UniversityInfoForApply> recommendedUniversities = new java.util.ArrayList<>(universityRepository.findByCountryCodeInOrRegionCodeIn(interestedCountryCodes, interestedRegionCodes)
+    /*
+     * 대학교 상세 정보를 불러온다.
+     * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
+     * */
+    @Transactional(readOnly = true)
+    public UniversityDetailResponse getUniversityDetail(Long universityInfoForApplyId) {
+        UniversityInfoForApply universityInfoForApply
+                = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        University university = universityInfoForApply.getUniversity();
+
+        return UniversityDetailResponse.of(university, universityInfoForApply);
+    }
+
+    /*
+     * 대학교 검색 결과를 불러온다.
+     * - 권역, 키워드, 언어 시험 종류, 언어 시험 점수를 조건으로 검색하여 결과를 반환한다.
+     *   - 키워드는 국가명 또는 대학명에 포함되는 것이 조건이다.
+     *   - 언어 시험 점수는 합격 최소 점수보다 높은 것이 조건이다.
+     * */
+    @Transactional(readOnly = true)
+    public List<UniversityInfoForApplyPreviewResponse> searchUniversity(
+            String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
+        return universityFilterRepository
+                .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScore(regionCode, keywords, testType, testScore)
                 .stream()
-                .map(universityValidator::getValidatedUniversityInfoForApplyByUniversityAndTermNoException)
-                .filter(Objects::nonNull)
-                .toList());
-
-        Collections.shuffle(recommendedUniversities);
-        List<UniversityInfoForApply> shuffledList = recommendedUniversities.subList(0, Math.min(RECOMMEND_UNIVERSITY_NUM, recommendedUniversities.size()));
-        if (shuffledList.size() < 6) {
-            shuffledList.addAll(getGeneralRecommendsExcept(shuffledList));
-        }
-
-        return shuffledList.stream().map(RecommendedUniversityDto::fromEntity).collect(Collectors.toList());
-    }
-
-    public List<RecommendedUniversityDto> getGeneralRecommends() {
-        List<UniversityInfoForApply> generalRecommend = new java.util.ArrayList<>(generalRecommendUniversities.getRecommendedUniversities());
-        Collections.shuffle(generalRecommend);
-        return generalRecommend.stream().map(RecommendedUniversityDto::fromEntity).collect(Collectors.toList());
-    }
-
-    private List<UniversityInfoForApply> getGeneralRecommendsExcept(List<UniversityInfoForApply> alreadyPicked) {
-        List<UniversityInfoForApply> generalRecommend = new java.util.ArrayList<>(generalRecommendUniversities.getRecommendedUniversities());
-        generalRecommend.removeAll(alreadyPicked);
-        int sizeToPick = RECOMMEND_UNIVERSITY_NUM - alreadyPicked.size();
-        Collections.shuffle(generalRecommend);
-        return generalRecommend.subList(0, sizeToPick);
-    }
-
-    public UniversityDetailDto getDetail(Long universityInfoForApplyId) {
-        UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyById(universityInfoForApplyId);
-        University university = universityValidator.getValidatedUniversityById(universityInfoForApply.getUniversity().getId());
-
-        List<LanguageRequirementDto> languageRequirements = languageRequirementRepository
-                .findAllByUniversityInfoForApply_Id(universityInfoForApplyId)
-                .stream()
-                .map(LanguageRequirementDto::fromEntity)
-                .toList();
-
-        String countryKoreanName = null;
-        String regionKoreanName = null;
-        if (university.getCountry() != null) {
-            countryKoreanName = university.getCountry().getKoreanName();
-        }
-        if (university.getCountry() != null) {
-            regionKoreanName = university.getRegion().getKoreanName();
-        }
-
-        return UniversityDetailDto.builder()
-                .id(university.getId())
-                .term(universityInfoForApply.getTerm())
-                .koreanName(university.getKoreanName())
-                .englishName(university.getEnglishName())
-                .formatName(university.getFormatName())
-                .region(regionKoreanName)
-                .country(countryKoreanName)
-                .homepageUrl(university.getHomepageUrl())
-                .logoImageUrl(university.getLogoImageUrl())
-                .backgroundImageUrl(university.getBackgroundImageUrl())
-                .detailsForLocal(university.getDetailsForLocal())
-                .studentCapacity(universityInfoForApply.getStudentCapacity())
-                .tuitionFeeType(universityInfoForApply.getTuitionFeeType().getKoreanName())
-                .semesterAvailableForDispatch(universityInfoForApply.getSemesterAvailableForDispatch().getKoreanName())
-                .languageRequirements(languageRequirements)
-                .detailsForLanguage(universityInfoForApply.getDetailsForLanguage())
-                .gpaRequirement(universityInfoForApply.getGpaRequirement())
-                .gpaRequirementCriteria(universityInfoForApply.getGpaRequirementCriteria())
-                .semesterRequirement(universityInfoForApply.getSemesterRequirement())
-                .detailsForApply(universityInfoForApply.getDetailsForApply())
-                .detailsForMajor(universityInfoForApply.getDetailsForMajor())
-                .detailsForAccommodation(universityInfoForApply.getDetailsForAccommodation())
-                .detailsForEnglishCourse(universityInfoForApply.getDetailsForEnglishCourse())
-                .details(universityInfoForApply.getDetails())
-                .accommodationUrl(university.getAccommodationUrl())
-                .englishCourseUrl(university.getEnglishCourseUrl())
-                .build();
-    }
-
-
-    public List<UniversityPreviewDto> search(String region, List<String> keywords, String testType, String testScore) {
-        RegionCode regionCode = null;
-        if (region != null && !region.isBlank()) {
-            regionCode = RegionCode.getRegionCodeByKoreanName(region);
-        }
-
-        List<CountryCode> countryCodes = null;
-        if (keywords != null && !keywords.isEmpty()) {
-            countryCodes = CountryCode.getCountryCodeMatchesToKeyword(keywords);
-        }
-
-        List<University> universities = universityRepositoryForFilter.findByRegionAndCountryAndKeyword(regionCode, countryCodes, keywords);
-        return universities.stream()
-                .filter(university -> universityInfoForApplyRepository.existsByUniversityAndTerm(university, TERM))
-                .filter(university -> {
-                    UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyByUniversityAndTerm(university);
-                    if (!testType.isBlank()) {
-                        LanguageTestType languageTestType = LanguageTestType.getLanguageTestTypeForString(testType);
-                        if (!testScore.isBlank()) {
-                            return languageRequirementRepository.findByUniversityInfoForApplyAndLanguageTestTypeAndLessThanMyScore(universityInfoForApply, languageTestType, testScore).isPresent();
-                        }
-                        return languageRequirementRepository.existsByUniversityInfoForApplyAndLanguageTestType(universityInfoForApply, languageTestType);
-                    }
-                    return true;
-                })
-                .map(university -> {
-                    UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyByUniversityAndTerm(university);
-                    return UniversityPreviewDto.fromEntity(universityInfoForApply);
-                })
+                .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList();
     }
 
-    public LikedResultDto like(String email, Long universityInfoForApplyId) {
+    /*
+     * 대학교를 '좋아요' 한다.
+     * - 이미 좋아요가 눌러져있다면, 좋아요를 취소한다.
+     * */
+    @Transactional
+    public LikeResultResponse likeUniversity(String email, Long universityInfoForApplyId) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyById(universityInfoForApplyId);
+        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
         Optional<LikedUniversity> alreadyLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
         if (alreadyLikedUniversity.isPresent()) {
             likedUniversityRepository.delete(alreadyLikedUniversity.get());
-            return LikedResultDto.builder()
-                    .result("LIKE_CANCELED")
-                    .build();
+            return new LikeResultResponse(LIKE_CANCELED_MESSAGE);
         }
 
         LikedUniversity likedUniversity = LikedUniversity.builder()
@@ -184,15 +82,17 @@ public class UniversityService {
                 .siteUser(siteUser)
                 .build();
         likedUniversityRepository.save(likedUniversity);
-        return LikedResultDto.builder()
-                .result("LIKE_SUCCESS")
-                .build();
+        return new LikeResultResponse(LIKE_SUCCESS_MESSAGE);
     }
 
-    public boolean getIsLiked(String email, Long universityInfoForApplyId) {
+    /*
+     * '좋아요'한 대학교인지 확인한다.
+     * */
+    @Transactional(readOnly = true)
+    public IsLikeResponse getIsLiked(String email, Long universityInfoForApplyId) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        UniversityInfoForApply universityInfoForApply = universityValidator.getValidatedUniversityInfoForApplyById(universityInfoForApplyId);
-        return likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply)
-                .isPresent();
+        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        boolean isLike = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply).isPresent();
+        return new IsLikeResponse(isLike);
     }
 }
