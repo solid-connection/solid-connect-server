@@ -5,7 +5,6 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto.KakaoAccountDto.KakaoProfileDto;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -20,8 +19,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 
-import static com.example.solidconnection.e2e.Fixture.createKakaoUserInfoDtoByEmail;
-import static com.example.solidconnection.e2e.Fixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createKakaoUserInfoDtoByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
 import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -58,7 +57,7 @@ class SignInTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(FirstAccessResponse.class);
 
-        KakaoProfileDto kakaoProfileDto = kakaoUserInfoDto.kakaoAccountDto().profile();
+        KakaoUserInfoDto.KakaoAccountDto.KakaoProfileDto kakaoProfileDto = kakaoUserInfoDto.kakaoAccountDto().profile();
         assertAll("카카오톡 사용자 정보를 응답한다.",
                 () -> assertThat(response.isRegistered()).isFalse(),
                 () -> assertThat(response.email()).isEqualTo(email),
@@ -78,7 +77,7 @@ class SignInTest extends BaseEndToEndTest {
         given(kakaoOAuthClient.processOauth(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
-        // setup - 사용자 정보 저장
+        // setUp - 사용자 정보 저장
         siteUserRepository.save(createSiteUserFixtureByEmail(email));
 
         // request - body 생성 및 요청
@@ -108,7 +107,7 @@ class SignInTest extends BaseEndToEndTest {
         given(kakaoOAuthClient.processOauth(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
-        // setup - 계정 복구 기간이 되지 않은 사용자 저장
+        // setUp - 계정 복구 기간이 되지 않은 사용자 저장
         SiteUser siteUserFixture = createSiteUserFixtureByEmail(email);
         LocalDate justBeforeRemoval = LocalDate.now().minusDays(ACCOUNT_RECOVER_DURATION - 1);
         siteUserFixture.setQuitedAt(justBeforeRemoval);

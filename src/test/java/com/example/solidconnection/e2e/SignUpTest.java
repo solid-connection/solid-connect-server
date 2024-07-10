@@ -30,8 +30,8 @@ import java.util.List;
 import static com.example.solidconnection.custom.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_EXISTED;
-import static com.example.solidconnection.e2e.Fixture.createSiteUserFixtureByEmail;
-import static com.example.solidconnection.e2e.Fixture.createSiteUserFixtureByNickName;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByNickName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
