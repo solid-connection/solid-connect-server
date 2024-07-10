@@ -12,6 +12,7 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,6 @@ import java.util.Objects;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
 import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
-import static com.example.solidconnection.university.service.UniversityService.TERM;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +30,8 @@ public class ApplicationSubmissionService {
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final SiteUserRepository siteUserRepository;
+    @Value("${university.term}")
+    public String term;
 
     /*
      * 학점과 영어 성적을 제출한다.
@@ -69,9 +71,9 @@ public class ApplicationSubmissionService {
 
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
-                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), TERM);
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
         UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository
-                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), TERM);
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), term);
 
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(

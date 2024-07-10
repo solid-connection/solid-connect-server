@@ -5,12 +5,12 @@ import com.example.solidconnection.university.repository.UniversityInfoForApplyR
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
-import static com.example.solidconnection.university.service.UniversityService.TERM;
 
 @RequiredArgsConstructor
 @Component
@@ -31,11 +31,14 @@ public class GeneralRecommendUniversities {
             "그라츠공과대학", "그라츠 대학", "코펜하겐 IT대학", "메이지대학", "분쿄가쿠인대학"
     );
 
+    @Value("${university.term}")
+    public String term;
+
     @PostConstruct
     public void init() {
         int i = 0;
         while (recommendUniversities.size() < RECOMMEND_UNIVERSITY_NUM && i < candidates.size()) {
-            universityInfoForApplyRepository.findByUniversity_KoreanNameAndTerm(candidates.get(i), TERM)
+            universityInfoForApplyRepository.findByUniversity_KoreanNameAndTerm(candidates.get(i), term)
                     .ifPresent(recommendUniversities::add);
             i++;
         }

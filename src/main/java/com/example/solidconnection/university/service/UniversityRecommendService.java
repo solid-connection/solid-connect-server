@@ -7,14 +7,13 @@ import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewR
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.example.solidconnection.university.service.UniversityService.TERM;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +24,8 @@ public class UniversityRecommendService {
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final GeneralRecommendUniversities generalRecommendUniversities;
     private final SiteUserRepository siteUserRepository;
+    @Value("${university.term}")
+    public String term;
 
     /*
      * 사용자 맞춤 추천 대학교를 불러온다.
@@ -37,7 +38,7 @@ public class UniversityRecommendService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         // 맞춤 추천 대학교를 불러온다.
         List<UniversityInfoForApply> personalRecommends = universityInfoForApplyRepository
-                .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, TERM);
+                .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
         List<UniversityInfoForApply> shuffledList
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIVERSITY_NUM, personalRecommends.size()));
         Collections.shuffle(personalRecommends);

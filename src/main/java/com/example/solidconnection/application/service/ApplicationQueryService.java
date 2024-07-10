@@ -14,6 +14,7 @@ import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
-import static com.example.solidconnection.university.service.UniversityService.TERM;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +32,8 @@ public class ApplicationQueryService {
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final SiteUserRepository siteUserRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
+    @Value("${university.term}")
+    public String term;
 
     /*
      * 다른 지원자들의 성적을 조회한다.
@@ -82,7 +84,7 @@ public class ApplicationQueryService {
             List<University> searchedUniversities,
             SiteUser siteUser,
             Function<UniversityInfoForApply, List<Application>> findApplicationsByChoice) {
-        return universityInfoForApplyRepository.findByUniversitiesAndTerm(searchedUniversities, TERM).stream()
+        return universityInfoForApplyRepository.findByUniversitiesAndTerm(searchedUniversities, term).stream()
                 .map(universityInfoForApply -> UniversityApplicantsResponse.of(
                         universityInfoForApply,
                         findApplicationsByChoice.apply(universityInfoForApply).stream()
