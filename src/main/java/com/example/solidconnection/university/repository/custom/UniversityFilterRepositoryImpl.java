@@ -33,20 +33,6 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
-/*
-
-        System.out.println(regionCodeEq(regionCode, region).and(countryOrUniversityContainsKeyword(country, university, keywords)));
-
-        System.out.println(queryFactory
-                .selectFrom(university)
-                .join(university.country, country)
-                .join(country.region, region)
-                .where(
-                        regionCodeEq(regionCode, region)
-                                .and(countryOrUniversityContainsKeyword(country, university, keywords))
-                )
-                .fetch());
-*/
 
         return queryFactory
                 .selectFrom(university)

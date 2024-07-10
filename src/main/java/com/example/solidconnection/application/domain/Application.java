@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -38,6 +39,7 @@ public class Application {
     @Embedded
     private LanguageTest languageTest;
 
+    @Setter
     @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus;

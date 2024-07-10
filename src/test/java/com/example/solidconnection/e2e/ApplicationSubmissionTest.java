@@ -187,11 +187,10 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
 
         // request - body 생성 및 요청
         UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId());
-        ErrorResponse errorResponse = RestAssured.given()
+        ErrorResponse errorResponse = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)
                 .contentType("application/json")
-                .log().all()
                 .post("/application/university")
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
