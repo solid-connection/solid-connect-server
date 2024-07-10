@@ -15,13 +15,11 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import static com.example.solidconnection.type.VerifyStatus.PENDING;
 
-@ToString
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @DynamicUpdate

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.application.service.VerifyStatusQueryService.ApplicationStatusResponse.COLLEGE_SUBMITTED;
 import static com.example.solidconnection.application.service.VerifyStatusQueryService.ApplicationStatusResponse.NOT_SUBMITTED;
 import static com.example.solidconnection.application.service.VerifyStatusQueryService.ApplicationStatusResponse.SCORE_SUBMITTED;
 import static com.example.solidconnection.application.service.VerifyStatusQueryService.ApplicationStatusResponse.SUBMITTED_APPROVED;
@@ -43,10 +42,6 @@ public class VerifyStatusQueryService {
 
         // 제출한 상태
         if (application.get().getVerifyStatus() == VerifyStatus.PENDING) {
-            // 지망 대학만 제출
-            if (application.get().getGpa().getGpaReportUrl() == null) {
-                return new VerifyStatusResponse(COLLEGE_SUBMITTED.name(), updateCount);
-            }
             // 성적만 제출
             if (application.get().getFirstChoiceUniversity() == null) {
                 return new VerifyStatusResponse(SCORE_SUBMITTED.name(), 0);
