@@ -87,7 +87,6 @@ abstract class UniversityDataSetUpEndToEndTest {
     public void setUpBasicData() {
         RestAssured.port = port;
 
-        System.out.println("term 이 뭐자?" + term);
         영미권 = regionRepository.save(new Region("AMERICAS", "영미권"));
         유럽 = regionRepository.save(new Region("EUROPE", "유럽"));
         아시아 = regionRepository.save(new Region("ASIA", "아시아"));

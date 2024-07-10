@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 
 @Getter
@@ -41,11 +42,12 @@ public enum ErrorCode {
     INVALID_FILE_EXTENSIONS(HttpStatus.BAD_REQUEST.value(), "파일 형식이 유효하지 않습니다."),
 
     // invalid operation
+    SCORE_SHOULD_SUBMITTED_FIRST(HttpStatus.BAD_REQUEST.value(), "성적을 먼저 제출해주세요."),
     USER_ALREADY_EXISTED(HttpStatus.CONFLICT.value(), "이미 존재하는 회원입니다."),
     NICKNAME_ALREADY_EXISTED(HttpStatus.CONFLICT.value(), "이미 존재하는 닉네임입니다."),
     INVALID_TEST_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않은 어학 시험 종류입니다."),
     APPLICATION_NOT_APPROVED(HttpStatus.BAD_REQUEST.value(), "성적표가 인증되지 않았습니다."),
-    APPLY_UPDATE_LIMIT_EXCEED(HttpStatus.BAD_REQUEST.value(), "지원 정보 수정은 3회까지만 가능합니다."),
+    APPLY_UPDATE_LIMIT_EXCEED(HttpStatus.BAD_REQUEST.value(), "지원 정보 수정은 " + APPLICATION_UPDATE_COUNT_LIMIT + "회까지만 가능합니다."),
     CANT_APPLY_FOR_SAME_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "1, 2지망에 동일한 대학교를 입력할 수 없습니다."),
     CAN_NOT_CHANGE_NICKNAME_YET(HttpStatus.BAD_REQUEST.value(), "마지막 닉네임 변경으로부터 " + MIN_DAYS_BETWEEN_NICKNAME_CHANGES + "일이 지나지 않았습니다."),
 

@@ -14,14 +14,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import static com.example.solidconnection.type.VerifyStatus.PENDING;
 
+@ToString
 @Getter
-@DynamicInsert
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@DynamicUpdate
+@DynamicInsert
 @Entity
 public class Application {
 
@@ -35,16 +38,14 @@ public class Application {
     @Embedded
     private LanguageTest languageTest;
 
-    @ColumnDefault("'PENDING'")
-    @Column(nullable = false, length = 50)
+    @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus;
 
     @Column(length = 100)
     private String nicknameForApply;
 
-    @ColumnDefault("0")
-    @Column(nullable = false)
+    @Column(columnDefinition = "int not null default 0")
     private Integer updateCount;
 
     @ManyToOne
@@ -59,23 +60,10 @@ public class Application {
     public Application(
             SiteUser siteUser,
             Gpa gpa,
-            LanguageTest languageTest,
-            String nicknameForApply) {
+            LanguageTest languageTest) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.nicknameForApply = nicknameForApply;
-    }
-
-    public Application(
-            SiteUser siteUser,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            String nicknameForApply) {
-        this.siteUser = siteUser;
-        this.firstChoiceUniversity = firstChoiceUniversity;
-        this.secondChoiceUniversity = secondChoiceUniversity;
-        this.nicknameForApply = nicknameForApply;
     }
 
     public void updateGpaAndLanguageTest(
