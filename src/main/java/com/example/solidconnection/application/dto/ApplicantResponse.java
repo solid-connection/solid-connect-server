@@ -5,7 +5,7 @@ import com.example.solidconnection.type.LanguageTestType;
 
 public record ApplicantResponse(
         String nicknameForApply,
-        float gpa,
+        double gpa,
         LanguageTestType testType,
         String testScore,
         boolean isMine) {

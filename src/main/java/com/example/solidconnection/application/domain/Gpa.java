@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 public class Gpa {
 
     @Column(nullable = false, name = "gpa")
-    private Float gpa;
+    private Double gpa;
 
     @Column(nullable = false, name = "gpa_creteria")
-    private Float gpaCriteria;
+    private Double gpaCriteria;
 
     @Column(nullable = false, name = "gpa_report_url", length = 500)
     private String gpaReportUrl;

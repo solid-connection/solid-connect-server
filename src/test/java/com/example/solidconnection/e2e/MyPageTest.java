@@ -19,21 +19,19 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("마이페이지 테스트")
 class MyPageTest extends BaseEndToEndTest {
 
-    private final String email = "email@email.com";
-
     @Autowired
     private SiteUserRepository siteUserRepository;
 
     @Autowired
     private TokenService tokenService;
 
+    private final String email = "email@email.com";
     private String accessToken;
 
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        SiteUser siteUser = createSiteUserFixtureByEmail(email);
-        siteUserRepository.save(siteUser);
+        siteUserRepository.save(createSiteUserFixtureByEmail(email));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
         accessToken = tokenService.generateToken(email, TokenType.ACCESS);

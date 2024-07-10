@@ -15,9 +15,9 @@ public record ScoreRequest(
         @NotBlank(message = "어학 증명서를 첨부해주세요.")
         String languageTestReportUrl,
         @NotNull(message = "학점을 입력해주세요.")
-        Float gpa,
+        Double gpa,
         @NotNull(message = "학점 기준을 입력해주세요.")
-        Float gpaCriteria,
+        Double gpaCriteria,
         @NotBlank(message = "대학 성적 증명서를 첨부해주세요.")
         String gpaReportUrl) {
 

@@ -14,7 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import static com.example.solidconnection.type.VerifyStatus.PENDING;
 
 @Getter
 @DynamicInsert
@@ -32,6 +35,7 @@ public class Application {
     @Embedded
     private LanguageTest languageTest;
 
+    @ColumnDefault("'PENDING'")
     @Column(nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus;
@@ -39,6 +43,7 @@ public class Application {
     @Column(length = 100)
     private String nicknameForApply;
 
+    @ColumnDefault("0")
     @Column(nullable = false)
     private Integer updateCount;
 
@@ -78,7 +83,7 @@ public class Application {
             LanguageTest languageTest) {
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.verifyStatus = VerifyStatus.PENDING;
+        this.verifyStatus = PENDING;
     }
 
     public void updateUniversityChoice(

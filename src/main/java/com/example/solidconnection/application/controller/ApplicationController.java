@@ -36,7 +36,7 @@ public class ApplicationController {
             @Valid @RequestBody ScoreRequest scoreRequest) {
         boolean result = applicationSubmissionService.submitScore(principal.getName(), scoreRequest);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(new ApplicationSubmissionResponse(result));
     }
 
@@ -46,7 +46,7 @@ public class ApplicationController {
             @Valid @RequestBody UniversityChoiceRequest universityChoiceRequest) {
         boolean result = applicationSubmissionService.submitUniversityChoice(principal.getName(), universityChoiceRequest);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(new ApplicationSubmissionResponse(result));
     }
 
