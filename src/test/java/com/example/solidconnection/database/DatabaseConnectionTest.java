@@ -31,8 +31,8 @@ class DatabaseConnectionTest {
     @Test
     void connectDatabaseAndCheckTables() {
         assertThatCode(() -> metaData = Objects.requireNonNull(jdbcTemplate.getDataSource())
-                        .getConnection()
-                        .getMetaData())
+                .getConnection()
+                .getMetaData())
                 .doesNotThrowAnyException();
 
         assertAll(

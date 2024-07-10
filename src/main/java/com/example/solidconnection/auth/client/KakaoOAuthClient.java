@@ -25,11 +25,10 @@ import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_
 public class KakaoOAuthClient {
 
     private final RestTemplate restTemplate;
-
+    @Value("${kakao.redirect_uri}")
+    public String redirectUri;
     @Value("${kakao.client_id}")
     private String clientId;
-    @Value("${kakao.redirect_uri}")
-    private String redirectUri;
     @Value("${kakao.token_url}")
     private String tokenUrl;
     @Value("${kakao.user_info_url}")

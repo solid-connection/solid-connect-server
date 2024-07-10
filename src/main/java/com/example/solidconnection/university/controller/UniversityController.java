@@ -39,6 +39,14 @@ public class UniversityController {
         }
     }
 
+    @GetMapping("/{universityInfoForApplyId}/like")
+    public ResponseEntity<IsLikeResponse> getIsLiked(
+            Principal principal,
+            @PathVariable Long universityInfoForApplyId) {
+        IsLikeResponse isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
+        return ResponseEntity.ok(isLiked);
+    }
+
     @PostMapping("/{universityInfoForApplyId}/like")
     public ResponseEntity<LikeResultResponse> addWishUniversity(
             Principal principal,
@@ -53,14 +61,6 @@ public class UniversityController {
             @PathVariable Long universityInfoForApplyId) {
         UniversityDetailResponse universityDetailResponse = universityService.getUniversityDetail(universityInfoForApplyId);
         return ResponseEntity.ok(universityDetailResponse);
-    }
-
-    @GetMapping("/{universityInfoForApplyId}/like")
-    public ResponseEntity<IsLikeResponse> getIsLiked(
-            Principal principal,
-            @PathVariable Long universityInfoForApplyId) {
-        IsLikeResponse isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
-        return ResponseEntity.ok(isLiked);
     }
 
     @GetMapping("/search")

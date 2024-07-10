@@ -51,7 +51,8 @@ public class MyPageService {
 
     /*
      * 마이페이지 정보를 수정한다.
-     * - 정보를 수정하기 전에 닉네임 중복, 닉네임 변경 최소 기간을 검증한다.
+     * - 닉네임 중복을 검증한다.
+     * - '닉네임 변경 최소 기간'이 지나지 않았는데 변경하려 하는지 검증한다.
      * */
     @Transactional
     public MyPageUpdateResponse update(String email, MyPageUpdateRequest pageUpdateRequest) {
@@ -79,7 +80,7 @@ public class MyPageService {
         }
         if (LocalDateTime.now().isBefore(lastModifiedAt.plusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES))) {
             String formatLastModifiedAt
-                    = String.format("(마지막 수정 시간 : %s) ", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
+                    = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
             throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
         }
     }
