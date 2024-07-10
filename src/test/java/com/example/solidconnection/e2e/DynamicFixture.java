@@ -1,8 +1,11 @@
 package com.example.solidconnection.e2e;
 
+import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Gender;
+import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.SemesterAvailableForDispatch;
@@ -16,7 +19,7 @@ import java.util.Set;
 
 public class DynamicFixture {
 
-    public static SiteUser createSiteUserFixtureByEmail(String email) {
+    public static SiteUser createSiteUserByEmail(String email) {
         return new SiteUser(
                 email,
                 "nickname",
@@ -28,7 +31,7 @@ public class DynamicFixture {
         );
     }
 
-    public static SiteUser createSiteUserFixtureByNickName(String nickname) {
+    public static SiteUser createSiteUserByNickName(String nickname) {
         return new SiteUser(
                 "email@email.com",
                 nickname,
@@ -76,5 +79,13 @@ public class DynamicFixture {
     public static LikedUniversity createLikedUniversity(
             SiteUser siteUser, UniversityInfoForApply universityInfoForApply) {
         return new LikedUniversity(null, universityInfoForApply, siteUser);
+    }
+
+    public static Gpa createDummyGpa() {
+        return new Gpa(3.5, 4.0, "gpaReportUrl");
+    }
+
+    public static LanguageTest createDummyLanguageTest() {
+        return new LanguageTest(LanguageTestType.TOEIC, "900", "toeicReportUrl");
     }
 }

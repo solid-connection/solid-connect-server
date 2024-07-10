@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.example.solidconnection.e2e.DynamicFixture.createLikedUniversity;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createUniversityForApply;
 import static com.example.solidconnection.university.service.UniversityService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityService.LIKE_SUCCESS_MESSAGE;
@@ -52,7 +52,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserFixtureByEmail(email);
+        siteUser = createSiteUserByEmail(email);
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장

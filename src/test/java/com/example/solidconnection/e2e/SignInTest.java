@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 
 import static com.example.solidconnection.e2e.DynamicFixture.createKakaoUserInfoDtoByEmail;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -78,7 +78,7 @@ class SignInTest extends BaseEndToEndTest {
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 사용자 정보 저장
-        siteUserRepository.save(createSiteUserFixtureByEmail(email));
+        siteUserRepository.save(createSiteUserByEmail(email));
 
         // request - body 생성 및 요청
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
@@ -108,7 +108,7 @@ class SignInTest extends BaseEndToEndTest {
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 계정 복구 기간이 되지 않은 사용자 저장
-        SiteUser siteUserFixture = createSiteUserFixtureByEmail(email);
+        SiteUser siteUserFixture = createSiteUserByEmail(email);
         LocalDate justBeforeRemoval = LocalDate.now().minusDays(ACCOUNT_RECOVER_DURATION - 1);
         siteUserFixture.setQuitedAt(justBeforeRemoval);
         siteUserRepository.save(siteUserFixture);

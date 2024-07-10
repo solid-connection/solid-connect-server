@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -41,7 +41,7 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserFixtureByEmail(email);
+        siteUser = createSiteUserByEmail(email);
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
@@ -90,7 +90,7 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     @Test
     void 마이_페이지_정보를_수정할_때_닉네임이_중복된다면_예외_응답을_반환한다() {
         // setUp - 같은 닉네임을 갖는 다른 회원 정보 저장
-        SiteUser existUser = createSiteUserFixtureByEmail("existUser");
+        SiteUser existUser = createSiteUserByEmail("existUser");
         String duplicateNickname = "duplicateNickname";
         existUser.setNickname(duplicateNickname);
         siteUserRepository.save(existUser);

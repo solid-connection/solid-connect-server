@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -31,7 +31,7 @@ class MyPageTest extends BaseEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUserRepository.save(createSiteUserFixtureByEmail(email));
+        siteUserRepository.save(createSiteUserByEmail(email));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
         accessToken = tokenService.generateToken(email, TokenType.ACCESS);

@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
 import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -44,7 +44,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = siteUserRepository.save(createSiteUserFixtureByEmail(email));
+        siteUser = siteUserRepository.save(createSiteUserByEmail(email));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
         accessToken = tokenService.generateToken(email, TokenType.ACCESS);

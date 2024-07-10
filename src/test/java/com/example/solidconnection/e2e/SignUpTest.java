@@ -30,8 +30,8 @@ import java.util.List;
 import static com.example.solidconnection.custom.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_EXISTED;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByEmail;
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserFixtureByNickName;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByNickName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -117,7 +117,7 @@ class SignUpTest extends BaseEndToEndTest {
     void 이미_있는_닉네임으로_회원가입하면_예외를_응답한다() {
         // setup - 회원 정보 저장
         String alreadyExistNickname = "nickname";
-        SiteUser alreadyExistUser = createSiteUserFixtureByNickName(alreadyExistNickname);
+        SiteUser alreadyExistUser = createSiteUserByNickName(alreadyExistNickname);
         siteUserRepository.save(alreadyExistUser);
 
         // setup - 카카오 토큰 발급
@@ -144,7 +144,7 @@ class SignUpTest extends BaseEndToEndTest {
     void 이미_있는_이메일로_회원가입하면_예외를_응답한다() {
         // setup - 회원 정보 저장
         String alreadyExistEmail = "email@email.com";
-        SiteUser alreadyExistUser = createSiteUserFixtureByEmail(alreadyExistEmail);
+        SiteUser alreadyExistUser = createSiteUserByEmail(alreadyExistEmail);
         siteUserRepository.save(alreadyExistUser);
 
         // setup - 카카오 토큰 발급
