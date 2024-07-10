@@ -14,6 +14,7 @@ import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewR
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,6 @@ import java.util.Optional;
 @Service
 public class UniversityService {
 
-    public static final String TERM = "2024-2-a";
     public static final String LIKE_SUCCESS_MESSAGE = "LIKE_SUCCESS";
     public static final String LIKE_CANCELED_MESSAGE = "LIKE_CANCELED";
 
@@ -32,6 +32,9 @@ public class UniversityService {
     private final LikedUniversityRepository likedUniversityRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
     private final SiteUserRepository siteUserRepository;
+
+    @Value("${university.term}")
+    public String term;
 
     /*
      * 대학교 상세 정보를 불러온다.

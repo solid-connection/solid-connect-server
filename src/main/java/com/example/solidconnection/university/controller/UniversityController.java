@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.controller;
 
+import com.example.solidconnection.siteuser.service.SiteUserService;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
@@ -27,6 +28,7 @@ public class UniversityController {
 
     private final UniversityService universityService;
     private final UniversityRecommendService universityRecommendService;
+    private final SiteUserService siteUserService;
 
     //todo: uri 를 "/home" 에서 "/university/recommends" 로 변경하고, 위백님께 알리기
     @GetMapping("/recommends")
@@ -37,6 +39,14 @@ public class UniversityController {
         } else {
             return ResponseEntity.ok(universityRecommendService.getPersonalRecommends(principal.getName()));
         }
+    }
+
+    @GetMapping("/like") // todo: uri 를 get university/like로 바꾸고 위백님께 알리기
+    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity(Principal principal) {
+        List<UniversityInfoForApplyPreviewResponse> wishUniversities
+                = siteUserService.getWishUniversity(principal.getName());
+        return ResponseEntity
+                .ok(wishUniversities);
     }
 
     @GetMapping("/{universityInfoForApplyId}/like")

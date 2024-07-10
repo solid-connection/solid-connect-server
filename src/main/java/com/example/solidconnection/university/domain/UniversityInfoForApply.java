@@ -10,17 +10,20 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class UniversityInfoForApply {
 
     @Id
@@ -69,8 +72,12 @@ public class UniversityInfoForApply {
     private String details;
 
     @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.LAZY)
-    private Set<LanguageRequirement> languageRequirements;
+    private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private University university;
+
+    public void addLanguageRequirements(LanguageRequirement languageRequirements) {
+        this.languageRequirements.add(languageRequirements);
+    }
 }
