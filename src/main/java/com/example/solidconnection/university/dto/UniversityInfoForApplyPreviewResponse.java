@@ -2,6 +2,7 @@ package com.example.solidconnection.university.dto;
 
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 
+import java.util.Collections;
 import java.util.List;
 
 public record UniversityInfoForApplyPreviewResponse(
@@ -15,6 +16,12 @@ public record UniversityInfoForApplyPreviewResponse(
         List<LanguageRequirementResponse> languageRequirements) {
 
     public static UniversityInfoForApplyPreviewResponse from(UniversityInfoForApply universityInfoForApply) {
+        List<LanguageRequirementResponse> languageRequirementResponses = new java.util.ArrayList<>(
+                universityInfoForApply.getLanguageRequirements().stream()
+                .map(LanguageRequirementResponse::from)
+                .toList());
+        Collections.sort(languageRequirementResponses);
+
         return new UniversityInfoForApplyPreviewResponse(
                 universityInfoForApply.getId(),
                 universityInfoForApply.getTerm(),
@@ -23,9 +30,7 @@ public record UniversityInfoForApplyPreviewResponse(
                 universityInfoForApply.getUniversity().getCountry().getKoreanName(),
                 universityInfoForApply.getUniversity().getLogoImageUrl(),
                 universityInfoForApply.getStudentCapacity(),
-                universityInfoForApply.getLanguageRequirements().stream()
-                        .map(LanguageRequirementResponse::from)
-                        .toList()
+                languageRequirementResponses
         );
     }
 }
