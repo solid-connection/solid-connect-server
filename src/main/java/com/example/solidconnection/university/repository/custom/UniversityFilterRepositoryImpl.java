@@ -87,6 +87,16 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
                         .and(countryOrUniversityContainsKeyword(country, university, keywords)))
                 .fetch();
 
+        if(testType == null || testScore == null || testScore.isEmpty()) {
+            if(testType != null) {
+                return filteredUniversityInfoForApply.stream()
+                        .filter(uifa -> uifa.getLanguageRequirements().stream()
+                                .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))
+                        .toList();
+            }
+            return filteredUniversityInfoForApply;
+        }
+
         return filteredUniversityInfoForApply.stream()
                 .filter(uifa -> compareMyTestScoreToMinPassScore(uifa, testType, testScore) >= 0)
                 .toList();
