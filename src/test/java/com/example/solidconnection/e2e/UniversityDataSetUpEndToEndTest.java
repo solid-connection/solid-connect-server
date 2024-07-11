@@ -279,7 +279,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         saveLanguageTestRequirement(괌대학_B_지원_정보, LanguageTestType.TOEIC, "900");
         saveLanguageTestRequirement(네바다주립대학_라스베이거스_지원_정보, LanguageTestType.TOEIC, "800");
         saveLanguageTestRequirement(메모리얼대학_세인트존스_A_지원_정보, LanguageTestType.TOEIC, "800");
-        saveLanguageTestRequirement(서던덴마크대학교_지원_정보, LanguageTestType.TOEFL_IBT, "80");
+        saveLanguageTestRequirement(서던덴마크대학교_지원_정보, LanguageTestType.TOEFL_IBT, "70");
         saveLanguageTestRequirement(코펜하겐IT대학_지원_정보, LanguageTestType.TOEFL_IBT, "80");
         saveLanguageTestRequirement(그라츠대학_지원_정보, LanguageTestType.TOEFL_IBT, "80");
         saveLanguageTestRequirement(그라츠공과대학_지원_정보, LanguageTestType.TOEIC, "800");

@@ -5,11 +5,16 @@ import com.example.solidconnection.university.domain.LanguageRequirement;
 
 public record LanguageRequirementResponse(
         LanguageTestType languageTestType,
-        String minScore) {
+        String minScore) implements Comparable<LanguageRequirementResponse> {
 
     public static LanguageRequirementResponse from(LanguageRequirement languageRequirement) {
         return new LanguageRequirementResponse(
                 languageRequirement.getLanguageTestType(),
                 languageRequirement.getMinScore());
+    }
+
+    @Override
+    public int compareTo(LanguageRequirementResponse other) {
+        return this.languageTestType.name().compareTo(other.languageTestType.name());
     }
 }
