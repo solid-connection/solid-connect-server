@@ -22,7 +22,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @RestController
-public class AuthController {
+public class AuthController implements AuthControllerSwagger {
 
     private final AuthService authService;
     private final SignUpService signUpService;
@@ -46,17 +46,13 @@ public class AuthController {
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(Principal principal) {
         authService.signOut(principal.getName());
-        return ResponseEntity
-                .noContent()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/quit")
     public ResponseEntity<Void> quit(Principal principal) {
         authService.quit(principal.getName());
-        return ResponseEntity
-                .noContent()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reissue")
