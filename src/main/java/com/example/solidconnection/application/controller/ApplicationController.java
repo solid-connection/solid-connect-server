@@ -24,7 +24,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/application")
 @RestController
-public class ApplicationController {
+public class ApplicationController implements ApplicationControllerSwagger {
 
     private final ApplicationSubmissionService applicationSubmissionService;
     private final ApplicationQueryService applicationQueryService;
@@ -47,8 +47,8 @@ public class ApplicationController {
         boolean result = applicationSubmissionService.submitUniversityChoice(principal.getName(), universityChoiceRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApplicationSubmissionResponse(result));
-    }
+                    .body(new ApplicationSubmissionResponse(result));
+        }
 
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
