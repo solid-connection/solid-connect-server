@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/university")
 @RestController
-public class UniversityController {
+public class UniversityController implements UniversityControllerSwagger {
 
     private final UniversityService universityService;
     private final UniversityRecommendService universityRecommendService;

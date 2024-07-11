@@ -16,7 +16,7 @@ import java.security.Principal;
 
 import static com.example.solidconnection.config.swagger.SwaggerConfig.ACCESS_TOKEN;
 
-@Tag(name = "S3 Storage", description = "S3 파일 업로드 API")
+@Tag(name = "ImageUpload", description = "S3 파일 업로드 API")
 public interface S3ControllerSwagger {
 
     @Operation(

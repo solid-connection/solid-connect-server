@@ -34,7 +34,7 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("솔리드 커넥션 API 문서✈️")
-                .description("솔리드 커넥션의 API 문서입니다. \n\"Autorization\" 버튼을 눌러 인증을 하면 인증이 필요한 API를 호출할 수 있습니다.")
+                .description("솔리드 커넥션의 API 문서입니다. \n\"Authorize\" 버튼을 눌러 인증을 하면 인증이 필요한 API를 호출할 수 있습니다.")
                 .version("1.0.0");
     }
 }
