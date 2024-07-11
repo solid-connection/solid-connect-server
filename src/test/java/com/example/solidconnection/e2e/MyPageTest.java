@@ -19,13 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("마이페이지 테스트")
 class MyPageTest extends BaseEndToEndTest {
 
+    private final String email = "email@email.com";
     @Autowired
     private SiteUserRepository siteUserRepository;
-
     @Autowired
     private TokenService tokenService;
-
-    private final String email = "email@email.com";
     private String accessToken;
 
     @BeforeEach

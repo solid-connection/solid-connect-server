@@ -131,14 +131,12 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
                         List.of(ApplicantResponse.of(나의_지원정보, true))),
                 UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))
-        ));
+                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))));
         assertThat(secondChoiceApplicants).containsAnyElementsOf(List.of(
                 UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                         List.of(ApplicantResponse.of(나의_지원정보, true))),
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                        List.of(ApplicantResponse.of(사용자1_지원정보, false)))
-        ));
+                        List.of(ApplicantResponse.of(사용자1_지원정보, false)))));
     }
 
     @Test
