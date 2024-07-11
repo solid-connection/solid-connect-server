@@ -14,7 +14,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/file")
 @RestController
-public class S3Controller {
+public class S3Controller implements S3ControllerSwagger {
 
     private final S3Service s3Service;
 
