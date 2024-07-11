@@ -28,7 +28,6 @@ public class AuthController implements AuthControllerSwagger {
     private final SignUpService signUpService;
     private final SignInService signInService;
 
-    //TODO: 추후 OAuth 추가를 염두에 둔다면 "/sign-in/kakao" 로 바꿔야 할 것 같다.
     @PostMapping("/kakao")
     public ResponseEntity<KakaoOauthResponse> processKakaoOauth(@RequestBody KakaoCodeRequest kakaoCodeRequest) {
         KakaoOauthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);

@@ -30,7 +30,6 @@ public class UniversityController implements UniversityControllerSwagger {
     private final UniversityRecommendService universityRecommendService;
     private final SiteUserService siteUserService;
 
-    //todo: uri 를 "/home" 에서 "/university/recommends" 로 변경하고, 위백님께 알리기
     @GetMapping("/recommends")
     public ResponseEntity<UniversityRecommendsResponse> getUniversityRecommends(
             Principal principal) {
@@ -41,7 +40,7 @@ public class UniversityController implements UniversityControllerSwagger {
         }
     }
 
-    @GetMapping("/like") // todo: uri 를 get university/like로 바꾸고 위백님께 알리기
+    @GetMapping("/like")
     public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity(Principal principal) {
         List<UniversityInfoForApplyPreviewResponse> wishUniversities
                 = siteUserService.getWishUniversity(principal.getName());
