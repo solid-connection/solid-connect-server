@@ -7,6 +7,7 @@ import com.example.solidconnection.siteuser.repository.LikedUniversityRepository
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
@@ -129,5 +130,21 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 () -> assertThat(likedUniversity).isEmpty(),
                 () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE)
         );
+    }
+
+    @Test
+    void 대학의_좋아요_여부를_조회한다() {
+        // setUp - 대학교 좋아요 저장
+        likedUniversityRepository.save(createLikedUniversity(siteUser, 괌대학_A_지원_정보));
+
+        // request - 요청
+        IsLikeResponse response = RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .get("/university/"+ 괌대학_A_지원_정보.getId() +"/like")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().as(IsLikeResponse.class);
+
+        assertThat(response.isLike()).isTrue();
     }
 }
