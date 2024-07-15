@@ -1,0 +1,41 @@
+spring:
+  profiles:
+    group:
+      prod:
+        - prod
+        - secret
+      local:
+        - local
+        - secret
+      test:
+        - test
+        - secret
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    generate-ddl: false
+    show-sql: false
+    database: mysql
+    defer-datasource-initialization: true
+
+  mvc:
+    path match:
+      matching-strategy: ANT_PATH_MATCHER
+
+  sql:
+    init:
+      mode: never
+
+jwt:
+  secret:
+    aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+
+kakao:
+  token_url: "https://kauth.kakao.com/oauth/token"
+  user_info_url: "https://kapi.kakao.com/v2/user/me"

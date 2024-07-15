@@ -1,0 +1,30 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+    show-sql: true
+    database: mysql
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/solid_connection?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: solid_connection_local_username
+    password: solid_connection_local_password
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+kakao:
+  redirect_uri: "http://localhost:8080/auth/kakao"
