@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: solid-connection-local-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: solid_connection_local_root_password
+      MYSQL_DATABASE: solid_connection
+      MYSQL_USER: solid_connection_local_username
+      MYSQL_PASSWORD: solid_connection_local_password
+    ports:
+      - "3306:3306"
+#    volumes:
+#      - mysql_data_local:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: solid-connection-local-redis
+    ports:
+      - "6379:6379"
+#    volumes:
+#      - redis_data_local:/data
+
+#volumes:
+#  mysql_data_local:
+#  redis_data_local:
