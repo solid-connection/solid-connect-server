@@ -44,7 +44,12 @@ class DatabaseConnectionTest {
                 () -> assertThat(isTableExist("LANGUAGE_REQUIREMENT")).isTrue(),
                 () -> assertThat(isTableExist("UNIVERSITY")).isTrue(),
                 () -> assertThat(isTableExist("LIKED_UNIVERSITY")).isTrue(),
-                () -> assertThat(isTableExist("UNIVERSITY_INFO_FOR_APPLY")).isTrue()
+                () -> assertThat(isTableExist("UNIVERSITY_INFO_FOR_APPLY")).isTrue(),
+                () -> assertThat(isTableExist("BOARD")).isTrue(),
+                () -> assertThat(isTableExist("COMMENT")).isTrue(),
+                () -> assertThat(isTableExist("POST")).isTrue(),
+                () -> assertThat(isTableExist("POST_IMAGE")).isTrue(),
+                () -> assertThat(isTableExist("POST_LIKE")).isTrue()
         );
     }
 
