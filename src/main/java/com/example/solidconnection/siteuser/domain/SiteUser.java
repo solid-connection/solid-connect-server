@@ -1,26 +1,24 @@
 package com.example.solidconnection.siteuser.domain;
 
+import com.example.solidconnection.entity.Comment;
+import com.example.solidconnection.entity.Post;
+import com.example.solidconnection.entity.mapping.PostLike;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Builder
+@AllArgsConstructor
 public class SiteUser {
 
     @Id
@@ -58,6 +56,15 @@ public class SiteUser {
 
     @Setter
     private LocalDate quitedAt;
+
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    private List<Post> postList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    private List<PostLike> postLikeList = new ArrayList<>();
 
     public SiteUser(
             String email,
