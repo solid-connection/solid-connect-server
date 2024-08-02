@@ -6,16 +6,12 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.PostCategory;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@DynamicUpdate
-@DynamicInsert
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
