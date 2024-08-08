@@ -39,3 +39,8 @@ jwt:
 kakao:
   token_url: "https://kauth.kakao.com/oauth/token"
   user_info_url: "https://kapi.kakao.com/v2/user/me"
+
+view:
+  count:
+    scheduling:
+      delay: 3000
