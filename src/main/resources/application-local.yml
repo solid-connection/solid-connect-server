@@ -10,6 +10,9 @@ spring:
     show-sql: true
     database: mysql
     defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
 
   sql:
     init:
