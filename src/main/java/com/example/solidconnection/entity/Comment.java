@@ -1,10 +1,9 @@
 package com.example.solidconnection.entity;
 
 import com.example.solidconnection.entity.common.BaseEntity;
+import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,10 +12,15 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Comment extends BaseEntity {
+
+    // for recursive query
+    @Transient
+    private int level;
+
+    @Transient
+    private String path;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
