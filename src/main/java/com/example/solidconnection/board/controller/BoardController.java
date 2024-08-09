@@ -2,6 +2,7 @@ package com.example.solidconnection.board.controller;
 
 import com.example.solidconnection.board.service.BoardService;
 import com.example.solidconnection.post.dto.BoardFindPostResponse;
+import com.example.solidconnection.type.BoardCode;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +27,9 @@ public class BoardController {
     @GetMapping()
     public ResponseEntity<?> findAccessibleCodes() {
         List<String> accessibleCodeList = new ArrayList<>();
-        accessibleCodeList.add("EUROPE");
-        accessibleCodeList.add("AMERICAS");
-        accessibleCodeList.add("ASIA");
-        accessibleCodeList.add("FREE");
+        for (BoardCode boardCode : BoardCode.values()) {
+            accessibleCodeList.add(String.valueOf(boardCode));
+        }
         return ResponseEntity.ok().body(accessibleCodeList);
     }
 
