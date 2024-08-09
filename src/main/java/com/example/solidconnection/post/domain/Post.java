@@ -94,9 +94,9 @@ public class Post extends BaseEntity {
     }
 
     public void update(PostUpdateRequest postUpdateRequest) {
-        this.title = postUpdateRequest.getTitle();
-        this.content = postUpdateRequest.getContent();
-        this.category = PostCategory.valueOf(postUpdateRequest.getPostCategory());
+        this.title = postUpdateRequest.title();
+        this.content = postUpdateRequest.content();
+        this.category = PostCategory.valueOf(postUpdateRequest.postCategory());
     }
 
     public void increaseViewCount(Long updateViewCount) {
