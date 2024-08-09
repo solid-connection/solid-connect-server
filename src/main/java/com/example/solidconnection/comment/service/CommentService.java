@@ -15,7 +15,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    private Boolean getIsOwner(Comment comment, String email) {
+    private Boolean isOwner(Comment comment, String email) {
         return comment.getSiteUser().getEmail().equals(email);
     }
 
@@ -23,7 +23,7 @@ public class CommentService {
     public List<PostFindCommentResponse> findCommentsByPostId(String email, Long postId) {
         return commentRepository.findCommentTreeByPostId(postId)
                 .stream()
-                .map(comment -> PostFindCommentResponse.from(getIsOwner(comment, email), comment))
+                .map(comment -> PostFindCommentResponse.from(isOwner(comment, email), comment))
                 .collect(Collectors.toList());
     }
 }
