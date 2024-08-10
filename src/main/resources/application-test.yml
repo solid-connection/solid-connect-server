@@ -22,5 +22,25 @@ spring:
       host: localhost
       port: 6379
 
+# 빈 생성 성공만을 위한 가짜 데이터
 kakao:
-  redirect_uri: "http://localhost:8080/auth/kakao"
+  redirect_uri: kakao-redirect-uri-for-test
+  client_id: kakao-client-id-for-test-012345678910
+
+jwt:
+  secret: jwt-secret-key-for-test-012345678910
+
+cloud:
+  aws:
+    credentials:
+      access-key: access-key-for-test-012345678910
+      secret-key: secret-key-for-test-012345678910
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: s3-bucket-for-test-012345678910
+
+university:
+  term: 2099-1
