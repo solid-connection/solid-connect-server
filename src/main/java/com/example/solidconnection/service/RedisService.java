@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import static com.example.solidconnection.type.RedisConstants.*;
 
@@ -23,21 +24,20 @@ public class RedisService {
     }
 
     // incr & set ttl -> lua
-    public void increaseViewCountSync(Long postId) {
-        String key = getPostKey(postId);
+    public void increaseViewCountSync(String key) {
         redisTemplate.execute(incrViewCountLuaScript, Collections.singletonList(key), VIEW_COUNT_TTL.getValue());
     }
 
-    public void deletePostViewCountKey(Long postId) {
-        String key = getPostKey(postId);
+    public void deleteKey(String key){
         redisTemplate.opsForValue().getAndDelete(key);
     }
 
-    public Long getViewCountValueAndDeleteKey(String key) {
+    public Long getAndDelete(String key) {
         return Long.valueOf(redisTemplate.opsForValue().getAndDelete(key));
     }
 
-    private String getPostKey(Long postId) {
-        return VIEW_COUNT_KEY_PREFIX.getValue() + postId;
+    public boolean isPresent(String key) {
+        return Boolean.TRUE.equals(redisTemplate.opsForValue()
+                .setIfAbsent(key, "1", Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()), TimeUnit.SECONDS));
     }
 }
