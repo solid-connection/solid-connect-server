@@ -20,10 +20,6 @@ spring:
     init:
       mode: never
 
-jwt:
-  secret:
-    aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
-
 kakao:
   token_url: "https://kauth.kakao.com/oauth/token"
   user_info_url: "https://kapi.kakao.com/v2/user/me"
