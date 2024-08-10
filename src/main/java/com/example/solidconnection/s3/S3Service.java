@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
@@ -76,6 +73,40 @@ public class S3Service {
         return new UploadedFileUrlResponse(amazonS3.getUrl(bucket, fileName).toString());
     }
 
+    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
+
+        List<UploadedFileUrlResponse> uploadedFileUrlResponseList = new ArrayList<>();
+
+        for (MultipartFile file : multipartFile) {
+            // 파일 검증
+            validateImgFile(file);
+
+            // 메타데이터 생성
+            String contentType = file.getContentType();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(contentType);
+            metadata.setContentLength(file.getSize());
+
+            // 파일 이름 생성
+            UUID randomUUID = UUID.randomUUID();
+            String fileName = imageFile.getType() + "/" + randomUUID;
+
+            try {
+                amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+            } catch (AmazonServiceException e) {
+                log.error("이미지 업로드 중 s3 서비스 예외 발생 : {}", e.getMessage());
+                throw new CustomException(S3_SERVICE_EXCEPTION);
+            } catch (SdkClientException | IOException e) {
+                log.error("이미지 업로드 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
+                throw new CustomException(S3_CLIENT_EXCEPTION);
+            }
+            uploadedFileUrlResponseList.add(new UploadedFileUrlResponse(amazonS3.getUrl(bucket, fileName).toString()));
+        }
+
+        return uploadedFileUrlResponseList;
+    }
+
     private void validateImgFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new CustomException(FILE_NOT_EXIST);
@@ -108,6 +139,11 @@ public class S3Service {
         deleteFile(key);
     }
 
+    public void deletePostImage(String url) {
+        String key = getPostImageUrl(url);
+        deleteFile(key);
+    }
+
     private void deleteFile(String fileName) {
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
@@ -125,5 +161,10 @@ public class S3Service {
         String fileName = siteUser.getProfileImageUrl();
         int domainStartIndex = fileName.indexOf(".com");
         return fileName.substring(domainStartIndex + 5);
+    }
+
+    private String getPostImageUrl(String url) {
+        int domainStartIndex = url.indexOf(".com");
+        return url.substring(domainStartIndex + 5);
     }
 }

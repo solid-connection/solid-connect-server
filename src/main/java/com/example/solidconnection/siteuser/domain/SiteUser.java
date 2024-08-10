@@ -1,7 +1,7 @@
 package com.example.solidconnection.siteuser.domain;
 
 import com.example.solidconnection.entity.Comment;
-import com.example.solidconnection.entity.Post;
+import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.entity.mapping.PostLike;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
@@ -17,7 +17,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Builder
 @AllArgsConstructor
 public class SiteUser {
 
@@ -57,13 +56,13 @@ public class SiteUser {
     @Setter
     private LocalDate quitedAt;
 
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> postLikeList = new ArrayList<>();
 
     public SiteUser(

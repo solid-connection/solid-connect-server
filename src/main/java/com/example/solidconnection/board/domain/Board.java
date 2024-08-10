@@ -1,19 +1,15 @@
-package com.example.solidconnection.entity;
+package com.example.solidconnection.board.domain;
 
+import com.example.solidconnection.post.domain.Post;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Board {
 
     @Id
@@ -23,7 +19,11 @@ public class Board {
     @Column(nullable = false, length = 20)
     private String koreanName;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
-}
 
+    public Board(String code, String koreanName) {
+        this.code = code;
+        this.koreanName = koreanName;
+    }
+}

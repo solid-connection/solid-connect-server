@@ -39,3 +39,7 @@ out/
 ### YML ###
 application-secret.yml
 application-prod.yml
+
+### docker volumes ###
+mysql_data_local
+redis_data_local
