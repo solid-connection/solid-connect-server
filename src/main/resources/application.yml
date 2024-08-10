@@ -11,6 +11,10 @@ spring:
         - test
         - secret
 
+  tomcat:
+    threads:
+      min-spare: 20 # default 10
+
   servlet:
     multipart:
       max-file-size: 10MB
