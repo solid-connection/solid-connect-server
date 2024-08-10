@@ -11,6 +11,7 @@ import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
+import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.solidconnection.type.RedisConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -39,6 +41,8 @@ public class PostViewCountConcurrencyTest {
     private BoardRepository boardRepository;
     @Autowired
     private SiteUserRepository siteUserRepository;
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Value("${view.count.scheduling.delay}")
     private int SCHEDULING_DELAY_MS;
@@ -47,7 +51,6 @@ public class PostViewCountConcurrencyTest {
     private int TIMEOUT_SECONDS = 10;
 
     private Post post;
-    private Post postToBeDeleted;
     private Board board;
     private SiteUser siteUser;
 
@@ -59,8 +62,6 @@ public class PostViewCountConcurrencyTest {
         siteUserRepository.save(siteUser);
         post = createPost(board, siteUser);
         postRepository.save(post);
-        postToBeDeleted = createPost(board, siteUser);
-        postRepository.save(postToBeDeleted);
     }
 
     private SiteUser createSiteUser() {
@@ -96,8 +97,6 @@ public class PostViewCountConcurrencyTest {
 
     @Test
     public void 게시글을_조회할_때_조회수_동시성_문제를_해결한다() throws InterruptedException {
-        Thread.sleep(SCHEDULING_DELAY_MS);
-        long startTime = System.currentTimeMillis();
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -105,7 +104,7 @@ public class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    redisService.increaseViewCountSync(post.getId());
+                    redisService.increaseViewCountSync(redisUtils.getPostViewCountRedisKey(post.getId()));
                 } finally {
                     doneSignal.countDown();
                 }
@@ -121,11 +120,52 @@ public class PostViewCountConcurrencyTest {
 
         Thread.sleep(SCHEDULING_DELAY_MS);
 
-        long endTime = System.currentTimeMillis();
-        long runningTime = endTime - startTime - SCHEDULING_DELAY_MS;
-        System.out.println("runningTime: " + runningTime + "ms");
+        assertEquals(THREAD_NUMS, postRepository.getById(post.getId()).getViewCount());
+    }
 
-        Long viewCount = postRepository.getById(post.getId()).getViewCount();
-        assertEquals(THREAD_NUMS, viewCount);
+    @Test
+    public void 게시글을_조회할_때_조회수_조작_문제를_해결한다() throws InterruptedException {
+
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+
+        ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
+
+        for (int i = 0; i < THREAD_NUMS; i++) {
+            executorService.submit(() -> {
+                try {
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    if (isFirstTime) {
+                        redisService.increaseViewCountSync(redisUtils.getPostViewCountRedisKey(post.getId()));
+                    }
+                } finally {
+                    doneSignal.countDown();
+                }
+            });
+        }
+        Thread.sleep(Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()) * 1000);
+        for (int i = 0; i < THREAD_NUMS; i++) {
+            executorService.submit(() -> {
+                try {
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    if (isFirstTime) {
+                        redisService.increaseViewCountSync(redisUtils.getPostViewCountRedisKey(post.getId()));
+                    }
+                } finally {
+                    doneSignal.countDown();
+                }
+            });
+        }
+
+        doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        executorService.shutdown();
+        boolean terminated = executorService.awaitTermination(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        if (!terminated) {
+            System.err.println("ExecutorService did not terminate in the expected time.");
+        }
+
+        Thread.sleep(SCHEDULING_DELAY_MS);
+
+        assertEquals(2L, postRepository.getById(post.getId()).getViewCount());
     }
 }

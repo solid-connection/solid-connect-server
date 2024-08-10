@@ -20,6 +20,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.*;
+import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,8 @@ public class PostServiceTest {
     CommentService commentService;
     @Mock
     RedisService redisService;
+    @Mock
+    RedisUtils redisUtils;
 
     private SiteUser siteUser;
     private Board board;
@@ -429,7 +432,6 @@ public class PostServiceTest {
         assertEquals(expectedResponse, response);
         verify(postRepository, times(1)).getByIdUsingEntityGraph(post.getId());
         verify(commentService, times(1)).findCommentsByPostId(siteUser.getEmail(), post.getId());
-        verify(redisService, times(1)).increaseViewCountSync(post.getId());
     }
 
     @Test
@@ -475,7 +477,7 @@ public class PostServiceTest {
         // Then
         assertEquals(postDeleteResponse.id(), post.getId());
         verify(postRepository, times(1)).getById(post.getId());
-        verify(redisService, times(1)).deletePostViewCountKey(post.getId());
+        verify(redisService, times(1)).deleteKey(redisUtils.getPostViewCountRedisKey(post.getId()));
         verify(postRepository, times(1)).deleteById(post.getId());
     }
 
