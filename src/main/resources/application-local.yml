@@ -2,6 +2,7 @@ spring:
   config:
     activate:
       on-profile: local
+    import: classpath:/secret/application-secret.yml
 
   jpa:
     hibernate:
@@ -28,3 +29,6 @@ spring:
 
 kakao:
   redirect_uri: "http://localhost:8080/auth/kakao"
+
+university:
+  term: 2024-2-a
