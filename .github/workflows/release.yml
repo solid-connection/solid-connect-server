@@ -13,12 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Create application-secret.yml
-      run: echo "${{ secrets.APPLICATION_SECRET }}" > src/main/resources/application-secret.yml
+    - name: Set secret files
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
+        submodules: true
 
-    - name: Create application-prod.yml
-      run: echo "${{ secrets.APPLICATION_PROD }}" > src/main/resources/application-prod.yml
-    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
