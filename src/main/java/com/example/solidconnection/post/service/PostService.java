@@ -19,6 +19,7 @@ import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.ImgType;
+import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class PostService {
     private final S3Service s3Service;
     private final CommentService commentService;
     private final RedisService redisService;
+    private final RedisUtils redisUtils;
 
     private String validateCode(String code) {
         try {
@@ -142,8 +144,10 @@ public class PostService {
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
         List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(email, postId);
 
-        // caching
-        redisService.increaseViewCountSync(postId);
+        // caching && 어뷰징 방지
+        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(email,postId))) {
+            redisService.increaseViewCountSync(redisUtils.getPostViewCountRedisKey(postId));
+        }
 
         return PostFindResponse.from(
                 post, isOwner, boardPostFindResultDTO, siteUserPostFindResultDTO, commentFindResultDTOList, postImageFindResultDTOList);
@@ -160,7 +164,7 @@ public class PostService {
         removePostImages(post);
         post.resetBoardAndSiteUser();
         // cache out
-        redisService.deletePostViewCountKey(postId);
+        redisService.deleteKey(redisUtils.getPostViewCountRedisKey(postId));
         postRepository.deleteById(post.getId());
 
         return new PostDeleteResponse(postId);
