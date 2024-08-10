@@ -11,6 +11,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.example.solidconnection.type.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PREFIX;
+
 @Component
 public class RedisUtils {
 
@@ -33,5 +36,17 @@ public class RedisUtils {
 
     public Long getExpirationTime(String key) {
         return redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+    }
+
+    public String getPostViewCountRedisKey(Long postId) {
+        return VIEW_COUNT_KEY_PREFIX.getValue() + postId;
+    }
+
+    public String getValidatePostViewCountRedisKey(String email, Long postId) {
+        return VALIDATE_VIEW_COUNT_KEY_PREFIX.getValue() + postId + ":" + email;
+    }
+
+    public Long getPostIdFromPostViewCountRedisKey(String key) {
+        return Long.parseLong(key.substring(VIEW_COUNT_KEY_PREFIX.getValue().length()));
     }
 }
