@@ -1,16 +1,4 @@
 spring:
-  profiles:
-    group:
-      prod:
-        - prod
-        - secret
-      local:
-        - local
-        - secret
-      test:
-        - test
-        - secret
-
   servlet:
     multipart:
       max-file-size: 10MB
@@ -39,3 +27,10 @@ jwt:
 kakao:
   token_url: "https://kauth.kakao.com/oauth/token"
   user_info_url: "https://kapi.kakao.com/v2/user/me"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: classpath:/secret/application-prod.yml
