@@ -24,7 +24,7 @@ public class RedisService {
     }
 
     // incr & set ttl -> lua
-    public void increaseViewCountSync(String key) {
+    public void increaseViewCount(String key) {
         redisTemplate.execute(incrViewCountLuaScript, Collections.singletonList(key), VIEW_COUNT_TTL.getValue());
     }
 
