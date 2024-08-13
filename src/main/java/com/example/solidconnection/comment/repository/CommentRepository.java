@@ -1,12 +1,14 @@
 package com.example.solidconnection.comment.repository;
 
-import com.example.solidconnection.entity.Comment;
+import com.example.solidconnection.comment.domain.Comment;
+import com.example.solidconnection.custom.exception.CustomException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_ID;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = """
@@ -30,4 +32,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             """, nativeQuery = true)
     List<Comment> findCommentTreeByPostId(@Param("postId") Long postId);
 
+    default Comment getById(Long id) {
+        return findById(id)
+                .orElseThrow(() -> new CustomException(INVALID_COMMENT_ID));
+    }
 }
