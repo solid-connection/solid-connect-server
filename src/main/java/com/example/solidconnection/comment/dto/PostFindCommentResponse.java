@@ -1,6 +1,6 @@
 package com.example.solidconnection.comment.dto;
 
-import com.example.solidconnection.entity.Comment;
+import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 
 import java.time.LocalDateTime;
