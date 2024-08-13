@@ -9,11 +9,14 @@ import com.example.solidconnection.post.dto.BoardFindPostResponse;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.PostCategory;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +31,11 @@ public class BoardService {
         }
     }
 
-    private PostCategory validatePostCategory(String postCategory) {
-        try {
-            return PostCategory.valueOf(postCategory);
-        } catch (IllegalArgumentException ex) {
-            throw new CustomException(ErrorCode.INVALID_POST_CATEGORY);
+    private PostCategory validatePostCategory(String category){
+        if(!EnumUtils.isValidEnum(PostCategory.class, category)){
+            throw new CustomException(INVALID_POST_CATEGORY);
         }
+        return PostCategory.valueOf(category);
     }
 
     @Transactional(readOnly = true)

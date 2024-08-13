@@ -242,6 +242,22 @@ public class PostServiceTest {
     }
 
     @Test
+    void 게시글을_등록할_때_유효한_카테고리가_아니라면_예외_응답을_반환한다() {
+        // Given
+        String invalidPostCategory = "invalidPostCategory";
+        PostCreateRequest postCreateRequest = new PostCreateRequest(
+                invalidPostCategory, "title", "content", false);
+
+        // When & Then
+        CustomException exception = assertThrows(CustomException.class, () -> postService
+                .createPost(siteUser.getEmail(), board.getCode(), postCreateRequest, Collections.emptyList()));
+        assertThat(exception.getMessage())
+                .isEqualTo(INVALID_POST_CATEGORY.getMessage());
+        assertThat(exception.getCode())
+                .isEqualTo(INVALID_POST_CATEGORY.getCode());
+    }
+
+    @Test
     void 게시글을_등록할_때_파일_수가_5개를_넘는다면_예외_응답을_반환한다() {
         // Given
         PostCreateRequest postCreateRequest = new PostCreateRequest(

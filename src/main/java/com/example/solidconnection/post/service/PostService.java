@@ -19,8 +19,10 @@ import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.ImgType;
+import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,6 +71,12 @@ public class PostService {
         }
     }
 
+    private void validatePostCategory(String category){
+        if(!EnumUtils.isValidEnum(PostCategory.class, category)){
+            throw new CustomException(INVALID_POST_CATEGORY);
+        }
+    }
+
     private Boolean getIsOwner(Post post, String email) {
         return post.getSiteUser().getEmail().equals(email);
     }
@@ -79,6 +87,7 @@ public class PostService {
 
         // 유효성 검증
         String boardCode = validateCode(code);
+        validatePostCategory(postCreateRequest.postCategory());
         validateFileSize(imageFile);
 
         // 객체 생성
@@ -146,7 +155,7 @@ public class PostService {
 
         // caching && 어뷰징 방지
         if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(email,postId))) {
-            redisService.increaseViewCountSync(redisUtils.getPostViewCountRedisKey(postId));
+            redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(postId));
         }
 
         return PostFindResponse.from(
