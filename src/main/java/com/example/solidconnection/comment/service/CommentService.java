@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
@@ -56,7 +57,7 @@ public class CommentService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Post post = postRepository.getById(postId);
 
-        Comment parentComment = commentCreateRequest.parentId()
+        Comment parentComment = Optional.ofNullable(commentCreateRequest.getParentId())
                 .map(commentRepository::getById)
                 .orElse(null);
         Comment createdComment = commentRepository.save(commentCreateRequest.toEntity(siteUser, post, parentComment));

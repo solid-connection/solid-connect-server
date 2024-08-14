@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.*;
@@ -138,8 +137,7 @@ class CommentServiceTest {
     void 부모_댓글을_등록한다() {
         // Given
         CommentCreateRequest commentCreateRequest = new CommentCreateRequest(
-                "parent",
-                Optional.empty()
+                "parent", null
         );
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
         when(postRepository.getById(post.getId())).thenReturn(post);
@@ -151,10 +149,10 @@ class CommentServiceTest {
 
         // Then
         assertEquals(commentCreateResponse, CommentCreateResponse.from(parentComment_1));
-        verify(commentRepository,times(0))
+        verify(commentRepository, times(0))
                 .getById(any(Long.class));
-        verify(commentRepository,times(1))
-                .save(commentCreateRequest.toEntity(siteUser,post, parentComment_1));
+        verify(commentRepository, times(1))
+                .save(commentCreateRequest.toEntity(siteUser, post, parentComment_1));
     }
 
     @Test
@@ -162,8 +160,7 @@ class CommentServiceTest {
         // Given
         Long parentCommentId = 1L;
         CommentCreateRequest commentCreateRequest = new CommentCreateRequest(
-                "child",
-                Optional.of(parentCommentId)
+                "child", parentCommentId
         );
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
         when(postRepository.getById(post.getId())).thenReturn(post);
@@ -176,10 +173,10 @@ class CommentServiceTest {
 
         // Then
         assertEquals(commentCreateResponse, CommentCreateResponse.from(p1s_childComment));
-        verify(commentRepository,times(1))
+        verify(commentRepository, times(1))
                 .getById(parentCommentId);
-        verify(commentRepository,times(1))
-                .save(commentCreateRequest.toEntity(siteUser,post, parentComment_1));
+        verify(commentRepository, times(1))
+                .save(commentCreateRequest.toEntity(siteUser, post, parentComment_1));
     }
 
 
@@ -188,8 +185,7 @@ class CommentServiceTest {
         // Given
         Long invalidPostId = -1L;
         CommentCreateRequest commentCreateRequest = new CommentCreateRequest(
-                "child",
-                Optional.empty()
+                "child", null
         );
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
         when(postRepository.getById(invalidPostId)).thenThrow(new CustomException(INVALID_POST_ID));
@@ -202,7 +198,7 @@ class CommentServiceTest {
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
                 .isEqualTo(INVALID_POST_ID.getCode());
-        verify(commentRepository,times(0))
+        verify(commentRepository, times(0))
                 .save(any(Comment.class));
     }
 
@@ -211,8 +207,7 @@ class CommentServiceTest {
         // Given
         Long invalidParentCommentId = -1L;
         CommentCreateRequest commentCreateRequest = new CommentCreateRequest(
-                "child",
-                Optional.of(invalidParentCommentId)
+                "child", invalidParentCommentId
         );
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
         when(postRepository.getById(post.getId())).thenReturn(post);
@@ -226,7 +221,7 @@ class CommentServiceTest {
                 .isEqualTo(INVALID_COMMENT_ID.getMessage());
         assertThat(exception.getCode())
                 .isEqualTo(INVALID_COMMENT_ID.getCode());
-        verify(commentRepository,times(0))
+        verify(commentRepository, times(0))
                 .save(any(Comment.class));
     }
 
