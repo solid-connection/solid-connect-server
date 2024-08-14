@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("게시판 서비스 테스트")
-public class BoardServiceTest {
+class BoardServiceTest {
     @InjectMocks
     BoardService boardService;
     @Mock

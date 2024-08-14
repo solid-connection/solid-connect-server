@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("local")
 @DisplayName("댓글 레포지토리 테스트")
-public class CommentRepositoryTest {
+class CommentRepositoryTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired

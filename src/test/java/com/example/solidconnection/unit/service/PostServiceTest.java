@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("게시글 서비스 테스트")
-public class PostServiceTest {
+class PostServiceTest {
     @InjectMocks
     PostService postService;
     @Mock

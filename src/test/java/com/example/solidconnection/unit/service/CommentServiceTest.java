@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("댓글 서비스 테스트")
-public class CommentServiceTest {
+class CommentServiceTest {
     @InjectMocks
     CommentService commentService;
     @Mock

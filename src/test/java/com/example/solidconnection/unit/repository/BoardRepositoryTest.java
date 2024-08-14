@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ActiveProfiles("test")
 @DisplayName("게시판 레포지토리 테스트")
-public class BoardRepositoryTest {
+class BoardRepositoryTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired
