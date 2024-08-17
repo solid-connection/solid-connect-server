@@ -194,7 +194,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         괌대학_A_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "괌대학(A형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -202,7 +202,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         괌대학_B_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "괌대학(B형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -210,7 +210,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "네바다주립대학 라스베이거스(B형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -218,7 +218,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         메모리얼대학_세인트존스_A_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "메모리얼 대학 세인트존스(A형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -226,7 +226,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         서던덴마크대학교_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "서던덴마크대학교", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -234,7 +234,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         코펜하겐IT대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "코펜하겐 IT대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -242,7 +242,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         그라츠대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "그라츠 대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -250,7 +250,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         그라츠공과대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "그라츠공과대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -258,7 +258,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         린츠_카톨릭대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "린츠 카톨릭 대학교", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
@@ -266,7 +266,7 @@ abstract class UniversityDataSetUpEndToEndTest {
         ));
 
         메이지대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
-                null, term, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, term, "메이지대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",

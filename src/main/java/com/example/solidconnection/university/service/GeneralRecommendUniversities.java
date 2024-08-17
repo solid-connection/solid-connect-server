@@ -41,7 +41,7 @@ public class GeneralRecommendUniversities {
     public void init() {
         int i = 0;
         while (recommendUniversities.size() < RECOMMEND_UNIVERSITY_NUM && i < candidates.size()) {
-            universityInfoForApplyRepository.findByUniversity_KoreanNameAndTerm(candidates.get(i), term)
+            universityInfoForApplyRepository.findByKoreanNameAndTerm(candidates.get(i), term)
                     .ifPresent(recommendUniversities::add);
             i++;
         }

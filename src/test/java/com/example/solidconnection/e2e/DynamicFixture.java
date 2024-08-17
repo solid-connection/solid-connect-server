@@ -60,6 +60,7 @@ public class DynamicFixture {
         return new UniversityInfoForApply(
                 null,
                 term,
+                "koreanName",
                 1,
                 TuitionFeeType.HOME_UNIVERSITY_PAYMENT,
                 SemesterAvailableForDispatch.ONE_SEMESTER,

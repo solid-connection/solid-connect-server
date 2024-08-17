@@ -35,6 +35,9 @@ public class UniversityInfoForApply {
     @Column(length = 50, nullable = false)
     private String term;
 
+    @Column(nullable = false, length = 100)
+    private String koreanName;
+
     @Column
     private Integer studentCapacity;
 
