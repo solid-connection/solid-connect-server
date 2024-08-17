@@ -8,6 +8,8 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.dto.*;
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.entity.PostImage;
+import com.example.solidconnection.post.domain.PostLike;
+import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.dto.*;
 import com.example.solidconnection.post.repository.PostRepository;
@@ -24,6 +26,7 @@ import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +44,7 @@ public class PostService {
     private final CommentService commentService;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
+    private final PostLikeRepository postLikeRepository;
 
     private String validateCode(String code) {
         try {
@@ -71,8 +75,8 @@ public class PostService {
         }
     }
 
-    private void validatePostCategory(String category){
-        if(!EnumUtils.isValidEnum(PostCategory.class, category)){
+    private void validatePostCategory(String category) {
+        if (!EnumUtils.isValidEnum(PostCategory.class, category)) {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
     }
@@ -154,7 +158,7 @@ public class PostService {
         List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(email, postId);
 
         // caching && 어뷰징 방지
-        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(email,postId))) {
+        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(email, postId))) {
             redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(postId));
         }
 
@@ -177,5 +181,42 @@ public class PostService {
         postRepository.deleteById(post.getId());
 
         return new PostDeleteResponse(postId);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public PostLikeResponse likePost(String email, String code, Long postId) {
+
+        String boardCode = validateCode(code);
+        Post post = postRepository.getById(postId);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
+        validateDuplicatePostLike(post, siteUser);
+
+        PostLike postLike = new PostLike();
+        postLike.setPostAndSiteUser(post, siteUser);
+        postLikeRepository.save(postLike);
+        postRepository.increaseLikeCount(post.getId());
+
+        return PostLikeResponse.from(postRepository.getById(postId)); // 실시간성을 위한 재조회
+    }
+
+    private void validateDuplicatePostLike(Post post, SiteUser siteUser) {
+        if (postLikeRepository.findPostLikeByPostAndSiteUser(post, siteUser).isPresent()) {
+            throw new CustomException(DUPLICATE_POST_LIKE);
+        }
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public PostDislikeResponse dislikePost(String email, String code, Long postId) {
+
+        String boardCode = validateCode(code);
+        Post post = postRepository.getById(postId);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
+
+        PostLike postLike = postLikeRepository.getByPostAndSiteUser(post, siteUser);
+        postLike.resetPostAndSiteUser();
+        postLikeRepository.deleteById(postLike.getId());
+        postRepository.decreaseLikeCount(post.getId());
+
+        return PostDislikeResponse.from(postRepository.getById(postId)); // 실시간성을 위한 재조회
     }
 }
