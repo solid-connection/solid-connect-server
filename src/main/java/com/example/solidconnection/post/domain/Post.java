@@ -4,7 +4,6 @@ import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.entity.common.BaseEntity;
-import com.example.solidconnection.entity.mapping.PostLike;
 import com.example.solidconnection.post.dto.PostUpdateRequest;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.PostCategory;
