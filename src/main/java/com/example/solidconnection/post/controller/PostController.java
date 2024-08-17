@@ -89,7 +89,7 @@ public class PostController {
         return ResponseEntity.ok().body(postLikeResponse);
     }
 
-    @DeleteMapping(value = "/{code}/posts/{post_id}/dislike")
+    @DeleteMapping(value = "/{code}/posts/{post_id}/like")
     public ResponseEntity<?> dislikePost(
             Principal principal,
             @PathVariable("code") String code,
