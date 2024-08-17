@@ -77,4 +77,26 @@ public class PostController {
         PostDeleteResponse postDeleteResponse = postService.deletePostById(principal.getName(), code, postId);
         return ResponseEntity.ok().body(postDeleteResponse);
     }
+
+    @PostMapping(value = "/{code}/posts/{post_id}/like")
+    public ResponseEntity<?> likePost(
+            Principal principal,
+            @PathVariable("code") String code,
+            @PathVariable("post_id") Long postId
+    ) {
+
+        PostLikeResponse postLikeResponse = postService.likePost(principal.getName(), code, postId);
+        return ResponseEntity.ok().body(postLikeResponse);
+    }
+
+    @DeleteMapping(value = "/{code}/posts/{post_id}/dislike")
+    public ResponseEntity<?> dislikePost(
+            Principal principal,
+            @PathVariable("code") String code,
+            @PathVariable("post_id") Long postId
+    ) {
+
+        PostDislikeResponse postDislikeResponse = postService.dislikePost(principal.getName(), code, postId);
+        return ResponseEntity.ok().body(postDislikeResponse);
+    }
 }
