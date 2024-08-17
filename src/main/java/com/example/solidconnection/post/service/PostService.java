@@ -85,6 +85,11 @@ public class PostService {
         return post.getSiteUser().getEmail().equals(email);
     }
 
+    private Boolean getIsLiked(Post post, SiteUser siteUser) {
+        return postLikeRepository.findPostLikeByPostAndSiteUser(post, siteUser)
+                .isPresent();
+    }
+
     @Transactional
     public PostCreateResponse createPost(String email, String code, PostCreateRequest postCreateRequest,
                                          List<MultipartFile> imageFile) {
@@ -150,7 +155,9 @@ public class PostService {
         String boardCode = validateCode(code);
 
         Post post = postRepository.getByIdUsingEntityGraph(postId);
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
         Boolean isOwner = getIsOwner(post, email);
+        Boolean isLiked = getIsLiked(post, siteUser);
 
         PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(post.getBoard());
         PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(post.getSiteUser());
@@ -163,7 +170,7 @@ public class PostService {
         }
 
         return PostFindResponse.from(
-                post, isOwner, boardPostFindResultDTO, siteUserPostFindResultDTO, commentFindResultDTOList, postImageFindResultDTOList);
+                post, isOwner, isLiked, boardPostFindResultDTO, siteUserPostFindResultDTO, commentFindResultDTOList, postImageFindResultDTOList);
     }
 
     @Transactional

@@ -443,6 +443,8 @@ class PostServiceTest {
         // Given
         List<PostFindCommentResponse> commentFindResultDTOList = new ArrayList<>();
         when(postRepository.getByIdUsingEntityGraph(post.getId())).thenReturn(post);
+        when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
+        when(postLikeRepository.findPostLikeByPostAndSiteUser(post, siteUser)).thenReturn(Optional.empty());
         when(commentService.findCommentsByPostId(siteUser.getEmail(), post.getId())).thenReturn(commentFindResultDTOList);
 
         // When
@@ -452,6 +454,7 @@ class PostServiceTest {
         PostFindResponse expectedResponse = PostFindResponse.from(
                 post,
                 true,
+                false,
                 PostFindBoardResponse.from(post.getBoard()),
                 PostFindSiteUserResponse.from(post.getSiteUser()),
                 commentFindResultDTOList,
@@ -459,6 +462,8 @@ class PostServiceTest {
         );
         assertEquals(expectedResponse, response);
         verify(postRepository, times(1)).getByIdUsingEntityGraph(post.getId());
+        verify(siteUserRepository, times(1)).getByEmail(siteUser.getEmail());
+        verify(postLikeRepository, times(1)).findPostLikeByPostAndSiteUser(post, siteUser);
         verify(commentService, times(1)).findCommentsByPostId(siteUser.getEmail(), post.getId());
     }
 

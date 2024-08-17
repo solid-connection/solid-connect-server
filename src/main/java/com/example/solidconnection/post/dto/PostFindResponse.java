@@ -19,6 +19,7 @@ public record PostFindResponse(
         Integer commentCount,
         String postCategory,
         Boolean isOwner,
+        Boolean isLiked,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         PostFindBoardResponse postFindBoardResponse,
@@ -27,7 +28,7 @@ public record PostFindResponse(
         List<PostFindPostImageResponse> postFindPostImageResponses
 ) {
 
-    public static PostFindResponse from(Post post, Boolean isOwner, PostFindBoardResponse postFindBoardResponse,
+    public static PostFindResponse from(Post post, Boolean isOwner, Boolean isLiked, PostFindBoardResponse postFindBoardResponse,
                                         PostFindSiteUserResponse postFindSiteUserResponse,
                                         List<PostFindCommentResponse> postFindCommentResponses,
                                         List<PostFindPostImageResponse> postFindPostImageResponses
@@ -42,6 +43,7 @@ public record PostFindResponse(
                 postFindCommentResponses.size(),
                 String.valueOf(post.getCategory()),
                 isOwner,
+                isLiked,
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 postFindBoardResponse,
