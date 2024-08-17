@@ -61,6 +61,8 @@ public enum ErrorCode {
     INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 댓글입니다."),
     INVALID_COMMENT_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 댓글만 제어할 수 있습니다."),
     CAN_NOT_UPDATE_DEPRECATED_COMMENT(HttpStatus.BAD_REQUEST.value(),"이미 삭제된 댓글을 수정할 수 없습니다."),
+    INVALID_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글 좋아요입니다."),
+    DUPLICATE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 게시글입니다."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
