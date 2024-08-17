@@ -35,7 +35,11 @@ VALUES ('BN', '브루나이', 'ASIA'),
        ('HU', '헝가리', 'EUROPE'),
        ('LT', '리투아니아', 'EUROPE'),
        ('TH', '태국', 'ASIA'),
-       ('UZ', '우즈베키스탄', 'ASIA');
+       ('UZ', '우즈베키스탄', 'ASIA'),
+       ('KZ', '카자흐스탄', 'ASIA'),
+       ('IL', '이스라엘', 'ASIA'),
+       ('MY', '말레이시아', 'ASIA'),
+       ('RU', '러시아', 'EUROPE');
 
 INSERT INTO university(id, country_code, region_code, english_name, format_name, korean_name,
                        accommodation_url, english_course_url, homepage_url,
