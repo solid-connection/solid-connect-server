@@ -44,7 +44,7 @@ class PostRepositoryTest {
     private SiteUser siteUser;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         board = createBoard();
         boardRepository.save(board);
         siteUser = createSiteUser();
@@ -92,7 +92,7 @@ class PostRepositoryTest {
 
     @Test
     @Transactional
-    public void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다() {
+    void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다() {
         Post foundPost = postRepository.getByIdUsingEntityGraph(post.getId());
         foundPost.getPostImageList().size(); // 추가쿼리 발생하지 않는다.
 
@@ -101,7 +101,7 @@ class PostRepositoryTest {
 
     @Test
     @Transactional
-    public void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다_유효한_게시글이_아니라면_예외_응답을_반환한다() {
+    void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다_유효한_게시글이_아니라면_예외_응답을_반환한다() {
         // given
         Long invalidId = -1L;
 
@@ -117,7 +117,7 @@ class PostRepositoryTest {
 
     @Test
     @Transactional
-    public void 게시글을_조회한다() {
+    void 게시글을_조회한다() {
         Post foundPost = postRepository.getById(post.getId());
 
         assertEquals(post, foundPost);
@@ -125,7 +125,7 @@ class PostRepositoryTest {
 
     @Test
     @Transactional
-    public void 게시글을_조회할_때_유효한_게시글이_아니라면_예외_응답을_반환한다() {
+    void 게시글을_조회할_때_유효한_게시글이_아니라면_예외_응답을_반환한다() {
         Long invalidId = -1L;
 
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -135,5 +135,34 @@ class PostRepositoryTest {
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
                 .isEqualTo(INVALID_POST_ID.getCode());
+    }
+
+    @Test
+    @Transactional
+    void 게시글_좋아요를_등록한다() {
+        // given
+        Long likeCount = post.getLikeCount();
+
+        // when
+        postRepository.increaseLikeCount(post.getId());
+
+        // then
+        Post response = postRepository.getById(post.getId());
+        assertEquals(response.getLikeCount(), likeCount + 1);
+    }
+
+    @Test
+    @Transactional
+    void 게시글_좋아요를_삭제한다() {
+        // given
+        Long likeCount = post.getLikeCount();
+        postRepository.increaseLikeCount(post.getId());
+
+        // when
+        postRepository.decreaseLikeCount(post.getId());
+
+        // then
+        Post response = postRepository.getById(post.getId());
+        assertEquals(response.getLikeCount(), likeCount);
     }
 }
