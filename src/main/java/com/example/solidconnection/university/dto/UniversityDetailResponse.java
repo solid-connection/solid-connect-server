@@ -94,7 +94,7 @@ public record UniversityDetailResponse(
         return new UniversityDetailResponse(
                 university.getId(),
                 universityInfoForApply.getTerm(),
-                university.getKoreanName(),
+                universityInfoForApply.getKoreanName(),
                 university.getEnglishName(),
                 university.getFormatName(),
                 university.getRegion().getKoreanName(),

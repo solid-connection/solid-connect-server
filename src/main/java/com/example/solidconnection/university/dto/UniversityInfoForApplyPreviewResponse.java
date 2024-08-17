@@ -43,7 +43,7 @@ public record UniversityInfoForApplyPreviewResponse(
         return new UniversityInfoForApplyPreviewResponse(
                 universityInfoForApply.getId(),
                 universityInfoForApply.getTerm(),
-                universityInfoForApply.getUniversity().getKoreanName(),
+                universityInfoForApply.getKoreanName(),
                 universityInfoForApply.getUniversity().getRegion().getKoreanName(),
                 universityInfoForApply.getUniversity().getCountry().getKoreanName(),
                 universityInfoForApply.getUniversity().getLogoImageUrl(),

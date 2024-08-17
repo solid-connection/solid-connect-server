@@ -55,7 +55,7 @@ class UniversityDetailTest extends UniversityDataSetUpEndToEndTest {
         // response - 응답
         Assertions.assertAll(
                 () -> assertThat(response.id()).isEqualTo(메이지대학_지원_정보.getId()),
-                () -> assertThat(response.koreanName()).isEqualTo(아시아_일본_메이지대학.getKoreanName()),
+                () -> assertThat(response.koreanName()).isEqualTo(메이지대학_지원_정보.getKoreanName()),
                 () -> assertThat(response.englishName()).isEqualTo(아시아_일본_메이지대학.getEnglishName()),
                 () -> assertThat(response.region()).isEqualTo(아시아_일본_메이지대학.getRegion().getKoreanName()),
                 () -> assertThat(response.country()).isEqualTo(아시아_일본_메이지대학.getCountry().getKoreanName()),

@@ -66,7 +66,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     void 좋아요를_한_대학을_조회한다() {
         // setUp - 대학교 좋아요 저장
         UniversityInfoForApply differentTermUniversityInfoForApply =
-                createUniversityForApply(term + " 추가 지원", 영미권_미국_괌대학_A, null);
+                createUniversityForApply(term + " 추가 지원", 영미권_미국_괌대학, null);
         universityInfoForApplyRepository.save(differentTermUniversityInfoForApply);
         likedUniversityRepository.saveAll(Set.of(
                 createLikedUniversity(siteUser, 괌대학_A_지원_정보),

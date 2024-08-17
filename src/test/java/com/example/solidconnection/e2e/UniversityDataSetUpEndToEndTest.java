@@ -40,10 +40,9 @@ abstract class UniversityDataSetUpEndToEndTest {
     public static Country 오스트리아;
     public static Country 일본;
 
-    public static University 영미권_미국_괌대학_A;
-    public static University 영미권_미국_괌대학_B;
+    public static University 영미권_미국_괌대학;
     public static University 영미권_미국_네바다주립대학_라스베이거스;
-    public static University 영미권_캐나다_메모리얼대학_세인트존스_A;
+    public static University 영미권_캐나다_메모리얼대학_세인트존스;
     public static University 유럽_덴마크_서던덴마크대학교;
     public static University 유럽_덴마크_코펜하겐IT대학;
     public static University 유럽_오스트리아_그라츠대학;
@@ -97,8 +96,8 @@ abstract class UniversityDataSetUpEndToEndTest {
         오스트리아 = countryRepository.save(new Country("AT", "오스트리아", 유럽));
         일본 = countryRepository.save(new Country("JP", "일본", 아시아));
 
-        영미권_미국_괌대학_A = universityRepository.save(new University(
-                null, "괌대학(A형)", "University of Guam", "university_of_guam",
+        영미권_미국_괌대학 = universityRepository.save(new University(
+                null, "괌대학", "University of Guam", "university_of_guam",
                 "https://www.uog.edu/admissions/international-students",
                 "https://www.uog.edu/admissions/course-schedule",
                 "https://www.uog.edu/life-at-uog/residence-halls/",
@@ -107,18 +106,8 @@ abstract class UniversityDataSetUpEndToEndTest {
                 null, 미국, 영미권
         ));
 
-        영미권_미국_괌대학_B = universityRepository.save(new University(
-                null, "괌대학(B형)", "University of Guam", "university_of_guam",
-                "https://www.uog.edu/admissions/international-students",
-                "https://www.uog.edu/admissions/course-schedule/",
-                "https://www.uog.edu/life-at-uog/residence-halls/",
-                "https://solid-connection.s3.ap-northeast-2.amazonaws.com/original/university_of_guam/logo.png",
-                "https://solid-connection.s3.ap-northeast-2.amazonaws.com/original/university_of_guam/1.png",
-                null, 미국, 영미권
-        ));
-
         영미권_미국_네바다주립대학_라스베이거스 = universityRepository.save(new University(
-                null, "네바다주립대학 라스베이거스(B형)", "University of Nevada, Las Vegas", "university_of_nevada_las_vegas",
+                null, "네바다주립대학 라스베이거스", "University of Nevada, Las Vegas", "university_of_nevada_las_vegas",
                 "https://www.unlv.edu/engineering/eip",
                 "https://www.unlv.edu/engineering/academic-programs",
                 "https://www.unlv.edu/housing",
@@ -127,8 +116,8 @@ abstract class UniversityDataSetUpEndToEndTest {
                 null, 미국, 영미권
         ));
 
-        영미권_캐나다_메모리얼대학_세인트존스_A = universityRepository.save(new University(
-                null, "메모리얼 대학 세인트존스(A형)", "Memorial University of Newfoundland St. John's", "memorial_university_of_newfoundland_st_johns",
+        영미권_캐나다_메모리얼대학_세인트존스 = universityRepository.save(new University(
+                null, "메모리얼 대학 세인트존스", "Memorial University of Newfoundland St. John's", "memorial_university_of_newfoundland_st_johns",
                 "https://mun.ca/goabroad/visiting-students-inbound/",
                 "https://www.unlv.edu/engineering/academic-programs",
                 "https://www.mun.ca/residences/",
@@ -198,7 +187,7 @@ abstract class UniversityDataSetUpEndToEndTest {
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
-                new HashSet<>(), 영미권_미국_괌대학_A
+                new HashSet<>(), 영미권_미국_괌대학
         ));
 
         괌대학_B_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
@@ -206,7 +195,7 @@ abstract class UniversityDataSetUpEndToEndTest {
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
-                new HashSet<>(), 영미권_미국_괌대학_B
+                new HashSet<>(), 영미권_미국_괌대학
         ));
 
         네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
@@ -222,7 +211,7 @@ abstract class UniversityDataSetUpEndToEndTest {
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
-                new HashSet<>(), 영미권_캐나다_메모리얼대학_세인트존스_A
+                new HashSet<>(), 영미권_캐나다_메모리얼대학_세인트존스
         ));
 
         서던덴마크대학교_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
