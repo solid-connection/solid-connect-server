@@ -76,7 +76,7 @@ public class PostService {
     }
 
     private void validatePostCategory(String category) {
-        if (!EnumUtils.isValidEnum(PostCategory.class, category)) {
+        if (!EnumUtils.isValidEnum(PostCategory.class, category) || category.equals(PostCategory.전체.toString())) {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
     }
