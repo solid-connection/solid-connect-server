@@ -57,9 +57,10 @@ public class CommentService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Post post = postRepository.getById(postId);
 
-        Comment parentComment = Optional.ofNullable(commentCreateRequest.getParentId())
-                .map(commentRepository::getById)
-                .orElse(null);
+        Comment parentComment = null;
+        if (commentCreateRequest.parentId() != null) {
+            parentComment = commentRepository.getById(commentCreateRequest.parentId());
+        }
         Comment createdComment = commentRepository.save(commentCreateRequest.toEntity(siteUser, post, parentComment));
 
         return CommentCreateResponse.from(createdComment);
