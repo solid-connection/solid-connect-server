@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
 import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
@@ -70,7 +72,7 @@ public class ApplicationSubmissionService {
      * */
     @Transactional
     public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
-        validateFirstAndSecondChoiceIdDifferent(universityChoiceRequest);
+        validateNoDuplicateUniversityChoices(universityChoiceRequest);
         Application application = applicationRepository.findBySiteUser_Email(email)
                 .orElseThrow(() -> new CustomException(SCORE_SHOULD_SUBMITTED_FIRST));
 
@@ -100,10 +102,14 @@ public class ApplicationSubmissionService {
         }
     }
 
-    private void validateFirstAndSecondChoiceIdDifferent(UniversityChoiceRequest universityChoiceRequest) {
-        if (Objects.equals(
-                universityChoiceRequest.firstChoiceUniversityId(),
-                universityChoiceRequest.secondChoiceUniversityId())) {
+    private void validateNoDuplicateUniversityChoices(UniversityChoiceRequest universityChoiceRequest) {
+        Set<Long> uniqueUniversityIds = new HashSet<>();
+
+        uniqueUniversityIds.add(universityChoiceRequest.firstChoiceUniversityId());
+        uniqueUniversityIds.add(universityChoiceRequest.secondChoiceUniversityId());
+        uniqueUniversityIds.add(universityChoiceRequest.thirdChoiceUniversityId());
+
+        if (uniqueUniversityIds.size() < 3) {
             throw new CustomException(CANT_APPLY_FOR_SAME_UNIVERSITY);
         }
     }
