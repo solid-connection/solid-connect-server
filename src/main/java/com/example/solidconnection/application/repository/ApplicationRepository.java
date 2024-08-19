@@ -26,6 +26,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findAllBySecondChoiceUniversityAndVerifyStatus(UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus);
 
+    List<Application> findAllByThirdChoiceUniversityAndVerifyStatus(UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus);
+
     default Application getApplicationBySiteUser(SiteUser siteUser) {
         return findBySiteUser(siteUser)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));

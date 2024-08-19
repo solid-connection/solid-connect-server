@@ -119,7 +119,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
         applicationRepository.save(new Application(siteUser, firstRequest.toGpa(), firstRequest.toLanguageTest()));
 
         // request - body 생성 및 요청
-        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId());
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 메이지대학_지원_정보.getId());
         RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)
@@ -135,6 +135,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 () -> assertThat(application.getSiteUser().getId()).isEqualTo(siteUser.getId()),
                 () -> assertThat(application.getFirstChoiceUniversity().getId()).isEqualTo(request.firstChoiceUniversityId()),
                 () -> assertThat(application.getSecondChoiceUniversity().getId()).isEqualTo(request.secondChoiceUniversityId()),
+                () -> assertThat(application.getThirdChoiceUniversity().getId()).isEqualTo(request.thirdChoiceUniversityId()),
                 () -> assertThat(application.getNicknameForApply()).isNotNull(),
                 () -> assertThat(application.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
                 () -> assertThat(application.getUpdateCount()).isZero());
@@ -146,11 +147,11 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
         ScoreRequest firstRequest = new ScoreRequest(LanguageTestType.TOEFL_IBT, "80",
                 "languageTestReportUrl", 4.0, 4.5, "gpaReportUrl");
         applicationRepository.save(new Application(siteUser, firstRequest.toGpa(), firstRequest.toLanguageTest()))
-                .updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, "nickname");
+                .updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 네바다주립대학_라스베이거스_지원_정보, "nickname");
         Application initialApplication = applicationRepository.getApplicationBySiteUser(siteUser);
 
         // request - body 생성 및 요청
-        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId());
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 메이지대학_지원_정보.getId());
         RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)
@@ -166,6 +167,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 () -> assertThat(updatedApplication.getSiteUser().getId()).isEqualTo(siteUser.getId()),
                 () -> assertThat(updatedApplication.getFirstChoiceUniversity().getId()).isEqualTo(request.firstChoiceUniversityId()),
                 () -> assertThat(updatedApplication.getSecondChoiceUniversity().getId()).isEqualTo(request.secondChoiceUniversityId()),
+                () -> assertThat(updatedApplication.getThirdChoiceUniversity().getId()).isEqualTo(request.thirdChoiceUniversityId()),
                 () -> assertThat(updatedApplication.getNicknameForApply()).isNotNull(),
                 () -> assertThat(updatedApplication.getVerifyStatus()).isEqualTo(initialApplication.getVerifyStatus()),
                 () -> assertThat(updatedApplication.getUpdateCount()).isEqualTo(initialApplication.getUpdateCount()));
@@ -181,12 +183,12 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
 
         // setUp - 지망 대학을 한계까지 수정
         for (int i = 0; i <= APPLICATION_UPDATE_COUNT_LIMIT; i++) {
-            initialApplication.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, "nickname");
+            initialApplication.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 네바다주립대학_라스베이거스_지원_정보, "nickname");
             applicationRepository.save(initialApplication);
         }
 
         // request - body 생성 및 요청
-        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId());
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 메이지대학_지원_정보.getId());
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)
@@ -202,7 +204,41 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
     @Test
     void 일지망_대학과_이지망_대학이_같으면_예외_응답을_반환한다() {
         // request - body 생성 및 요청
-        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 그라츠대학_지원_정보.getId());
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 그라츠대학_지원_정보.getId(), 메이지대학_지원_정보.getId());
+        ErrorResponse errorResponse = RestAssured.given()
+                .header("Authorization", "Bearer " + accessToken)
+                .body(request)
+                .contentType("application/json")
+                .log().all()
+                .post("/application/university")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.message()).isEqualTo(CANT_APPLY_FOR_SAME_UNIVERSITY.getMessage());
+    }
+
+    @Test
+    void 일지망_대학과_삼지망_대학이_같으면_예외_응답을_반환한다() {
+        // request - body 생성 및 요청
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 그라츠대학_지원_정보.getId());
+        ErrorResponse errorResponse = RestAssured.given()
+                .header("Authorization", "Bearer " + accessToken)
+                .body(request)
+                .contentType("application/json")
+                .log().all()
+                .post("/application/university")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .extract().as(ErrorResponse.class);
+
+        assertThat(errorResponse.message()).isEqualTo(CANT_APPLY_FOR_SAME_UNIVERSITY.getMessage());
+    }
+
+    @Test
+    void 이지망_대학과_삼지망_대학이_같으면_예외_응답을_반환한다() {
+        // request - body 생성 및 요청
+        UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId());
         ErrorResponse errorResponse = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)

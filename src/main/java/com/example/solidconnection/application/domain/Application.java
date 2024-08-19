@@ -55,6 +55,9 @@ public class Application {
     private UniversityInfoForApply secondChoiceUniversity;
 
     @ManyToOne
+    private UniversityInfoForApply thirdChoiceUniversity;
+
+    @ManyToOne
     private SiteUser siteUser;
 
     public Application(
@@ -77,12 +80,14 @@ public class Application {
     public void updateUniversityChoice(
             UniversityInfoForApply firstChoiceUniversity,
             UniversityInfoForApply secondChoiceUniversity,
+            UniversityInfoForApply thirdChoiceUniversity,
             String nicknameForApply) {
         if (this.firstChoiceUniversity != null) {
             this.updateCount++;
         }
         this.firstChoiceUniversity = firstChoiceUniversity;
         this.secondChoiceUniversity = secondChoiceUniversity;
+        this.thirdChoiceUniversity = thirdChoiceUniversity;
         this.nicknameForApply = nicknameForApply;
     }
 }

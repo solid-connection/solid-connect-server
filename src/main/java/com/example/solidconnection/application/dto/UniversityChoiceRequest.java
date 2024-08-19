@@ -11,5 +11,7 @@ public record UniversityChoiceRequest(
         Long firstChoiceUniversityId,
 
         @Schema(description = "2지망 대학교의 지원 정보 ID (선택사항)", example = "2", nullable = true)
-        Long secondChoiceUniversityId) {
-}
+        Long secondChoiceUniversityId,
+
+        @Schema(description = "3지망 대학교의 지원 정보 ID (선택사항)", example = "3", nullable = true)
+        Long thirdChoiceUniversityId) {}

@@ -78,9 +78,11 @@ public class ApplicationSubmissionService {
                 .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
         UniversityInfoForApply secondChoiceUniversity = universityInfoForApplyRepository
                 .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.secondChoiceUniversityId(), term);
+        UniversityInfoForApply thirdChoiceUniversity = universityInfoForApplyRepository
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.thirdChoiceUniversityId(), term);
 
         validateUpdateLimitNotExceed(application);
-        application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, getRandomNickname());
+        application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
         return true;
     }
 

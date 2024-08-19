@@ -66,10 +66,10 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         사용자1_지원정보 = new Application(사용자1, gpa, languageTest);
         사용자2_지원정보 = new Application(사용자2, gpa, languageTest);
         사용자3_지원정보 = new Application(사용자3, gpa, languageTest);
-        나의_지원정보.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, "0");
-        사용자1_지원정보.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, "1");
-        사용자2_지원정보.updateUniversityChoice(메이지대학_지원_정보, 그라츠대학_지원_정보, "2");
-        사용자3_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, "3");
+        나의_지원정보.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 린츠_카톨릭대학_지원_정보, "0");
+        사용자1_지원정보.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 그라츠공과대학_지원_정보, "1");
+        사용자2_지원정보.updateUniversityChoice(메이지대학_지원_정보, 그라츠대학_지원_정보, 서던덴마크대학교_지원_정보, "2");
+        사용자3_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "3");
         나의_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자1_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자2_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
@@ -89,6 +89,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
 
         List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
         List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = response.thirdChoice();
 
         assertThat(firstChoiceApplicants).containsAnyElementsOf(List.of(
                 UniversityApplicantsResponse.of(괌대학_A_지원_정보,
@@ -109,6 +110,16 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                         List.of(ApplicantResponse.of(사용자3_지원정보, false))),
                 UniversityApplicantsResponse.of(그라츠대학_지원_정보,
                         List.of(ApplicantResponse.of(사용자2_지원정보, false)))
+        ));
+        assertThat(thirdChoiceApplicants).containsAnyElementsOf(List.of(
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                        List.of(ApplicantResponse.of(나의_지원정보, true))),
+                UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
+                        List.of(ApplicantResponse.of(사용자2_지원정보, false))),
+                UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
+                        List.of(ApplicantResponse.of(사용자1_지원정보, false))),
+                UniversityApplicantsResponse.of(메이지대학_지원_정보,
+                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))
         ));
     }
 

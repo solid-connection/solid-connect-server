@@ -87,7 +87,7 @@ class VerifyStatusQueryTest extends UniversityDataSetUpEndToEndTest {
     void 성적과_대학을_모두_제출하고_승인을_기대라는_상태를_반환한다() {
         // setUp - 성적과 대학을 모두 제출한 상태
         Application application = new Application(siteUser, createDummyGpa(), createDummyLanguageTest());
-        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, "닉네임");
+        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 네바다주립대학_라스베이거스_지원_정보, "닉네임");
         applicationRepository.save(application);
 
         // request - 요청
@@ -108,7 +108,7 @@ class VerifyStatusQueryTest extends UniversityDataSetUpEndToEndTest {
     void 성적과_대학을_모두_제출했지만_승인이_반려된_상태를_반환한다() {
         // setUp - 성적과 대학을 모두 제출했지만, 승인 거절
         Application application = new Application(siteUser, createDummyGpa(), createDummyLanguageTest());
-        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, "닉네임");
+        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 네바다주립대학_라스베이거스_지원_정보,"닉네임");
         application.setVerifyStatus(VerifyStatus.REJECTED);
         applicationRepository.save(application);
 
@@ -130,7 +130,7 @@ class VerifyStatusQueryTest extends UniversityDataSetUpEndToEndTest {
     void 성적과_대학을_모두_제출했으며_승인이_된_상태를_반환한다() {
         // setUp - 성적과 대학을 모두 제출했으며, 승인이 된 상태
         Application application = new Application(siteUser, createDummyGpa(), createDummyLanguageTest());
-        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, "닉네임");
+        application.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 네바다주립대학_라스베이거스_지원_정보, "닉네임");
         application.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(application);
 

@@ -55,7 +55,8 @@ public class ApplicationQueryService {
         // 1지망, 2지망 지원자들을 조회한다.
         List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser);
         List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser);
-        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants);
+        List <UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(universities, siteUser);
+        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 
     private void validateSiteUserCanViewApplicants(SiteUser siteUser) {
@@ -78,6 +79,14 @@ public class ApplicationQueryService {
                 universities,
                 siteUser,
                 uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+        );
+    }
+
+    private List<UniversityApplicantsResponse> getThirdChoiceApplicants(List<University> universities, SiteUser siteUser) {
+        return getApplicantsByChoice(
+                universities,
+                siteUser,
+                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
         );
     }
 
