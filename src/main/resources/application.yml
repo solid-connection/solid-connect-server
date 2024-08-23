@@ -48,3 +48,9 @@ view:
   count:
     scheduling:
       delay: 3000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
