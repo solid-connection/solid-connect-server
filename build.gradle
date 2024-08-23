@@ -38,6 +38,8 @@ dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
     testImplementation "org.mockito:mockito-core:3.3.3"
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok'
