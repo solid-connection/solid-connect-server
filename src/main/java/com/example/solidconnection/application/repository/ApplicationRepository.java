@@ -22,11 +22,11 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     Optional<Application> findBySiteUser(SiteUser siteUser);
 
-    List<Application> findAllByFirstChoiceUniversityAndVerifyStatus(UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus);
+    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
 
-    List<Application> findAllBySecondChoiceUniversityAndVerifyStatus(UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus);
+    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
 
-    List<Application> findAllByThirdChoiceUniversityAndVerifyStatus(UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus);
+    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     default Application getApplicationBySiteUser(SiteUser siteUser) {
         return findBySiteUser(siteUser)

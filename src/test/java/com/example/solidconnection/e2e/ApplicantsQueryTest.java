@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -42,6 +43,11 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
     private Application 사용자1_지원정보;
     private Application 사용자2_지원정보;
     private Application 사용자3_지원정보;
+    private Application 사용자4_이전학기_지원정보;
+
+    @Value("${university.term}")
+    private String term;
+    private String beforeTerm = "1988-1";
 
     @BeforeEach
     public void setUpUserAndToken() {
@@ -58,23 +64,27 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         SiteUser 사용자1 = siteUserRepository.save(createSiteUserByEmail("email1"));
         SiteUser 사용자2 = siteUserRepository.save(createSiteUserByEmail("email2"));
         SiteUser 사용자3 = siteUserRepository.save(createSiteUserByEmail("email3"));
+        SiteUser 사용자4_이전학기_지원자 = siteUserRepository.save(createSiteUserByEmail("email4"));
 
         // setUp - 지원 정보 저장
         Gpa gpa = createDummyGpa();
         LanguageTest languageTest = createDummyLanguageTest();
-        나의_지원정보 = new Application(siteUser, gpa, languageTest);
-        사용자1_지원정보 = new Application(사용자1, gpa, languageTest);
-        사용자2_지원정보 = new Application(사용자2, gpa, languageTest);
-        사용자3_지원정보 = new Application(사용자3, gpa, languageTest);
+        나의_지원정보 = new Application(siteUser, gpa, languageTest, term);
+        사용자1_지원정보 = new Application(사용자1, gpa, languageTest, term);
+        사용자2_지원정보 = new Application(사용자2, gpa, languageTest, term);
+        사용자3_지원정보 = new Application(사용자3, gpa, languageTest, term);
+        사용자4_이전학기_지원정보 = new Application(사용자4_이전학기_지원자, gpa, languageTest, beforeTerm);
         나의_지원정보.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 린츠_카톨릭대학_지원_정보, "0");
         사용자1_지원정보.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 그라츠공과대학_지원_정보, "1");
         사용자2_지원정보.updateUniversityChoice(메이지대학_지원_정보, 그라츠대학_지원_정보, 서던덴마크대학교_지원_정보, "2");
         사용자3_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "3");
+        사용자4_이전학기_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "4");
         나의_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자1_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자2_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자3_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
-        applicationRepository.saveAll(List.of(나의_지원정보, 사용자1_지원정보, 사용자2_지원정보, 사용자3_지원정보));
+        사용자4_이전학기_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
+        applicationRepository.saveAll(List.of(나의_지원정보, 사용자1_지원정보, 사용자2_지원정보, 사용자3_지원정보, 사용자4_이전학기_지원정보));
     }
 
     @Test
@@ -194,5 +204,34 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                         List.of(ApplicantResponse.of(사용자2_지원정보, false))));
         assertThat(secondChoiceApplicants).containsExactlyInAnyOrder(
                 UniversityApplicantsResponse.of(메이지대학_지원_정보, List.of()));
+    }
+
+    @Test
+    void 지원자를_조회할_때_이전학기_지원자는_조회되지_않는다() {
+        ApplicationsResponse response = RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().log().all()
+                .get("/application")
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(ApplicationsResponse.class);
+
+        List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
+        List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = response.thirdChoice();
+
+
+        assertThat(firstChoiceApplicants).doesNotContainAnyElementsOf(List.of(
+                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
+                        List.of(ApplicantResponse.of(사용자4_이전학기_지원정보, false)))
+        ));
+        assertThat(secondChoiceApplicants).doesNotContainAnyElementsOf(List.of(
+                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
+                        List.of(ApplicantResponse.of(사용자4_이전학기_지원정보, false)))
+        ));
+        assertThat(thirdChoiceApplicants).doesNotContainAnyElementsOf(List.of(
+                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
+                        List.of(ApplicantResponse.of(사용자4_이전학기_지원정보, false)))
+        ));
     }
 }

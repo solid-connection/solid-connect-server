@@ -52,10 +52,10 @@ public class ApplicationQueryService {
         List<University> universities
                 = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
 
-        // 1지망, 2지망 지원자들을 조회한다.
-        List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser);
-        List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser);
-        List <UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(universities, siteUser);
+        // 1지망, 2지망, 3지망 지원자들을 조회한다.
+        List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser, term);
+        List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser, term);
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(universities, siteUser, term);
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 
@@ -66,27 +66,27 @@ public class ApplicationQueryService {
         }
     }
 
-    private List<UniversityApplicantsResponse> getFirstChoiceApplicants(List<University> universities, SiteUser siteUser) {
+    private List<UniversityApplicantsResponse> getFirstChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
         );
     }
 
-    private List<UniversityApplicantsResponse> getSecondChoiceApplicants(List<University> universities, SiteUser siteUser) {
+    private List<UniversityApplicantsResponse> getSecondChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
         );
     }
 
-    private List<UniversityApplicantsResponse> getThirdChoiceApplicants(List<University> universities, SiteUser siteUser) {
+    private List<UniversityApplicantsResponse> getThirdChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatus(uia, VerifyStatus.APPROVED)
+                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
         );
     }
 
