@@ -51,11 +51,14 @@ public class ApplicationSubmissionService {
         applicationRepository.findBySiteUser_Email(email)
                 .ifPresentOrElse(
                         // 수정
-                        application -> application.updateGpaAndLanguageTest(gpa, languageTest),
+                        application -> {
+                            application.updateGpaAndLanguageTest(gpa, languageTest);
+                            application.updateTerm(term);
+                        },
 
                         // 최초 등록
                         () -> applicationRepository.save(
-                                new Application(siteUser, gpa, languageTest)
+                                new Application(siteUser, gpa, languageTest, term)
                         )
                 );
         return true;
@@ -85,6 +88,7 @@ public class ApplicationSubmissionService {
 
         validateUpdateLimitNotExceed(application);
         application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
+        application.updateTerm(term);
         return true;
     }
 
