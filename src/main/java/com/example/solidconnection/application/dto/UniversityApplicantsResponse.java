@@ -25,7 +25,7 @@ public record UniversityApplicantsResponse(
 
     public static UniversityApplicantsResponse of(UniversityInfoForApply universityInfoForApply, List<ApplicantResponse> applicant) {
         return new UniversityApplicantsResponse(
-                universityInfoForApply.getUniversity().getKoreanName(),
+                universityInfoForApply.getKoreanName(),
                 universityInfoForApply.getStudentCapacity(),
                 universityInfoForApply.getUniversity().getRegion().getKoreanName(),
                 universityInfoForApply.getUniversity().getCountry().getKoreanName(),
