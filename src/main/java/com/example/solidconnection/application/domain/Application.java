@@ -48,6 +48,9 @@ public class Application {
     @Column(columnDefinition = "int not null default 0")
     private Integer updateCount;
 
+    @Column(length = 50, nullable = false)
+    private String term;
+
     @ManyToOne
     private UniversityInfoForApply firstChoiceUniversity;
 
@@ -60,13 +63,16 @@ public class Application {
     @ManyToOne
     private SiteUser siteUser;
 
+    // deprecate 시켜보자.
     public Application(
             SiteUser siteUser,
             Gpa gpa,
-            LanguageTest languageTest) {
+            LanguageTest languageTest,
+            String term) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
+        this.term = term;
     }
 
     public void updateGpaAndLanguageTest(
@@ -89,5 +95,10 @@ public class Application {
         this.secondChoiceUniversity = secondChoiceUniversity;
         this.thirdChoiceUniversity = thirdChoiceUniversity;
         this.nicknameForApply = nicknameForApply;
+    }
+
+    public void updateTerm(
+            String term) {
+        this.term = term;
     }
 }
