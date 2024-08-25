@@ -7,6 +7,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.VerifyStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +26,17 @@ public class VerifyStatusQueryService {
     private final ApplicationRepository applicationRepository;
     private final SiteUserRepository siteUserRepository;
 
+    @Value("${university.term}")
+    private String term;
+
     /*
      * 지원 상태를 조회한다.
+     * 학기별로 상태가 관리된다.
      * */
     @Transactional(readOnly = true)
     public VerifyStatusResponse getVerifyStatus(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        Optional<Application> application = applicationRepository.findBySiteUser_Email(siteUser.getEmail());
+        Optional<Application> application = applicationRepository.findBySiteUserAndTerm(siteUser,term);
 
         // 아무것도 제출 안함
         if (application.isEmpty()) {

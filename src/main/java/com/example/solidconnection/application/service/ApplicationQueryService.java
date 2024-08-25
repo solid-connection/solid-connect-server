@@ -59,8 +59,10 @@ public class ApplicationQueryService {
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 
+    // 학기별로 상태가 관리된다.
+    // 금학기에 지원이력이 있는 사용자만 지원정보를 확인할 수 있도록 한다.
     private void validateSiteUserCanViewApplicants(SiteUser siteUser) {
-        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUser(siteUser).getVerifyStatus();
+        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);
         }
