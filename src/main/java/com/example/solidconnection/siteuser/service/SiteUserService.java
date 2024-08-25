@@ -1,34 +1,36 @@
 package com.example.solidconnection.siteuser.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.s3.S3Service;
+import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateRequest;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
+import com.example.solidconnection.siteuser.dto.*;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
-import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.custom.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
 public class SiteUserService {
 
-    public static final int MIN_DAYS_BETWEEN_NICKNAME_CHANGES = 30;
+    public static final int MIN_DAYS_BETWEEN_NICKNAME_CHANGES = 7;
     public static final DateTimeFormatter NICKNAME_LAST_CHANGE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private final SiteUserRepository siteUserRepository;
     private final LikedUniversityRepository likedUniversityRepository;
+    private final S3Service s3Service;
 
     /*
      * 마이페이지 정보를 조회한다.
@@ -73,7 +75,6 @@ public class SiteUserService {
             throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
     }
-
     private void validateNicknameNotChangedRecently(LocalDateTime lastModifiedAt) {
         if (lastModifiedAt == null) {
             return;
@@ -95,5 +96,28 @@ public class SiteUserService {
         return likedUniversities.stream()
                 .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
                 .toList();
+    }
+
+
+    /*
+     * 프로필 이미지를 수정한다.
+     * */
+    @Transactional
+    public ProfileImageUpdateResponse updateProfileImage(String email, MultipartFile imageFile) {
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
+        validateProfileImage(imageFile);
+
+        s3Service.deleteExProfile(email);
+        UploadedFileUrlResponse uploadedFileUrlResponse = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+        siteUser.setProfileImageUrl(uploadedFileUrlResponse.fileUrl());
+        siteUserRepository.save(siteUser);
+
+        return ProfileImageUpdateResponse.from(siteUser);
+    }
+
+    private void validateProfileImage(MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new CustomException(PROFILE_IMAGE_NEEDED);
+        }
     }
 }
