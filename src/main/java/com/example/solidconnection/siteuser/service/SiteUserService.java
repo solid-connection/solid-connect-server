@@ -51,25 +51,6 @@ public class SiteUserService {
         return MyPageUpdateResponse.from(siteUser);
     }
 
-    /*
-     * 마이페이지 정보를 수정한다.
-     * - 닉네임 중복을 검증한다.
-     * - '닉네임 변경 최소 기간'이 지나지 않았는데 변경하려 하는지 검증한다.
-     * */
-    @Transactional
-    public MyPageUpdateResponse update(String email, MyPageUpdateRequest pageUpdateRequest) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
-        validateNicknameDuplicated(pageUpdateRequest.nickname());
-        validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-
-        siteUser.setNickname(pageUpdateRequest.nickname());
-        siteUser.setProfileImageUrl(pageUpdateRequest.profileImageUrl());
-        siteUser.setNicknameModifiedAt(LocalDateTime.now());
-        siteUserRepository.save(siteUser);
-        return MyPageUpdateResponse.from(siteUser);
-    }
-
     private void validateNicknameDuplicated(String nickname) {
         if (siteUserRepository.existsByNickname(nickname)) {
             throw new CustomException(NICKNAME_ALREADY_EXISTED);

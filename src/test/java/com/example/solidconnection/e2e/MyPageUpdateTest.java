@@ -4,8 +4,9 @@ import com.example.solidconnection.config.token.TokenService;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
+import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
+import com.example.solidconnection.siteuser.dto.NicknameUpdateResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,27 +69,26 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     }
 
     @Test
-    void 마이_페이지_정보를_수정한다() {
+    void 닉네임을_수정한다() {
         // request - body 생성 및 요청
-        MyPageUpdateRequest myPageUpdateRequest = new MyPageUpdateRequest("newNickname", "newProfileImageUrl");
-        MyPageUpdateResponse myPageUpdateResponse = RestAssured.given()
+        NicknameUpdateRequest nicknameUpdateRequest = new NicknameUpdateRequest("newNickname");
+        NicknameUpdateResponse nicknameUpdateResponse = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .body(myPageUpdateRequest)
+                .body(nicknameUpdateRequest)
                 .contentType("application/json")
-                .patch("/my-page/update")
+                .patch("/my-page/update/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(MyPageUpdateResponse.class);
+                .extract().as(NicknameUpdateResponse.class);
 
         SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
         assertAll("마이 페이지 정보가 수정된다.",
-                () -> assertThat(myPageUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
-                () -> assertThat(myPageUpdateResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()));
+                () -> assertThat(nicknameUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()));
     }
 
     @Test
-    void 마이_페이지_정보를_수정할_때_닉네임이_중복된다면_예외_응답을_반환한다() {
+    void 닉네임을_수정할_때_닉네임이_중복된다면_예외_응답을_반환한다() {
         // setUp - 같은 닉네임을 갖는 다른 회원 정보 저장
         SiteUser existUser = createSiteUserByEmail("existUser");
         String duplicateNickname = "duplicateNickname";
@@ -96,13 +96,13 @@ class MyPageUpdateTest extends BaseEndToEndTest {
         siteUserRepository.save(existUser);
 
         // request - body 생성 및 요청
-        MyPageUpdateRequest myPageUpdateRequest = new MyPageUpdateRequest(duplicateNickname, "newProfileImageUrl");
+        NicknameUpdateRequest nicknameUpdateRequest = new NicknameUpdateRequest("duplicateNickname");
         ErrorResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .body(myPageUpdateRequest)
+                .body(nicknameUpdateRequest)
                 .contentType("application/json")
-                .patch("/my-page/update")
+                .patch("/my-page/update/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.CONFLICT.value())
                 .extract().as(ErrorResponse.class);
@@ -112,7 +112,7 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     }
 
     @Test
-    void 마이_페이지_정보를_수정할_때_닉네임_변경_가능_기한이_지나지않았다면_예외_응답을_반환한다() {
+    void 닉네임을_수정할_때_닉네임_변경_가능_기한이_지나지않았다면_예외_응답을_반환한다() {
         // setUp - 회원 정보 저장 (닉네임 변경 가능 시간이 되기 1분 전)
         LocalDateTime nicknameModifiedAt = LocalDateTime.now()
                 .minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES)
@@ -121,13 +121,13 @@ class MyPageUpdateTest extends BaseEndToEndTest {
         siteUserRepository.save(siteUser);
 
         // request - body 생성 및 요청
-        MyPageUpdateRequest myPageUpdateRequest = new MyPageUpdateRequest("newNickname", "newProfileImageUrl");
+        NicknameUpdateRequest nicknameUpdateRequest = new NicknameUpdateRequest("newNickname");
         ErrorResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .body(myPageUpdateRequest)
+                .body(nicknameUpdateRequest)
                 .contentType("application/json")
-                .patch("/my-page/update")
+                .patch("/my-page/update/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract().as(ErrorResponse.class);

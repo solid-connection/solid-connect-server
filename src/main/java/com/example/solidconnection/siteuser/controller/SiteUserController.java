@@ -31,15 +31,6 @@ class SiteUserController implements SiteUserControllerSwagger {
                 .ok(myPageUpdateDto);
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<MyPageUpdateResponse> updateMyPageInfo(
-            Principal principal,
-            @Valid @RequestBody MyPageUpdateRequest myPageUpdateDto) {
-        MyPageUpdateResponse myPageUpdateResponse = siteUserService.update(principal.getName(), myPageUpdateDto);
-        return ResponseEntity
-                .ok(myPageUpdateResponse);
-    }
-
     @PatchMapping("/update/profileImage")
     public ResponseEntity<ProfileImageUpdateResponse> updateProfileImage(
             Principal principal,

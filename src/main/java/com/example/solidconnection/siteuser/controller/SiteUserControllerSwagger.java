@@ -52,27 +52,4 @@ public interface SiteUserControllerSwagger {
             }
     )
     ResponseEntity<MyPageUpdateResponse> getMyPageInfoToUpdate(Principal principal);
-
-    @Operation(
-            summary = "마이 페이지 정보 수정",
-            requestBody = @RequestBody(
-                    description = "업데이트할 정보",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = MyPageUpdateRequest.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "마이 페이지 정보 수정 성공",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = MyPageUpdateResponse.class)
-                            )
-                    )
-            }
-    )
-    ResponseEntity<MyPageUpdateResponse> updateMyPageInfo(Principal principal, @Valid @RequestBody MyPageUpdateRequest myPageUpdateDto);
 }
