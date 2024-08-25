@@ -63,7 +63,6 @@ public class Application {
     @ManyToOne
     private SiteUser siteUser;
 
-    // deprecate 시켜보자.
     public Application(
             SiteUser siteUser,
             Gpa gpa,
@@ -73,6 +72,8 @@ public class Application {
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
+        this.updateCount = 0;
+        this.verifyStatus = PENDING;
     }
 
     public void updateGpaAndLanguageTest(
@@ -95,10 +96,5 @@ public class Application {
         this.secondChoiceUniversity = secondChoiceUniversity;
         this.thirdChoiceUniversity = thirdChoiceUniversity;
         this.nicknameForApply = nicknameForApply;
-    }
-
-    public void updateTerm(
-            String term) {
-        this.term = term;
     }
 }

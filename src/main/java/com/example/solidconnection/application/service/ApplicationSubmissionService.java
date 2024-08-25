@@ -16,13 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
-import static com.example.solidconnection.custom.exception.ErrorCode.SCORE_SHOULD_SUBMITTED_FIRST;
+import static com.example.solidconnection.custom.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -35,11 +31,12 @@ public class ApplicationSubmissionService {
     private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
-    public String term;
+    private String term;
 
     /*
      * 학점과 영어 성적을 제출한다.
-     * - 기존에 제출한 적이 있다면, 수정한다.
+     * - 금학기에 제출한 적이 있다면, 수정한다.
+     * - 성적을 제출한적이 한번도 없거나 제출한적이 있지만 금학기에 제출한 적이 없다면 새로 등록한다.
      * - 수정을 하고 나면, 성적 승인 상태(verifyStatus)를 PENDING 상태로 변경한다.
      * */
     @Transactional
@@ -48,18 +45,14 @@ public class ApplicationSubmissionService {
         Gpa gpa = scoreRequest.toGpa();
         LanguageTest languageTest = scoreRequest.toLanguageTest();
 
-        applicationRepository.findBySiteUser_Email(email)
+        applicationRepository.findBySiteUserAndTerm(siteUser, term)
                 .ifPresentOrElse(
-                        // 수정
-                        application -> {
-                            application.updateGpaAndLanguageTest(gpa, languageTest);
-                            application.updateTerm(term);
-                        },
-
-                        // 최초 등록
-                        () -> applicationRepository.save(
-                                new Application(siteUser, gpa, languageTest, term)
-                        )
+                        // 금학기에 성적 제출 이력이 있는 경우
+                        application -> application.updateGpaAndLanguageTest(gpa, languageTest),
+                        () -> {
+                            // 성적 제출한적이 한번도 없는 경우 && 성적 제출한적이 있지만 금학기에 없는 경우
+                            applicationRepository.save(new Application(siteUser, gpa, languageTest, term));
+                        }
                 );
         return true;
     }
@@ -76,8 +69,19 @@ public class ApplicationSubmissionService {
     @Transactional
     public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
         validateNoDuplicateUniversityChoices(universityChoiceRequest);
-        Application application = applicationRepository.findBySiteUser_Email(email)
+
+        // 성적 제출한 적이 한번도 없는 경우
+        Application existingApplication = applicationRepository.findTop1BySiteUser_EmailOrderByTermDesc(email)
                 .orElseThrow(() -> new CustomException(SCORE_SHOULD_SUBMITTED_FIRST));
+
+        Application application = Optional.of(existingApplication)
+                .filter(app -> !app.getTerm().equals(term))
+                .map(app -> {
+                    // 성적 제출한 적이 있지만 금학기에 없는 경우, 이전 성적으로 새 Application 객체를 등록
+                    SiteUser siteUser = siteUserRepository.getByEmail(email);
+                    return applicationRepository.save(new Application(siteUser, app.getGpa(), app.getLanguageTest(), term));
+                })
+                .orElse(existingApplication); // 금학기에 이미 성적 제출한 경우 기존 객체 사용
 
         UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
                 .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
@@ -88,7 +92,6 @@ public class ApplicationSubmissionService {
 
         validateUpdateLimitNotExceed(application);
         application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
-        application.updateTerm(term);
         return true;
     }
 

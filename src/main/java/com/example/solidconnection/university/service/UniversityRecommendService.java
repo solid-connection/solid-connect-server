@@ -26,7 +26,7 @@ public class UniversityRecommendService {
     private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
-    public String term;
+    private String term;
 
     /*
      * 사용자 맞춤 추천 대학교를 불러온다.

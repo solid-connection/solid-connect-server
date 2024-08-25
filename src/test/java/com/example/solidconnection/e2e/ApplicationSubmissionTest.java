@@ -66,7 +66,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
-        Application application = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application application = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
         assertAll("대학교 성적과 어학 성적을 저장한다.",
                 () -> assertThat(application.getId()).isNotNull(),
                 () -> assertThat(application.getSiteUser().getId()).isEqualTo(siteUser.getId()),
@@ -98,7 +98,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
-        Application updatedApplication = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application updatedApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
         assertAll("대학교 성적과 어학 성적을 수정한다. 이때 수정 횟수는 증가하지 않고, 성적 승인 상태는 PENDING 으로 바뀐다.",
                 () -> assertThat(updatedApplication.getId()).isNotNull(),
                 () -> assertThat(updatedApplication.getSiteUser().getId()).isEqualTo(siteUser.getId()),
@@ -129,7 +129,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
-        Application application = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application application = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
         assertAll("지망 대학교를 저장한다.",
                 () -> assertThat(application.getId()).isNotNull(),
                 () -> assertThat(application.getSiteUser().getId()).isEqualTo(siteUser.getId()),
@@ -148,7 +148,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 "languageTestReportUrl", 4.0, 4.5, "gpaReportUrl");
         applicationRepository.save(new Application(siteUser, firstRequest.toGpa(), firstRequest.toLanguageTest(),term))
                 .updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 네바다주립대학_라스베이거스_지원_정보, "nickname");
-        Application initialApplication = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application initialApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
 
         // request - body 생성 및 요청
         UniversityChoiceRequest request = new UniversityChoiceRequest(그라츠대학_지원_정보.getId(), 코펜하겐IT대학_지원_정보.getId(), 메이지대학_지원_정보.getId());
@@ -161,7 +161,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
-        Application updatedApplication = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application updatedApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
         assertAll("지망 대학교를 수정한다. 이때 수정 횟수는 증가하고, 성적 승인 상태는 바뀌지 않는다.",
                 () -> assertThat(updatedApplication.getId()).isNotNull(),
                 () -> assertThat(updatedApplication.getSiteUser().getId()).isEqualTo(siteUser.getId()),
@@ -179,7 +179,7 @@ class ApplicationSubmissionTest extends UniversityDataSetUpEndToEndTest {
         ScoreRequest firstRequest = new ScoreRequest(LanguageTestType.TOEFL_IBT, "80",
                 "languageTestReportUrl", 4.0, 4.5, "gpaReportUrl");
         applicationRepository.save(new Application(siteUser, firstRequest.toGpa(), firstRequest.toLanguageTest(),term));
-        Application initialApplication = applicationRepository.getApplicationBySiteUser(siteUser);
+        Application initialApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser,term);
 
         // setUp - 지망 대학을 한계까지 수정
         for (int i = 0; i <= APPLICATION_UPDATE_COUNT_LIMIT; i++) {
