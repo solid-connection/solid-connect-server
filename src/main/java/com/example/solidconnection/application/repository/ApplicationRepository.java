@@ -18,9 +18,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByNicknameForApply(String nicknameForApply);
 
-    Optional<Application> findBySiteUser_Email(String email);
+    Optional<Application> findTop1BySiteUser_EmailOrderByTermDesc(String email);
 
-    Optional<Application> findBySiteUser(SiteUser siteUser);
+    Optional<Application> findBySiteUserAndTerm(SiteUser siteUser, String term);
 
     List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
 
@@ -28,8 +28,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
 
-    default Application getApplicationBySiteUser(SiteUser siteUser) {
-        return findBySiteUser(siteUser)
+    default Application getApplicationBySiteUserAndTerm(SiteUser siteUser, String term) {
+        return findBySiteUserAndTerm(siteUser, term)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 }
