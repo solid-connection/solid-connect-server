@@ -47,4 +47,12 @@ class SiteUserController implements SiteUserControllerSwagger {
         ProfileImageUpdateResponse profileImageUpdateResponse = siteUserService.updateProfileImage(principal.getName(), imageFile);
         return ResponseEntity.ok().body(profileImageUpdateResponse);
     }
+
+    @PatchMapping("/update/nickname")
+    public ResponseEntity<NicknameUpdateResponse> updateNickname(
+            Principal principal,
+            @Valid @RequestBody NicknameUpdateRequest nicknameUpdateRequest) {
+        NicknameUpdateResponse nicknameUpdateResponse = siteUserService.updateNickname(principal.getName(), nicknameUpdateRequest);
+        return ResponseEntity.ok().body(nicknameUpdateResponse);
+    }
 }
