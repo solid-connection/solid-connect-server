@@ -120,4 +120,21 @@ public class SiteUserService {
             throw new CustomException(PROFILE_IMAGE_NEEDED);
         }
     }
+
+    /*
+     * 닉네임을 수정한다.
+     * */
+    @Transactional
+    public NicknameUpdateResponse updateNickname(String email, NicknameUpdateRequest nicknameUpdateRequest) {
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
+
+        validateNicknameDuplicated(nicknameUpdateRequest.nickname());
+        validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
+
+        siteUser.setNickname(nicknameUpdateRequest.nickname());
+        siteUser.setNicknameModifiedAt(LocalDateTime.now());
+        siteUserRepository.save(siteUser);
+
+        return NicknameUpdateResponse.from(siteUser);
+    }
 }
