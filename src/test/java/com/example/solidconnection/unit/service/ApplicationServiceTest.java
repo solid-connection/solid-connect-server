@@ -11,6 +11,7 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.*;
+import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ public class ApplicationServiceTest {
     ApplicationRepository applicationRepository;
     @Mock
     SiteUserRepository siteUserRepository;
+    @Mock
+    UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     private SiteUser siteUser;
     private Application application;
@@ -159,7 +162,6 @@ public class ApplicationServiceTest {
         );
         when(applicationRepository.findTop1BySiteUser_EmailOrderByTermDesc(siteUser.getEmail()))
                 .thenReturn(Optional.of(application));
-        System.out.println(application.getTerm());
 
         // When
         applicationSubmissionService.submitUniversityChoice(siteUser.getEmail(), universityChoiceRequest);
