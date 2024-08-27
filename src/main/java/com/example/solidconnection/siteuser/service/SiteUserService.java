@@ -88,7 +88,10 @@ public class SiteUserService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         validateProfileImage(imageFile);
 
-        s3Service.deleteExProfile(email);
+        // 기존 url이 초기에 등록되는 kakao,,, 형식인 경우에는 deleteExProfile 수행하지 않음
+        if (siteUser.getProfileImageUrl().contains(".com")) {
+            s3Service.deleteExProfile(email);
+        }
         UploadedFileUrlResponse uploadedFileUrlResponse = s3Service.uploadFile(imageFile, ImgType.PROFILE);
         siteUser.setProfileImageUrl(uploadedFileUrlResponse.fileUrl());
         siteUserRepository.save(siteUser);
