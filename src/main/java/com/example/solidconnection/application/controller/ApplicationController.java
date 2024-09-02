@@ -55,6 +55,7 @@ public class ApplicationController implements ApplicationControllerSwagger {
             Principal principal,
             @RequestParam(required = false, defaultValue = "") String region,
             @RequestParam(required = false, defaultValue = "") String keyword) {
+        applicationQueryService.validateSiteUserCanViewApplicants(principal.getName());
         ApplicationsResponse result = applicationQueryService.getApplicants(principal.getName(), region, keyword);
         return ResponseEntity
                 .ok(result);
