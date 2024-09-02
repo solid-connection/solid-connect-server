@@ -72,6 +72,7 @@ public class UniversityController implements UniversityControllerSwagger {
         return ResponseEntity.ok(universityDetailResponse);
     }
 
+    // todo return타입 UniversityInfoForApplyPreviewResponses로 추후 수정 필요
     @GetMapping("/search")
     public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> searchUniversity(
             @RequestParam(required = false, defaultValue = "") String region,
@@ -79,7 +80,7 @@ public class UniversityController implements UniversityControllerSwagger {
             @RequestParam(required = false, defaultValue = "") LanguageTestType testType,
             @RequestParam(required = false, defaultValue = "") String testScore) {
         List<UniversityInfoForApplyPreviewResponse> universityInfoForApplyPreviewResponse
-                = universityService.searchUniversity(region, keyword, testType, testScore);
+                = universityService.searchUniversity(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
         return ResponseEntity.ok(universityInfoForApplyPreviewResponse);
     }
 }
