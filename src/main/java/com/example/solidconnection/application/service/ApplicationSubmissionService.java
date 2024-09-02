@@ -6,6 +6,7 @@ import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.dto.ScoreRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.cache.annotation.DefaultCacheOut;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -40,6 +41,7 @@ public class ApplicationSubmissionService {
      * - 수정을 하고 나면, 성적 승인 상태(verifyStatus)를 PENDING 상태로 변경한다.
      * */
     @Transactional
+    @DefaultCacheOut(key = "application:query", cacheManager = "customCacheManager", prefix = true)
     public boolean submitScore(String email, ScoreRequest scoreRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         Gpa gpa = scoreRequest.toGpa();
@@ -67,6 +69,7 @@ public class ApplicationSubmissionService {
      *   - 성적 승인 상태(verifyStatus) 는 변경하지 않는다.
      * */
     @Transactional
+    @DefaultCacheOut(key = "application:query", cacheManager = "customCacheManager", prefix = true)
     public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
         validateUniversityChoices(universityChoiceRequest);
 
