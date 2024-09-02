@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.service;
 
+import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -7,10 +8,7 @@ import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.dto.IsLikeResponse;
-import com.example.solidconnection.university.dto.LikeResultResponse;
-import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.*;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +39,7 @@ public class UniversityService {
      * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
      * */
     @Transactional(readOnly = true)
+    @ThunderingHerdCaching(key = "university:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityDetailResponse getUniversityDetail(Long universityInfoForApplyId) {
         UniversityInfoForApply universityInfoForApply
                 = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
@@ -57,13 +56,15 @@ public class UniversityService {
      *   - 언어 시험 점수는 합격 최소 점수보다 높은 것이 조건이다.
      * */
     @Transactional(readOnly = true)
-    public List<UniversityInfoForApplyPreviewResponse> searchUniversity(
+    @ThunderingHerdCaching(key = "university:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UniversityInfoForApplyPreviewResponses searchUniversity(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
-        return universityFilterRepository
+
+        return new UniversityInfoForApplyPreviewResponses(universityFilterRepository
                 .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
                 .stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
-                .toList();
+                .toList());
     }
 
     /*
