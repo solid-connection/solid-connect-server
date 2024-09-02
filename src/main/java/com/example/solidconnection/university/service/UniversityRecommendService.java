@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.service;
 
+import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -65,6 +66,7 @@ public class UniversityRecommendService {
      * 공통 추천 대학교를 불러온다.
      * */
     @Transactional(readOnly = true)
+    @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityRecommendsResponse getGeneralRecommends() {
         List<UniversityInfoForApply> generalRecommends = new ArrayList<>(generalRecommendUniversities.getRecommendUniversities());
         Collections.shuffle(generalRecommends);
