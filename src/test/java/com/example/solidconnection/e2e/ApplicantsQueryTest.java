@@ -234,4 +234,44 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                         List.of(ApplicantResponse.of(사용자4_이전학기_지원정보, false)))
         ));
     }
+
+    @Test
+    void 내가_지원한_대학의_지원자를_조회한다() {
+        ApplicationsResponse response = RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().log().all()
+                .get("/application/competitors")
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(ApplicationsResponse.class);
+
+        List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
+        List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = response.thirdChoice();
+
+        assertThat(firstChoiceApplicants).containsExactlyInAnyOrder(
+                UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                        List.of(ApplicantResponse.of(사용자1_지원정보, false))),
+                UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                        List.of(ApplicantResponse.of(나의_지원정보, true))),
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보, List.of()));
+        assertThat(secondChoiceApplicants).containsExactlyInAnyOrder(
+                UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                        List.of(ApplicantResponse.of(나의_지원정보, true))),
+                UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                        List.of(ApplicantResponse.of(사용자1_지원정보, false))),
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                        List.of()));
+        assertThat(thirdChoiceApplicants).containsExactlyInAnyOrder(
+                UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                        List.of()),
+                UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                        List.of()),
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                        List.of(ApplicantResponse.of(나의_지원정보, true))));
+        
+        assertThat(firstChoiceApplicants.size()).isEqualTo(3);
+        assertThat(secondChoiceApplicants.size()).isEqualTo(3);
+        assertThat(thirdChoiceApplicants.size()).isEqualTo(3);
+    }
 }
