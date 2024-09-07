@@ -7,6 +7,16 @@ services:
     ports:
       - "6379:6379"
 
+  redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: "redis:6379"
+    depends_on:
+      - redis
+
   solid-connect-server:
     build:
       context: .
