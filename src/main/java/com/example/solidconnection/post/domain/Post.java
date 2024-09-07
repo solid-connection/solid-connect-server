@@ -97,9 +97,4 @@ public class Post extends BaseEntity {
         this.content = postUpdateRequest.content();
         this.category = PostCategory.valueOf(postUpdateRequest.postCategory());
     }
-
-    public void increaseViewCount(Long updateViewCount) {
-        this.viewCount += updateViewCount;
-    }
-
 }
