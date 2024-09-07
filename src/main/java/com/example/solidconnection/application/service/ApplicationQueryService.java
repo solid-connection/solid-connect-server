@@ -19,9 +19,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
@@ -64,12 +67,19 @@ public class ApplicationQueryService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
 
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
-        List<University> userAppliedUniversities = List.of(
-                userLatestApplication.getFirstChoiceUniversity().getUniversity(),
-                userLatestApplication.getSecondChoiceUniversity().getUniversity(),
-                userLatestApplication.getThirdChoiceUniversity().getUniversity()
-        );
-
+        List<University> userAppliedUniversities = Arrays.asList(
+                        Optional.ofNullable(userLatestApplication.getFirstChoiceUniversity())
+                                .map(UniversityInfoForApply::getUniversity)
+                                .orElse(null),
+                        Optional.ofNullable(userLatestApplication.getSecondChoiceUniversity())
+                                .map(UniversityInfoForApply::getUniversity)
+                                .orElse(null),
+                        Optional.ofNullable(userLatestApplication.getThirdChoiceUniversity())
+                                .map(UniversityInfoForApply::getUniversity)
+                                .orElse(null)
+                ).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(userAppliedUniversities, siteUser, term);
         List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(userAppliedUniversities, siteUser, term);
