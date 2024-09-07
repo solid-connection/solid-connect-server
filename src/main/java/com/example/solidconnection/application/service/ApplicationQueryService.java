@@ -46,7 +46,6 @@ public class ApplicationQueryService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "application:query:{1}:{2}", cacheManager = "customCacheManager", ttlSec = 86400)
     public ApplicationsResponse getApplicants(String email, String regionCode, String keyword) {
-        // 유저가 다른 지원자들을 볼 수 있는지 검증
         SiteUser siteUser = siteUserRepository.getByEmail(email);
 
         // 국가와 키워드와 지역을 통해 대학을 필터링한다.
@@ -57,6 +56,24 @@ public class ApplicationQueryService {
         List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser, term);
         List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser, term);
         List<UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(universities, siteUser, term);
+        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
+    }
+
+    @Transactional(readOnly = true)
+    public ApplicationsResponse getApplicantsByUserApplications(String email) {
+        SiteUser siteUser = siteUserRepository.getByEmail(email);
+
+        Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
+        List<University> userAppliedUniversities = List.of(
+                userLatestApplication.getFirstChoiceUniversity().getUniversity(),
+                userLatestApplication.getSecondChoiceUniversity().getUniversity(),
+                userLatestApplication.getThirdChoiceUniversity().getUniversity()
+        );
+
+
+        List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(userAppliedUniversities, siteUser, term);
+        List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(userAppliedUniversities, siteUser, term);
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(userAppliedUniversities, siteUser, term);
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 

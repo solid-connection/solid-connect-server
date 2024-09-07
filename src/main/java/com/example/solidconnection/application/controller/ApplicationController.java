@@ -61,6 +61,15 @@ public class ApplicationController implements ApplicationControllerSwagger {
                 .ok(result);
     }
 
+    @GetMapping("/competitors")
+    public ResponseEntity<ApplicationsResponse> getApplicantsForUserCompetitors(
+            Principal principal) {
+        applicationQueryService.validateSiteUserCanViewApplicants(principal.getName());
+        ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(principal.getName());
+        return ResponseEntity
+                .ok(result);
+    }
+
     @GetMapping("/status")
     public ResponseEntity<VerifyStatusResponse> getApplicationVerifyStatus(Principal principal) {
         VerifyStatusResponse result = verifyStatusQueryService.getVerifyStatus(principal.getName());
