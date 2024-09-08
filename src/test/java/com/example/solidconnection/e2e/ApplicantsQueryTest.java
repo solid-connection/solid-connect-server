@@ -40,12 +40,14 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
 
     private String accessToken;
     private String adminAccessToken;
+    private String user6AccessToken;
     private Application 나의_지원정보;
     private Application 사용자1_지원정보;
     private Application 사용자2_지원정보;
     private Application 사용자3_지원정보;
     private Application 사용자4_이전학기_지원정보;
     private Application 사용자5_관리자_지원정보;
+    private Application 사용자6_지원정보;
 
     @Value("${university.term}")
     private String term;
@@ -66,12 +68,17 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         String adminRefreshToken = tokenService.generateToken("email5", TokenType.REFRESH);
         tokenService.saveToken(adminRefreshToken, TokenType.REFRESH);
 
+        user6AccessToken = tokenService.generateToken("email6", TokenType.ACCESS);
+        String user6RefreshToken = tokenService.generateToken("email6", TokenType.REFRESH);
+        tokenService.saveToken(user6RefreshToken, TokenType.REFRESH);
+
         // setUp - 사용자 정보 저장
         SiteUser 사용자1 = siteUserRepository.save(createSiteUserByEmail("email1"));
         SiteUser 사용자2 = siteUserRepository.save(createSiteUserByEmail("email2"));
         SiteUser 사용자3 = siteUserRepository.save(createSiteUserByEmail("email3"));
         SiteUser 사용자4_이전학기_지원자 = siteUserRepository.save(createSiteUserByEmail("email4"));
         SiteUser 사용자5_관리자 = siteUserRepository.save(createSiteUserByEmail("email5"));
+        SiteUser 사용자6 = siteUserRepository.save(createSiteUserByEmail("email6"));
 
         // setUp - 지원 정보 저장
         Gpa gpa = createDummyGpa();
@@ -82,18 +89,21 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         사용자3_지원정보 = new Application(사용자3, gpa, languageTest, term);
         사용자4_이전학기_지원정보 = new Application(사용자4_이전학기_지원자, gpa, languageTest, beforeTerm);
         사용자5_관리자_지원정보 = new Application(사용자5_관리자, gpa, languageTest, term);
+        사용자6_지원정보 = new Application(사용자6, gpa, languageTest, term);
         나의_지원정보.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 린츠_카톨릭대학_지원_정보, "0");
         사용자1_지원정보.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 그라츠공과대학_지원_정보, "1");
         사용자2_지원정보.updateUniversityChoice(메이지대학_지원_정보, 그라츠대학_지원_정보, 서던덴마크대학교_지원_정보, "2");
         사용자3_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "3");
         사용자4_이전학기_지원정보.updateUniversityChoice(네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "4");
+        사용자6_지원정보.updateUniversityChoice(코펜하겐IT대학_지원_정보, null, null, "6");
         나의_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자1_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자2_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자3_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자4_이전학기_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
         사용자5_관리자_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
-        applicationRepository.saveAll(List.of(나의_지원정보, 사용자1_지원정보, 사용자2_지원정보, 사용자3_지원정보, 사용자4_이전학기_지원정보, 사용자5_관리자_지원정보));
+        사용자6_지원정보.setVerifyStatus(VerifyStatus.APPROVED);
+        applicationRepository.saveAll(List.of(나의_지원정보, 사용자1_지원정보, 사용자2_지원정보, 사용자3_지원정보, 사용자4_이전학기_지원정보, 사용자5_관리자_지원정보, 사용자6_지원정보));
     }
 
     @Test
@@ -245,7 +255,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
     }
 
     @Test
-    void 내가_지원한_대학의_지원자를_조회한다() {
+    void 경쟁자를_조회한다() {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
@@ -280,14 +290,35 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                         List.of()),
                 UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
                         List.of(ApplicantResponse.of(나의_지원정보, true))));
-        
+
         assertThat(firstChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
         assertThat(secondChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
         assertThat(thirdChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
     }
 
     @Test
-    void 관리자가_선택한_대학의_지원자는_조회되지_않는다() {
+    void 지원_대학중_미선택이_있을_떄_경쟁자를_조회한다() {
+        ApplicationsResponse response = RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + user6AccessToken)
+                .when().log().all()
+                .get("/application/competitors")
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(ApplicationsResponse.class);
+
+        Integer choicedUniversityCount = 1;
+
+        List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
+        List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
+        List<UniversityApplicantsResponse> thirdChoiceApplicants = response.thirdChoice();
+
+        assertThat(firstChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
+        assertThat(secondChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
+        assertThat(thirdChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
+    }
+
+    @Test
+    void 지원_대학이_모두_미선택일_때_경쟁자를_조회한다() {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + adminAccessToken)
                 .when().log().all()
@@ -296,14 +327,15 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
 
+        Integer choicedUniversityCount = 0;
+
         List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
         List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
         List<UniversityApplicantsResponse> thirdChoiceApplicants = response.thirdChoice();
 
-        assertThat(firstChoiceApplicants.size()).isEqualTo(0);
-        assertThat(secondChoiceApplicants.size()).isEqualTo(0);
-        assertThat(thirdChoiceApplicants.size()).isEqualTo(0);
+        assertThat(firstChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
+        assertThat(secondChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
+        assertThat(thirdChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
     }
-
 
 }
