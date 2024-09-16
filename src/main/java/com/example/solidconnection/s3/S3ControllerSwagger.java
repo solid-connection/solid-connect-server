@@ -116,4 +116,21 @@ public interface S3ControllerSwagger {
             }
     )
     ResponseEntity<UploadedFileUrlResponse> uploadLanguageImage(@RequestParam("file") MultipartFile imageFile);
+
+    @SecurityRequirements
+    @SecurityRequirement(name = ACCESS_TOKEN)
+    @Operation(
+            summary = "S3 url prefix 확인",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "S3 url prefix 반환",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = urlPrefixResponse.class)
+                            )
+                    )
+            }
+    )
+    ResponseEntity<urlPrefixResponse> getS3UrlPrefix();
 }
