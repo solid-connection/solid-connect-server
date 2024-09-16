@@ -63,7 +63,7 @@ public class SiteUserServiceTest {
         return new SiteUser(
                 "test@example.com",
                 "nickname",
-                "https://solid-connection-uploaded.s3.ap-northeast-2.amazonaws.com/profile/abcd",
+                "profile/fajwoiejoiewjfoi",
                 "1999-01-01",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
@@ -78,7 +78,7 @@ public class SiteUserServiceTest {
     }
 
     private UploadedFileUrlResponse createUploadedFileUrlResponse() {
-        return new UploadedFileUrlResponse("https://s3.example.com/test1.png");
+        return new UploadedFileUrlResponse("profile/fajwoiejoiewjfoi");
     }
 
     @Test

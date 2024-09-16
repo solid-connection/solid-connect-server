@@ -69,8 +69,7 @@ public class S3Service {
             log.error("이미지 업로드 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
             throw new CustomException(S3_CLIENT_EXCEPTION);
         }
-
-        return new UploadedFileUrlResponse(amazonS3.getUrl(bucket, fileName).toString());
+        return new UploadedFileUrlResponse(fileName);
     }
 
     public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
@@ -101,7 +100,7 @@ public class S3Service {
                 log.error("이미지 업로드 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
                 throw new CustomException(S3_CLIENT_EXCEPTION);
             }
-            uploadedFileUrlResponseList.add(new UploadedFileUrlResponse(amazonS3.getUrl(bucket, fileName).toString()));
+            uploadedFileUrlResponseList.add(new UploadedFileUrlResponse(fileName));
         }
 
         return uploadedFileUrlResponseList;
@@ -140,8 +139,7 @@ public class S3Service {
     }
 
     public void deletePostImage(String url) {
-        String key = getPostImageUrl(url);
-        deleteFile(key);
+        deleteFile(url);
     }
 
     private void deleteFile(String fileName) {
@@ -158,13 +156,6 @@ public class S3Service {
 
     private String getExProfileImageUrl(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        String fileName = siteUser.getProfileImageUrl();
-        int domainStartIndex = fileName.indexOf(".com");
-        return fileName.substring(domainStartIndex + 5);
-    }
-
-    private String getPostImageUrl(String url) {
-        int domainStartIndex = url.indexOf(".com");
-        return url.substring(domainStartIndex + 5);
+        return siteUser.getProfileImageUrl();
     }
 }

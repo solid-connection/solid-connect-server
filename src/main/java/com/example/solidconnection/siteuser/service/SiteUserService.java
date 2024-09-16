@@ -106,7 +106,7 @@ public class SiteUserService {
     }
 
     private boolean isDefaultProfileImage(String profileImageUrl) {
-        String prefix = "https://solid-connection-uploaded.s3.ap-northeast-2.amazonaws.com/profile/";
+        String prefix = "profile/";
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
     }
 
