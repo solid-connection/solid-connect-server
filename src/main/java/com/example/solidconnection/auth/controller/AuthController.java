@@ -31,15 +31,13 @@ public class AuthController implements AuthControllerSwagger {
     @PostMapping("/kakao")
     public ResponseEntity<KakaoOauthResponse> processKakaoOauth(@RequestBody KakaoCodeRequest kakaoCodeRequest) {
         KakaoOauthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);
-        return ResponseEntity
-                .ok(kakaoOauthResponse);
+        return ResponseEntity.ok(kakaoOauthResponse);
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         SignUpResponse signUpResponseDto = signUpService.signUp(signUpRequest);
-        return ResponseEntity
-                .ok(signUpResponseDto);
+        return ResponseEntity.ok(signUpResponseDto);
     }
 
     @PostMapping("/sign-out")
@@ -57,7 +55,6 @@ public class AuthController implements AuthControllerSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(Principal principal) {
         ReissueResponse reissueResponse = authService.reissue(principal.getName());
-        return ResponseEntity
-                .ok(reissueResponse);
+        return ResponseEntity.ok(reissueResponse);
     }
 }

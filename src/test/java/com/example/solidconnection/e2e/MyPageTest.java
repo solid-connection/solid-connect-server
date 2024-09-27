@@ -52,6 +52,7 @@ class MyPageTest extends BaseEndToEndTest {
         assertAll("불러온 마이 페이지 정보가 DB의 정보와 일치한다.",
                 () -> assertThat(myPageResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
                 () -> assertThat(myPageResponse.birth()).isEqualTo(savedSiteUser.getBirth()),
-                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()));
+                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()),
+                () -> assertThat(myPageResponse.email()).isEqualTo(savedSiteUser.getEmail()));
     }
 }

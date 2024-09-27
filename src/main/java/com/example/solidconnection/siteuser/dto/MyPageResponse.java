@@ -19,6 +19,9 @@ public record MyPageResponse(
         @Schema(description = "생년월일", example = "1990-01-01")
         String birth,
 
+        @Schema(description = "이메일", example = "example@solid-conenct.net")
+        String email,
+
         @Schema(description = "좋아요 누른 게시물 수", example = "0")
         int likedPostCount,
 
@@ -34,6 +37,7 @@ public record MyPageResponse(
                 siteUser.getProfileImageUrl(),
                 siteUser.getRole(),
                 siteUser.getBirth(),
+                siteUser.getEmail(),
                 0, // TODO: 커뮤니티 기능 생기면 업데이트 필요
                 0, // TODO: 멘토 기능 생기면 업데이트 필요
                 likedUniversityCount
