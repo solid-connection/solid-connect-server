@@ -3,10 +3,7 @@ package com.example.solidconnection.s3;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -15,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.FILE_NOT_EXIST;
@@ -34,8 +31,11 @@ public class S3Service {
     private static final Logger log = LoggerFactory.getLogger(S3Service.class);
     private final AmazonS3Client amazonS3;
     private final SiteUserRepository siteUserRepository;
+    private final FileUploadService fileUploadService;
+    private final ThreadPoolTaskExecutor asyncExecutor;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    private final long MAX_FILE_SIZE_MB = 1024 * 1024 * 3;
 
     /*
      * 파일을 S3에 업로드한다.
@@ -44,30 +44,24 @@ public class S3Service {
      * - 파일에 대한 메타 데이터를 생성한다.
      * - 임의의 랜덤한 문자열로 파일 이름을 생성한다.
      * - S3에 파일을 업로드한다.
+     * - 3mb 이상의 파일은 /origin/ 경로로 업로드하여 lambda 함수로 리사이징 진행한다.
+     * - 3mb 미만의 파일은 바로 업로드한다.
      * */
     public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, ImgType imageFile) {
         // 파일 검증
         validateImgFile(multipartFile);
-
-        // 메타데이터 생성
-        String contentType = multipartFile.getContentType();
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(multipartFile.getSize());
-
         // 파일 이름 생성
         UUID randomUUID = UUID.randomUUID();
         String fileName = imageFile.getType() + "/" + randomUUID;
-
-        try {
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (AmazonServiceException e) {
-            log.error("이미지 업로드 중 s3 서비스 예외 발생 : {}", e.getMessage());
-            throw new CustomException(S3_SERVICE_EXCEPTION);
-        } catch (SdkClientException | IOException e) {
-            log.error("이미지 업로드 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
-            throw new CustomException(S3_CLIENT_EXCEPTION);
+        // 파일업로드 비동기로 진행
+        if (multipartFile.getSize() >= MAX_FILE_SIZE_MB) {
+            asyncExecutor.submit(() -> {
+                fileUploadService.uploadFile(bucket, "origin/" + fileName, multipartFile);
+            });
+        } else {
+            asyncExecutor.submit(() -> {
+                fileUploadService.uploadFile(bucket, fileName, multipartFile);
+            });
         }
         return new UploadedFileUrlResponse(fileName);
     }
@@ -75,34 +69,10 @@ public class S3Service {
     public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
 
         List<UploadedFileUrlResponse> uploadedFileUrlResponseList = new ArrayList<>();
-
         for (MultipartFile file : multipartFile) {
-            // 파일 검증
-            validateImgFile(file);
-
-            // 메타데이터 생성
-            String contentType = file.getContentType();
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(file.getSize());
-
-            // 파일 이름 생성
-            UUID randomUUID = UUID.randomUUID();
-            String fileName = imageFile.getType() + "/" + randomUUID;
-
-            try {
-                amazonS3.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch (AmazonServiceException e) {
-                log.error("이미지 업로드 중 s3 서비스 예외 발생 : {}", e.getMessage());
-                throw new CustomException(S3_SERVICE_EXCEPTION);
-            } catch (SdkClientException | IOException e) {
-                log.error("이미지 업로드 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
-                throw new CustomException(S3_CLIENT_EXCEPTION);
-            }
-            uploadedFileUrlResponseList.add(new UploadedFileUrlResponse(fileName));
+            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, imageFile);
+            uploadedFileUrlResponseList.add(uploadedFileUrlResponse);
         }
-
         return uploadedFileUrlResponseList;
     }
 
