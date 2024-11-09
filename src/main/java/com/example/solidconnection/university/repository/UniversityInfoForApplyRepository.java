@@ -20,7 +20,7 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
 
     Optional<UniversityInfoForApply> findByIdAndTerm(Long id, String term);
 
-    Optional<UniversityInfoForApply> findByKoreanNameAndTerm(String koreanName, String term);
+    Optional<UniversityInfoForApply> findFirstByKoreanNameAndTerm(String koreanName, String term);
 
     @Query("SELECT c FROM UniversityInfoForApply c WHERE c.university IN :universities AND c.term = :term")
     List<UniversityInfoForApply> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
