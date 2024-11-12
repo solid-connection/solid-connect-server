@@ -6,6 +6,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Embeddable
+@EqualsAndHashCode(of = {"languageTestType", "languageTestScore", "languageTestReportUrl"})
 public class LanguageTest {
 
     @Column(nullable = false, name = "language_test_type", length = 10)

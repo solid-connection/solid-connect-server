@@ -3,6 +3,7 @@ package com.example.solidconnection.application.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Embeddable
+@EqualsAndHashCode(of = {"gpa", "gpaCriteria", "gpaReportUrl"})
 public class Gpa {
 
     @Column(nullable = false, name = "gpa")

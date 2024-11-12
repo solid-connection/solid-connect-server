@@ -3,6 +3,8 @@ package com.example.solidconnection.siteuser.domain;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.domain.PostLike;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -64,6 +66,20 @@ public class SiteUser {
 
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> postLikeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LanguageTestScore> languageTestScoreList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private GpaScore gpaScore;
+
+
+    public void setGpaScore(GpaScore gpaScore) {
+        this.gpaScore = gpaScore;
+        if (gpaScore != null && gpaScore.getSiteUser() != this) {
+            gpaScore.setSiteUser(this);
+        }
+    }
 
     public SiteUser(
             String email,
