@@ -66,6 +66,13 @@ public enum ErrorCode {
     INVALID_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글 좋아요입니다."),
     DUPLICATE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 게시글입니다."),
 
+    // score
+    INVALID_GPA_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 학점입니다."),
+    INVALID_GPA_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "학점이 승인되지 않았습니다."),
+    INVALID_LANGUAGE_TEST_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 어학성적입니다."),
+    INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
+    USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
+
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "JWT 토큰을 처리할 수 없습니다."),
