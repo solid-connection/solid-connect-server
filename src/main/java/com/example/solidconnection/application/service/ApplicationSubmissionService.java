@@ -1,15 +1,17 @@
 package com.example.solidconnection.application.service;
 
-import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.application.dto.ScoreRequest;
+import com.example.solidconnection.application.domain.*;
+import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.cache.annotation.DefaultCacheOut;
+import com.example.solidconnection.score.repository.GpaScoreRepository;
+import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,74 +32,63 @@ public class ApplicationSubmissionService {
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final SiteUserRepository siteUserRepository;
+    private final GpaScoreRepository gpaScoreRepository;
+    private final LanguageTestScoreRepository languageTestScoreRepository;
 
     @Value("${university.term}")
     private String term;
 
-    /*
-     * 학점과 영어 성적을 제출한다.
-     * - 금학기에 제출한 적이 있다면, 수정한다.
-     * - 성적을 제출한적이 한번도 없거나 제출한적이 있지만 금학기에 제출한 적이 없다면 새로 등록한다.
-     * - 수정을 하고 나면, 성적 승인 상태(verifyStatus)를 PENDING 상태로 변경한다.
-     * */
+    // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
+    // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
-    @DefaultCacheOut(key = "application:query", cacheManager = "customCacheManager", prefix = true)
-    public boolean submitScore(String email, ScoreRequest scoreRequest) {
+    public boolean apply(String email, ApplyRequest applyRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        Gpa gpa = scoreRequest.toGpa();
-        LanguageTest languageTest = scoreRequest.toLanguageTest();
+        UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
+        validateUniversityChoices(universityChoiceRequest);
 
-        applicationRepository.findBySiteUserAndTerm(siteUser, term)
-                .ifPresentOrElse(
-                        // 금학기에 성적 제출 이력이 있는 경우
-                        application -> application.updateGpaAndLanguageTest(gpa, languageTest),
-                        () -> {
-                            // 성적 제출한적이 한번도 없는 경우 && 성적 제출한적이 있지만 금학기에 없는 경우
-                            applicationRepository.save(new Application(siteUser, gpa, languageTest, term));
-                        }
-                );
+        Long gpaScoreId = applyRequest.gpaScoreId();
+        Long languageTestScoreId = applyRequest.languageTestScoreId();
+        GpaScore gpaScore = validateGpaScore(siteUser, gpaScoreId);
+        LanguageTestScore languageTestScore = validateLanguageTestScore(siteUser, languageTestScoreId);
+
+        Optional<Application> application = applicationRepository.findBySiteUserAndTerm(siteUser, term);
+        application.ifPresentOrElse(before -> {
+            validateUpdateLimitNotExceed(before);
+            UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
+                    .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
+            UniversityInfoForApply secondChoiceUniversity = Optional.ofNullable(universityChoiceRequest.secondChoiceUniversityId())
+                    .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
+                    .orElse(null);
+            UniversityInfoForApply thirdChoiceUniversity = Optional.ofNullable(universityChoiceRequest.thirdChoiceUniversityId())
+                    .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
+                    .orElse(null);
+            before.updateApplication(gpaScore.getGpa(), languageTestScore.getLanguageTest(), firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
+            applicationRepository.save(before);
+        }, () -> {
+            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(), term);
+            newApplication.setVerifyStatus(VerifyStatus.APPROVED);
+            applicationRepository.save(newApplication);
+        });
         return true;
     }
 
-    /*
-     * 지망 대학교를 제출한다.
-     * - 지망 대학중 중복된 대학교가 있는지 검증한다.
-     * - 지원 정보 제출 내역이 없다면, 지금의 프로세스(성적 제출 후 지망대학 제출)에 벗어나는 요청이므로 예외를 응답한다.
-     * - 기존에 제출한 적이 있다면, 수정한다.
-     *   - 수정 횟수 제한을 초과하지 않았는지 검증한다.
-     *   - 새로운 '제출 닉네임'을 부여한다. (악의적으로 타인의 변경 기록을 추적하는 것을 막기 위해)
-     *   - 성적 승인 상태(verifyStatus) 는 변경하지 않는다.
-     * */
-    @Transactional
-    @DefaultCacheOut(key = "application:query", cacheManager = "customCacheManager", prefix = true)
-    public boolean submitUniversityChoice(String email, UniversityChoiceRequest universityChoiceRequest) {
-        validateUniversityChoices(universityChoiceRequest);
+    private GpaScore validateGpaScore(SiteUser siteUser, Long gpaScoreId) {
+        GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserAndId(siteUser, gpaScoreId)
+                .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
+        if (gpaScore.getVerifyStatus() != VerifyStatus.APPROVED) {
+            throw new CustomException(INVALID_GPA_SCORE_STATUS);
+        }
+        return gpaScore;
+    }
 
-        // 성적 제출한 적이 한번도 없는 경우
-        Application existingApplication = applicationRepository.findTop1BySiteUser_EmailOrderByTermDesc(email)
-                .orElseThrow(() -> new CustomException(SCORE_SHOULD_SUBMITTED_FIRST));
-
-        Application application = Optional.of(existingApplication)
-                .filter(app -> !app.getTerm().equals(term))
-                .map(app -> {
-                    // 성적 제출한 적이 있지만 금학기에 없는 경우, 이전 성적으로 새 Application 객체를 등록
-                    SiteUser siteUser = siteUserRepository.getByEmail(email);
-                    return applicationRepository.save(new Application(siteUser, app.getGpa(), app.getLanguageTest(), term));
-                })
-                .orElse(existingApplication); // 금학기에 이미 성적 제출한 경우 기존 객체 사용
-
-        validateUpdateLimitNotExceed(application);
-
-        UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
-                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
-        UniversityInfoForApply secondChoiceUniversity = Optional.ofNullable(universityChoiceRequest.secondChoiceUniversityId())
-                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                .orElse(null);
-        UniversityInfoForApply thirdChoiceUniversity = Optional.ofNullable(universityChoiceRequest.thirdChoiceUniversityId())
-                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                .orElse(null);
-        application.updateUniversityChoice(firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
-        return true;
+    private LanguageTestScore validateLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
+        LanguageTestScore languageTestScore = languageTestScoreRepository
+                .findLanguageTestScoreBySiteUserAndId(siteUser, languageTestScoreId)
+                .orElseThrow(() -> new CustomException(INVALID_LANGUAGE_TEST_SCORE));
+        if (languageTestScore.getVerifyStatus() != VerifyStatus.APPROVED) {
+            throw new CustomException(INVALID_LANGUAGE_TEST_SCORE_STATUS);
+        }
+        return languageTestScore;
     }
 
     private String getRandomNickname() {

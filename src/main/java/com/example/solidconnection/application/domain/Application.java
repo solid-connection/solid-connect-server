@@ -76,12 +76,24 @@ public class Application {
         this.verifyStatus = PENDING;
     }
 
-    public void updateGpaAndLanguageTest(
+    public void updateApplication(
             Gpa gpa,
-            LanguageTest languageTest) {
+            LanguageTest languageTest,
+            UniversityInfoForApply firstChoiceUniversity,
+            UniversityInfoForApply secondChoiceUniversity,
+            UniversityInfoForApply thirdChoiceUniversity,
+            String nicknameForApply
+    ) {
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.verifyStatus = PENDING;
+        if (this.firstChoiceUniversity != null) {
+            this.updateCount++;
+        }
+        this.firstChoiceUniversity = firstChoiceUniversity;
+        this.secondChoiceUniversity = secondChoiceUniversity;
+        this.thirdChoiceUniversity = thirdChoiceUniversity;
+        this.nicknameForApply = nicknameForApply;
+        this.verifyStatus = VerifyStatus.APPROVED;
     }
 
     public void updateUniversityChoice(

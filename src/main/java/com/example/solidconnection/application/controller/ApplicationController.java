@@ -1,13 +1,8 @@
 package com.example.solidconnection.application.controller;
 
-import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
-import com.example.solidconnection.application.dto.ApplicationsResponse;
-import com.example.solidconnection.application.dto.ScoreRequest;
-import com.example.solidconnection.application.dto.UniversityChoiceRequest;
-import com.example.solidconnection.application.dto.VerifyStatusResponse;
+import com.example.solidconnection.application.dto.*;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
-import com.example.solidconnection.application.service.VerifyStatusQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,27 +23,17 @@ public class ApplicationController implements ApplicationControllerSwagger {
 
     private final ApplicationSubmissionService applicationSubmissionService;
     private final ApplicationQueryService applicationQueryService;
-    private final VerifyStatusQueryService verifyStatusQueryService;
 
-    @PostMapping("/score")
-    public ResponseEntity<ApplicationSubmissionResponse> submitScore(
+    // 지원서 제출하기 api
+    @PostMapping()
+    public ResponseEntity<ApplicationSubmissionResponse> apply(
             Principal principal,
-            @Valid @RequestBody ScoreRequest scoreRequest) {
-        boolean result = applicationSubmissionService.submitScore(principal.getName(), scoreRequest);
+            @Valid @RequestBody ApplyRequest applyRequest) {
+        boolean result = applicationSubmissionService.apply(principal.getName(), applyRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApplicationSubmissionResponse(result));
     }
-
-    @PostMapping("/university")
-    public ResponseEntity<ApplicationSubmissionResponse> submitUniversityChoice(
-            Principal principal,
-            @Valid @RequestBody UniversityChoiceRequest universityChoiceRequest) {
-        boolean result = applicationSubmissionService.submitUniversityChoice(principal.getName(), universityChoiceRequest);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                    .body(new ApplicationSubmissionResponse(result));
-        }
 
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
@@ -66,13 +51,6 @@ public class ApplicationController implements ApplicationControllerSwagger {
             Principal principal) {
         applicationQueryService.validateSiteUserCanViewApplicants(principal.getName());
         ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(principal.getName());
-        return ResponseEntity
-                .ok(result);
-    }
-
-    @GetMapping("/status")
-    public ResponseEntity<VerifyStatusResponse> getApplicationVerifyStatus(Principal principal) {
-        VerifyStatusResponse result = verifyStatusQueryService.getVerifyStatus(principal.getName());
         return ResponseEntity
                 .ok(result);
     }
