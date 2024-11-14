@@ -23,7 +23,7 @@ public class ScoreController {
     private final ScoreService scoreService;
 
     // 학점을 등록하는 api
-    @PostMapping("/gpaScore")
+    @PostMapping("/gpa")
     public ResponseEntity<Long> submitGpaScore(
             Principal principal,
             @Valid @RequestBody GpaScoreRequest gpaScoreRequest) {
@@ -32,7 +32,7 @@ public class ScoreController {
     }
 
     // 어학성적을 등록하는 api
-    @PostMapping("/languageTestScore")
+    @PostMapping("/languageTest")
     public ResponseEntity<Long> submitLanguageTestScore(
             Principal principal,
             @Valid @RequestBody LanguageTestScoreRequest languageTestScoreRequest) {
@@ -41,14 +41,14 @@ public class ScoreController {
     }
 
     // 학점 상태를 확인하는 api
-    @GetMapping("/gpaScore/status")
+    @GetMapping("/gpa")
     public ResponseEntity<GpaScoreStatusResponse> getGpaScoreStatus(Principal principal) {
         GpaScoreStatusResponse gpaScoreStatus = scoreService.getGpaScoreStatus(principal.getName());
         return ResponseEntity.ok(gpaScoreStatus);
     }
 
     // 어학 성적 상태를 확인하는 api
-    @GetMapping("/languageTestScore/status")
+    @GetMapping("/languageTest")
     public ResponseEntity<LanguageTestScoreStatusResponse> getLanguageTestScoreStatus(Principal principal) {
         LanguageTestScoreStatusResponse languageTestScoreStatus = scoreService.getLanguageTestScoreStatus(principal.getName());
         return ResponseEntity.ok(languageTestScoreStatus);
