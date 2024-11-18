@@ -48,8 +48,8 @@ public class ApplicationSubmissionService {
 
         Long gpaScoreId = applyRequest.gpaScoreId();
         Long languageTestScoreId = applyRequest.languageTestScoreId();
-        GpaScore gpaScore = validateGpaScore(siteUser, gpaScoreId);
-        LanguageTestScore languageTestScore = validateLanguageTestScore(siteUser, languageTestScoreId);
+        GpaScore gpaScore = getGpaScore(siteUser, gpaScoreId);
+        LanguageTestScore languageTestScore = getLanguageTestScore(siteUser, languageTestScoreId);
 
         Optional<Application> application = applicationRepository.findBySiteUserAndTerm(siteUser, term);
         application.ifPresentOrElse(before -> {
@@ -72,7 +72,7 @@ public class ApplicationSubmissionService {
         return true;
     }
 
-    private GpaScore validateGpaScore(SiteUser siteUser, Long gpaScoreId) {
+    private GpaScore getGpaScore(SiteUser siteUser, Long gpaScoreId) {
         GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserAndId(siteUser, gpaScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
         if (gpaScore.getVerifyStatus() != VerifyStatus.APPROVED) {
@@ -81,7 +81,7 @@ public class ApplicationSubmissionService {
         return gpaScore;
     }
 
-    private LanguageTestScore validateLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
+    private LanguageTestScore getLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
         LanguageTestScore languageTestScore = languageTestScoreRepository
                 .findLanguageTestScoreBySiteUserAndId(siteUser, languageTestScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_LANGUAGE_TEST_SCORE));
