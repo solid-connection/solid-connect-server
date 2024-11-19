@@ -2,12 +2,7 @@ package com.example.solidconnection.university.domain;
 
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.Region;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,9 +45,9 @@ public class University {
     @Column(length = 1000)
     private String detailsForLocal;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Country country;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Region region;
 }

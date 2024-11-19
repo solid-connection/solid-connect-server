@@ -32,7 +32,7 @@ public class GpaScore extends BaseEntity {
 
     private String rejectedReason;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private SiteUser siteUser;
 
     public GpaScore(Gpa gpa, SiteUser siteUser, LocalDate issueDate) {

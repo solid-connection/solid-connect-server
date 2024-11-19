@@ -76,10 +76,10 @@ public class UniversityInfoForApply {
     @Column(length = 500)
     private String details;
 
-    @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.LAZY)
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private University university;
 
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
