@@ -48,31 +48,39 @@ public class ApplicationSubmissionService {
 
         Long gpaScoreId = applyRequest.gpaScoreId();
         Long languageTestScoreId = applyRequest.languageTestScoreId();
-        GpaScore gpaScore = getGpaScore(siteUser, gpaScoreId);
-        LanguageTestScore languageTestScore = getLanguageTestScore(siteUser, languageTestScoreId);
+        GpaScore gpaScore = getValidGpaScore(siteUser, gpaScoreId);
+        LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, languageTestScoreId);
 
         Optional<Application> application = applicationRepository.findBySiteUserAndTerm(siteUser, term);
-        application.ifPresentOrElse(before -> {
-            validateUpdateLimitNotExceed(before);
-            UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
-                    .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
-            UniversityInfoForApply secondChoiceUniversity = Optional.ofNullable(universityChoiceRequest.secondChoiceUniversityId())
-                    .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                    .orElse(null);
-            UniversityInfoForApply thirdChoiceUniversity = Optional.ofNullable(universityChoiceRequest.thirdChoiceUniversityId())
-                    .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                    .orElse(null);
-            before.updateApplication(gpaScore.getGpa(), languageTestScore.getLanguageTest(), firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
-            applicationRepository.save(before);
-        }, () -> {
-            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(), term);
+
+        UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
+                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
+        UniversityInfoForApply secondChoiceUniversity = Optional.ofNullable(universityChoiceRequest.secondChoiceUniversityId())
+                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
+                .orElse(null);
+        UniversityInfoForApply thirdChoiceUniversity = Optional.ofNullable(universityChoiceRequest.thirdChoiceUniversityId())
+                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
+                .orElse(null);
+
+        if (application.isEmpty()) {
+            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
+                    term, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
             newApplication.setVerifyStatus(VerifyStatus.APPROVED);
             applicationRepository.save(newApplication);
-        });
+        } else {
+            Application before = application.get();
+            validateUpdateLimitNotExceed(before);
+            before.setIsDeleteTrue(); // 기존 이력 soft delete 수행한다.
+
+            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
+                    term, before.getUpdateCount() + 1, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
+            newApplication.setVerifyStatus(VerifyStatus.APPROVED);
+            applicationRepository.save(newApplication);
+        }
         return true;
     }
 
-    private GpaScore getGpaScore(SiteUser siteUser, Long gpaScoreId) {
+    private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
         GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserAndId(siteUser, gpaScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
         if (gpaScore.getVerifyStatus() != VerifyStatus.APPROVED) {
@@ -81,7 +89,7 @@ public class ApplicationSubmissionService {
         return gpaScore;
     }
 
-    private LanguageTestScore getLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
+    private LanguageTestScore getValidLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
         LanguageTestScore languageTestScore = languageTestScoreRepository
                 .findLanguageTestScoreBySiteUserAndId(siteUser, languageTestScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_LANGUAGE_TEST_SCORE));

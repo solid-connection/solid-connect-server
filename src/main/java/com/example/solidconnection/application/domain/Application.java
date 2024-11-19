@@ -3,15 +3,7 @@ package com.example.solidconnection.application.domain;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,16 +43,19 @@ public class Application {
     @Column(length = 50, nullable = false)
     private String term;
 
-    @ManyToOne
+    @Column(columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0")
+    private Boolean isDelete;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private UniversityInfoForApply firstChoiceUniversity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UniversityInfoForApply secondChoiceUniversity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UniversityInfoForApply thirdChoiceUniversity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser siteUser;
 
     public Application(
@@ -76,24 +71,51 @@ public class Application {
         this.verifyStatus = PENDING;
     }
 
-    public void updateApplication(
+    public Application(
+            SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
+            String term,
+            Integer updateCount,
             UniversityInfoForApply firstChoiceUniversity,
             UniversityInfoForApply secondChoiceUniversity,
             UniversityInfoForApply thirdChoiceUniversity,
-            String nicknameForApply
-    ) {
+            String nicknameForApply) {
+        this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
-        if (this.firstChoiceUniversity != null) {
-            this.updateCount++;
-        }
+        this.term = term;
+        this.updateCount = updateCount;
         this.firstChoiceUniversity = firstChoiceUniversity;
         this.secondChoiceUniversity = secondChoiceUniversity;
         this.thirdChoiceUniversity = thirdChoiceUniversity;
         this.nicknameForApply = nicknameForApply;
-        this.verifyStatus = VerifyStatus.APPROVED;
+        this.verifyStatus = PENDING;
+    }
+
+    public Application(
+            SiteUser siteUser,
+            Gpa gpa,
+            LanguageTest languageTest,
+            String term,
+            UniversityInfoForApply firstChoiceUniversity,
+            UniversityInfoForApply secondChoiceUniversity,
+            UniversityInfoForApply thirdChoiceUniversity,
+            String nicknameForApply) {
+        this.siteUser = siteUser;
+        this.gpa = gpa;
+        this.languageTest = languageTest;
+        this.term = term;
+        this.updateCount = 0;
+        this.firstChoiceUniversity = firstChoiceUniversity;
+        this.secondChoiceUniversity = secondChoiceUniversity;
+        this.thirdChoiceUniversity = thirdChoiceUniversity;
+        this.nicknameForApply = nicknameForApply;
+        this.verifyStatus = PENDING;
+    }
+
+    public void setIsDeleteTrue() {
+        this.isDelete = true;
     }
 
     public void updateUniversityChoice(
