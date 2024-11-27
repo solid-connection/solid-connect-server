@@ -49,11 +49,4 @@ public class LanguageTestScore extends BaseEntity {
         this.siteUser = siteUser;
         siteUser.getLanguageTestScoreList().add(this);
     }
-
-    public void update(LanguageTest languageTest, LocalDate issueDate) {
-        this.languageTest = languageTest;
-        this.issueDate = issueDate;
-        this.verifyStatus = VerifyStatus.PENDING;
-        this.rejectedReason = null;
-    }
 }

@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -43,13 +42,15 @@ public class ScoreServiceTest {
 
     private SiteUser siteUser;
     private GpaScore beforeGpaScore;
+    private GpaScore beforeGpaScore2;
     private LanguageTestScore beforeLanguageTestScore;
     private LanguageTestScore beforeLanguageTestScore2;
 
     @BeforeEach
     void setUp() {
         siteUser = createSiteUser();
-        beforeGpaScore = createBeforeGpaScore(siteUser);
+        beforeGpaScore = createBeforeGpaScore(siteUser, 4.5);
+        beforeGpaScore2 = createBeforeGpaScore(siteUser, 4.3);
         beforeLanguageTestScore = createBeforeLanguageTestScore(siteUser);
         beforeLanguageTestScore2 = createBeforeLanguageTestScore2(siteUser);
     }
@@ -66,9 +67,9 @@ public class ScoreServiceTest {
         );
     }
 
-    private GpaScore createBeforeGpaScore(SiteUser siteUser) {
+    private GpaScore createBeforeGpaScore(SiteUser siteUser, Double gpa) {
         return new GpaScore(
-                new Gpa(4.5, 4.5, "http://example.com/gpa-report.pdf"),
+                new Gpa(gpa, 4.5, "http://example.com/gpa-report.pdf"),
                 siteUser,
                 LocalDate.of(2024, 10, 20)
         );
@@ -98,33 +99,9 @@ public class ScoreServiceTest {
         );
         GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser, gpaScoreRequest.issueDate());
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
-        when(gpaScoreRepository.findGpaScoreBySiteUser(siteUser)).thenReturn(Optional.empty());
         when(gpaScoreRepository.save(newGpaScore)).thenReturn(newGpaScore);
 
         // 새로운 gpa 저장하게된다.
-        scoreService.submitGpaScore(siteUser.getEmail(), gpaScoreRequest);
-
-        // Then
-        verify(siteUserRepository, times(1)).getByEmail(siteUser.getEmail());
-        verify(gpaScoreRepository, times(1)).save(any(GpaScore.class));
-    }
-
-    @Test
-    void 학점을_등록한다_기존이력이_있을_때() {
-        // Given
-        GpaScoreRequest gpaScoreRequest = new GpaScoreRequest(
-                4.5, 4.5, LocalDate.of(2024, 10, 30), "http://example.com/gpa-report.pdf"
-        );
-        GpaScore afterGpaScore = new GpaScore(
-                new Gpa(4.3, 4.5, "http://example.com/gpa-report.pdf"),
-                siteUser,
-                LocalDate.of(2024, 10, 30)
-        );
-        when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
-        when(gpaScoreRepository.findGpaScoreBySiteUser(siteUser)).thenReturn(Optional.of(beforeGpaScore));
-        when(gpaScoreRepository.save(any(GpaScore.class))).thenReturn(afterGpaScore);
-
-        // GPA 저장
         scoreService.submitGpaScore(siteUser.getEmail(), gpaScoreRequest);
 
         // Then
@@ -143,32 +120,7 @@ public class ScoreServiceTest {
         LanguageTestScore languageTestScore = new LanguageTestScore(languageTest, LocalDate.of(2024, 10, 30), siteUser);
 
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
-        when(languageTestScoreRepository.findLanguageTestScoreBySiteUserAndLanguageTest_LanguageTestType(
-                siteUser, languageTest.getLanguageTestType())).thenReturn(Optional.empty());
         when(languageTestScoreRepository.save(any(LanguageTestScore.class))).thenReturn(languageTestScore);
-
-        //when
-        scoreService.submitLanguageTestScore(siteUser.getEmail(), languageTestScoreRequest);
-
-        // Then
-        verify(siteUserRepository, times(1)).getByEmail(siteUser.getEmail());
-        verify(languageTestScoreRepository, times(1)).save(any(LanguageTestScore.class));
-    }
-
-    @Test
-    void 어학성적을_등록한다_기존이력이_있을_때() {
-        // Given
-        LanguageTestScoreRequest languageTestScoreRequest = new LanguageTestScoreRequest(
-                LanguageTestType.TOEIC, "990",
-                LocalDate.of(2024, 10, 30), "http://example.com/gpa-report.pdf"
-        );
-        LanguageTest languageTest = languageTestScoreRequest.toLanguageTest();
-
-        when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
-        when(languageTestScoreRepository.findLanguageTestScoreBySiteUserAndLanguageTest_LanguageTestType(
-                siteUser, languageTest.getLanguageTestType())).thenReturn(Optional.of(beforeLanguageTestScore));
-        beforeLanguageTestScore.update(languageTest, languageTestScoreRequest.issueDate());
-        when(languageTestScoreRepository.save(any(LanguageTestScore.class))).thenReturn(beforeLanguageTestScore);
 
         //when
         scoreService.submitLanguageTestScore(siteUser.getEmail(), languageTestScoreRequest);
@@ -183,13 +135,19 @@ public class ScoreServiceTest {
         // Given
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
         beforeGpaScore.setSiteUser(siteUser);
+        beforeGpaScore2.setSiteUser(siteUser);
 
         // when
-        GpaScoreStatusResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUser.getEmail());
+        GpaScoreStatusResponse gpaScoreStatusResponse = scoreService.getGpaScoreStatus(siteUser.getEmail());
 
         // Then
-        assertThat(gpaScoreStatus)
-                .isEqualTo(GpaScoreStatusResponse.from(siteUser.getGpaScore()));
+        List<GpaScoreStatus> expectedStatusList = List.of(
+                GpaScoreStatus.from(beforeGpaScore),
+                GpaScoreStatus.from(beforeGpaScore2)
+        );
+        assertThat(gpaScoreStatusResponse.gpaScoreStatusList())
+                .hasSize(2)
+                .containsExactlyElementsOf(expectedStatusList);
         verify(siteUserRepository, times(1)).getByEmail(siteUser.getEmail());
     }
 
@@ -202,8 +160,7 @@ public class ScoreServiceTest {
         GpaScoreStatusResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUser.getEmail());
 
         // Then
-        assertThat(gpaScoreStatus)
-                .isEqualTo(null);
+        assertThat(gpaScoreStatus.gpaScoreStatusList()).isEmpty();
         verify(siteUserRepository, times(1)).getByEmail(siteUser.getEmail());
     }
 

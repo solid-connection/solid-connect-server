@@ -70,16 +70,9 @@ public class SiteUser {
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LanguageTestScore> languageTestScoreList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private GpaScore gpaScore;
+    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GpaScore> gpaScoreList = new ArrayList<>();
 
-
-    public void setGpaScore(GpaScore gpaScore) {
-        this.gpaScore = gpaScore;
-        if (gpaScore != null && gpaScore.getSiteUser() != this) {
-            gpaScore.setSiteUser(this);
-        }
-    }
 
     public SiteUser(
             String email,

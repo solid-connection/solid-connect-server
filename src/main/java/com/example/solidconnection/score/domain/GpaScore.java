@@ -32,7 +32,7 @@ public class GpaScore extends BaseEntity {
 
     private String rejectedReason;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private SiteUser siteUser;
 
     public GpaScore(Gpa gpa, SiteUser siteUser, LocalDate issueDate) {
@@ -44,16 +44,10 @@ public class GpaScore extends BaseEntity {
     }
 
     public void setSiteUser(SiteUser siteUser) {
-        this.siteUser = siteUser;
-        if (siteUser != null && siteUser.getGpaScore() != this) {
-            siteUser.setGpaScore(this);
+        if (this.siteUser != null) {
+            this.siteUser.getGpaScoreList().remove(this);
         }
-    }
-
-    public void update(Gpa gpa, LocalDate issueDate) {
-        this.gpa = gpa;
-        this.issueDate = issueDate;
-        this.verifyStatus = VerifyStatus.PENDING;
-        this.rejectedReason = null;
+        this.siteUser = siteUser;
+        siteUser.getGpaScoreList().add(this);
     }
 }

@@ -29,18 +29,10 @@ public class ScoreService {
     public Long submitGpaScore(String email, GpaScoreRequest gpaScoreRequest) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
 
-        Optional<GpaScore> gpaScoreBySiteUser = gpaScoreRepository.findGpaScoreBySiteUser(siteUser);
-        if (gpaScoreBySiteUser.isPresent()) {
-            GpaScore gpaScore = gpaScoreBySiteUser.get();
-            gpaScore.update(gpaScoreRequest.toGpa(), gpaScoreRequest.issueDate());
-            GpaScore savedGpaScore = gpaScoreRepository.save(gpaScore);  // 저장 후 반환된 객체
-            return savedGpaScore.getId();  // 저장된 GPA Score의 ID 반환
-        } else {
-            GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser, gpaScoreRequest.issueDate());
-            newGpaScore.setSiteUser(siteUser);
-            GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);  // 저장 후 반환된 객체
-            return savedNewGpaScore.getId();  // 저장된 GPA Score의 ID 반환
-        }
+        GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser, gpaScoreRequest.issueDate());
+        newGpaScore.setSiteUser(siteUser);
+        GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);  // 저장 후 반환된 객체
+        return savedNewGpaScore.getId();  // 저장된 GPA Score의 ID 반환
     }
 
     @Transactional
@@ -48,33 +40,23 @@ public class ScoreService {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
         LanguageTest languageTest = languageTestScoreRequest.toLanguageTest();
 
-        Optional<LanguageTestScore> languageTestScore =
-                languageTestScoreRepository.findLanguageTestScoreBySiteUserAndLanguageTest_LanguageTestType(siteUser, languageTest.getLanguageTestType());
-
-        if (languageTestScore.isPresent()) {
-            // 기존 이력이 있을 경우 업데이트
-            LanguageTestScore existingScore = languageTestScore.get();
-            existingScore.update(languageTest, languageTestScoreRequest.issueDate());
-            languageTestScoreRepository.save(existingScore);
-            return existingScore.getId();  // 업데이트된 객체의 ID 반환
-        } else {
-            // 기존 이력이 없을 경우 새로 생성
-            LanguageTestScore newScore = new LanguageTestScore(
-                    languageTest, languageTestScoreRequest.issueDate(), siteUser);
-            newScore.setSiteUser(siteUser);
-            LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);  // 새로 저장한 객체
-            return savedNewScore.getId();  // 저장된 객체의 ID 반환
-        }
+        LanguageTestScore newScore = new LanguageTestScore(
+                languageTest, languageTestScoreRequest.issueDate(), siteUser);
+        newScore.setSiteUser(siteUser);
+        LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);  // 새로 저장한 객체
+        return savedNewScore.getId();  // 저장된 객체의 ID 반환
     }
 
     @Transactional(readOnly = true)
     public GpaScoreStatusResponse getGpaScoreStatus(String email) {
         SiteUser siteUser = siteUserRepository.getByEmail(email);
-        GpaScore gpaScore = siteUser.getGpaScore();
-        if (gpaScore == null) {
-            return null;
-        }
-        return GpaScoreStatusResponse.from(gpaScore);
+        List<GpaScoreStatus> gpaScoreStatusList =
+                Optional.ofNullable(siteUser.getGpaScoreList())
+                        .map(scores -> scores.stream()
+                                .map(GpaScoreStatus::from)
+                                .collect(Collectors.toList()))
+                        .orElse(Collections.emptyList());
+        return new GpaScoreStatusResponse(gpaScoreStatusList);
     }
 
     @Transactional(readOnly = true)
