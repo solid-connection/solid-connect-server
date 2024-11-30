@@ -45,9 +45,9 @@ public class University {
     @Column(length = 1000)
     private String detailsForLocal;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Country country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Region region;
 }
