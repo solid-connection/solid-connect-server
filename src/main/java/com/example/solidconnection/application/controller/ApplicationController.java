@@ -1,6 +1,8 @@
 package com.example.solidconnection.application.controller;
 
-import com.example.solidconnection.application.dto.*;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
+import com.example.solidconnection.application.dto.ApplicationsResponse;
+import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import jakarta.validation.Valid;

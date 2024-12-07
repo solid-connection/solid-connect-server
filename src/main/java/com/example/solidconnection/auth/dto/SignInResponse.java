@@ -1,7 +1,6 @@
 package com.example.solidconnection.auth.dto;
 
 import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "로그인 응답 데이터")

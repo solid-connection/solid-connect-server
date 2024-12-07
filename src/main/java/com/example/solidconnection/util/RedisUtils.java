@@ -11,7 +11,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.type.RedisConstants.*;
+import static com.example.solidconnection.type.RedisConstants.CREATE_LOCK_PREFIX;
+import static com.example.solidconnection.type.RedisConstants.REFRESH_LOCK_PREFIX;
+import static com.example.solidconnection.type.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PREFIX;
 
 @Component
 public class RedisUtils {
@@ -70,6 +73,6 @@ public class RedisUtils {
 
     public boolean isCacheExpiringSoon(String key, Long defaultTtl, Double percent) {
         Long leftTtl = redisTemplate.getExpire(key);
-        return defaultTtl != null && ((double) leftTtl /defaultTtl)*100 < percent;
+        return defaultTtl != null && ((double) leftTtl / defaultTtl) * 100 < percent;
     }
 }

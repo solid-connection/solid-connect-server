@@ -8,7 +8,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DefaultCaching {
+
     String key();
+
     String cacheManager();
+
     long ttlSec();
 }

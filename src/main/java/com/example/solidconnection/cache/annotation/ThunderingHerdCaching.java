@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ThunderingHerdCaching {
     String key();
+
     String cacheManager();
+
     long ttlSec();
 }

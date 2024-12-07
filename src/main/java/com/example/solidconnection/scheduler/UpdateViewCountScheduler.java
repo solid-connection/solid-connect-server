@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.example.solidconnection.type.RedisConstants.*;
+import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PATTERN;
 
 @RequiredArgsConstructor
 @Component

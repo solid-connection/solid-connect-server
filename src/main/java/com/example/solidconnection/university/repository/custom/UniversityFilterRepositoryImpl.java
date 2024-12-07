@@ -85,8 +85,8 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
                         .and(universityInfoForApply.term.eq(term)))
                 .fetch();
 
-        if(testScore == null || testScore.isEmpty()) {
-            if(testType != null) {
+        if (testScore == null || testScore.isEmpty()) {
+            if (testType != null) {
                 return filteredUniversityInfoForApply.stream()
                         .filter(uifa -> uifa.getLanguageRequirements().stream()
                                 .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))

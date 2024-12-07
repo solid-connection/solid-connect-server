@@ -11,10 +11,10 @@ public record MyPageUpdateResponse(
         @Schema(description = "업데이트된 프로필 이미지 URL", example = "http://example.com/updated-profile.jpg")
         String profileImageUrl) {
 
-        public static MyPageUpdateResponse from(SiteUser siteUser) {
-                return new MyPageUpdateResponse(
-                        siteUser.getNickname(),
-                        siteUser.getProfileImageUrl()
-                );
-        }
+    public static MyPageUpdateResponse from(SiteUser siteUser) {
+        return new MyPageUpdateResponse(
+                siteUser.getNickname(),
+                siteUser.getProfileImageUrl()
+        );
+    }
 }

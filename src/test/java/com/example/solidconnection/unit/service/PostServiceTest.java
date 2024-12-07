@@ -7,7 +7,7 @@ import com.example.solidconnection.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.comment.service.CommentService;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.exception.ErrorCode;
-import com.example.solidconnection.dto.PostFindPostImageResponse;
+import com.example.solidconnection.post.dto.PostFindPostImageResponse;
 import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.post.domain.PostLike;
 import com.example.solidconnection.post.repository.PostLikeRepository;

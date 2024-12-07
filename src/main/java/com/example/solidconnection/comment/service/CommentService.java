@@ -1,8 +1,13 @@
 package com.example.solidconnection.comment.service;
 
-import com.example.solidconnection.comment.dto.*;
-import com.example.solidconnection.comment.repository.CommentRepository;
 import com.example.solidconnection.comment.domain.Comment;
+import com.example.solidconnection.comment.dto.CommentCreateRequest;
+import com.example.solidconnection.comment.dto.CommentCreateResponse;
+import com.example.solidconnection.comment.dto.CommentDeleteResponse;
+import com.example.solidconnection.comment.dto.CommentUpdateRequest;
+import com.example.solidconnection.comment.dto.CommentUpdateResponse;
+import com.example.solidconnection.comment.dto.PostFindCommentResponse;
+import com.example.solidconnection.comment.repository.CommentRepository;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.repository.PostRepository;
@@ -15,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_LEVEL;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
 
 @Service
 @RequiredArgsConstructor

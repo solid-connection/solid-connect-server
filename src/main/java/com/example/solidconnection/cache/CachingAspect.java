@@ -47,7 +47,7 @@ public class CachingAspect {
 
             if (usingPrefix) {
                 cacheManager.evictUsingPrefix(cacheKey);
-            }else{
+            } else {
                 cacheManager.evict(cacheKey);
             }
         }

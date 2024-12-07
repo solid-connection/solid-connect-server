@@ -2,7 +2,6 @@ package com.example.solidconnection.siteuser.dto;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Role;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "마이페이지 페이지 정보 응답")

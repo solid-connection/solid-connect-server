@@ -16,7 +16,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
@@ -29,14 +33,14 @@ import static com.example.solidconnection.custom.exception.ErrorCode.S3_SERVICE_
 public class S3Service {
 
     private static final Logger log = LoggerFactory.getLogger(S3Service.class);
+    private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 3;
     private final AmazonS3Client amazonS3;
     private final SiteUserRepository siteUserRepository;
     private final FileUploadService fileUploadService;
     private final ThreadPoolTaskExecutor asyncExecutor;
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final long MAX_FILE_SIZE_MB = 1024 * 1024 * 3;
-
     /*
      * 파일을 S3에 업로드한다.
      * - 파일이 존재하는지 검증한다.
@@ -47,6 +51,7 @@ public class S3Service {
      * - 3mb 이상의 파일은 /origin/ 경로로 업로드하여 lambda 함수로 리사이징 진행한다.
      * - 3mb 미만의 파일은 바로 업로드한다.
      * */
+
     public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, ImgType imageFile) {
         // 파일 검증
         validateImgFile(multipartFile);

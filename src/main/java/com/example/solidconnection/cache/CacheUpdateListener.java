@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class CacheUpdateListener implements MessageListener {
 
     private final CompletableFutureManager futureManager;
+
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String messageBody = new String(message.getBody(), StandardCharsets.UTF_8).replaceAll("^\"|\"$", "");

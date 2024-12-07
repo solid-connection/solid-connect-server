@@ -1,13 +1,20 @@
 package com.example.solidconnection.score.controller;
 
-import com.example.solidconnection.score.dto.*;
+import com.example.solidconnection.score.dto.GpaScoreRequest;
+import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
+import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
+import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.service.ScoreService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 

@@ -22,6 +22,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.S3_SERVICE_
 @EnableAsync
 @Slf4j
 public class FileUploadService {
+
     private final AmazonS3Client amazonS3;
 
     public FileUploadService(AmazonS3Client amazonS3) {

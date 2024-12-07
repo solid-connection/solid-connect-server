@@ -1,17 +1,24 @@
 package com.example.solidconnection.post.service;
 
+import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.dto.PostFindBoardResponse;
 import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.comment.service.CommentService;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.dto.*;
-import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.entity.PostImage;
-import com.example.solidconnection.post.domain.PostLike;
-import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.dto.*;
+import com.example.solidconnection.post.domain.PostLike;
+import com.example.solidconnection.post.dto.PostCreateRequest;
+import com.example.solidconnection.post.dto.PostCreateResponse;
+import com.example.solidconnection.post.dto.PostDeleteResponse;
+import com.example.solidconnection.post.dto.PostDislikeResponse;
+import com.example.solidconnection.post.dto.PostFindPostImageResponse;
+import com.example.solidconnection.post.dto.PostFindResponse;
+import com.example.solidconnection.post.dto.PostLikeResponse;
+import com.example.solidconnection.post.dto.PostUpdateRequest;
+import com.example.solidconnection.post.dto.PostUpdateResponse;
+import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
@@ -32,11 +39,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_POST_LIKE;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
     private final PostRepository postRepository;
     private final SiteUserRepository siteUserRepository;
     private final BoardRepository boardRepository;

@@ -2,7 +2,6 @@ package com.example.solidconnection.application.dto;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.type.LanguageTestType;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "지원자")

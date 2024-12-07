@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_ID;
+
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(value = """

@@ -36,8 +36,8 @@ public record UniversityInfoForApplyPreviewResponse(
     public static UniversityInfoForApplyPreviewResponse from(UniversityInfoForApply universityInfoForApply) {
         List<LanguageRequirementResponse> languageRequirementResponses = new java.util.ArrayList<>(
                 universityInfoForApply.getLanguageRequirements().stream()
-                .map(LanguageRequirementResponse::from)
-                .toList());
+                        .map(LanguageRequirementResponse::from)
+                        .toList());
         Collections.sort(languageRequirementResponses);
 
         return new UniversityInfoForApplyPreviewResponse(

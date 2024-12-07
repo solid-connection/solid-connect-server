@@ -16,14 +16,22 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static com.example.solidconnection.type.RedisConstants.*;
+import static com.example.solidconnection.type.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.type.RedisConstants.LOCK_TIMEOUT_MS;
+import static com.example.solidconnection.type.RedisConstants.MAX_WAIT_TIME_MS;
+import static com.example.solidconnection.type.RedisConstants.REFRESH_LIMIT_PERCENT;
 
 @Aspect
 @Component
 @Slf4j
 public class ThunderingHerdCachingAspect {
+
     private final ApplicationContext applicationContext;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CompletableFutureManager futureManager;

@@ -1,8 +1,8 @@
 package com.example.solidconnection.post.repository;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.post.domain.PostLike;
 import com.example.solidconnection.post.domain.Post;
+import com.example.solidconnection.post.domain.PostLike;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

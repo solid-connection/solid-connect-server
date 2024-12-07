@@ -33,7 +33,7 @@ public class CustomCacheManager implements CacheManager {
     }
 
     public void evictUsingPrefix(String key) {
-        Set<String> keys = redisTemplate.keys(key+"*");
+        Set<String> keys = redisTemplate.keys(key + "*");
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
         }

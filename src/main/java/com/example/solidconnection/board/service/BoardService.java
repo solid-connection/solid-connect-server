@@ -31,8 +31,8 @@ public class BoardService {
         }
     }
 
-    private PostCategory validatePostCategory(String category){
-        if(!EnumUtils.isValidEnum(PostCategory.class, category)){
+    private PostCategory validatePostCategory(String category) {
+        if (!EnumUtils.isValidEnum(PostCategory.class, category)) {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
         return PostCategory.valueOf(category);

@@ -1,13 +1,28 @@
 package com.example.solidconnection.post.controller;
 
-import com.example.solidconnection.post.dto.*;
+import com.example.solidconnection.post.dto.PostCreateRequest;
+import com.example.solidconnection.post.dto.PostCreateResponse;
+import com.example.solidconnection.post.dto.PostDeleteResponse;
+import com.example.solidconnection.post.dto.PostDislikeResponse;
+import com.example.solidconnection.post.dto.PostFindResponse;
+import com.example.solidconnection.post.dto.PostLikeResponse;
+import com.example.solidconnection.post.dto.PostUpdateRequest;
+import com.example.solidconnection.post.dto.PostUpdateResponse;
 import com.example.solidconnection.post.service.PostService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;

@@ -4,7 +4,11 @@ import com.example.solidconnection.type.ImgType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
@@ -15,12 +19,16 @@ import java.security.Principal;
 public class S3Controller implements S3ControllerSwagger {
 
     private final S3Service s3Service;
+
     @Value("${cloud.aws.s3.url.default}")
     private String s3Default;
+
     @Value("${cloud.aws.s3.url.uploaded}")
     private String s3Uploaded;
+
     @Value("${cloud.aws.cloudFront.url.default}")
     private String cloudFrontDefault;
+
     @Value("${cloud.aws.cloudFront.url.uploaded}")
     private String cloudFrontUploaded;
 

@@ -22,7 +22,7 @@ import static io.swagger.v3.oas.annotations.enums.SecuritySchemeType.HTTP;
 )
 public class SwaggerConfig {
 
-        public static final String ACCESS_TOKEN = "access_token";
+    public static final String ACCESS_TOKEN = "access_token";
 
     @Bean
     public OpenAPI customOpenAPI() {

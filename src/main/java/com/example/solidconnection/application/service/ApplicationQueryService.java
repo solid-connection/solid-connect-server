@@ -36,6 +36,7 @@ public class ApplicationQueryService {
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final SiteUserRepository siteUserRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
+
     @Value("${university.term}")
     public String term;
 
