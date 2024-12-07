@@ -13,8 +13,8 @@ public record PostFindCommentResponse(
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt,
         PostFindSiteUserResponse postFindSiteUserResponse
-
 ) {
+
     public static PostFindCommentResponse from(Boolean isOwner, Comment comment) {
         return new PostFindCommentResponse(
                 comment.getId(),

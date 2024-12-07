@@ -9,7 +9,6 @@ import java.util.List;
 
 @Schema(description = "대학 세부 사항 응답 데이터")
 public record UniversityDetailResponse(
-
         @Schema(description = "대학 지원을 위한 정보 id", example = "1")
         long id,
 

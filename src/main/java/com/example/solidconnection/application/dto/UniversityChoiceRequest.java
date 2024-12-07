@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "지망 대학")
 public record UniversityChoiceRequest(
-
         @NotNull(message = "1지망 대학교를 입력해주세요.")
         @Schema(description = "1지망 대학교의 지원 정보 ID", example = "1")
         Long firstChoiceUniversityId,
@@ -14,4 +13,5 @@ public record UniversityChoiceRequest(
         Long secondChoiceUniversityId,
 
         @Schema(description = "3지망 대학교의 지원 정보 ID (선택사항)", example = "3", nullable = true)
-        Long thirdChoiceUniversityId) {}
+        Long thirdChoiceUniversityId) {
+}

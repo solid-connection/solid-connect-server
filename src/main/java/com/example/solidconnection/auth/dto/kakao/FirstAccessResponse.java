@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "등록되지 않은 사용자의 최초 접속 시 응답 데이터")
 public record FirstAccessResponse(
-
         @Schema(description = "사용자 등록 여부", example = "false")
         boolean isRegistered,
 
