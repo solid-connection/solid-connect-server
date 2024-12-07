@@ -1,4 +1,4 @@
-package com.example.solidconnection.dto;
+package com.example.solidconnection.post.dto;
 
 import com.example.solidconnection.entity.PostImage;
 

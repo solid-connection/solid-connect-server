@@ -2,7 +2,6 @@ package com.example.solidconnection.post.dto;
 
 import com.example.solidconnection.board.dto.PostFindBoardResponse;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
-import com.example.solidconnection.dto.*;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 
