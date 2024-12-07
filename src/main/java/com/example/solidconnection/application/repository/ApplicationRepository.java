@@ -20,14 +20,22 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByNicknameForApply(String nicknameForApply);
 
-    @Query("SELECT a FROM Application a WHERE a.siteUser = :siteUser AND a.term = :term AND a.isDelete = false")
+    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(
+            UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
+
+    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(
+            UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
+
+    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(
+            UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
+
+    @Query("""
+        SELECT a FROM Application a
+        WHERE a.siteUser = :siteUser
+        AND a.term = :term
+        AND a.isDelete = false
+    """)
     Optional<Application> findBySiteUserAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
-
-    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
-
-    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
-
-    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     default Application getApplicationBySiteUserAndTerm(SiteUser siteUser, String term) {
         return findBySiteUserAndTerm(siteUser, term)

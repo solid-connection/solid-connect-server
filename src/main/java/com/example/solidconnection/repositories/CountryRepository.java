@@ -14,11 +14,6 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     Optional<Country> findByKoreanName(String koreanName);
 
-/*    default Country getByKoreanName(String koreanName) {
-        return findByKoreanName(koreanName)
-                .orElseThrow(() -> new CustomException(COUNTRY_NOT_FOUND_BY_KOREAN_NAME));
-    }*/
-
     @Query("SELECT c FROM Country c WHERE c.koreanName IN :names")
     List<Country> findByKoreanNames(@Param(value = "names") List<String> names);
 

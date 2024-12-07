@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface GpaScoreRepository extends JpaRepository<GpaScore, Long> {
+
     Optional<GpaScore> findGpaScoreBySiteUser(SiteUser siteUser);
 
     Optional<GpaScore> findGpaScoreBySiteUserAndId(SiteUser siteUser, Long id);
