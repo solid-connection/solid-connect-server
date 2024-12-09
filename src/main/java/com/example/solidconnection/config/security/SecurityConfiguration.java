@@ -51,7 +51,6 @@ public class SecurityConfiguration {
                                 "/file/profile/pre",
                                 "/auth/kakao", "/auth/sign-up", "/auth/reissue",
                                 "/university/detail/**", "/university/search/**", "/university/recommends",
-                                "/swagger-ui/**", "/v3/api-docs/**",
                                 "/actuator/**"
                         )
                         .permitAll()

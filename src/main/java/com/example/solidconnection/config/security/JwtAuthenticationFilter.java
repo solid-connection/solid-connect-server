@@ -108,10 +108,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 대학교 정보
         permitAllEndpoints.add("/university/search/**");
 
-        // API 문서
-        permitAllEndpoints.add("/swagger-ui/**");
-        permitAllEndpoints.add("/v3/api-docs/**");
-
         return permitAllEndpoints;
     }
 }
