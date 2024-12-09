@@ -6,8 +6,6 @@ import com.example.solidconnection.comment.dto.CommentDeleteResponse;
 import com.example.solidconnection.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.comment.service.CommentService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-import static com.example.solidconnection.config.swagger.SwaggerConfig.ACCESS_TOKEN;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
-@SecurityRequirements
-@SecurityRequirement(name = ACCESS_TOKEN)
 public class CommentController {
 
     private final CommentService commentService;

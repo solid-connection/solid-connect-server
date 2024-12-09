@@ -21,7 +21,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/application")
 @RestController
-public class ApplicationController implements ApplicationControllerSwagger {
+public class ApplicationController {
 
     private final ApplicationSubmissionService applicationSubmissionService;
     private final ApplicationQueryService applicationQueryService;

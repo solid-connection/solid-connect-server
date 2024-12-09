@@ -9,8 +9,6 @@ import com.example.solidconnection.post.dto.PostLikeResponse;
 import com.example.solidconnection.post.dto.PostUpdateRequest;
 import com.example.solidconnection.post.dto.PostUpdateResponse;
 import com.example.solidconnection.post.service.PostService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +27,9 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.solidconnection.config.swagger.SwaggerConfig.ACCESS_TOKEN;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/communities")
-@SecurityRequirements
-@SecurityRequirement(name = ACCESS_TOKEN)
 public class PostController {
 
     private final PostService postService;

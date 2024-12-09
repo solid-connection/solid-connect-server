@@ -5,8 +5,6 @@ import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.service.ScoreService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-import static com.example.solidconnection.config.swagger.SwaggerConfig.ACCESS_TOKEN;
-
 @RestController
 @RequestMapping("/score")
 @RequiredArgsConstructor
-@SecurityRequirements
-@SecurityRequirement(name = ACCESS_TOKEN)
 public class ScoreController {
 
     private final ScoreService scoreService;

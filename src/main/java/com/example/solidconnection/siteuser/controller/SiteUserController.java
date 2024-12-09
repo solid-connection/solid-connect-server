@@ -22,7 +22,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/my-page")
 @RestController
-class SiteUserController implements SiteUserControllerSwagger {
+class SiteUserController {
 
     private final SiteUserService siteUserService;
 

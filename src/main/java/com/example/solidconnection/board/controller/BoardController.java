@@ -3,8 +3,6 @@ package com.example.solidconnection.board.controller;
 import com.example.solidconnection.board.service.BoardService;
 import com.example.solidconnection.post.dto.BoardFindPostResponse;
 import com.example.solidconnection.type.BoardCode;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.solidconnection.config.swagger.SwaggerConfig.ACCESS_TOKEN;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/communities")
-@SecurityRequirements
-@SecurityRequirement(name = ACCESS_TOKEN)
 public class BoardController {
 
     private final BoardService boardService;

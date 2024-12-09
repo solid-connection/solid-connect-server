@@ -22,7 +22,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @RestController
-public class AuthController implements AuthControllerSwagger {
+public class AuthController {
 
     private final AuthService authService;
     private final SignUpService signUpService;
