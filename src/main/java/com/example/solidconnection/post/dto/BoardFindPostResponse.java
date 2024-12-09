@@ -33,6 +33,12 @@ public record BoardFindPostResponse(
         );
     }
 
+    public static List<BoardFindPostResponse> from(List<Post> postList) {
+        return postList.stream()
+                .map(BoardFindPostResponse::from)
+                .collect(Collectors.toList());
+    }
+
     private static int getCommentCount(Post post) {
         return post.getCommentList().size();
     }
@@ -42,11 +48,5 @@ public record BoardFindPostResponse(
                 .findFirst()
                 .map(PostImage::getUrl)
                 .orElse(null);
-    }
-
-    public static List<BoardFindPostResponse> from(List<Post> postList) {
-        return postList.stream()
-                .map(BoardFindPostResponse::from)
-                .collect(Collectors.toList());
     }
 }

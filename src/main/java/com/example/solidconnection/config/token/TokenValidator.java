@@ -36,30 +36,15 @@ public class TokenValidator {
         validateRefreshToken(token);
     }
 
-    private void validateRefreshToken(String token) {
-        String email = getClaim(token).getSubject();
-        if (redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)) == null) {
-            throw new CustomException(REFRESH_TOKEN_EXPIRED);
-        }
-    }
-
-    private void validateNotSignOut(String token) {
-        String email = getClaim(token).getSubject();
-        if (SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))) {
-            throw new CustomException(USER_ALREADY_SIGN_OUT);
-        }
-    }
-
     public void validateKakaoToken(String token) {
         validateTokenNotEmpty(token);
         validateTokenNotExpired(token, TokenType.KAKAO_OAUTH);
         validateKakaoTokenNotUsed(token);
     }
 
-    private void validateKakaoTokenNotUsed(String token) {
-        String email = getClaim(token).getSubject();
-        if (!Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.addTokenPrefixToSubject(email)), token)) {
-            throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
+    private void validateTokenNotEmpty(String token) {
+        if (!StringUtils.hasText(token)) {
+            throw new CustomException(INVALID_TOKEN);
         }
     }
 
@@ -76,9 +61,24 @@ public class TokenValidator {
         }
     }
 
-    private void validateTokenNotEmpty(String token) {
-        if (!StringUtils.hasText(token)) {
-            throw new CustomException(INVALID_TOKEN);
+    private void validateNotSignOut(String token) {
+        String email = getClaim(token).getSubject();
+        if (SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))) {
+            throw new CustomException(USER_ALREADY_SIGN_OUT);
+        }
+    }
+
+    private void validateRefreshToken(String token) {
+        String email = getClaim(token).getSubject();
+        if (redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)) == null) {
+            throw new CustomException(REFRESH_TOKEN_EXPIRED);
+        }
+    }
+
+    private void validateKakaoTokenNotUsed(String token) {
+        String email = getClaim(token).getSubject();
+        if (!Objects.equals(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.addTokenPrefixToSubject(email)), token)) {
+            throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
         }
     }
 

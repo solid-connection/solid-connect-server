@@ -23,6 +23,18 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POS
 public class BoardService {
     private final BoardRepository boardRepository;
 
+    @Transactional(readOnly = true)
+    public List<BoardFindPostResponse> findPostsByCodeAndPostCategory(String code, String category) {
+
+        String boardCode = validateCode(code);
+        PostCategory postCategory = validatePostCategory(category);
+
+        Board board = boardRepository.getByCodeUsingEntityGraph(boardCode);
+        List<Post> postList = getPostListByPostCategory(board.getPostList(), postCategory);
+
+        return BoardFindPostResponse.from(postList);
+    }
+
     private String validateCode(String code) {
         try {
             return String.valueOf(BoardCode.valueOf(code));
@@ -36,18 +48,6 @@ public class BoardService {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
         return PostCategory.valueOf(category);
-    }
-
-    @Transactional(readOnly = true)
-    public List<BoardFindPostResponse> findPostsByCodeAndPostCategory(String code, String category) {
-
-        String boardCode = validateCode(code);
-        PostCategory postCategory = validatePostCategory(category);
-
-        Board board = boardRepository.getByCodeUsingEntityGraph(boardCode);
-        List<Post> postList = getPostListByPostCategory(board.getPostList(), postCategory);
-
-        return BoardFindPostResponse.from(postList);
     }
 
     private List<Post> getPostListByPostCategory(List<Post> postList, PostCategory postCategory) {

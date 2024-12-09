@@ -57,23 +57,6 @@ public class SiteUserService {
         return MyPageUpdateResponse.from(siteUser);
     }
 
-    private void validateNicknameDuplicated(String nickname) {
-        if (siteUserRepository.existsByNickname(nickname)) {
-            throw new CustomException(NICKNAME_ALREADY_EXISTED);
-        }
-    }
-
-    private void validateNicknameNotChangedRecently(LocalDateTime lastModifiedAt) {
-        if (lastModifiedAt == null) {
-            return;
-        }
-        if (LocalDateTime.now().isBefore(lastModifiedAt.plusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES))) {
-            String formatLastModifiedAt
-                    = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
-            throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
-        }
-    }
-
     /*
      * 관심 대학교 목록을 조회한다.
      * */
@@ -85,7 +68,6 @@ public class SiteUserService {
                 .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
                 .toList();
     }
-
 
     /*
      * 프로필 이미지를 수정한다.
@@ -111,7 +93,6 @@ public class SiteUserService {
             throw new CustomException(PROFILE_IMAGE_NEEDED);
         }
     }
-
     private boolean isDefaultProfileImage(String profileImageUrl) {
         String prefix = "profile/";
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
@@ -132,5 +113,22 @@ public class SiteUserService {
         siteUserRepository.save(siteUser);
 
         return NicknameUpdateResponse.from(siteUser);
+    }
+
+    private void validateNicknameDuplicated(String nickname) {
+        if (siteUserRepository.existsByNickname(nickname)) {
+            throw new CustomException(NICKNAME_ALREADY_EXISTED);
+        }
+    }
+
+    private void validateNicknameNotChangedRecently(LocalDateTime lastModifiedAt) {
+        if (lastModifiedAt == null) {
+            return;
+        }
+        if (LocalDateTime.now().isBefore(lastModifiedAt.plusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES))) {
+            String formatLastModifiedAt
+                    = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
+            throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
+        }
     }
 }
