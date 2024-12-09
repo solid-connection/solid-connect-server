@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Component("customCacheManager")
 public class CustomCacheManager implements CacheManager {
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired

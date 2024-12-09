@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class PostLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +31,6 @@ public class PostLike {
     private SiteUser siteUser;
 
     public void setPostAndSiteUser(Post post, SiteUser siteUser) {
-
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
@@ -45,7 +45,6 @@ public class PostLike {
     }
 
     public void resetPostAndSiteUser() {
-
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }

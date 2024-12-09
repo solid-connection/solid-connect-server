@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String TOKEN_HEADER = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
+
     private final TokenService tokenService;
     private final TokenValidator tokenValidator;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

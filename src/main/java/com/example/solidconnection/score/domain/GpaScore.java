@@ -29,6 +29,7 @@ public class GpaScore extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Embedded
     private Gpa gpa;
 

@@ -23,7 +23,6 @@ import static com.example.solidconnection.type.RedisConstants.CREATE_CHANNEL;
 public class RedisConfig {
 
     private final String redisHost;
-
     private final int redisPort;
 
     public RedisConfig(@Value("${spring.data.redis.host}") final String redisHost,

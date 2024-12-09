@@ -14,6 +14,7 @@ import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_TTL;
 
 @Service
 public class RedisService {
+
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisScript<Long> incrViewCountLuaScript;
 
