@@ -76,7 +76,7 @@ class SignUpTest extends BaseEndToEndTest {
         List<String> interestedRegionNames = List.of("유럽");
         List<String> interestedCountryNames = List.of("프랑스", "독일");
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, interestedRegionNames, interestedCountryNames,
-                PreparationStatus.CONSIDERING, "nickname", "profile", Gender.FEMALE, "2000-01-01");
+                PreparationStatus.CONSIDERING, "nickname", Gender.FEMALE, "profile", "2000-01-01");
         SignUpResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -127,7 +127,7 @@ class SignUpTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
-                PreparationStatus.CONSIDERING, alreadyExistNickname, "profile", Gender.FEMALE, "2000-01-01");
+                PreparationStatus.CONSIDERING, alreadyExistNickname, Gender.FEMALE, "profile", "2000-01-01");
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -153,7 +153,7 @@ class SignUpTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
-                PreparationStatus.CONSIDERING, "nickname0", "profile", Gender.FEMALE, "2000-01-01");
+                PreparationStatus.CONSIDERING, "nickname0", Gender.FEMALE, "profile", "2000-01-01");
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -169,8 +169,7 @@ class SignUpTest extends BaseEndToEndTest {
     @Test
     void 유효하지_않은_카카오_토큰으로_회원가입을_하면_예외를_응답한다() {
         SignUpRequest signUpRequest = new SignUpRequest("invalid", null, null,
-                PreparationStatus.CONSIDERING, "nickname", "profile", Gender.FEMALE, "2000-01-01");
-
+                PreparationStatus.CONSIDERING, "nickname", Gender.FEMALE, "profile", "2000-01-01");
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
