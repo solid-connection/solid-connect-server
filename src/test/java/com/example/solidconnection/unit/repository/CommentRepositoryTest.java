@@ -13,7 +13,6 @@ import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("dev")
 @DisplayName("댓글 레포지토리 테스트")
 class CommentRepositoryTest {
     @Autowired
