@@ -40,8 +40,6 @@ class CommentRepositoryTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
     @Autowired
-    private EntityManager entityManager;
-    @Autowired
     private CommentRepository commentRepository;
 
     private Board board;
@@ -65,9 +63,6 @@ class CommentRepositoryTest {
         childComment = createChildComment();
         commentRepository.save(parentComment);
         commentRepository.save(childComment);
-
-        entityManager.flush();
-        entityManager.clear();
     }
 
     private Board createBoard() {
