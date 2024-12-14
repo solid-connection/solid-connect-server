@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://www.solid-connect.net", "http://localhost:8080", "https://www.api.solid-connect.net", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("https://www.solid-connection.com", "http://localhost:8080", "https://www.api.solid-connection.com", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
