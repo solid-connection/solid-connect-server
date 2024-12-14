@@ -52,8 +52,8 @@ public class Application {
     @Column(length = 50, nullable = false)
     private String term;
 
-    @Column(columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0")
-    private Boolean isDelete;
+    @Column
+    private boolean isDelete = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UniversityInfoForApply firstChoiceUniversity;
