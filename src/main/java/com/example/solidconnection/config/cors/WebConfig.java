@@ -14,7 +14,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                // TODO: 환경변수 분리가 필요해 보임
                 .allowedOrigins(corsProperties.getAllowedOrigins().toArray(new String[0]))
                 .allowedMethods("*")
                 .allowedHeaders("*")
