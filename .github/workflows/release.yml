@@ -12,9 +12,9 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout the code
+      uses: actions/checkout@v4
       with:
-    - name: Set secret files
         token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
         submodules: true
 
