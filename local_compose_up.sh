@@ -14,10 +14,10 @@ if [ ! -d "redis_data_local" ]; then
 fi
 
 echo "Starting all docker containers..."
-docker-compose -f docker-compose.local.yml up -d
+docker compose -f docker-compose.local.yml up -d
 
 echo "Pruning unused Docker images..."
 docker image prune -f
 
 echo "Containers are up and running."
-docker-compose ps -a
+docker compose ps -a
