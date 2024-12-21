@@ -85,7 +85,6 @@ public class SiteUser {
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GpaScore> gpaScoreList = new ArrayList<>();
 
-
     public SiteUser(
             String email,
             String nickname,
