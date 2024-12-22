@@ -66,7 +66,7 @@ alter table comment
         foreign key (post_id)
             references post (id);
 
-alter table liked_university drop foreign key FKhj3gn3mqmfeiiw9jt83g7t3rk_idx;
+alter table liked_university drop foreign key FKhj3gn3mqmfeiiw9jt83g7t3rk;
 alter table liked_university drop foreign key FKrrhud921brslcukx6fyuh0th3;
 
 alter table liked_university
@@ -84,10 +84,10 @@ alter table post
         foreign key (board_code)
             references board (code);
 
-alter table post_image
-    add constraint FKsip7qv57jw2fw50g97t16nrjr
-        foreign key (post_id)
-            references post (id);
+-- alter table post_image
+--     add constraint FKsip7qv57jw2fw50g97t16nrjr
+--         foreign key (post_id)
+--             references post (id);
 
 alter table post_like
     add constraint FKj7iy0k7n3d0vkh8o7ibjna884
