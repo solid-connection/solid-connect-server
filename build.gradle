@@ -55,6 +55,7 @@ dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     )
 
     implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {
