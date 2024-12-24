@@ -160,13 +160,13 @@ class UniversityLikeServiceTest {
 
         when(siteUserRepository.getByEmail(email)).thenReturn(testUser);
         when(universityInfoForApplyRepository.getUniversityInfoForApplyById(invalidUniversityId))
-                .thenThrow(new CustomException(ErrorCode.UNIVERSITY_NOT_FOUND));
+                .thenThrow(new CustomException(ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
 
         // when & then
         CustomException exception = assertThrows(CustomException.class,
                 () -> universityService.likeUniversity(email, invalidUniversityId));
 
-        assertThat(exception.getCode()).isEqualTo(ErrorCode.UNIVERSITY_NOT_FOUND.getCode());
+        assertThat(exception.getCode()).isEqualTo(ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getCode());
 
         // verify
         verify(siteUserRepository).getByEmail(email);
