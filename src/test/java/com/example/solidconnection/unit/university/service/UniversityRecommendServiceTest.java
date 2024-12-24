@@ -59,7 +59,7 @@ class UniversityRecommendServiceTest {
 
     @Test
     @DisplayName("일반 추천 목록을 정상적으로 반환한다")
-    void getGeneralRecommends_ShouldReturnShuffledAndConvertedList() {
+    void getGeneralRecommendsShouldReturnShuffledAndConvertedList() {
         // given
         List<UniversityInfoForApply> generalUniversities =
                 range(0, UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM)
@@ -92,7 +92,7 @@ class UniversityRecommendServiceTest {
 
     @Test
     @DisplayName("개인화 추천 목록을 정상적으로 반환한다")
-    void getPersonalRecommends_ShouldReturnPersonalizedAndShuffledList() {
+    void getPersonalRecommendsShouldReturnPersonalizedAndShuffledList() {
 
         // given
         String email = "test@example.com";
@@ -137,7 +137,7 @@ class UniversityRecommendServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 사용자의 경우 예외를 반환한다")
-    void getPersonalRecommends_WithInvalidUser_ShouldThrowException() {
+    void getPersonalRecommendsWithInvalidUserShouldThrowException() {
         // given
         String email = "invalid@example.com";
         when(siteUserRepository.getByEmail(email))
@@ -154,7 +154,7 @@ class UniversityRecommendServiceTest {
 
     @Test
     @DisplayName("개인화 추천이 부족할 경우 일반 추천으로 보충한다")
-    void getPersonalRecommends_WithInsufficientRecommends_ShouldSupplementWithGeneral() {
+    void getPersonalRecommendsWithInsufficientRecommendsShouldSupplementWithGeneral() {
         // given
         String email = "test@example.com";
         List<UniversityInfoForApply> personalRecommends = new ArrayList<>();
@@ -197,7 +197,7 @@ class UniversityRecommendServiceTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
+                "1999-10-21",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
                 Gender.MALE
