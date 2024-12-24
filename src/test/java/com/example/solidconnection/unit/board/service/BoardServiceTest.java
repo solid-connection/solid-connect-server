@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.service;
+package com.example.solidconnection.unit.board.service;
 
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;

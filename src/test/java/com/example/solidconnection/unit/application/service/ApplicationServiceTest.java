@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.service;
+package com.example.solidconnection.unit.application.service;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;

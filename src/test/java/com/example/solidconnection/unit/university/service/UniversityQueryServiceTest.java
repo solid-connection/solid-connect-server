@@ -69,7 +69,7 @@ class UniversityQueryServiceTest {
 
 
     @Test
-    @DisplayName("유효한 ID로 상세 조회하면 대학 정보를 반환한다")
+    @DisplayName("유효한_ID로_상세_조회하면_대학_정보를_반환한다()")
     void shouldReturnUniversityDetailsWhenValidIdProvided() {
         // given
         Long universityInfoForApplyId = testUniversityInfoForApply.getId();
@@ -89,7 +89,7 @@ class UniversityQueryServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 ID로 조회하면 예외를 반환한다")
+    @DisplayName("존재하지_않는_ID로_조회하면_예외를_반환한다()")
     void shouldThrowExceptionWhenInvalidIdProvided() {
         // given
         Long invalidId = 999L;
@@ -107,7 +107,7 @@ class UniversityQueryServiceTest {
     }
 
     @Test
-    @DisplayName("검색 조건이 없는 경우 전체 대학 목록을 반환한다")
+    @DisplayName("검색_조건이_없는_경우_전체_대학_목록을_반환한다()")
     void shouldReturnAllUniversitiesWhenNoSearchConditionProvided() {
         // given
         List<UniversityInfoForApply> universityList = List.of(testUniversityInfoForApply);
@@ -131,7 +131,7 @@ class UniversityQueryServiceTest {
     }
 
     @Test
-    @DisplayName("검색 조건(region, keyword)을 만족하는 대학 목록을 반환한다")
+    @DisplayName("검색_조건(region,_keyword)을_만족하는_대학_목록을_반환한다()")
     void shouldReturnFilteredUniversitiesWhenSearchConditionProvided() {
         // given
         String region = "ASIA";
@@ -159,7 +159,7 @@ class UniversityQueryServiceTest {
 
 
     @Test
-    @DisplayName("검색 조건(region, keyword, testType, testScore)을 만족하는 대학 목록을 반환한다")
+    @DisplayName("검색_조건(region,_keyword,_testType,_testScore)을_만족하는_대학_목록을_반환한다()")
     void shouldReturnFilteredUniversitiesWhenFullSearchConditionProvided() {
         // given
         String region = "ASIA";
@@ -188,7 +188,7 @@ class UniversityQueryServiceTest {
     }
 
     @Test
-    @DisplayName("검색 조건을 만족하지 않을 경우 결과가 비어 있다")
+    @DisplayName("검색_조건을_만족하지_않을_경우_결과가_비어_있다()")
     void shouldReturnEmptyListWhenSearchConditionNotMet() {
         // given
         String region = "EUROPE";

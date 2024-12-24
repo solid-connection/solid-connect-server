@@ -56,7 +56,7 @@ class UniversityLikeServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 특정 대학을 좋아요 상태인지 확인하면 True를 반환한다")
+    @DisplayName("사용자가_특정_대학을_좋아요_상태인지_확인하면_True를_반환한다()")
     void shouldReturnTrueWhenUserLikedTheUniversity() {
         // given
         String email = testUser.getEmail();
@@ -81,7 +81,7 @@ class UniversityLikeServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 특정 대학을 좋아요 상태인지 확인하면 False를 반환한다")
+    @DisplayName("사용자가_특정_대학을_좋아요_상태인지_확인하면_False를_반환한다()")
     void shouldReturnFalseWhenUserNotLikedTheUniversity() {
         // given
         String email = testUser.getEmail();
@@ -106,7 +106,7 @@ class UniversityLikeServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 대학 좋아요를 추가하면 성공 메시지를 반환한다")
+    @DisplayName("사용자가_대학_좋아요를_추가하면_성공_메시지를_반환한다()")
     void shouldAddLikeWhenUserNotLikedTheUniversity() {
         // given
         String email = testUser.getEmail();
@@ -129,7 +129,7 @@ class UniversityLikeServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 대학 좋아요를 취소하면 취소 메시지를 반환한다")
+    @DisplayName("사용자가_대학_좋아요를_취소하면_취소_메시지를_반환한다()")
     void shouldRemoveLikeWhenUserAlreadyLikedTheUniversity() {
         // given
         String email = testUser.getEmail();
@@ -152,7 +152,7 @@ class UniversityLikeServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 대학 ID로 좋아요 요청 시 예외를 반환한다")
+    @DisplayName("존재하지_않는_대학_ID로_좋아요_요청_시_예외를_반환한다()")
     void shouldThrowExceptionWhenUniversityNotFound() {
         // given
         String email = testUser.getEmail();

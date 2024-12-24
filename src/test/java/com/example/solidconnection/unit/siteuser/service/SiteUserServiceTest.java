@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.service;
+package com.example.solidconnection.unit.siteuser.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;

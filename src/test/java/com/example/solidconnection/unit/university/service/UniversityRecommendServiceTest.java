@@ -58,7 +58,7 @@ class UniversityRecommendServiceTest {
     }
 
     @Test
-    @DisplayName("일반 추천 목록을 정상적으로 반환한다")
+    @DisplayName("일반_추천_목록을_정상적으로_반환한다()")
     void getGeneralRecommendsShouldReturnShuffledAndConvertedList() {
         // given
         List<UniversityInfoForApply> generalUniversities =
@@ -91,7 +91,7 @@ class UniversityRecommendServiceTest {
     }
 
     @Test
-    @DisplayName("개인화 추천 목록을 정상적으로 반환한다")
+    @DisplayName("개인화_추천_목록을_정상적으로_반환한다()")
     void getPersonalRecommendsShouldReturnPersonalizedAndShuffledList() {
 
         // given
@@ -136,7 +136,7 @@ class UniversityRecommendServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 사용자의 경우 예외를 반환한다")
+    @DisplayName("존재하지_않는_사용자의_경우_예외를_반환한다()")
     void getPersonalRecommendsWithInvalidUserShouldThrowException() {
         // given
         String email = "invalid@example.com";
@@ -153,7 +153,7 @@ class UniversityRecommendServiceTest {
     }
 
     @Test
-    @DisplayName("개인화 추천이 부족할 경우 일반 추천으로 보충한다")
+    @DisplayName("개인화_추천이_부족할_경우_일반_추천으로_보충한다()")
     void getPersonalRecommendsWithInsufficientRecommendsShouldSupplementWithGeneral() {
         // given
         String email = "test@example.com";

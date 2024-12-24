@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.service;
+package com.example.solidconnection.unit.score.service;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;

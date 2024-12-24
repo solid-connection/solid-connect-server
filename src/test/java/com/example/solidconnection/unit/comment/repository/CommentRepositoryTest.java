@@ -1,7 +1,9 @@
-package com.example.solidconnection.unit.repository;
+package com.example.solidconnection.unit.comment.repository;
 
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
+import com.example.solidconnection.comment.domain.Comment;
+import com.example.solidconnection.comment.repository.CommentRepository;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.repository.PostRepository;
@@ -11,23 +13,26 @@ import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
-@DataJpaTest
-@ActiveProfiles("test")
-@DisplayName("게시판 레포지토리 테스트")
-class BoardRepositoryTest {
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_ID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
+@SpringBootTest
+@ActiveProfiles("dev")
+@DisplayName("댓글 레포지토리 테스트")
+class CommentRepositoryTest {
     @Autowired
     private PostRepository postRepository;
     @Autowired
@@ -35,11 +40,13 @@ class BoardRepositoryTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
     @Autowired
-    private EntityManager entityManager;
+    private CommentRepository commentRepository;
 
     private Board board;
     private SiteUser siteUser;
     private Post post;
+    private Comment parentComment;
+    private Comment childComment;
 
     @BeforeEach
     public void setUp() {
@@ -52,8 +59,10 @@ class BoardRepositoryTest {
         post = createPost(board, siteUser);
         post = postRepository.save(post);
 
-        entityManager.flush();
-        entityManager.clear();
+        parentComment = createParentComment();
+        childComment = createChildComment();
+        commentRepository.save(parentComment);
+        commentRepository.save(childComment);
     }
 
     private Board createBoard() {
@@ -86,56 +95,56 @@ class BoardRepositoryTest {
         return post;
     }
 
-    @Test
-    @Transactional
-    public void 게시판을_조회할_때_게시글은_즉시_로딩한다() {
-        // when
-        Board foundBoard = boardRepository.getByCodeUsingEntityGraph(board.getCode());
-        foundBoard.getPostList().size(); // 추가쿼리 발생하지 않는다.
+    private Comment createParentComment() {
+        Comment comment = new Comment(
+                "parent"
+        );
+        comment.setPostAndSiteUser(post, siteUser);
+        return comment;
+    }
 
-        // then
-        assertThat(foundBoard.getCode()).isEqualTo(board.getCode());
+    private Comment createChildComment() {
+        Comment comment = new Comment(
+                "child"
+        );
+        comment.setParentCommentAndPostAndSiteUser(parentComment, post, siteUser);
+        return comment;
     }
 
     @Test
     @Transactional
-    public void 게시판을_조회할_때_게시글은_즉시_로딩한다_유효한_게시판이_아니라면_예외_응답을_반환한다() {
+    public void 재귀쿼리로_댓글트리를_조회한다() {
+        // when
+        List<Comment> commentTreeByPostId = commentRepository.findCommentTreeByPostId(post.getId());
+
+        // then
+        List<Comment> expectedResponse = List.of(parentComment, childComment);
+        assertEquals(commentTreeByPostId, expectedResponse);
+    }
+
+    @Test
+    @Transactional
+    public void 댓글을_조회한다() {
+        // when
+        Comment foundComment = commentRepository.getById(parentComment.getId());
+
+        // then
+        assertEquals(parentComment, foundComment);
+    }
+
+    @Test
+    @Transactional
+    public void 댓글을_조회할_때_유효한_댓글이_아니라면_예외_응답을_반환한다() {
         // given
-        String invalidCode = "INVALID_CODE";
+        Long invalidId = -1L;
 
         // when, then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            boardRepository.getByCodeUsingEntityGraph(invalidCode);
+            commentRepository.getById(invalidId);
         });
         assertThat(exception.getMessage())
-                .isEqualTo(INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_COMMENT_ID.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(INVALID_BOARD_CODE.getCode());
-    }
-
-    @Test
-    @Transactional
-    public void 게시판을_조회한다() {
-        // when
-        Board foundBoard = boardRepository.getByCode(board.getCode());
-
-        // then
-        assertEquals(board.getCode(), foundBoard.getCode());
-    }
-
-    @Test
-    @Transactional
-    public void 게시판을_조회할_때_유효한_게시판이_아니라면_예외_응답을_반환한다() {
-        // given
-        String invalidCode = "INVALID_CODE";
-
-        // when, then
-        CustomException exception = assertThrows(CustomException.class, () -> {
-            boardRepository.getByCode(invalidCode);
-        });
-        assertThat(exception.getMessage())
-                .isEqualTo(INVALID_BOARD_CODE.getMessage());
-        assertThat(exception.getCode())
-                .isEqualTo(INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_COMMENT_ID.getCode());
     }
 }

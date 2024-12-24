@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.service;
+package com.example.solidconnection.unit.post.service;
 
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.dto.PostFindBoardResponse;

@@ -1,4 +1,4 @@
-package com.example.solidconnection.unit.repository;
+package com.example.solidconnection.unit.score.repository;
 
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.score.domain.LanguageTestScore;
