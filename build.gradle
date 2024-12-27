@@ -37,17 +37,25 @@ dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    testImplementation 'org.mockito:mockito-core:3.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'io.rest-assured:rest-assured:5.4.0'
 
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    // Testcontainers
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mysql'
+    testImplementation 'com.redis:testcontainers-redis'
+
     annotationProcessor(
             'com.querydsl:querydsl-apt:5.0.0:jakarta',
             'jakarta.persistence:jakarta.persistence-api:3.1.0',
