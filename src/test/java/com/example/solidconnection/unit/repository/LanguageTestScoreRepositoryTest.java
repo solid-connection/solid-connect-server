@@ -5,6 +5,7 @@ import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.support.TestContainerDataJpaTest;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
@@ -13,8 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -22,8 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@ActiveProfiles("test")
+@TestContainerDataJpaTest
 @DisplayName("어학성적 레포지토리 테스트")
 @Transactional
 public class LanguageTestScoreRepositoryTest {

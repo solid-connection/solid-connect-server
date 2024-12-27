@@ -5,6 +5,7 @@ import com.example.solidconnection.entity.Region;
 import com.example.solidconnection.repositories.CountryRepository;
 import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.University;
@@ -17,9 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 
@@ -27,8 +26,7 @@ import static com.example.solidconnection.type.SemesterAvailableForDispatch.ONE_
 import static com.example.solidconnection.type.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 
 @ExtendWith(DatabaseClearExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestContainerSpringBootTest
 abstract class UniversityDataSetUpEndToEndTest {
 
     public static Region 영미권;
