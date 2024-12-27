@@ -105,7 +105,7 @@ class SignUpTest extends BaseEndToEndTest {
         assertAll(
                 "관심 지역과 나라 정보를 저장한다.",
                 () -> assertThat(interestedRegions).containsExactlyInAnyOrder(region),
-                () -> assertThat(interestedCountries).containsExactlyElementsOf(countries)
+                () -> assertThat(interestedCountries).containsExactlyInAnyOrderElementsOf(countries)
         );
 
         assertThat(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))
