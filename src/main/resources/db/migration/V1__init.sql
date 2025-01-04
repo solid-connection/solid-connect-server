@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS application
     verify_status               VARCHAR(50) DEFAULT 'PENDING' NOT NULL,
     gpa DOUBLE NOT NULL,
     gpa_criteria DOUBLE NOT NULL,
-    language_test_type          ENUM                          NOT NULL,
+    language_test_type          ENUM ('CEFR','DALF','DELF','DUOLINGO','IELTS','JLPT','NEW_HSK','TCF','TEF','TOEFL_IBT','TOEFL_ITP','TOEIC') NOT NULL,
     language_test_score         VARCHAR(255)                  NOT NULL,
     gpa_report_url              VARCHAR(500)                  NOT NULL,
     language_test_report_url    VARCHAR(500)                  NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS language_requirement
 (
     id                           BIGINT AUTO_INCREMENT NOT NULL,
     university_info_for_apply_id BIGINT NULL,
-    language_test_type           ENUM         NOT NULL,
+    language_test_type           ENUM ('CEFR','DALF','DELF','DUOLINGO','IELTS','JLPT','NEW_HSK','TCF','TEF','TOEFL_IBT','TOEFL_ITP','TOEIC') NOT NULL,
     min_score                    VARCHAR(255) NOT NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS post
     view_count   BIGINT NULL,
     board_code   VARCHAR(20) NULL,
     content      VARCHAR(1000) NULL,
-    category     ENUM NULL,
+    category     ENUM ('자유','전체','질문') NULL,
     title        VARCHAR(255) NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
@@ -126,9 +126,9 @@ CREATE TABLE IF NOT EXISTS site_user
     email                VARCHAR(100) NOT NULL,
     nickname             VARCHAR(100) NOT NULL,
     profile_image_url    VARCHAR(500) NULL,
-    gender               ENUM         NOT NULL,
-    preparation_stage    ENUM         NOT NULL,
-    `role`               ENUM         NOT NULL,
+    gender               ENUM ('FEMALE','MALE','PREFER_NOT_TO_SAY') NOT NULL,
+    preparation_stage    ENUM ('AFTER_EXCHANGE','CONSIDERING','PREPARING_FOR_DEPARTURE','STUDYING_ABROAD') NOT NULL,
+    `role`               ENUM ('MENTEE','MENTOR') NOT NULL,
     CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
 
@@ -156,8 +156,8 @@ CREATE TABLE IF NOT EXISTS university_info_for_apply
     university_id                   BIGINT NULL,
     korean_name                     VARCHAR(100) NOT NULL,
     student_capacity                INT NULL,
-    tuition_fee_type                ENUM NULL,
-    semester_available_for_dispatch ENUM NULL,
+    tuition_fee_type                ENUM ('HOME_UNIVERSITY_PAYMENT','MIXED_PAYMENT','OVERSEAS_UNIVERSITY_PAYMENT') NULL,
+    semester_available_for_dispatch ENUM ('FOUR_SEMESTER','IRRELEVANT','NO_DATA','ONE_OR_TWO_SEMESTER','ONE_SEMESTER','ONE_YEAR') NULL,
     details_for_language            VARCHAR(1000) NULL,
     gpa_requirement                 VARCHAR(100) NULL,
     gpa_requirement_criteria        VARCHAR(100) NULL,
