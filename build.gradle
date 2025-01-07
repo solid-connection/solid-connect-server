@@ -54,7 +54,6 @@ dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mysql'
-    testImplementation 'com.redis:testcontainers-redis'
 
     annotationProcessor(
             'com.querydsl:querydsl-apt:5.0.0:jakarta',
