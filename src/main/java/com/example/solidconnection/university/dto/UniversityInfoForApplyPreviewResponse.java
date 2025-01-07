@@ -12,6 +12,7 @@ public record UniversityInfoForApplyPreviewResponse(
         String region,
         String country,
         String logoImageUrl,
+        String backgroundImageUrl,
         int studentCapacity,
         List<LanguageRequirementResponse> languageRequirements) {
 
@@ -29,6 +30,7 @@ public record UniversityInfoForApplyPreviewResponse(
                 universityInfoForApply.getUniversity().getRegion().getKoreanName(),
                 universityInfoForApply.getUniversity().getCountry().getKoreanName(),
                 universityInfoForApply.getUniversity().getLogoImageUrl(),
+                universityInfoForApply.getUniversity().getBackgroundImageUrl(),
                 universityInfoForApply.getStudentCapacity(),
                 languageRequirementResponses
         );
