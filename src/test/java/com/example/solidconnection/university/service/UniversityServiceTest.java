@@ -102,11 +102,11 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 존재하지_않는_대학_상세정보_조회시_예외_응답을_반환한다() {
         // given
-        Long invalidId = 9999L;
+        Long invalidUniversityInfoForApplyId = 9999L;
 
         // when
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> universityService.getUniversityDetail(invalidId));
+                () -> universityService.getUniversityDetail(invalidUniversityInfoForApplyId));
         CustomException customException = (CustomException) exception.getCause().getCause();
 
         // then
