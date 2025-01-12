@@ -1,0 +1,168 @@
+package com.example.solidconnection.university.service;
+
+import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.entity.InterestedCountry;
+import com.example.solidconnection.entity.InterestedRegion;
+import com.example.solidconnection.repositories.InterestedCountyRepository;
+import com.example.solidconnection.repositories.InterestedRegionRepository;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.type.Gender;
+import com.example.solidconnection.type.PreparationStatus;
+import com.example.solidconnection.type.Role;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
+import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+
+class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest {
+
+    @Autowired
+    private UniversityRecommendService universityRecommendService;
+
+    @Autowired
+    private SiteUserRepository siteUserRepository;
+
+    @Autowired
+    private InterestedRegionRepository interestedRegionRepository;
+
+    @Autowired
+    private InterestedCountyRepository interestedCountyRepository;
+
+    @Autowired
+    private GeneralRecommendUniversities generalRecommendUniversities;
+
+
+    @BeforeEach
+    void setUp() {
+        generalRecommendUniversities.init();
+    }
+
+    @Test
+    void 관심_지역_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        interestedRegionRepository.save(new InterestedRegion(testUser, 영미권));
+
+        // when
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .containsAll(List.of(
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보)
+                ));
+    }
+
+    @Test
+    void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
+
+        // when
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .containsAll(List.of(
+                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                ));
+    }
+
+    @Test
+    void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        interestedRegionRepository.save(new InterestedRegion(testUser, 영미권));
+        interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
+
+        // when
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .containsExactlyInAnyOrder(
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                );
+    }
+
+    @Test
+    void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+
+        // when
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .containsExactlyInAnyOrderElementsOf(
+                        generalRecommendUniversities.getRecommendUniversities().stream()
+                                .map(UniversityInfoForApplyPreviewResponse::from)
+                                .toList()
+                );
+    }
+
+    @Test
+    void 존재하지_않는_사용자_조회시_예외를_반환한다() {
+        // given
+        String invalidEmail = "invalid@email.com";
+
+        // when & then
+        CustomException exception = assertThrows(CustomException.class,
+                () -> universityRecommendService.getPersonalRecommends(invalidEmail));
+
+        assertThat(exception.getMessage()).isEqualTo(USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 일반_추천_대학을_조회한다() {
+        // when
+        UniversityRecommendsResponse response = universityRecommendService.getGeneralRecommends();
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .containsExactlyInAnyOrderElementsOf(
+                        generalRecommendUniversities.getRecommendUniversities().stream()
+                                .map(UniversityInfoForApplyPreviewResponse::from)
+                                .toList()
+                );
+    }
+
+    private SiteUser createSiteUser() {
+        SiteUser siteUser = new SiteUser(
+                "test@example.com",
+                "nickname",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE
+        );
+        return siteUserRepository.save(siteUser);
+    }
+}
