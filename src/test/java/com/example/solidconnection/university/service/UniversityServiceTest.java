@@ -11,7 +11,12 @@ import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.dto.*;
+import com.example.solidconnection.university.dto.UniversityDetailResponse;
+import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.LanguageRequirementResponse;
+import com.example.solidconnection.university.dto.LikeResultResponse;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -266,6 +271,59 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         // when
         CustomException exception = assertThrows(CustomException.class,
                 () -> universityService.likeUniversity(testUser.getEmail(), invalidUniversityId));
+
+        // then
+        assertThat(exception.getMessage())
+                .isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 좋아요한_대학인지_확인한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+
+        // when
+        IsLikeResponse response = universityService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+
+        // then
+        assertThat(response.isLike()).isTrue();
+    }
+
+    @Test
+    void 좋아요하지_않은_대학인지_확인한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+
+        // when
+        IsLikeResponse response = universityService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+
+        // then
+        assertThat(response.isLike()).isFalse();
+    }
+
+    @Test
+    void 존재하지_않는_유저의_좋아요_여부_조회시_예외를_반환한다() {
+        // given
+        String invalidEmail = "invalid@email.com";
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> universityService.getIsLiked(invalidEmail, 괌대학_A_지원_정보.getId()));
+
+        // then
+        assertThat(exception.getMessage()).isEqualTo(USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 존재하지_않는_대학의_좋아요_여부_조회시_예외를_반환한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        Long invalidUniversityId = 9999L;
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+                () -> universityService.getIsLiked(testUser.getEmail(), invalidUniversityId));
 
         // then
         assertThat(exception.getMessage())
