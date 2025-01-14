@@ -1,7 +1,6 @@
 package com.example.solidconnection.config.token;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.userdetails.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,9 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -28,7 +24,6 @@ public class TokenProvider {
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -54,12 +49,6 @@ public class TokenProvider {
                 TimeUnit.MILLISECONDS
         );
         return token;
-    }
-
-    public Authentication getAuthentication(String token) {
-        String email = parseSubject(token);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String getEmail(String token) {
