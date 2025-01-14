@@ -27,6 +27,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         writeResponse(response, errorResponse);
     }
 
+    public void generalCommence(HttpServletResponse response, Exception exception) throws IOException {
+        ErrorResponse errorResponse = new ErrorResponse(AUTHENTICATION_FAILED, exception.getMessage());
+        writeResponse(response, errorResponse);
+    }
+
     public void customCommence(HttpServletResponse response, CustomException customException) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(customException);
         writeResponse(response, errorResponse);

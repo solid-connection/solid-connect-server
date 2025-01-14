@@ -1,26 +1,21 @@
-package com.example.solidconnection.custom.userdetails;
+package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-public class CustomUserDetails implements UserDetails {//todo: principal 을 썼을 때 바로 SiteUser를 반환하게 하면 안되나??
+public class JwtUserDetails implements UserDetails {
 
-    private final SiteUser siteUser;
+    private final String userName;
 
-    public CustomUserDetails(SiteUser siteUser) {
-        this.siteUser = siteUser;
-    }
-
-    public String getEmail() {
-        return siteUser.getEmail();
+    public JwtUserDetails(String userName) {
+        this.userName = userName;
     }
 
     @Override
     public String getUsername() {
-        return siteUser.getEmail();
+        return this.userName;
     }
 
     @Override
