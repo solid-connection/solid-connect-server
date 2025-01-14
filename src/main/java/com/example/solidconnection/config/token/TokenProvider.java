@@ -76,11 +76,7 @@ public class TokenProvider {
 
     public String parseSubject(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
+            return extractSubject(token);
         } catch (ExpiredJwtException e) {
             return e.getClaims().getSubject();
         }
@@ -88,13 +84,17 @@ public class TokenProvider {
 
     public String parseSubjectOrElseThrow(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
+            return extractSubject(token);
         } catch (ExpiredJwtException e) {
             throw new CustomException(INVALID_TOKEN);
         }
+    }
+
+    private String extractSubject(String token) throws ExpiredJwtException {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }
