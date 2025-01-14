@@ -5,7 +5,6 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
-import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import io.restassured.RestAssured;
@@ -19,6 +18,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 
+import static com.example.solidconnection.config.token.TokenType.KAKAO_OAUTH;
+import static com.example.solidconnection.config.token.TokenType.REFRESH;
 import static com.example.solidconnection.e2e.DynamicFixture.createKakaoUserInfoDtoByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;
@@ -64,7 +65,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.nickname()).isEqualTo(kakaoProfileDto.nickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(kakaoProfileDto.profileImageUrl()),
                 () -> assertThat(response.kakaoOauthToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(TokenType.KAKAO_OAUTH.addTokenPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(KAKAO_OAUTH.addPrefixToSubject(email)))
                 .as("카카오 인증 토큰을 저장한다.")
                 .isEqualTo(response.kakaoOauthToken());
     }
@@ -94,7 +95,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.isRegistered()).isTrue(),
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }
@@ -128,7 +129,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull(),
                 () -> assertThat(siteUserRepository.getByEmail(email).getQuitedAt()).isNull());
-        assertThat(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }

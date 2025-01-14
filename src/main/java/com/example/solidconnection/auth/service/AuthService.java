@@ -3,7 +3,6 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.config.token.TokenProvider;
-import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -16,6 +15,8 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.solidconnection.config.token.TokenType.ACCESS;
+import static com.example.solidconnection.config.token.TokenType.REFRESH;
 import static com.example.solidconnection.config.token.TokenValidator.SIGN_OUT_VALUE;
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
@@ -36,9 +37,9 @@ public class AuthService {
      * */
     public void signOut(String email) {
         redisTemplate.opsForValue().set(
-                TokenType.REFRESH.addTokenPrefixToSubject(email),
+                REFRESH.addPrefixToSubject(email),
                 SIGN_OUT_VALUE,
-                TokenType.REFRESH.getExpireTime(),
+                REFRESH.getExpireTime(),
                 TimeUnit.MILLISECONDS
         );
     }
@@ -62,14 +63,14 @@ public class AuthService {
      * */
     public ReissueResponse reissue(String email) {
         // 리프레시 토큰 만료 확인
-        String refreshTokenKey = TokenType.REFRESH.addTokenPrefixToSubject(email);
+        String refreshTokenKey = REFRESH.addPrefixToSubject(email);
         String refreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
         if (ObjectUtils.isEmpty(refreshToken)) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
-        String newAccessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        tokenProvider.saveToken(newAccessToken, TokenType.ACCESS);
+        String newAccessToken = tokenProvider.generateToken(email, ACCESS);
+        tokenProvider.saveToken(newAccessToken, ACCESS);
         return new ReissueResponse(newAccessToken);
     }
 }

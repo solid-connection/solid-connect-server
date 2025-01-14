@@ -40,7 +40,7 @@ public class TokenProvider {
 
     public void saveToken(String token, TokenType tokenType) {
         redisTemplate.opsForValue().set(
-                tokenType.addTokenPrefixToSubject(getClaim(token).getSubject()),
+                tokenType.addPrefixToSubject(getClaim(token).getSubject()),
                 token,
                 tokenType.getExpireTime(),
                 TimeUnit.MILLISECONDS

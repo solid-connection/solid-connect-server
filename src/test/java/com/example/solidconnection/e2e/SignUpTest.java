@@ -3,7 +3,6 @@ package com.example.solidconnection.e2e;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.config.token.TokenProvider;
-import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.InterestedCountry;
@@ -27,6 +26,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static com.example.solidconnection.config.token.TokenType.KAKAO_OAUTH;
+import static com.example.solidconnection.config.token.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_EXISTED;
@@ -69,8 +70,8 @@ class SignUpTest extends BaseEndToEndTest {
 
         // setup - 카카오 토큰 발급
         String email = "email@email.com";
-        String generatedKakaoToken = tokenProvider.generateToken(email, TokenType.KAKAO_OAUTH);
-        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(email, KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         List<String> interestedRegionNames = List.of("유럽");
@@ -108,7 +109,7 @@ class SignUpTest extends BaseEndToEndTest {
                 () -> assertThat(interestedCountries).containsExactlyInAnyOrderElementsOf(countries)
         );
 
-        assertThat(redisTemplate.opsForValue().get(TokenType.REFRESH.addTokenPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }
@@ -122,8 +123,8 @@ class SignUpTest extends BaseEndToEndTest {
 
         // setup - 카카오 토큰 발급
         String email = "email@email.com";
-        String generatedKakaoToken = tokenProvider.generateToken(email, TokenType.KAKAO_OAUTH);
-        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(email, KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
@@ -148,8 +149,8 @@ class SignUpTest extends BaseEndToEndTest {
         siteUserRepository.save(alreadyExistUser);
 
         // setup - 카카오 토큰 발급
-        String generatedKakaoToken = tokenProvider.generateToken(alreadyExistEmail, TokenType.KAKAO_OAUTH);
-        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(alreadyExistEmail, KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
