@@ -68,14 +68,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (JwtExpiredTokenException e) {
             SecurityContextHolder.clearContext();
-            jwtAuthenticationEntryPoint.expiredCommence(request, response, e);
+            jwtAuthenticationEntryPoint.commence(request, response, e);
             return;
         } catch (AuthenticationException e) {
             SecurityContextHolder.clearContext();
             jwtAuthenticationEntryPoint.commence(request, response, e);
             return;
         } catch (CustomException e) {
-            jwtAuthenticationEntryPoint.customCommence(request, response, e);
+            jwtAuthenticationEntryPoint.customCommence(response, e);
             return;
         }
         filterChain.doFilter(request, response); // 다음 필터로 요청과 응답 전달

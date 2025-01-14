@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_TOKEN_EXPIRED;
 import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICATION_FAILED;
 
 @Component
@@ -25,24 +24,15 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(AUTHENTICATION_FAILED, authException.getMessage());
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        writeResponse(response, errorResponse);
     }
 
-    public void expiredCommence(HttpServletRequest request, HttpServletResponse response,
-                                AuthenticationException authException) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(new CustomException(ACCESS_TOKEN_EXPIRED));
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-    }
-
-    public void customCommence(HttpServletRequest request, HttpServletResponse response,
-                               CustomException customException) throws IOException {
+    public void customCommence(HttpServletResponse response, CustomException customException) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(customException);
+        writeResponse(response, errorResponse);
+    }
+
+    private void writeResponse(HttpServletResponse response, ErrorResponse errorResponse) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
