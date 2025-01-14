@@ -19,13 +19,10 @@ import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_TOKE
 import static com.example.solidconnection.custom.exception.ErrorCode.EMPTY_TOKEN;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN;
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 
 @Component
 @RequiredArgsConstructor
 public class TokenValidator {
-
-    public static final String SIGN_OUT_VALUE = "signOut";
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -35,7 +32,6 @@ public class TokenValidator {
     public void validateAccessToken(String token) {
         validateTokenNotEmpty(token);
         validateTokenNotExpired(token, ACCESS);
-        validateNotSignOut(token);
         validateRefreshToken(token);
     }
 
@@ -61,13 +57,6 @@ public class TokenValidator {
             if (token.equals(KAKAO_OAUTH)) {
                 throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
             }
-        }
-    }
-
-    private void validateNotSignOut(String token) {
-        String email = getClaim(token).getSubject();
-        if (SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))) {
-            throw new CustomException(USER_ALREADY_SIGN_OUT);
         }
     }
 

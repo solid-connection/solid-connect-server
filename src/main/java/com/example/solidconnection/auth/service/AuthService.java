@@ -17,12 +17,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.example.solidconnection.config.token.TokenType.ACCESS;
 import static com.example.solidconnection.config.token.TokenType.REFRESH;
-import static com.example.solidconnection.config.token.TokenValidator.SIGN_OUT_VALUE;
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+
+    public static final String SIGN_OUT_VALUE = "signOut";
 
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
