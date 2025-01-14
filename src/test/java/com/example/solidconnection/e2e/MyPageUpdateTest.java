@@ -1,6 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -31,7 +31,7 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     private SiteUserRepository siteUserRepository;
 
     @Autowired
-    private TokenService tokenService;
+    private TokenProvider tokenProvider;
 
     private String accessToken;
 
@@ -46,9 +46,9 @@ class MyPageUpdateTest extends BaseEndToEndTest {
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
     }
 
     @Test

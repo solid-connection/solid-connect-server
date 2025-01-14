@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Component
-public class TokenService {
+public class TokenProvider {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final CustomUserDetailsService customUserDetailsService;

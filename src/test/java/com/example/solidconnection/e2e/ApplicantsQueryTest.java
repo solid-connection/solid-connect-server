@@ -7,7 +7,7 @@ import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -36,7 +36,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
     ApplicationRepository applicationRepository;
 
     @Autowired
-    TokenService tokenService;
+    TokenProvider tokenProvider;
 
     private String accessToken;
     private String adminAccessToken;
@@ -60,17 +60,17 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         SiteUser siteUser = siteUserRepository.save(createSiteUserByEmail(email));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
 
-        adminAccessToken = tokenService.generateToken("email5", TokenType.ACCESS);
-        String adminRefreshToken = tokenService.generateToken("email5", TokenType.REFRESH);
-        tokenService.saveToken(adminRefreshToken, TokenType.REFRESH);
+        adminAccessToken = tokenProvider.generateToken("email5", TokenType.ACCESS);
+        String adminRefreshToken = tokenProvider.generateToken("email5", TokenType.REFRESH);
+        tokenProvider.saveToken(adminRefreshToken, TokenType.REFRESH);
 
-        user6AccessToken = tokenService.generateToken("email6", TokenType.ACCESS);
-        String user6RefreshToken = tokenService.generateToken("email6", TokenType.REFRESH);
-        tokenService.saveToken(user6RefreshToken, TokenType.REFRESH);
+        user6AccessToken = tokenProvider.generateToken("email6", TokenType.ACCESS);
+        String user6RefreshToken = tokenProvider.generateToken("email6", TokenType.REFRESH);
+        tokenProvider.saveToken(user6RefreshToken, TokenType.REFRESH);
 
         // setUp - 사용자 정보 저장
         SiteUser 사용자1 = siteUserRepository.save(createSiteUserByEmail("email1"));

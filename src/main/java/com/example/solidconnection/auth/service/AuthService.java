@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.service;
 
 
 import com.example.solidconnection.auth.dto.ReissueResponse;
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -24,7 +24,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOK
 public class AuthService {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     private final SiteUserRepository siteUserRepository;
 
     /*
@@ -68,8 +68,8 @@ public class AuthService {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
-        String newAccessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        tokenService.saveToken(newAccessToken, TokenType.ACCESS);
+        String newAccessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
+        tokenProvider.saveToken(newAccessToken, TokenType.ACCESS);
         return new ReissueResponse(newAccessToken);
     }
 }

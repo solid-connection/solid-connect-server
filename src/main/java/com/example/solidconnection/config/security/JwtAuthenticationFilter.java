@@ -1,6 +1,6 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenValidator;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.exception.JwtExpiredTokenException;
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String TOKEN_HEADER = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
 
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     private final TokenValidator tokenValidator;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 try {
                     String requestURI = request.getRequestURI();
                     if (requestURI.equals("/auth/reissue")) {
-                        Authentication auth = this.tokenService.getAuthentication(token);
+                        Authentication auth = this.tokenProvider.getAuthentication(token);
                         SecurityContextHolder.getContext().setAuthentication(auth);
                         filterChain.doFilter(request, response);
                         return;
@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } catch (ExpiredJwtException e) {
                     throw new JwtExpiredTokenException(ACCESS_TOKEN_EXPIRED.getMessage());
                 }
-                Authentication auth = this.tokenService.getAuthentication(token); // 토큰에서 인증 정보 가져옴
+                Authentication auth = this.tokenProvider.getAuthentication(token); // 토큰에서 인증 정보 가져옴
                 SecurityContextHolder.getContext().setAuthentication(auth);// 인증 정보를 보안 컨텍스트에 설정
             }
         } catch (JwtExpiredTokenException e) {

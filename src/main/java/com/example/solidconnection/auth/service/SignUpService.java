@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.config.token.TokenValidator;
 import com.example.solidconnection.custom.exception.CustomException;
@@ -29,7 +29,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREAD
 public class SignUpService {
 
     private final TokenValidator tokenValidator;
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     private final SiteUserRepository siteUserRepository;
     private final RegionRepository regionRepository;
     private final InterestedRegionRepository interestedRegionRepository;
@@ -51,7 +51,7 @@ public class SignUpService {
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 검증
         tokenValidator.validateKakaoToken(signUpRequest.kakaoOauthToken());
-        String email = tokenService.getEmail(signUpRequest.kakaoOauthToken());
+        String email = tokenProvider.getEmail(signUpRequest.kakaoOauthToken());
         validateNicknameDuplicated(signUpRequest.nickname());
         validateUserNotDuplicated(email);
 
@@ -64,9 +64,9 @@ public class SignUpService {
         saveInterestedCountry(signUpRequest, savedSiteUser);
 
         // 토큰 발급
-        String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        String accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
         return new SignUpResponse(accessToken, refreshToken);
     }
 

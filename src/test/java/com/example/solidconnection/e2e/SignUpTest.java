@@ -2,7 +2,7 @@ package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.entity.Country;
@@ -54,7 +54,7 @@ class SignUpTest extends BaseEndToEndTest {
     InterestedCountyRepository interestedCountyRepository;
 
     @Autowired
-    TokenService tokenService;
+    TokenProvider tokenProvider;
 
     @Autowired
     RedisTemplate<String, String> redisTemplate;
@@ -69,8 +69,8 @@ class SignUpTest extends BaseEndToEndTest {
 
         // setup - 카카오 토큰 발급
         String email = "email@email.com";
-        String generatedKakaoToken = tokenService.generateToken(email, TokenType.KAKAO_OAUTH);
-        tokenService.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(email, TokenType.KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         List<String> interestedRegionNames = List.of("유럽");
@@ -122,8 +122,8 @@ class SignUpTest extends BaseEndToEndTest {
 
         // setup - 카카오 토큰 발급
         String email = "email@email.com";
-        String generatedKakaoToken = tokenService.generateToken(email, TokenType.KAKAO_OAUTH);
-        tokenService.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(email, TokenType.KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
@@ -148,8 +148,8 @@ class SignUpTest extends BaseEndToEndTest {
         siteUserRepository.save(alreadyExistUser);
 
         // setup - 카카오 토큰 발급
-        String generatedKakaoToken = tokenService.generateToken(alreadyExistEmail, TokenType.KAKAO_OAUTH);
-        tokenService.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
+        String generatedKakaoToken = tokenProvider.generateToken(alreadyExistEmail, TokenType.KAKAO_OAUTH);
+        tokenProvider.saveToken(generatedKakaoToken, TokenType.KAKAO_OAUTH);
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,

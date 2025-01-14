@@ -6,7 +6,7 @@ import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
-import com.example.solidconnection.config.token.TokenService;
+import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.config.token.TokenType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SignInService {
 
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     private final SiteUserRepository siteUserRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
 
@@ -58,15 +58,15 @@ public class SignInService {
     }
 
     private SignInResponse getSignInInfo(String email) {
-        String accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        String accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
         return new SignInResponse(true, accessToken, refreshToken);
     }
 
     private FirstAccessResponse getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
-        String kakaoOauthToken = tokenService.generateToken(kakaoUserInfoDto.kakaoAccountDto().email(), TokenType.KAKAO_OAUTH);
-        tokenService.saveToken(kakaoOauthToken, TokenType.KAKAO_OAUTH);
+        String kakaoOauthToken = tokenProvider.generateToken(kakaoUserInfoDto.kakaoAccountDto().email(), TokenType.KAKAO_OAUTH);
+        tokenProvider.saveToken(kakaoOauthToken, TokenType.KAKAO_OAUTH);
         return FirstAccessResponse.of(kakaoUserInfoDto, kakaoOauthToken);
     }
 }
