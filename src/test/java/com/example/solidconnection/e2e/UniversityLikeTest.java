@@ -25,8 +25,8 @@ import java.util.Set;
 import static com.example.solidconnection.e2e.DynamicFixture.createLikedUniversity;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createUniversityForApply;
-import static com.example.solidconnection.university.service.UniversityService.LIKE_CANCELED_MESSAGE;
-import static com.example.solidconnection.university.service.UniversityService.LIKE_SUCCESS_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

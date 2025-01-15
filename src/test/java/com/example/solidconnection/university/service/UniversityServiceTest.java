@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.university.service.UniversityService.LIKE_CANCELED_MESSAGE;
-import static com.example.solidconnection.university.service.UniversityService.LIKE_SUCCESS_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
     @Autowired
-    private UniversityService universityService;
+    private UniversityQueryService universityQueryService;
+
+    @Autowired
+    private UniversityLikeService universityLikeService;
 
     @Autowired
     private LikedUniversityRepository likedUniversityRepository;
@@ -51,7 +54,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         Long universityId = 괌대학_A_지원_정보.getId();
 
         // when
-        UniversityDetailResponse response = universityService.getUniversityDetail(universityId);
+        UniversityDetailResponse response = universityQueryService.getUniversityDetail(universityId);
 
         // then
         Assertions.assertAll(
@@ -94,9 +97,9 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         String cacheKey = "university:" + 괌대학_A_지원_정보.getId();
 
         // when
-        UniversityDetailResponse dbResponse = universityService.getUniversityDetail(universityId);
+        UniversityDetailResponse dbResponse = universityQueryService.getUniversityDetail(universityId);
         Object cachedValue = cacheManager.get(cacheKey);
-        UniversityDetailResponse cacheResponse = universityService.getUniversityDetail(universityId);
+        UniversityDetailResponse cacheResponse = universityQueryService.getUniversityDetail(universityId);
 
         // then(정말 한 번만 호출하는지 검증하는 로직이 필요한데 아직 구현이 안되었습니다.)
         assertThat(dbResponse).isEqualTo(cacheResponse);
@@ -110,7 +113,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // when
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> universityService.getUniversityDetail(invalidUniversityInfoForApplyId));
+                () -> universityQueryService.getUniversityDetail(invalidUniversityInfoForApplyId));
         CustomException customException = (CustomException) exception.getCause().getCause();
 
         // then
@@ -120,7 +123,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 전체_대학을_조회한다() {
         // when
-        UniversityInfoForApplyPreviewResponses response = universityService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of(), null, null);
 
         // then
@@ -150,10 +153,10 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // when
         UniversityInfoForApplyPreviewResponses firstResponse =
-                universityService.searchUniversity(regionCode, keywords, testType, testScore);
+                universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
         Object cachedValue = cacheManager.get(cacheKey);
         UniversityInfoForApplyPreviewResponses secondResponse =
-                universityService.searchUniversity(regionCode, keywords, testType, testScore);
+                universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
@@ -163,7 +166,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 지역으로_대학을_필터링한다() {
         // when
-        UniversityInfoForApplyPreviewResponses response = universityService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 영미권.getCode(), List.of(), null, null);
 
         // then
@@ -179,7 +182,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 키워드로_대학을_필터링한다() {
         // when
-        UniversityInfoForApplyPreviewResponses response = universityService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of("라", "일본"), null, null);
 
         // then
@@ -195,7 +198,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 어학시험_조건으로_대학을_필터링한다() {
         // when
-        UniversityInfoForApplyPreviewResponses response = universityService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
@@ -209,7 +212,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     @Test
     void 모든_조건으로_대학을_필터링한다() {
         // when
-        UniversityInfoForApplyPreviewResponses response = universityService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 "EUROPE", List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
@@ -222,7 +225,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        LikeResultResponse response = universityService.likeUniversity(
+        LikeResultResponse response = universityLikeService.likeUniversity(
                 testUser.getEmail(), 괌대학_A_지원_정보.getId());
 
         // then
@@ -238,7 +241,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         saveLikedUniversity(testUser, 괌대학_A_지원_정보);
 
         // when
-        LikeResultResponse response = universityService.likeUniversity(
+        LikeResultResponse response = universityLikeService.likeUniversity(
                 testUser.getEmail(), 괌대학_A_지원_정보.getId());
 
         // then
@@ -255,7 +258,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> universityService.likeUniversity(testUser.getEmail(), invalidUniversityId));
+                () -> universityLikeService.likeUniversity(testUser.getEmail(), invalidUniversityId));
 
         // then
         assertThat(exception.getMessage())
@@ -269,7 +272,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         saveLikedUniversity(testUser, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = universityService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -281,7 +284,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        IsLikeResponse response = universityService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -295,7 +298,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> universityService.getIsLiked(testUser.getEmail(), invalidUniversityId));
+                () -> universityLikeService.getIsLiked(testUser.getEmail(), invalidUniversityId));
 
         // then
         assertThat(exception.getMessage())

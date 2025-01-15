@@ -7,8 +7,9 @@ import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.service.UniversityLikeService;
+import com.example.solidconnection.university.service.UniversityQueryService;
 import com.example.solidconnection.university.service.UniversityRecommendService;
-import com.example.solidconnection.university.service.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,8 @@ import java.util.List;
 @RestController
 public class UniversityController {
 
-    private final UniversityService universityService;
+    private final UniversityQueryService universityQueryService;
+    private final UniversityLikeService universityLikeService;
     private final UniversityRecommendService universityRecommendService;
     private final SiteUserService siteUserService;
 
@@ -52,7 +54,7 @@ public class UniversityController {
     public ResponseEntity<IsLikeResponse> getIsLiked(
             Principal principal,
             @PathVariable Long universityInfoForApplyId) {
-        IsLikeResponse isLiked = universityService.getIsLiked(principal.getName(), universityInfoForApplyId);
+        IsLikeResponse isLiked = universityLikeService.getIsLiked(principal.getName(), universityInfoForApplyId);
         return ResponseEntity.ok(isLiked);
     }
 
@@ -60,7 +62,7 @@ public class UniversityController {
     public ResponseEntity<LikeResultResponse> addWishUniversity(
             Principal principal,
             @PathVariable Long universityInfoForApplyId) {
-        LikeResultResponse likeResultResponse = universityService.likeUniversity(principal.getName(), universityInfoForApplyId);
+        LikeResultResponse likeResultResponse = universityLikeService.likeUniversity(principal.getName(), universityInfoForApplyId);
         return ResponseEntity
                 .ok(likeResultResponse);
     }
@@ -68,7 +70,7 @@ public class UniversityController {
     @GetMapping("/detail/{universityInfoForApplyId}")
     public ResponseEntity<UniversityDetailResponse> getUniversityDetails(
             @PathVariable Long universityInfoForApplyId) {
-        UniversityDetailResponse universityDetailResponse = universityService.getUniversityDetail(universityInfoForApplyId);
+        UniversityDetailResponse universityDetailResponse = universityQueryService.getUniversityDetail(universityInfoForApplyId);
         return ResponseEntity.ok(universityDetailResponse);
     }
 
@@ -80,7 +82,7 @@ public class UniversityController {
             @RequestParam(required = false, defaultValue = "") LanguageTestType testType,
             @RequestParam(required = false, defaultValue = "") String testScore) {
         List<UniversityInfoForApplyPreviewResponse> universityInfoForApplyPreviewResponse
-                = universityService.searchUniversity(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
+                = universityQueryService.searchUniversity(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
         return ResponseEntity.ok(universityInfoForApplyPreviewResponse);
     }
 }
