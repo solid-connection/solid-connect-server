@@ -1,22 +1,26 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.cache.manager.CacheManager;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.LanguageRequirementResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
+import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 @DisplayName("대학교 조회 서비스 테스트")
 class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
@@ -24,8 +28,11 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
     @Autowired
     private UniversityQueryService universityQueryService;
 
-    @Autowired
-    private CacheManager cacheManager;
+    @SpyBean
+    private UniversityFilterRepository universityFilterRepository;
+
+    @SpyBean
+    private UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     @Test
      void 대학_상세정보를_정상_조회한다() {
@@ -73,16 +80,14 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
     void 대학_상세정보_조회시_캐시가_적용된다() {
         // given
         Long universityId = 괌대학_A_지원_정보.getId();
-        String cacheKey = "university:" + 괌대학_A_지원_정보.getId();
 
         // when
-        UniversityDetailResponse dbResponse = universityQueryService.getUniversityDetail(universityId);
-        Object cachedValue = cacheManager.get(cacheKey);
-        UniversityDetailResponse cacheResponse = universityQueryService.getUniversityDetail(universityId);
+        UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(universityId);
+        UniversityDetailResponse secondResponse = universityQueryService.getUniversityDetail(universityId);
 
-        // then(정말 한 번만 호출하는지 검증하는 로직이 필요한데 아직 구현이 안되었습니다.)
-        assertThat(dbResponse).isEqualTo(cacheResponse);
-        assertThat(cachedValue).isEqualTo(dbResponse);
+        // then
+        assertThat(firstResponse).isEqualTo(secondResponse);
+        verify(universityInfoForApplyRepository, times(1)).getUniversityInfoForApplyById(universityId);
     }
 
     @Test
@@ -128,18 +133,19 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
         List<String> keywords = List.of("괌");
         LanguageTestType testType = LanguageTestType.TOEFL_IBT;
         String testScore = "70";
-        String cacheKey = String.format("university:%s:%s:%s:%s", regionCode, keywords, testType, testScore);
+        String term = "2024-1";
 
         // when
         UniversityInfoForApplyPreviewResponses firstResponse =
                 universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
-        Object cachedValue = cacheManager.get(cacheKey);
         UniversityInfoForApplyPreviewResponses secondResponse =
                 universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        assertThat(cachedValue).isEqualTo(firstResponse);
+        verify(universityFilterRepository, times(1))
+                .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
+                        regionCode, keywords, testType, testScore, term);
     }
 
     @Test
