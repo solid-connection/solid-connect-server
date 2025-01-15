@@ -2,19 +2,9 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.cache.manager.CacheManager;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
-import com.example.solidconnection.university.domain.LikedUniversity;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LanguageRequirementResponse;
-import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import org.junit.jupiter.api.Assertions;
@@ -24,26 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
-import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("대학교 서비스 테스트")
-class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
+@DisplayName("대학교 조회 서비스 테스트")
+class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
 
     @Autowired
     private UniversityQueryService universityQueryService;
-
-    @Autowired
-    private UniversityLikeService universityLikeService;
-
-    @Autowired
-    private LikedUniversityRepository likedUniversityRepository;
-
-    @Autowired
-    private SiteUserRepository siteUserRepository;
 
     @Autowired
     private CacheManager cacheManager;
@@ -217,112 +196,5 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // then
         assertThat(response.universityInfoForApplyPreviewResponses()).containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
-    }
-
-    @Test
-    void 대학_좋아요를_등록한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
-        // when
-        LikeResultResponse response = universityLikeService.likeUniversity(
-                testUser.getEmail(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE);
-        assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                testUser, 괌대학_A_지원_정보)).isPresent();
-    }
-
-    @Test
-    void 대학_좋아요를_취소한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        saveLikedUniversity(testUser, 괌대학_A_지원_정보);
-
-        // when
-        LikeResultResponse response = universityLikeService.likeUniversity(
-                testUser.getEmail(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE);
-        assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                testUser, 괌대학_A_지원_정보)).isEmpty();
-    }
-
-    @Test
-    void 존재하지_않는_대학_좋아요_시도하면_예외를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        Long invalidUniversityId = 9999L;
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityLikeService.likeUniversity(testUser.getEmail(), invalidUniversityId));
-
-        // then
-        assertThat(exception.getMessage())
-                .isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    void 좋아요한_대학인지_확인한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        saveLikedUniversity(testUser, 괌대학_A_지원_정보);
-
-        // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.isLike()).isTrue();
-    }
-
-    @Test
-    void 좋아요하지_않은_대학인지_확인한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
-        // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.isLike()).isFalse();
-    }
-
-    @Test
-    void 존재하지_않는_대학의_좋아요_여부_조회시_예외를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        Long invalidUniversityId = 9999L;
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityLikeService.getIsLiked(testUser.getEmail(), invalidUniversityId));
-
-        // then
-        assertThat(exception.getMessage())
-                .isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                "1999-01-01",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
-        );
-        return siteUserRepository.save(siteUser);
-    }
-
-    private void saveLikedUniversity(SiteUser siteUser, UniversityInfoForApply universityInfoForApply) {
-        LikedUniversity likedUniversity = LikedUniversity.builder()
-                .siteUser(siteUser)
-                .universityInfoForApply(universityInfoForApply)
-                .build();
-        likedUniversityRepository.save(likedUniversity);
     }
 }
