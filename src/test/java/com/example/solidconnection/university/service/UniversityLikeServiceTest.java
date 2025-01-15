@@ -18,7 +18,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @DisplayName("대학교 좋아요 서비스 테스트")
 class UniversityLikeServiceTest extends UniversityDataSetUpIntegrationTest {
@@ -69,13 +69,10 @@ class UniversityLikeServiceTest extends UniversityDataSetUpIntegrationTest {
         SiteUser testUser = createSiteUser();
         Long invalidUniversityId = 9999L;
 
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityLikeService.likeUniversity(testUser.getEmail(), invalidUniversityId));
-
-        // then
-        assertThat(exception.getMessage())
-                .isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+        // when & then
+        assertThatCode(() -> universityLikeService.likeUniversity(testUser.getEmail(), invalidUniversityId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -109,13 +106,10 @@ class UniversityLikeServiceTest extends UniversityDataSetUpIntegrationTest {
         SiteUser testUser = createSiteUser();
         Long invalidUniversityId = 9999L;
 
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityLikeService.getIsLiked(testUser.getEmail(), invalidUniversityId));
-
-        // then
-        assertThat(exception.getMessage())
-                .isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+        // when & then
+        assertThatCode(() -> universityLikeService.getIsLiked(testUser.getEmail(), invalidUniversityId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
 
     private SiteUser createSiteUser() {

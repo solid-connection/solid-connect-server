@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -95,13 +95,12 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
         // given
         Long invalidUniversityInfoForApplyId = 9999L;
 
-        // when
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> universityQueryService.getUniversityDetail(invalidUniversityInfoForApplyId));
-        CustomException customException = (CustomException) exception.getCause().getCause();
-
-        // then
-        assertThat(customException.getMessage()).isEqualTo(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+        // when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> universityQueryService.getUniversityDetail(invalidUniversityInfoForApplyId))
+                .havingRootCause()
+                .isInstanceOf(CustomException.class)
+                .withMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
 
     @Test
