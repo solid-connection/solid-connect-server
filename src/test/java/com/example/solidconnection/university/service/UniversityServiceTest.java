@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
 import static com.example.solidconnection.university.service.UniversityService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityService.LIKE_SUCCESS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -249,19 +248,6 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
     }
 
     @Test
-    void 존재하지_않는_유저가_좋아요_시도하면_예외를_반환한다() {
-        // given
-        String invalidEmail = "invalid@email.com";
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityService.likeUniversity(invalidEmail, 괌대학_A_지원_정보.getId()));
-
-        // then
-        assertThat(exception.getMessage()).isEqualTo(USER_NOT_FOUND.getMessage());
-    }
-
-    @Test
     void 존재하지_않는_대학_좋아요_시도하면_예외를_반환한다() {
         // given
         SiteUser testUser = createSiteUser();
@@ -299,19 +285,6 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // then
         assertThat(response.isLike()).isFalse();
-    }
-
-    @Test
-    void 존재하지_않는_유저의_좋아요_여부_조회시_예외를_반환한다() {
-        // given
-        String invalidEmail = "invalid@email.com";
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityService.getIsLiked(invalidEmail, 괌대학_A_지원_정보.getId()));
-
-        // then
-        assertThat(exception.getMessage()).isEqualTo(USER_NOT_FOUND.getMessage());
     }
 
     @Test

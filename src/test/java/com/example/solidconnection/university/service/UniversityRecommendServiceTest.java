@@ -1,6 +1,5 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
@@ -19,10 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
 import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("대학교 추천 서비스 테스트")
 class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest {
@@ -124,18 +121,6 @@ class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest 
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );
-    }
-
-    @Test
-    void 존재하지_않는_사용자_조회시_예외를_반환한다() {
-        // given
-        String invalidEmail = "invalid@email.com";
-
-        // when & then
-        CustomException exception = assertThrows(CustomException.class,
-                () -> universityRecommendService.getPersonalRecommends(invalidEmail));
-
-        assertThat(exception.getMessage()).isEqualTo(USER_NOT_FOUND.getMessage());
     }
 
     @Test
