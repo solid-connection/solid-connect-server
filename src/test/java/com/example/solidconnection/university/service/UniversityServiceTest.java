@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("대학교 서비스 테스트")
 class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
 
-
     @Autowired
     private UniversityService universityService;
 
@@ -88,6 +87,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
                 () -> assertThat(response.englishCourseUrl()).isEqualTo(괌대학_A_지원_정보.getUniversity().getEnglishCourseUrl())
         );
     }
+
     @Test
     void 대학_상세정보_조회시_캐시가_적용된다() {
         // given
@@ -214,8 +214,7 @@ class UniversityServiceTest extends UniversityDataSetUpIntegrationTest {
                 "EUROPE", List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
+        assertThat(response.universityInfoForApplyPreviewResponses()).containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
     }
 
     @Test

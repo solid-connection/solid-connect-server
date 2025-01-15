@@ -24,7 +24,6 @@ import static com.example.solidconnection.university.service.UniversityRecommend
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 @DisplayName("대학교 추천 서비스 테스트")
 class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest {
 
@@ -42,7 +41,6 @@ class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest 
 
     @Autowired
     private GeneralRecommendUniversities generalRecommendUniversities;
-
 
     @BeforeEach
     void setUp() {
