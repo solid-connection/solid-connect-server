@@ -19,7 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @DisplayName("대학교 조회 서비스 테스트")
@@ -87,7 +87,7 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        verify(universityInfoForApplyRepository, times(1)).getUniversityInfoForApplyById(universityId);
+        then(universityInfoForApplyRepository).should(times(1)).getUniversityInfoForApplyById(universityId);
     }
 
     @Test
@@ -142,7 +142,7 @@ class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        verify(universityFilterRepository, times(1))
+        then(universityFilterRepository).should(times(1))
                 .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
                         regionCode, keywords, testType, testScore, term);
     }
