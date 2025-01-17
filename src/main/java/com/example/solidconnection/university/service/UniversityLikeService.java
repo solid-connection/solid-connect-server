@@ -5,7 +5,8 @@ import com.example.solidconnection.siteuser.repository.LikedUniversityRepository
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.dto.*;
+import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
