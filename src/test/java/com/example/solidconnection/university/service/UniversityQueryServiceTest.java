@@ -105,7 +105,7 @@ class UniversityQueryServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 존재하지_않는_대학_상세정보_조회시_예외_응답을_반환한다() {
+    void 존재하지_않는_대학_상세정보를_조회하면_예외_응답을_반환한다() {
         // given
         Long invalidUniversityInfoForApplyId = 9999L;
 

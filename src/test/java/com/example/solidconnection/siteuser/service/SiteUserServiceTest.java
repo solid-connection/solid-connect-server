@@ -165,7 +165,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 빈_이미지_파일로_프로필을_수정하면_예외를_반환한다() {
+    void 빈_이미지_파일로_프로필을_수정하면_예외_응답을_반환한다() {
         // given
         SiteUser testUser = createSiteUser();
         MockMultipartFile emptyFile = createEmptyImageFile();
@@ -196,7 +196,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 중복된_닉네임으로_변경시_예외가_발생한다() {
+    void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
         // given
         createDuplicatedSiteUser();
         SiteUser testUser = createSiteUser();
@@ -209,7 +209,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 최소_대기기간이_지나지_않은_상태에서_변경시_예외가_발생한다() {
+    void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
         // given
         SiteUser testUser = createSiteUser();
         LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
