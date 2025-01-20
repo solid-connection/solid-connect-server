@@ -6,6 +6,8 @@ import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
+import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
+import com.example.solidconnection.siteuser.dto.NicknameUpdateResponse;
 import com.example.solidconnection.siteuser.dto.ProfileImageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -23,9 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMAGE_NEEDED;
+import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
+import static com.example.solidconnection.siteuser.service.SiteUserService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메이지대학_지원_정보;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
@@ -36,7 +43,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
-
 
 @DisplayName("유저 서비스 테스트")
 class SiteUserServiceTest extends BaseIntegrationTest {
@@ -170,6 +176,55 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
     }
 
+    @Test
+    void 닉네임을_성공적으로_수정한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        String newNickname = "newNickname";
+        NicknameUpdateRequest request = new NicknameUpdateRequest(newNickname);
+
+        // when
+        NicknameUpdateResponse response = siteUserService.updateNickname(
+                testUser.getEmail(),
+                request
+        );
+
+        // then
+        SiteUser updatedUser = siteUserRepository.getByEmail(testUser.getEmail());
+        assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
+        assertThat(response.nickname()).isEqualTo(newNickname);
+    }
+
+    @Test
+    void 중복된_닉네임으로_변경시_예외가_발생한다() {
+        // given
+        createDuplicatedSiteUser();
+        SiteUser testUser = createSiteUser();
+        NicknameUpdateRequest request = new NicknameUpdateRequest("duplicatedNickname");
+
+        // when & then
+        assertThatCode(() -> siteUserService.updateNickname(testUser.getEmail(), request))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
+    }
+
+    @Test
+    void 최소_대기기간이_지나지_않은_상태에서_변경시_예외가_발생한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
+        testUser.setNicknameModifiedAt(modifiedAt);
+        siteUserRepository.save(testUser);
+
+        NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
+
+        // when & then
+        assertThatCode(() ->
+                siteUserService.updateNickname(testUser.getEmail(), request))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(createExpectedErrorMessage(modifiedAt));
+    }
+
     private SiteUser createSiteUser() {
         SiteUser siteUser = new SiteUser(
                 "test@example.com",
@@ -194,6 +249,19 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 Gender.MALE
         );
         return siteUserRepository.save(siteUser);
+    }
+
+    private void createDuplicatedSiteUser() {
+        SiteUser siteUser = new SiteUser(
+                "duplicated@example.com",
+                "duplicatedNickname",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE
+        );
+        siteUserRepository.save(siteUser);
     }
 
     private int createLikedUniversities(SiteUser testUser) {
@@ -223,5 +291,13 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 "image/jpeg",
                 new byte[0]
         );
+    }
+
+    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
+        String formatLastModifiedAt = String.format(
+                "(마지막 수정 시간 : %s)",
+                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
+        );
+        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
     }
 }
