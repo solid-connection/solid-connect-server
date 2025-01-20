@@ -96,7 +96,7 @@ class SignOutCheckFilterTest {
                 .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
                 .compact();
 
         MockHttpServletRequest request = new MockHttpServletRequest();
