@@ -1,7 +1,7 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.config.cors.CorsPropertiesConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,16 +17,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableConfigurationProperties({CorsProperties.class, JwtProperties.class})
 public class SecurityConfiguration {
 
-    private final CorsPropertiesConfig corsProperties;
+    private final CorsProperties corsProperties;
     private final SignOutCheckFilter signOutCheckFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        configuration.setAllowedOrigins(corsProperties.allowedOrigins());
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
