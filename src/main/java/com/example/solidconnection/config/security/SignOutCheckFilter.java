@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.auth.service.AuthService.SIGN_OUT_VALUE;
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 
 @Component
@@ -23,7 +22,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREAD
 public class SignOutCheckFilter extends OncePerRequestFilter {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final TokenProvider tokenProvider;
+    private final JwtProperties jwtProperties;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Override

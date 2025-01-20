@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +28,8 @@ class JwtAuthenticationFilterTest {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    @Autowired
+    private JwtProperties jwtProperties;
 
     private HttpServletRequest request;
     private HttpServletResponse response;
@@ -50,7 +49,7 @@ class JwtAuthenticationFilterTest {
                 .setSubject("subject")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
                 .compact();
         request = createRequestWithToken(token);
 
@@ -58,7 +57,8 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // then
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isExactlyInstanceOf(JwtAuthentication.class);
+        assertThat(SecurityContextHolder.getContext().getAuthentication())
+                .isExactlyInstanceOf(JwtAuthentication.class);
         then(filterChain).should().doFilter(request, response);
     }
 
@@ -85,7 +85,7 @@ class JwtAuthenticationFilterTest {
                     .setSubject("subject")
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() - 1000))
-                    .signWith(SignatureAlgorithm.HS256, secretKey)
+                    .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
                     .compact();
             request = createRequestWithToken(token);
 

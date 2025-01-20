@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -34,8 +33,8 @@ class SignOutCheckFilterTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    @Autowired
+    private JwtProperties jwtProperties;
 
     private HttpServletRequest request;
     private HttpServletResponse response;

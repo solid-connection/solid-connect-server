@@ -23,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String REISSUE_URI = "/auth/reissue";
     private static final String REISSUE_METHOD = "post";
 
-    private final TokenProvider tokenProvider;
+    private final JwtProperties jwtProperties;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Override
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            String subject = tokenProvider.parseSubjectOrElseThrow(token);
+            String subject = parseSubjectOrElseThrow(token, jwtProperties.secret());
             UserDetails userDetails = new JwtUserDetails(subject);
             Authentication auth = new JwtAuthentication(userDetails, token, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
