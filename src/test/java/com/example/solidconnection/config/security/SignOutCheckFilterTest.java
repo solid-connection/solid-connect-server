@@ -18,7 +18,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;

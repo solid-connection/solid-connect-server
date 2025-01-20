@@ -18,8 +18,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 
-import static com.example.solidconnection.config.token.TokenType.KAKAO_OAUTH;
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.KAKAO_OAUTH;
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.e2e.DynamicFixture.createKakaoUserInfoDtoByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;

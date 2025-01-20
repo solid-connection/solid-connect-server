@@ -2,9 +2,7 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
-import com.example.solidconnection.config.token.TokenProvider;
-import com.example.solidconnection.config.token.TokenType;
-import com.example.solidconnection.config.token.TokenValidator;
+import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;

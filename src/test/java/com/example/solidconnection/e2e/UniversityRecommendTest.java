@@ -1,7 +1,7 @@
 package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.config.token.TokenProvider;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
 import com.example.solidconnection.repositories.InterestedCountyRepository;

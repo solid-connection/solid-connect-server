@@ -15,8 +15,8 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.config.token.TokenType.ACCESS;
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.ACCESS;
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
 @RequiredArgsConstructor

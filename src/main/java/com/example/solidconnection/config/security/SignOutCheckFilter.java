@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.auth.service.AuthService.SIGN_OUT_VALUE;
 import static com.example.solidconnection.config.token.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;

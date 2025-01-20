@@ -1,5 +1,6 @@
 package com.example.solidconnection.config.token;
 
+import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -12,9 +13,9 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.example.solidconnection.config.token.TokenType.ACCESS;
-import static com.example.solidconnection.config.token.TokenType.KAKAO_OAUTH;
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.ACCESS;
+import static com.example.solidconnection.auth.domain.TokenType.KAKAO_OAUTH;
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_TOKEN_EXPIRED;
 import static com.example.solidconnection.custom.exception.ErrorCode.EMPTY_TOKEN;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN;
