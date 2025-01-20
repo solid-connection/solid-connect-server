@@ -10,10 +10,13 @@ import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메이지대학_지원_정보;
@@ -66,6 +69,26 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl())
         );
+    }
+
+    @Test
+    void 관심_대학교_목록을_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        int likedUniversityCount = createLikedUniversities(testUser);
+
+        // when
+        List<UniversityInfoForApplyPreviewResponse> response = siteUserService.getWishUniversity(testUser.getEmail());
+
+        // then
+        assertThat(response)
+                .hasSize(likedUniversityCount)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .containsAll(List.of(
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                ));
     }
 
     private SiteUser createSiteUser() {
