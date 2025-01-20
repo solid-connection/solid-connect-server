@@ -2,6 +2,7 @@ package com.example.solidconnection.siteuser.service;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
@@ -49,6 +50,21 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.email()).isEqualTo(testUser.getEmail()),
                 () -> assertThat(response.likedPostCount()).isEqualTo(testUser.getPostLikeList().size()),
                 () -> assertThat(response.likedUniversityCount()).isEqualTo(likedUniversityCount)
+        );
+    }
+
+    @Test
+    void 내_정보를_수정하기_위한_마이페이지_정보를_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+
+        // when
+        MyPageUpdateResponse response = siteUserService.getMyPageInfoToUpdate(testUser.getEmail());
+
+        // then
+        Assertions.assertAll(
+                () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
+                () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl())
         );
     }
 
