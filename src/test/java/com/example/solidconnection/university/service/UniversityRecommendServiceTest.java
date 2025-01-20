@@ -6,6 +6,7 @@ import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -18,11 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_B_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.네바다주립대학_라스베이거스_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.덴마크;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메모리얼대학_세인트존스_A_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.서던덴마크대학교_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.영미권;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
 import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("대학교 추천 서비스 테스트")
-class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest {
+class UniversityRecommendServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private UniversityRecommendService universityRecommendService;
@@ -41,6 +50,7 @@ class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest 
 
     @BeforeEach
     void setUp() {
+        super.setUpBaseData();
         generalRecommendUniversities.init();
     }
 
@@ -55,7 +65,7 @@ class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest 
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIVERSITY_NUM).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .containsAll(List.of(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
@@ -94,7 +104,7 @@ class UniversityRecommendServiceTest extends UniversityDataSetUpIntegrationTest 
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIVERSITY_NUM).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .containsExactlyInAnyOrder(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),

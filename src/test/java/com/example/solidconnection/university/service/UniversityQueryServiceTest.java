@@ -1,6 +1,7 @@
 package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.LanguageRequirementResponse;
@@ -16,6 +17,19 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.List;
 
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_B_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.그라츠공과대학_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.그라츠대학_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.네바다주립대학_라스베이거스_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.린츠_카톨릭대학_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메모리얼대학_세인트존스_A_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메이지대학_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.미국;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.서던덴마크대학교_지원_정보;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.영미권;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.영미권_미국_괌대학;
+import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +37,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @DisplayName("대학교 조회 서비스 테스트")
-class UniversityQueryServiceTest extends UniversityDataSetUpIntegrationTest {
+class UniversityQueryServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private UniversityQueryService universityQueryService;
