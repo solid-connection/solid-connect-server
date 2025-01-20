@@ -1,12 +1,17 @@
 package com.example.solidconnection.siteuser.service;
 
+import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.s3.S3Service;
+import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
+import com.example.solidconnection.siteuser.dto.ProfileImageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.Gender;
+import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
@@ -15,19 +20,32 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMAGE_NEEDED;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메이지대학_지원_정보;
 import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.eq;
+
 
 @DisplayName("유저 서비스 테스트")
 class SiteUserServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private SiteUserService siteUserService;
+
+    @MockBean
+    private S3Service s3Service;
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -91,11 +109,85 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 ));
     }
 
+    @Test
+    void 새로운_이미지로_성공적으로_업데이트한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        String expectedUrl = "newProfileImageUrl";
+        MockMultipartFile imageFile = createValidImageFile();
+        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                .willReturn(new UploadedFileUrlResponse(expectedUrl));
+
+        // when
+        ProfileImageUpdateResponse response = siteUserService.updateProfileImage(
+                testUser.getEmail(),
+                imageFile
+        );
+
+        // then
+        assertThat(response.profileImageUrl()).isEqualTo(expectedUrl);
+    }
+
+    @Test
+    void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        MockMultipartFile imageFile = createValidImageFile();
+        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+
+        // when
+        siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+
+        // then
+        then(s3Service).should(never()).deleteExProfile(any());
+    }
+
+    @Test
+    void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
+        // given
+        SiteUser testUser = createSiteUserWithCustomProfile();
+        MockMultipartFile imageFile = createValidImageFile();
+        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+
+        // when
+        siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+
+        // then
+        then(s3Service).should().deleteExProfile(testUser.getEmail());
+    }
+
+    @Test
+    void 빈_이미지_파일로_프로필을_수정하면_예외를_반환한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        MockMultipartFile emptyFile = createEmptyImageFile();
+
+        // when & then
+        assertThatCode(() -> siteUserService.updateProfileImage(testUser.getEmail(), emptyFile))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
+    }
+
     private SiteUser createSiteUser() {
         SiteUser siteUser = new SiteUser(
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE
+        );
+        return siteUserRepository.save(siteUser);
+    }
+
+    private SiteUser createSiteUserWithCustomProfile() {
+        SiteUser siteUser = new SiteUser(
+                "test@example.com",
+                "nickname",
+                "profile/profileImageUrl",
                 "1999-01-01",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
@@ -113,5 +205,23 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         likedUniversityRepository.save(likedUniversity2);
         likedUniversityRepository.save(likedUniversity3);
         return likedUniversityRepository.countBySiteUser_Email(testUser.getEmail());
+    }
+
+    private MockMultipartFile createValidImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
+    private MockMultipartFile createEmptyImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "empty.jpg",
+                "image/jpeg",
+                new byte[0]
+        );
     }
 }
