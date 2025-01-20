@@ -2,7 +2,6 @@ package com.example.solidconnection.auth.service;
 
 
 import com.example.solidconnection.auth.dto.ReissueResponse;
-import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;

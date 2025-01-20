@@ -2,7 +2,7 @@ package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
-import com.example.solidconnection.config.token.TokenProvider;
+import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.InterestedCountry;
@@ -26,8 +26,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static com.example.solidconnection.config.token.TokenType.KAKAO_OAUTH;
-import static com.example.solidconnection.config.token.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.KAKAO_OAUTH;
+import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_EXISTED;

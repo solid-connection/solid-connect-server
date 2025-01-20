@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.token;
+package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;

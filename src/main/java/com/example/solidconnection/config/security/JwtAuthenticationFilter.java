@@ -1,6 +1,5 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.config.token.TokenProvider;
 import com.example.solidconnection.custom.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

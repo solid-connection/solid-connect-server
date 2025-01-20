@@ -1,6 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.config.token.TokenProvider;
+import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
