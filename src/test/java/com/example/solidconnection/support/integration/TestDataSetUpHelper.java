@@ -72,20 +72,20 @@ public class TestDataSetUpHelper {
     public String term;
 
     public void setUpBasicData() {
-        setupRegions();
-        setupCountries();
-        setupUniversities();
-        setupUniversityInfos();
-        setupLanguageRequirements();
+        setUpRegions();
+        setUpCountries();
+        setUpUniversities();
+        setUpUniversityInfos();
+        setUpLanguageRequirements();
     }
 
-    private void setupRegions() {
+    private void setUpRegions() {
         영미권 = regionRepository.save(new Region("AMERICAS", "영미권"));
         유럽 = regionRepository.save(new Region("EUROPE", "유럽"));
         아시아 = regionRepository.save(new Region("ASIA", "아시아"));
     }
 
-    private void setupCountries() {
+    private void setUpCountries() {
         미국 = countryRepository.save(new Country("US", "미국", 영미권));
         캐나다 = countryRepository.save(new Country("CA", "캐나다", 영미권));
         덴마크 = countryRepository.save(new Country("DK", "덴마크", 유럽));
@@ -93,7 +93,7 @@ public class TestDataSetUpHelper {
         일본 = countryRepository.save(new Country("JP", "일본", 아시아));
     }
 
-    private void setupUniversities() {
+    private void setUpUniversities() {
         영미권_미국_괌대학 = universityRepository.save(new University(
                 null, "괌대학", "University of Guam", "university_of_guam",
                 "https://www.uog.edu/admissions/international-students",
@@ -181,7 +181,7 @@ public class TestDataSetUpHelper {
         ));
     }
 
-    private void setupUniversityInfos() {
+    private void setUpUniversityInfos() {
         괌대학_A_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
                 null, term, "괌대학(A형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
@@ -263,7 +263,7 @@ public class TestDataSetUpHelper {
         ));
     }
 
-    private void setupLanguageRequirements() {
+    private void setUpLanguageRequirements() {
         saveLanguageTestRequirement(괌대학_A_지원_정보, LanguageTestType.TOEFL_IBT, "80");
         saveLanguageTestRequirement(괌대학_A_지원_정보, LanguageTestType.TOEIC, "800");
         saveLanguageTestRequirement(괌대학_B_지원_정보, LanguageTestType.TOEFL_IBT, "70");
