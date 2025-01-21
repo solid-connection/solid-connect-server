@@ -11,6 +11,7 @@ import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.LanguageRequirementRepository;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.UniversityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -52,28 +53,23 @@ public class TestDataSetUpHelper {
     public static UniversityInfoForApply 린츠_카톨릭대학_지원_정보;
     public static UniversityInfoForApply 메이지대학_지원_정보;
 
-    private final RegionRepository regionRepository;
-    private final CountryRepository countryRepository;
-    private final UniversityRepository universityRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final LanguageRequirementRepository languageRequirementRepository;
-    private final String term;
+    @Autowired
+    private RegionRepository regionRepository;
 
-    public TestDataSetUpHelper(
-            RegionRepository regionRepository,
-            CountryRepository countryRepository,
-            UniversityRepository universityRepository,
-            UniversityInfoForApplyRepository universityInfoForApplyRepository,
-            LanguageRequirementRepository languageRequirementRepository,
-            @Value("${university.term}") String term
-    ) {
-        this.regionRepository = regionRepository;
-        this.countryRepository = countryRepository;
-        this.universityRepository = universityRepository;
-        this.universityInfoForApplyRepository = universityInfoForApplyRepository;
-        this.languageRequirementRepository = languageRequirementRepository;
-        this.term = term;
-    }
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private UniversityRepository universityRepository;
+
+    @Autowired
+    private UniversityInfoForApplyRepository universityInfoForApplyRepository;
+
+    @Autowired
+    private LanguageRequirementRepository languageRequirementRepository;
+
+    @Value("${university.term}")
+    public String term;
 
     public void setUpBasicData() {
         setupRegions();
