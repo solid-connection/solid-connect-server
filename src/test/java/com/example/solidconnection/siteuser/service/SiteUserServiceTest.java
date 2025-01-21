@@ -20,6 +20,7 @@ import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -115,114 +116,122 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 ));
     }
 
-    @Test
-    void 새로운_이미지로_성공적으로_업데이트한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        String expectedUrl = "newProfileImageUrl";
-        MockMultipartFile imageFile = createValidImageFile();
-        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
-                .willReturn(new UploadedFileUrlResponse(expectedUrl));
+    @Nested
+    class 프로필_이미지_수정_테스트 {
 
-        // when
-        ProfileImageUpdateResponse response = siteUserService.updateProfileImage(
-                testUser.getEmail(),
-                imageFile
-        );
+        @Test
+        void 새로운_이미지로_성공적으로_업데이트한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            String expectedUrl = "newProfileImageUrl";
+            MockMultipartFile imageFile = createValidImageFile();
+            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                    .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
-        // then
-        assertThat(response.profileImageUrl()).isEqualTo(expectedUrl);
+            // when
+            ProfileImageUpdateResponse response = siteUserService.updateProfileImage(
+                    testUser.getEmail(),
+                    imageFile
+            );
+
+            // then
+            assertThat(response.profileImageUrl()).isEqualTo(expectedUrl);
+        }
+
+        @Test
+        void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            MockMultipartFile imageFile = createValidImageFile();
+            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                    .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+
+            // when
+            siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+
+            // then
+            then(s3Service).should(never()).deleteExProfile(any());
+        }
+
+        @Test
+        void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
+            // given
+            SiteUser testUser = createSiteUserWithCustomProfile();
+            MockMultipartFile imageFile = createValidImageFile();
+            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                    .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+
+            // when
+            siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+
+            // then
+            then(s3Service).should().deleteExProfile(testUser.getEmail());
+        }
+
+        @Test
+        void 빈_이미지_파일로_프로필을_수정하면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            MockMultipartFile emptyFile = createEmptyImageFile();
+
+            // when & then
+            assertThatCode(() -> siteUserService.updateProfileImage(testUser.getEmail(), emptyFile))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
+        }
     }
 
-    @Test
-    void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        MockMultipartFile imageFile = createValidImageFile();
-        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
-                .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+    @Nested
+    class 닉네임_수정_테스트 {
 
-        // when
-        siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+        @Test
+        void 닉네임을_성공적으로_수정한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            String newNickname = "newNickname";
+            NicknameUpdateRequest request = new NicknameUpdateRequest(newNickname);
 
-        // then
-        then(s3Service).should(never()).deleteExProfile(any());
-    }
+            // when
+            NicknameUpdateResponse response = siteUserService.updateNickname(
+                    testUser.getEmail(),
+                    request
+            );
 
-    @Test
-    void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
-        // given
-        SiteUser testUser = createSiteUserWithCustomProfile();
-        MockMultipartFile imageFile = createValidImageFile();
-        given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
-                .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+            // then
+            SiteUser updatedUser = siteUserRepository.getByEmail(testUser.getEmail());
+            assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
+            assertThat(response.nickname()).isEqualTo(newNickname);
+        }
 
-        // when
-        siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+        @Test
+        void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
+            // given
+            createDuplicatedSiteUser();
+            SiteUser testUser = createSiteUser();
+            NicknameUpdateRequest request = new NicknameUpdateRequest("duplicatedNickname");
 
-        // then
-        then(s3Service).should().deleteExProfile(testUser.getEmail());
-    }
+            // when & then
+            assertThatCode(() -> siteUserService.updateNickname(testUser.getEmail(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
+        }
 
-    @Test
-    void 빈_이미지_파일로_프로필을_수정하면_예외_응답을_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        MockMultipartFile emptyFile = createEmptyImageFile();
+        @Test
+        void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
+            testUser.setNicknameModifiedAt(modifiedAt);
+            siteUserRepository.save(testUser);
 
-        // when & then
-        assertThatCode(() -> siteUserService.updateProfileImage(testUser.getEmail(), emptyFile))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
-    }
+            NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
 
-    @Test
-    void 닉네임을_성공적으로_수정한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        String newNickname = "newNickname";
-        NicknameUpdateRequest request = new NicknameUpdateRequest(newNickname);
-
-        // when
-        NicknameUpdateResponse response = siteUserService.updateNickname(
-                testUser.getEmail(),
-                request
-        );
-
-        // then
-        SiteUser updatedUser = siteUserRepository.getByEmail(testUser.getEmail());
-        assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
-        assertThat(response.nickname()).isEqualTo(newNickname);
-    }
-
-    @Test
-    void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
-        // given
-        createDuplicatedSiteUser();
-        SiteUser testUser = createSiteUser();
-        NicknameUpdateRequest request = new NicknameUpdateRequest("duplicatedNickname");
-
-        // when & then
-        assertThatCode(() -> siteUserService.updateNickname(testUser.getEmail(), request))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
-    }
-
-    @Test
-    void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
-        testUser.setNicknameModifiedAt(modifiedAt);
-        siteUserRepository.save(testUser);
-
-        NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
-
-        // when & then
-        assertThatCode(() ->
-                siteUserService.updateNickname(testUser.getEmail(), request))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(createExpectedErrorMessage(modifiedAt));
+            // when & then
+            assertThatCode(() ->
+                    siteUserService.updateNickname(testUser.getEmail(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(createExpectedErrorMessage(modifiedAt));
+        }
     }
 
     private SiteUser createSiteUser() {
