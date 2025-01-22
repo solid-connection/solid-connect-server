@@ -34,9 +34,6 @@ import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_AL
 import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMAGE_NEEDED;
 import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.SiteUserService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메이지대학_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.BDDMockito.given;

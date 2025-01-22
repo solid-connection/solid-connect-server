@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;

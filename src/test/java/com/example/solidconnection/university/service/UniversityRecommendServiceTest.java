@@ -19,14 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_A_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.괌대학_B_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.네바다주립대학_라스베이거스_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.덴마크;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.메모리얼대학_세인트존스_A_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.서던덴마크대학교_지원_정보;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.영미권;
-import static com.example.solidconnection.support.integration.TestDataSetUpHelper.코펜하겐IT대학_지원_정보;
 import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +42,6 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        super.setUpBaseData();
         generalRecommendUniversities.init();
     }
 
@@ -65,7 +56,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
                 .containsAll(List.of(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
@@ -104,7 +95,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM).usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .hasSize(RECOMMEND_UNIVERSITY_NUM)
                 .containsExactlyInAnyOrder(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
