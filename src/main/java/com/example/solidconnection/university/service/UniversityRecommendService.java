@@ -33,7 +33,7 @@ public class UniversityRecommendService {
      * 사용자 맞춤 추천 대학교를 불러온다.
      * - 회원가입 시 선택한 관심 지역과 관심 국가에 해당하는 대학 중, 이번 term 에 열리는 학교들을 불러온다.
      * - 불러온 맞춤 추천 대학교의 순서를 무작위로 섞는다.
-     * - 맞춤 추천 대학교의 수가 6개보다 적다면, 공통 추천 대학교를 부족한 수 만큼 불러온다.
+     * - 맞춤 추천 대학교의 수가 6개보다 적다면, 공통 추천 대학교 후보에서 이번 term 에 열리는 학교들을 부족한 수 만큼 불러온다.
      * */
     @Transactional(readOnly = true)
     public UniversityRecommendsResponse getPersonalRecommends(String email) {
