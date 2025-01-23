@@ -17,6 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,14 +34,24 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @AllArgsConstructor
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_site_user_email_auth_type",
+                columnNames = {"email", "auth_type"}
+        )
+})
 public class SiteUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
+
+    @Column(name = "auth_type", nullable = false, length = 100)
+    @Enumerated(EnumType.STRING)
+    private AuthType authType;
 
     @Setter
     @Column(nullable = false, length = 100)
@@ -100,5 +112,25 @@ public class SiteUser {
         this.preparationStage = preparationStage;
         this.role = role;
         this.gender = gender;
+        this.authType = AuthType.KAKAO;
+    }
+
+    public SiteUser(
+            String email,
+            String nickname,
+            String profileImageUrl,
+            String birth,
+            PreparationStatus preparationStage,
+            Role role,
+            Gender gender,
+            AuthType authType) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.birth = birth;
+        this.preparationStage = preparationStage;
+        this.role = role;
+        this.gender = gender;
+        this.authType = authType;
     }
 }
