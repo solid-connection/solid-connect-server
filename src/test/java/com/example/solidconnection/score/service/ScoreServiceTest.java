@@ -1,8 +1,11 @@
 package com.example.solidconnection.score.service;
 
+import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
+import com.example.solidconnection.score.dto.GpaScoreStatus;
+import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,6 +41,40 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private LanguageTestScoreRepository languageTestScoreRepository;
+
+    @Test
+    void GPA_점수_상태를_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        List<GpaScore> scores = List.of(
+                createGpaScore(testUser, 3.5, 4.5),
+                createGpaScore(testUser, 3.8, 4.5)
+        );
+
+        // when
+        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser.getEmail());
+
+        // then
+        assertThat(response.gpaScoreStatusList())
+                .hasSize(scores.size())
+                .containsExactlyInAnyOrder(
+                        scores.stream()
+                                .map(GpaScoreStatus::from)
+                                .toArray(GpaScoreStatus[]::new)
+                );
+    }
+
+    @Test
+    void GPA_점수가_없는_경우_빈_리스트를_반환한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+
+        // when
+        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser.getEmail());
+
+        // then
+        assertThat(response.gpaScoreStatusList()).isEmpty();
+    }
 
     @Test
     void GPA_점수를_등록한다() {
@@ -88,6 +126,15 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 Gender.MALE
         );
         return siteUserRepository.save(siteUser);
+    }
+
+    private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
+        GpaScore gpaScore = new GpaScore(
+                new Gpa(gpa, gpaCriteria, "https://example.com/gpa-report.pdf"),
+                siteUser,
+                LocalDate.now()
+        );
+        return gpaScoreRepository.save(gpaScore);
     }
 
     private GpaScoreRequest createGpaScoreRequest() {
