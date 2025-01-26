@@ -1,12 +1,15 @@
 package com.example.solidconnection.score.service;
 
 import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
 import com.example.solidconnection.score.dto.GpaScoreStatus;
 import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
+import com.example.solidconnection.score.dto.LanguageTestScoreStatus;
+import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -77,6 +80,40 @@ class ScoreServiceTest extends BaseIntegrationTest {
     }
 
     @Test
+    void 어학_시험_점수_상태를_조회한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+        List<LanguageTestScore> scores = List.of(
+                createLanguageTestScore(testUser, LanguageTestType.TOEIC, "100"),
+                createLanguageTestScore(testUser, LanguageTestType.TOEFL_IBT, "7.5")
+        );
+
+        // when
+        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser.getEmail());
+
+        // then
+        assertThat(response.languageTestScoreStatusList())
+                .hasSize(scores.size())
+                .containsExactlyInAnyOrder(
+                        scores.stream()
+                                .map(LanguageTestScoreStatus::from)
+                                .toArray(LanguageTestScoreStatus[]::new)
+                );
+    }
+
+    @Test
+    void 어학_시험_점수가_없는_경우_빈_리스트를_반환한다() {
+        // given
+        SiteUser testUser = createSiteUser();
+
+        // when
+        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser.getEmail());
+
+        // then
+        assertThat(response.languageTestScoreStatusList()).isEmpty();
+    }
+
+    @Test
     void GPA_점수를_등록한다() {
         // given
         SiteUser testUser = createSiteUser();
@@ -135,6 +172,15 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 LocalDate.now()
         );
         return gpaScoreRepository.save(gpaScore);
+    }
+
+    private LanguageTestScore createLanguageTestScore(SiteUser siteUser, LanguageTestType languageTestType, String score) {
+        LanguageTestScore languageTestScore = new LanguageTestScore(
+                new LanguageTest(languageTestType, score, "https://example.com/gpa-report.pdf"),
+                LocalDate.now(),
+                siteUser
+        );
+        return languageTestScoreRepository.save(languageTestScore);
     }
 
     private GpaScoreRequest createGpaScoreRequest() {
