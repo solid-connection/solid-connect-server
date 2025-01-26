@@ -1,7 +1,6 @@
-package com.example.solidconnection.config.token;
+package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.exception.ErrorCode;
