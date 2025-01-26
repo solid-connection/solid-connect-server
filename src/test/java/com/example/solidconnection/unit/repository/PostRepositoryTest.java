@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestContainerDataJpaTest
 @DisplayName("게시글 레포지토리 테스트")
 class PostRepositoryTest {
+
     @Autowired
     private PostRepository postRepository;
+
     @Autowired
     private BoardRepository boardRepository;
+
     @Autowired
     private SiteUserRepository siteUserRepository;
 
@@ -89,7 +91,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다() {
         Post foundPost = postRepository.getByIdUsingEntityGraph(post.getId());
         foundPost.getPostImageList().size(); // 추가쿼리 발생하지 않는다.
@@ -98,7 +99,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글을_조회할_때_게시글_이미지는_즉시_로딩한다_유효한_게시글이_아니라면_예외_응답을_반환한다() {
         // given
         Long invalidId = -1L;
@@ -114,7 +114,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글을_조회한다() {
         Post foundPost = postRepository.getById(post.getId());
 
@@ -122,7 +121,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글을_조회할_때_유효한_게시글이_아니라면_예외_응답을_반환한다() {
         Long invalidId = -1L;
 
@@ -136,7 +134,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글_좋아요를_등록한다() {
         // given
         Long likeCount = post.getLikeCount();
@@ -150,7 +147,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    @Transactional
     void 게시글_좋아요를_삭제한다() {
         // given
         Long likeCount = post.getLikeCount();
