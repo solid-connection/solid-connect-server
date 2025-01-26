@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.util.JwtUtils.parseSubjectOrElseThrow;
+import static com.example.solidconnection.util.JwtUtils.parseSubject;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 
 @Component
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            String subject = parseSubjectOrElseThrow(token, jwtProperties.secret());
+            String subject = parseSubject(token, jwtProperties.secret());
             UserDetails userDetails = new JwtUserDetails(subject);
             Authentication auth = new JwtAuthentication(userDetails, token, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);

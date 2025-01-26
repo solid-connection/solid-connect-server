@@ -12,7 +12,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import java.util.Date;
 
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
-import static com.example.solidconnection.util.JwtUtils.parseSubjectOrElseThrow;
+import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -59,7 +59,7 @@ class JwtUtilsTest {
     }
 
     @Nested
-    class 토큰으로부터_subject_를_추출한다 {
+    class 유효한_토큰으로부터_subject_를_추출한다 {
 
         @Test
         void 유효한_토큰의_subject_를_추출한다() {
@@ -75,13 +75,29 @@ class JwtUtilsTest {
         }
 
         @Test
-        void 유효하지_않은_토큰의_subject_를_추출한다() {
+        void 유효하지_않은_토큰의_subject_를_추출하면_예외_응답을_반환한다() {
             // given
-            String subject = "subject999";
-            String token = createInvalidToken(subject);
+            String subject = "subject123";
+            String token = createExpiredToken(subject);
 
             // when
-            String extractedSubject = parseSubject(token, jwtSecretKey);
+            assertThatCode(() -> parseSubject(token, jwtSecretKey))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.INVALID_TOKEN.getMessage());
+        }
+    }
+
+    @Nested
+    class 만료된_토큰으로부터_subject_를_추출한다 {
+
+        @Test
+        void 만료된_토큰의_subject_를_예외를_발생시키지_않고_추출한다() {
+            // given
+            String subject = "subject999";
+            String token = createExpiredToken(subject);
+
+            // when
+            String extractedSubject = parseSubjectIgnoringExpiration(token, jwtSecretKey);
 
             // then
             assertThat(extractedSubject).isEqualTo(subject);
@@ -90,11 +106,10 @@ class JwtUtilsTest {
         @Test
         void 유효하지_않은_토큰의_subject_를_추출하면_예외_응답을_반환한다() {
             // given
-            String subject = "subject123";
-            String token = createInvalidToken(subject);
+            String token = createExpiredUnsignedToken("hackers secret key");
 
-            // when
-            assertThatCode(() -> parseSubjectOrElseThrow(token, jwtSecretKey))
+            // when & then
+            assertThatCode(() -> parseSubjectIgnoringExpiration(token, jwtSecretKey))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INVALID_TOKEN.getMessage());
         }
@@ -109,9 +124,18 @@ class JwtUtilsTest {
                 .compact();
     }
 
-    private String createInvalidToken(String subject) {
+    private String createExpiredToken(String subject) {
         return Jwts.builder()
                 .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(SignatureAlgorithm.HS256, jwtSecretKey)
+                .compact();
+    }
+
+    private String createExpiredUnsignedToken(String jwtSecretKey) {
+        return Jwts.builder()
+                .setSubject("subject")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() - 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtSecretKey)

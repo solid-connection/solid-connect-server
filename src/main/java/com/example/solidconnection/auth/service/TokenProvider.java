@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
-import static com.example.solidconnection.util.JwtUtils.parseSubjectOrElseThrow;
 
 @RequiredArgsConstructor
 @Component
@@ -35,7 +35,7 @@ public class TokenProvider {
     }
 
     public String saveToken(String token, TokenType tokenType) {
-        String subject = parseSubjectOrElseThrow(token, jwtProperties.secret());
+        String subject = parseSubject(token, jwtProperties.secret());
         redisTemplate.opsForValue().set(
                 tokenType.addPrefixToSubject(subject),
                 token,
@@ -46,6 +46,6 @@ public class TokenProvider {
     }
 
     public String getEmail(String token) {
-        return parseSubject(token, jwtProperties.secret());
+        return parseSubjectIgnoringExpiration(token, jwtProperties.secret());
     }
 }

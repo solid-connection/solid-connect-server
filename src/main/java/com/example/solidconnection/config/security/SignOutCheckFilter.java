@@ -16,7 +16,7 @@ import java.io.IOException;
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.auth.service.AuthService.SIGN_OUT_VALUE;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
-import static com.example.solidconnection.util.JwtUtils.parseSubject;
+import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 
 @Component
@@ -41,7 +41,7 @@ public class SignOutCheckFilter extends OncePerRequestFilter {
     }
 
     private boolean isSignOut(String accessToken) {
-        String subject = parseSubject(accessToken, jwtProperties.secret());
+        String subject = parseSubjectIgnoringExpiration(accessToken, jwtProperties.secret());
         String refreshToken = REFRESH.addPrefixToSubject(subject);
         return SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(refreshToken));
     }
