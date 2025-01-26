@@ -1,5 +1,6 @@
 package com.example.solidconnection.config.security;
 
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,7 +20,7 @@ import java.util.Objects;
 
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
 
@@ -59,11 +60,10 @@ class SignOutCheckFilterTest {
         String refreshTokenKey = REFRESH.addPrefixToSubject(subject);
         redisTemplate.opsForValue().set(refreshTokenKey, "signOut");
 
-        // when
-        signOutCheckFilter.doFilterInternal(request, response, filterChain);
-
-        // then
-        assertThat(response.getStatus()).isEqualTo(USER_ALREADY_SIGN_OUT.getCode());
+        // when & then
+        assertThatCode(() -> signOutCheckFilter.doFilterInternal(request, response, filterChain))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(USER_ALREADY_SIGN_OUT.getMessage());
         then(filterChain).shouldHaveNoMoreInteractions();
     }
 

@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration {
 
     private final CorsProperties corsProperties;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
     private final SignOutCheckFilter signOutCheckFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -45,8 +46,9 @@ public class SecurityConfiguration {
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .addFilterBefore(this.jwtAuthenticationFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(this.signOutCheckFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(signOutCheckFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, SignOutCheckFilter.class)
                 .build();
     }
 }

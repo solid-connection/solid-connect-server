@@ -1,6 +1,5 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.custom.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -27,7 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String REISSUE_METHOD = "post";
 
     private final JwtProperties jwtProperties;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -39,19 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            String subject = parseSubject(token, jwtProperties.secret());
-            UserDetails userDetails = new JwtUserDetails(subject);
-            Authentication auth = new JwtAuthentication(userDetails, token, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            filterChain.doFilter(request, response);
-        } catch (AuthenticationException e) {
-            jwtAuthenticationEntryPoint.commence(request, response, e);
-        } catch (CustomException e) {
-            jwtAuthenticationEntryPoint.customCommence(response, e);
-        } catch (Exception e) {
-            jwtAuthenticationEntryPoint.generalCommence(response, e);
-        }
+        String subject = parseSubject(token, jwtProperties.secret());
+        UserDetails userDetails = new JwtUserDetails(subject);
+        Authentication auth = new JwtAuthentication(userDetails, token, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        filterChain.doFilter(request, response);
     }
 
     private boolean isReissueRequest(HttpServletRequest request) {

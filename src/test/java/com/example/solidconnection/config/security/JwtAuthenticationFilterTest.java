@@ -1,5 +1,6 @@
 package com.example.solidconnection.config.security;
 
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Date;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
 
@@ -89,12 +92,10 @@ class JwtAuthenticationFilterTest {
                     .compact();
             request = createRequestWithToken(token);
 
-            // when
-            jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-            // then
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+            // when & then
+            assertThatCode(() -> jwtAuthenticationFilter.doFilterInternal(request, response, filterChain))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_TOKEN.getMessage());
             then(filterChain).shouldHaveNoMoreInteractions();
         }
 
@@ -109,12 +110,10 @@ class JwtAuthenticationFilterTest {
                     .compact();
             request = createRequestWithToken(token);
 
-            // when
-            jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-            // then
-            assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+            // when & then
+            assertThatCode(() -> jwtAuthenticationFilter.doFilterInternal(request, response, filterChain))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_TOKEN.getMessage());
             then(filterChain).shouldHaveNoMoreInteractions();
         }
     }

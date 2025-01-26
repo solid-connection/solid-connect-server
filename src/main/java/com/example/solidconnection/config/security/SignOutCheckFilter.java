@@ -25,22 +25,19 @@ public class SignOutCheckFilter extends OncePerRequestFilter {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtProperties jwtProperties;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = parseTokenFromRequest(request);
-        if (token == null || !isSignOut(token)) {
-            filterChain.doFilter(request, response);
-            return;
+        if (token != null && hasSignedOut(token)) {
+            throw new CustomException(USER_ALREADY_SIGN_OUT);
         }
-
-        jwtAuthenticationEntryPoint.customCommence(response, new CustomException(USER_ALREADY_SIGN_OUT));
+        filterChain.doFilter(request, response);
     }
 
-    private boolean isSignOut(String accessToken) {
+    private boolean hasSignedOut(String accessToken) {
         String subject = parseSubjectIgnoringExpiration(accessToken, jwtProperties.secret());
         String refreshToken = REFRESH.addPrefixToSubject(subject);
         return SIGN_OUT_VALUE.equals(redisTemplate.opsForValue().get(refreshToken));
