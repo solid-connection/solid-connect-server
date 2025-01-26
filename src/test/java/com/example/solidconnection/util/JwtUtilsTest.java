@@ -115,6 +115,47 @@ class JwtUtilsTest {
         }
     }
 
+
+    @Nested
+    class 토큰이_만료되었는지_확인한다 {
+
+        @Test
+        void 서명된_토큰의_만료_여부를_반환한다() {
+            // given
+            String subject = "subject123";
+            String validToken = createValidToken(subject);
+            String expiredToken = createExpiredToken(subject);
+
+            // when
+            boolean isExpired1 = JwtUtils.isExpired(validToken, jwtSecretKey);
+            boolean isExpired2 = JwtUtils.isExpired(expiredToken, jwtSecretKey);
+
+            // then
+            assertAll(
+                    () -> assertThat(isExpired1).isFalse(),
+                    () -> assertThat(isExpired2).isTrue()
+            );
+        }
+
+        @Test
+        void 서명되지_않은_토큰의_만료_여부를_반환한다() {
+            // given
+            String subject = "subject123";
+            String validToken = createValidToken(subject);
+            String expiredToken = createExpiredToken(subject);
+
+            // when
+            boolean isExpired1 = JwtUtils.isExpired(validToken, "wrong-secret-key");
+            boolean isExpired2 = JwtUtils.isExpired(expiredToken, "wrong-secret-key");
+
+            // then
+            assertAll(
+                    () -> assertThat(isExpired1).isTrue(),
+                    () -> assertThat(isExpired2).isTrue()
+            );
+        }
+    }
+
     private String createValidToken(String subject) {
         return Jwts.builder()
                 .setSubject(subject)

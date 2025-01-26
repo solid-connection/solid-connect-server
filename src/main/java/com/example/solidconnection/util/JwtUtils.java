@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
 
 @Component
@@ -40,6 +42,19 @@ public class JwtUtils {
             return extractSubject(token, secretKey);
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
+        }
+    }
+
+    public static boolean isExpired(String token, String secretKey) {
+        try {
+            Date expiration = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+            return expiration.before(new Date());
+        } catch (Exception e) {
+            return true;
         }
     }
 
