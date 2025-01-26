@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
+import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 
 @RequiredArgsConstructor
 @Component

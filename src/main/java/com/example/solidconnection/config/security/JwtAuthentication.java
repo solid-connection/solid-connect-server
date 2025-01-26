@@ -1,29 +1,30 @@
 package com.example.solidconnection.config.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
+public abstract class JwtAuthentication extends AbstractAuthenticationToken {
 
-public class JwtAuthentication extends AbstractAuthenticationToken {
+    private final String credentials;
 
-    private final String token;
     private final Object principal;
 
-    public JwtAuthentication(Object principal, String token, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
-        this.token = token;
+    public JwtAuthentication(String token, Object principal) {
+        super(null);
+        this.credentials = token;
         this.principal = principal;
-        setAuthenticated(true);
     }
 
     @Override
     public Object getCredentials() {
-        return this.token;
+        return this.credentials;
     }
 
     @Override
     public Object getPrincipal() {
         return this.principal;
+    }
+
+    public final String getToken() {
+        return (String) getCredentials();
     }
 }
