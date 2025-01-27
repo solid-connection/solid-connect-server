@@ -7,12 +7,14 @@ import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.dto.PostCreateRequest;
 import com.example.solidconnection.post.dto.PostCreateResponse;
+import com.example.solidconnection.post.dto.PostDeleteResponse;
 import com.example.solidconnection.post.dto.PostUpdateRequest;
 import com.example.solidconnection.post.dto.PostUpdateResponse;
 import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.repositories.PostImageRepository;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
+import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
@@ -22,6 +24,7 @@ import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
+import com.example.solidconnection.util.RedisUtils;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,6 +57,12 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
     @MockBean
     private S3Service s3Service;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -291,6 +300,91 @@ class PostCommandServiceTest extends BaseIntegrationTest {
                             testPost.getId(),
                             request,
                             imageFiles
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_BOARD_CODE.getMessage());
+        }
+    }
+
+    @Nested
+    class 게시글_삭제_테스트 {
+
+        @Test
+        void 게시글을_성공적으로_삭제한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            Board testBoard = createBoard(BoardCode.FREE);
+            String originImageUrl = "origin-image-url";
+            Post testPost = createPost(testBoard, testUser, originImageUrl);
+            String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
+            redisService.increaseViewCount(viewCountKey);
+
+            // when
+            PostDeleteResponse response = postCommandService.deletePostById(
+                    testUser.getEmail(),
+                    testBoard.getCode(),
+                    testPost.getId()
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(testPost.getId()),
+                    () -> assertThat(postRepository.findById(testPost.getId())).isEmpty(),
+                    () -> assertThat(redisService.isKeyExists(viewCountKey)).isFalse()
+            );
+            then(s3Service).should().deletePostImage(originImageUrl);
+        }
+
+        @Test
+        void 다른_사용자의_게시글을_삭제하면_예외_응답을_반환한다() {
+            // given
+            SiteUser owner = createSiteUser();
+            Board testBoard = createBoard(BoardCode.FREE);
+            Post testPost = createPost(testBoard, owner, "origin-image-url");
+            SiteUser anotherUser = createAnotherSiteUser();
+
+            // when & then
+            assertThatThrownBy(() ->
+                    postCommandService.deletePostById(
+                            anotherUser.getEmail(),
+                            testBoard.getCode(),
+                            testPost.getId()
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_POST_ACCESS.getMessage());
+        }
+
+        @Test
+        void 질문_게시글을_삭제하면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            Board testBoard = createBoard(BoardCode.FREE);
+            Post testPost = createQuestionPost(testBoard, testUser, "origin-image-url");
+
+            // when & then
+            assertThatThrownBy(() ->
+                    postCommandService.deletePostById(
+                            testUser.getEmail(),
+                            testBoard.getCode(),
+                            testPost.getId()
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
+        }
+
+        @Test
+        void 잘못된_게시판_코드로_삭제하면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            Board testBoard = createBoard(BoardCode.FREE);
+            Post testPost = createPost(testBoard, testUser, "origin-image-url");
+
+            // when & then
+            assertThatThrownBy(() ->
+                    postCommandService.deletePostById(
+                            testUser.getEmail(),
+                            "INVALID_CODE",
+                            testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_BOARD_CODE.getMessage());
