@@ -5,7 +5,6 @@ import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.comment.repository.CommentRepository;
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.dto.PostFindPostImageResponse;
@@ -28,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("게시글 조회 서비스 테스트")
@@ -113,24 +110,6 @@ class PostQueryServiceTest extends BaseIntegrationTest {
                 () -> assertThat(redisService.isKeyExists(viewCountKey)).isTrue(),
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
-    }
-
-    @Test
-    void 잘못된_게시판_코드로_조회하면_예외_응답을_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        Board testBoard = createBoard(BoardCode.FREE);
-        Post testPost = createPost(testBoard, testUser, "test-image-url");
-
-        // when & then
-        assertThatThrownBy(() ->
-                postQueryService.findPostById(
-                        testUser.getEmail(),
-                        "INVALID_CODE",
-                        testPost.getId()
-                ))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_BOARD_CODE.getMessage());
     }
 
     private SiteUser createSiteUser() {

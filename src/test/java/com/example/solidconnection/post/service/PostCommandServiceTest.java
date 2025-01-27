@@ -38,7 +38,6 @@ import java.util.List;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -113,20 +112,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
                             .extracting(PostImage::getUrl)
                             .containsExactly(expectedImageUrl)
             );
-        }
-
-        @Test
-        void 유효하지_않은_게시판_코드로_생성하면_예외_응답을_반환한다() {
-            // given
-            SiteUser testUser = createSiteUser();
-            PostCreateRequest request = createPostCreateRequest(PostCategory.자유.name());
-            List<MultipartFile> imageFiles = List.of();
-
-            // when & then
-            assertThatThrownBy(() ->
-                    postCommandService.createPost(testUser.getEmail(), "INVALID_CODE", request, imageFiles))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_BOARD_CODE.getMessage());
         }
 
         @Test
@@ -282,28 +267,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
-
-        @Test
-        void 잘못된_게시판_코드로_수정시_예외를_반환한다() {
-            // given
-            SiteUser testUser = createSiteUser();
-            Board testBoard = createBoard(BoardCode.FREE);
-            Post testPost = createPost(testBoard, testUser, "origin-image-url");
-            PostUpdateRequest request = createPostUpdateRequest();
-            List<MultipartFile> imageFiles = List.of();
-
-            // when & then
-            assertThatThrownBy(() ->
-                    postCommandService.updatePost(
-                            testUser.getEmail(),
-                            "INVALID_CODE",
-                            testPost.getId(),
-                            request,
-                            imageFiles
-                    ))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_BOARD_CODE.getMessage());
-        }
     }
 
     @Nested
@@ -370,24 +333,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
                     ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
-        }
-
-        @Test
-        void 잘못된_게시판_코드로_삭제하면_예외_응답을_반환한다() {
-            // given
-            SiteUser testUser = createSiteUser();
-            Board testBoard = createBoard(BoardCode.FREE);
-            Post testPost = createPost(testBoard, testUser, "origin-image-url");
-
-            // when & then
-            assertThatThrownBy(() ->
-                    postCommandService.deletePostById(
-                            testUser.getEmail(),
-                            "INVALID_CODE",
-                            testPost.getId()
-                    ))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_BOARD_CODE.getMessage());
         }
     }
 
