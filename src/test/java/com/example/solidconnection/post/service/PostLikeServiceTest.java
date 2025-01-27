@@ -123,7 +123,7 @@ class PostLikeServiceTest extends BaseIntegrationTest {
         }
 
         @Test
-        void 좋아요하지_않은_게시글을_좋아요_취소하면_예외를_반환한다() {
+        void 좋아요하지_않은_게시글을_좋아요_취소하면_예외_응답을_반환한다() {
             // given
             SiteUser testUser = createSiteUser();
             Board testBoard = createBoard(BoardCode.FREE);
