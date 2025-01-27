@@ -46,11 +46,11 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.then;
 
-@DisplayName("게시글 서비스 테스트")
-class PostServiceTest extends BaseIntegrationTest {
+@DisplayName("게시글 생성/수정/삭제 서비스 테스트")
+class PostCommandServiceTest extends BaseIntegrationTest {
 
     @Autowired
-    private PostService postService;
+    private PostCommandService postCommandService;
 
     @MockBean
     private S3Service s3Service;
@@ -83,7 +83,7 @@ class PostServiceTest extends BaseIntegrationTest {
                     .willReturn(List.of(new UploadedFileUrlResponse(expectedImageUrl)));
 
             // when
-            PostCreateResponse response = postService.createPost(
+            PostCreateResponse response = postCommandService.createPost(
                     testUser.getEmail(),
                     testBoard.getCode(),
                     request,
@@ -115,7 +115,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.createPost(testUser.getEmail(), "INVALID_CODE", request, imageFiles))
+                    postCommandService.createPost(testUser.getEmail(), "INVALID_CODE", request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_BOARD_CODE.getMessage());
         }
@@ -130,7 +130,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
+                    postCommandService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -145,7 +145,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
+                    postCommandService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -160,7 +160,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
+                    postCommandService.createPost(testUser.getEmail(), testBoard.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -185,7 +185,7 @@ class PostServiceTest extends BaseIntegrationTest {
                     .willReturn(List.of(new UploadedFileUrlResponse(expectedImageUrl)));
 
             // when
-            PostUpdateResponse response = postService.updatePost(
+            PostUpdateResponse response = postCommandService.updatePost(
                     testUser.getEmail(),
                     testBoard.getCode(),
                     testPost.getId(),
@@ -219,7 +219,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.updatePost(
+                    postCommandService.updatePost(
                             anotherUser.getEmail(),
                             testBoard.getCode(),
                             testPost.getId(),
@@ -241,7 +241,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.updatePost(
+                    postCommandService.updatePost(
                             testUser.getEmail(),
                             testBoard.getCode(),
                             testPost.getId(),
@@ -263,7 +263,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.updatePost(
+                    postCommandService.updatePost(
                             testUser.getEmail(),
                             testBoard.getCode(),
                             testPost.getId(),
@@ -285,7 +285,7 @@ class PostServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postService.updatePost(
+                    postCommandService.updatePost(
                             testUser.getEmail(),
                             "INVALID_CODE",
                             testPost.getId(),

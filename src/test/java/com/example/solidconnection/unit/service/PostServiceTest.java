@@ -14,7 +14,9 @@ import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.dto.*;
 import com.example.solidconnection.post.repository.PostRepository;
-import com.example.solidconnection.post.service.PostService;
+import com.example.solidconnection.post.service.PostCommandService;
+import com.example.solidconnection.post.service.PostLikeService;
+import com.example.solidconnection.post.service.PostQueryService;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
@@ -33,21 +35,41 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.*;
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ID;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_LIKE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("게시글 서비스 테스트")
 class PostServiceTest {
+
     @InjectMocks
-    PostService postService;
+    PostQueryService postQueryService;
+
+    @InjectMocks
+    PostCommandService postCommandService;
+
+    @InjectMocks
+    PostLikeService postLikeService;
+
     @Mock
     PostRepository postRepository;
     @Mock
@@ -74,7 +96,6 @@ class PostServiceTest {
     private List<MultipartFile> imageFiles;
     private List<MultipartFile> imageFilesWithMoreThanFiveFiles;
     private List<UploadedFileUrlResponse> uploadedFileUrlResponseList;
-
 
     @BeforeEach
     void setUp() {
@@ -206,7 +227,7 @@ class PostServiceTest {
         when(postRepository.save(any(Post.class))).thenReturn(postWithImages);
 
         // When
-        PostCreateResponse postCreateResponse = postService.createPost(
+        PostCreateResponse postCreateResponse = postCommandService.createPost(
                 siteUser.getEmail(), board.getCode(), postCreateRequest, imageFiles);
 
         // Then
@@ -227,7 +248,7 @@ class PostServiceTest {
         when(postRepository.save(postCreateRequest.toEntity(siteUser, board))).thenReturn(post);
 
         // When
-        PostCreateResponse postCreateResponse = postService.createPost(
+        PostCreateResponse postCreateResponse = postCommandService.createPost(
                 siteUser.getEmail(), board.getCode(), postCreateRequest, Collections.emptyList());
 
         // Then
@@ -245,7 +266,7 @@ class PostServiceTest {
                 "자유", "title", "content", false);
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> postService
+        CustomException exception = assertThrows(CustomException.class, () -> postCommandService
                 .createPost(siteUser.getEmail(), invalidBoardCode, postCreateRequest, Collections.emptyList()));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_BOARD_CODE.getMessage());
@@ -261,7 +282,7 @@ class PostServiceTest {
                 invalidPostCategory, "title", "content", false);
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> postService
+        CustomException exception = assertThrows(CustomException.class, () -> postCommandService
                 .createPost(siteUser.getEmail(), board.getCode(), postCreateRequest, Collections.emptyList()));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_CATEGORY.getMessage());
@@ -276,7 +297,7 @@ class PostServiceTest {
                 "자유", "title", "content", false);
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> postService
+        CustomException exception = assertThrows(CustomException.class, () -> postCommandService
                 .createPost(siteUser.getEmail(), board.getCode(), postCreateRequest, imageFilesWithMoreThanFiveFiles));
         assertThat(exception.getMessage())
                 .isEqualTo(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
@@ -294,7 +315,7 @@ class PostServiceTest {
         when(postRepository.getById(post.getId())).thenReturn(post);
 
         // When
-        PostUpdateResponse response = postService.updatePost(
+        PostUpdateResponse response = postCommandService.updatePost(
                 siteUser.getEmail(), board.getCode(), post.getId(), postUpdateRequest, Collections.emptyList());
 
         // Then
@@ -311,7 +332,7 @@ class PostServiceTest {
         when(postRepository.getById(postWithImages.getId())).thenReturn(postWithImages);
 
         // When
-        PostUpdateResponse response = postService.updatePost(
+        PostUpdateResponse response = postCommandService.updatePost(
                 siteUser.getEmail(), board.getCode(), postWithImages.getId(), postUpdateRequest, Collections.emptyList());
 
         // Then
@@ -329,7 +350,7 @@ class PostServiceTest {
         when(s3Service.uploadFiles(imageFiles, ImgType.COMMUNITY)).thenReturn(uploadedFileUrlResponseList);
 
         // When
-        PostUpdateResponse response = postService.updatePost(
+        PostUpdateResponse response = postCommandService.updatePost(
                 siteUser.getEmail(), board.getCode(), post.getId(), postUpdateRequest, imageFiles);
 
         // Then
@@ -347,7 +368,7 @@ class PostServiceTest {
         when(s3Service.uploadFiles(imageFiles, ImgType.COMMUNITY)).thenReturn(uploadedFileUrlResponseList);
 
         // When
-        PostUpdateResponse response = postService.updatePost(
+        PostUpdateResponse response = postCommandService.updatePost(
                 siteUser.getEmail(), board.getCode(), postWithImages.getId(), postUpdateRequest, imageFiles);
 
         // Then
@@ -365,11 +386,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.updatePost(siteUser.getEmail(), invalidBoardCode, post.getId(), postUpdateRequest, imageFiles));
+                postCommandService.updatePost(siteUser.getEmail(), invalidBoardCode, post.getId(), postUpdateRequest, imageFiles));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_BOARD_CODE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_BOARD_CODE.getCode());
     }
 
     @Test
@@ -381,7 +402,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.updatePost(siteUser.getEmail(), board.getCode(), invalidPostId, postUpdateRequest, imageFiles));
+                postCommandService.updatePost(siteUser.getEmail(), board.getCode(), invalidPostId, postUpdateRequest, imageFiles));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
@@ -397,7 +418,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.updatePost(invalidEmail, board.getCode(), post.getId(), postUpdateRequest, imageFiles));
+                postCommandService.updatePost(invalidEmail, board.getCode(), post.getId(), postUpdateRequest, imageFiles));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ACCESS.getMessage());
         assertThat(exception.getCode())
@@ -412,13 +433,12 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.updatePost(siteUser.getEmail(), board.getCode(), questionPost.getId(), postUpdateRequest, imageFiles));
+                postCommandService.updatePost(siteUser.getEmail(), board.getCode(), questionPost.getId(), postUpdateRequest, imageFiles));
         assertThat(exception.getMessage())
                 .isEqualTo(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
         assertThat(exception.getCode())
                 .isEqualTo(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getCode());
     }
-
 
     @Test
     void 게시글을_수정할_때_파일_수가_5개를_넘는다면_예외_응답을_반환한다() {
@@ -428,7 +448,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.updatePost(siteUser.getEmail(), board.getCode(), post.getId(), postUpdateRequest, imageFilesWithMoreThanFiveFiles));
+                postCommandService.updatePost(siteUser.getEmail(), board.getCode(), post.getId(), postUpdateRequest, imageFilesWithMoreThanFiveFiles));
         assertThat(exception.getMessage())
                 .isEqualTo(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         assertThat(exception.getCode())
@@ -448,7 +468,7 @@ class PostServiceTest {
         when(commentService.findCommentsByPostId(siteUser.getEmail(), post.getId())).thenReturn(commentFindResultDTOList);
 
         // When
-        PostFindResponse response = postService.findPostById(siteUser.getEmail(), board.getCode(), post.getId());
+        PostFindResponse response = postQueryService.findPostById(siteUser.getEmail(), board.getCode(), post.getId());
 
         // Then
         PostFindResponse expectedResponse = PostFindResponse.from(
@@ -474,11 +494,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.findPostById(siteUser.getEmail(), invalidBoardCode, post.getId()));
+                postQueryService.findPostById(siteUser.getEmail(), invalidBoardCode, post.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_BOARD_CODE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_BOARD_CODE.getCode());
     }
 
     @Test
@@ -489,7 +509,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.findPostById(siteUser.getEmail(), board.getCode(), invalidPostId));
+                postQueryService.findPostById(siteUser.getEmail(), board.getCode(), invalidPostId));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
@@ -505,7 +525,7 @@ class PostServiceTest {
         when(postRepository.getById(post.getId())).thenReturn(post);
 
         // When
-        PostDeleteResponse postDeleteResponse = postService.deletePostById(siteUser.getEmail(), board.getCode(), post.getId());
+        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(siteUser.getEmail(), board.getCode(), post.getId());
 
         // Then
         assertEquals(postDeleteResponse.id(), post.getId());
@@ -521,11 +541,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.deletePostById(siteUser.getEmail(), invalidBoardCode, post.getId()));
+                postCommandService.deletePostById(siteUser.getEmail(), invalidBoardCode, post.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_BOARD_CODE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_BOARD_CODE.getCode());
     }
 
     @Test
@@ -536,11 +556,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.deletePostById(siteUser.getEmail(), board.getCode(), invalidPostId));
+                postCommandService.deletePostById(siteUser.getEmail(), board.getCode(), invalidPostId));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_POST_ID.getMessage());
+                .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_POST_ID.getCode());
+                .isEqualTo(INVALID_POST_ID.getCode());
     }
 
     @Test
@@ -551,7 +571,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.deletePostById(invalidEmail, board.getCode(), post.getId())
+                postCommandService.deletePostById(invalidEmail, board.getCode(), post.getId())
         );
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ACCESS.getMessage());
@@ -565,11 +585,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.deletePostById(siteUser.getEmail(), board.getCode(), questionPost.getId()));
+                postCommandService.deletePostById(siteUser.getEmail(), board.getCode(), questionPost.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
+                .isEqualTo(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION.getCode());
+                .isEqualTo(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getCode());
     }
 
     /**
@@ -582,7 +602,7 @@ class PostServiceTest {
         when(siteUserRepository.getByEmail(siteUser.getEmail())).thenReturn(siteUser);
 
         // When
-        PostLikeResponse postLikeResponse = postService.likePost(siteUser.getEmail(), board.getCode(), post.getId());
+        PostLikeResponse postLikeResponse = postLikeService.likePost(siteUser.getEmail(), board.getCode(), post.getId());
 
         // Then
         assertEquals(postLikeResponse, PostLikeResponse.from(post));
@@ -597,7 +617,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.likePost(siteUser.getEmail(), board.getCode(), post.getId()));
+                postLikeService.likePost(siteUser.getEmail(), board.getCode(), post.getId()));
         assertThat(exception.getMessage())
                 .isEqualTo(ErrorCode.DUPLICATE_POST_LIKE.getMessage());
         assertThat(exception.getCode())
@@ -611,11 +631,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.likePost(siteUser.getEmail(), invalidBoardCode, post.getId()));
+                postLikeService.likePost(siteUser.getEmail(), invalidBoardCode, post.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_BOARD_CODE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_BOARD_CODE.getCode());
     }
 
     @Test
@@ -626,7 +646,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.likePost(siteUser.getEmail(), board.getCode(), invalidPostId));
+                postLikeService.likePost(siteUser.getEmail(), board.getCode(), invalidPostId));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())
@@ -642,7 +662,7 @@ class PostServiceTest {
         when(postLikeRepository.getByPostAndSiteUser(post, siteUser)).thenReturn(postLike);
 
         // When
-        PostDislikeResponse postDislikeResponse = postService.dislikePost(siteUser.getEmail(), board.getCode(), post.getId());
+        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(siteUser.getEmail(), board.getCode(), post.getId());
 
         // Then
         assertEquals(postDislikeResponse, PostDislikeResponse.from(post));
@@ -657,11 +677,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.dislikePost(siteUser.getEmail(), board.getCode(), post.getId()));
+                postLikeService.dislikePost(siteUser.getEmail(), board.getCode(), post.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_POST_LIKE.getMessage());
+                .isEqualTo(INVALID_POST_LIKE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_POST_LIKE.getCode());
+                .isEqualTo(INVALID_POST_LIKE.getCode());
     }
 
     @Test
@@ -671,11 +691,11 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.dislikePost(siteUser.getEmail(), invalidBoardCode, post.getId()));
+                postLikeService.dislikePost(siteUser.getEmail(), invalidBoardCode, post.getId()));
         assertThat(exception.getMessage())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getMessage());
+                .isEqualTo(INVALID_BOARD_CODE.getMessage());
         assertThat(exception.getCode())
-                .isEqualTo(ErrorCode.INVALID_BOARD_CODE.getCode());
+                .isEqualTo(INVALID_BOARD_CODE.getCode());
     }
 
     @Test
@@ -686,7 +706,7 @@ class PostServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () ->
-                postService.dislikePost(siteUser.getEmail(), board.getCode(), invalidPostId));
+                postLikeService.dislikePost(siteUser.getEmail(), board.getCode(), invalidPostId));
         assertThat(exception.getMessage())
                 .isEqualTo(INVALID_POST_ID.getMessage());
         assertThat(exception.getCode())

@@ -4,7 +4,8 @@ import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.repository.PostRepository;
-import com.example.solidconnection.post.service.PostService;
+import com.example.solidconnection.post.service.PostCommandService;
+import com.example.solidconnection.post.service.PostLikeService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PostLikeCountConcurrencyTest {
 
     @Autowired
-    private PostService postService;
+    private PostLikeService postLikeService;
     @Autowired
     private PostRepository postRepository;
     @Autowired
@@ -118,8 +119,8 @@ class PostLikeCountConcurrencyTest {
             String email = "email" + i;
             executorService.submit(() -> {
                 try {
-                    postService.likePost(email, board.getCode(), post.getId());
-                    postService.dislikePost(email, board.getCode(), post.getId());
+                    postLikeService.likePost(email, board.getCode(), post.getId());
+                    postLikeService.dislikePost(email, board.getCode(), post.getId());
                 } finally {
                     doneSignal.countDown();
                 }
@@ -135,5 +136,4 @@ class PostLikeCountConcurrencyTest {
 
         assertEquals(likeCount, postRepository.getById(post.getId()).getLikeCount());
     }
-
 }
