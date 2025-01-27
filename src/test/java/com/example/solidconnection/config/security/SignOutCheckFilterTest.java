@@ -18,7 +18,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.util.Date;
 import java.util.Objects;
 
-import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.then;
@@ -56,8 +56,9 @@ class SignOutCheckFilterTest {
     @Test
     void 로그아웃한_토큰이면_예외를_응답한다() throws Exception {
         // given
-        request = createTokenRequest(subject);
-        String refreshTokenKey = REFRESH.addPrefixToSubject(subject);
+        String token = createToken(subject);
+        request = createRequest(token);
+        String refreshTokenKey = BLACKLIST.addPrefixToSubject(token);
         redisTemplate.opsForValue().set(refreshTokenKey, "signOut");
 
         // when & then
@@ -82,7 +83,8 @@ class SignOutCheckFilterTest {
     @Test
     void 로그아웃하지_않은_토큰이면_다음_필터로_전달한다() throws Exception {
         // given
-        request = createTokenRequest(subject);
+        String token = createToken(subject);
+        request = createRequest(token);
 
         // when
         signOutCheckFilter.doFilterInternal(request, response, filterChain);
@@ -91,14 +93,16 @@ class SignOutCheckFilterTest {
         then(filterChain).should().doFilter(request, response);
     }
 
-    private HttpServletRequest createTokenRequest(String subject) {
-        String token = Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
-                .compact();
+    private String createToken(String subject) {
+            return Jwts.builder()
+                    .setSubject(subject)
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + 1000))
+                    .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                    .compact();
+    }
 
+    private HttpServletRequest createRequest(String token) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
         return request;
