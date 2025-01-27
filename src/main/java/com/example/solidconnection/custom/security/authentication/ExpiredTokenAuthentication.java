@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.authentication;
 
 public class ExpiredTokenAuthentication extends JwtAuthentication {
 

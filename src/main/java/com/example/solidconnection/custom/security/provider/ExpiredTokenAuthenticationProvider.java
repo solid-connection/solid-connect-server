@@ -1,6 +1,9 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.provider;
 
 
+import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
+import com.example.solidconnection.custom.security.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;

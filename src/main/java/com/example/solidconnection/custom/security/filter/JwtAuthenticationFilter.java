@@ -1,5 +1,9 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.filter;
 
+import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
+import com.example.solidconnection.custom.security.authentication.JwtAuthentication;
+import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,11 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.provider;
 
 
+import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
+import com.example.solidconnection.custom.security.userdetails.SiteUserDetailsService;
+import com.example.solidconnection.custom.security.authentication.JwtAuthentication;
+import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;

@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.authentication;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
