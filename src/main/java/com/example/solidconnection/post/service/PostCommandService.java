@@ -2,7 +2,6 @@ package com.example.solidconnection.post.service;
 
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
-import com.example.solidconnection.comment.service.CommentService;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.post.domain.Post;
@@ -11,7 +10,6 @@ import com.example.solidconnection.post.dto.PostCreateResponse;
 import com.example.solidconnection.post.dto.PostDeleteResponse;
 import com.example.solidconnection.post.dto.PostUpdateRequest;
 import com.example.solidconnection.post.dto.PostUpdateResponse;
-import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
