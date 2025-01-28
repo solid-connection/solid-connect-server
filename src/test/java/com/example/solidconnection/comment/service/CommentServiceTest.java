@@ -4,6 +4,7 @@ import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.comment.dto.CommentCreateRequest;
 import com.example.solidconnection.comment.dto.CommentCreateResponse;
+import com.example.solidconnection.comment.dto.CommentDeleteResponse;
 import com.example.solidconnection.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
@@ -14,6 +15,7 @@ import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.PostCategory;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -256,6 +258,137 @@ class CommentServiceTest extends BaseIntegrationTest {
                     ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPDATE_DEPRECATED_COMMENT.getMessage());
+        }
+    }
+
+    @Nested
+    class 댓글_삭제_테스트 {
+
+        @Test
+        @Transactional
+        void 대댓글이_없는_댓글을_삭제한다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment comment = createComment(testPost, 테스트유저_1, "테스트 댓글");
+            List<Comment> comments = testPost.getCommentList();
+            int expectedCommentsCount = comments.size() - 1;
+
+            // when
+            CommentDeleteResponse response = commentService.deleteCommentById(
+                    테스트유저_1.getEmail(),
+                    testPost.getId(),
+                    comment.getId()
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(comment.getId()),
+                    () -> assertThat(commentRepository.findById(comment.getId())).isEmpty(),
+                    () -> assertThat(testPost.getCommentList()).hasSize(expectedCommentsCount)
+            );
+        }
+
+        @Test
+        @Transactional
+        void 대댓글이_있는_댓글을_삭제하면_내용만_삭제된다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment parentComment = createComment(testPost, 테스트유저_1, "부모 댓글");
+            Comment childComment = createChildComment(testPost, 테스트유저_2, parentComment, "자식 댓글");
+            List<Comment> comments = testPost.getCommentList();
+            List<Comment> childComments = parentComment.getCommentList();
+
+            // when
+            CommentDeleteResponse response = commentService.deleteCommentById(
+                    테스트유저_1.getEmail(),
+                    testPost.getId(),
+                    parentComment.getId()
+            );
+
+            // then
+            Comment deletedComment = commentRepository.findById(response.id()).orElseThrow();
+            assertAll(
+                    () -> assertThat(deletedComment.getContent()).isNull(),
+                    () -> assertThat(deletedComment.getCommentList())
+                            .extracting(Comment::getId)
+                            .containsExactlyInAnyOrder(childComment.getId()),
+                    () -> assertThat(testPost.getCommentList()).hasSize(comments.size()),
+                    () -> assertThat(deletedComment.getCommentList()).hasSize(childComments.size())
+            );
+        }
+
+        @Test
+        @Transactional
+        void 대댓글을_삭제하면_부모댓글이_삭제되지_않는다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment parentComment = createComment(testPost, 테스트유저_1, "부모 댓글");
+            Comment childComment1 = createChildComment(testPost, 테스트유저_2, parentComment, "자식 댓글 1");
+            Comment childComment2 = createChildComment(testPost, 테스트유저_2, parentComment, "자식 댓글 2");
+            List<Comment> childComments = parentComment.getCommentList();
+            int expectedChildCommentsCount = childComments.size() - 1;
+
+            // when
+            CommentDeleteResponse response = commentService.deleteCommentById(
+                    테스트유저_2.getEmail(),
+                    testPost.getId(),
+                    childComment1.getId()
+            );
+
+            // then
+            Comment remainingParentComment = commentRepository.findById(parentComment.getId()).orElseThrow();
+            List<Comment> remainingChildComments = remainingParentComment.getCommentList();
+            assertAll(
+                    () -> assertThat(commentRepository.findById(response.id())).isEmpty(),
+                    () -> assertThat(remainingParentComment.getContent()).isEqualTo(parentComment.getContent()),
+                    () -> assertThat(remainingChildComments).hasSize(expectedChildCommentsCount),
+                    () -> assertThat(remainingChildComments)
+                            .extracting(Comment::getId)
+                            .containsExactly(childComment2.getId())
+            );
+        }
+
+        @Test
+        @Transactional
+        void 대댓글을_삭제하고_부모댓글이_삭제된_상태면_부모댓글도_삭제된다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment parentComment = createComment(testPost, 테스트유저_1, "부모 댓글");
+            Comment childComment = createChildComment(testPost, 테스트유저_2, parentComment, "자식 댓글");
+            List<Comment> comments = testPost.getCommentList();
+            int expectedCommentsCount = comments.size() - 2;
+            parentComment.deprecateComment();
+
+            // when
+            CommentDeleteResponse response = commentService.deleteCommentById(
+                    테스트유저_2.getEmail(),
+                    testPost.getId(),
+                    childComment.getId()
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(commentRepository.findById(response.id())).isEmpty(),
+                    () -> assertThat(commentRepository.findById(parentComment.getId())).isEmpty(),
+                    () -> assertThat(testPost.getCommentList()).hasSize(expectedCommentsCount)
+            );
+        }
+
+        @Test
+        void 다른_사용자의_댓글을_삭제하면_예외_응답을_반환한다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment comment = createComment(testPost, 테스트유저_1, "테스트 댓글");
+
+            // when & then
+            assertThatThrownBy(() ->
+                    commentService.deleteCommentById(
+                            테스트유저_2.getEmail(),
+                            testPost.getId(),
+                            comment.getId()
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_POST_ACCESS.getMessage());
         }
     }
 
