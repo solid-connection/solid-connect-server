@@ -168,7 +168,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
         GpaScore gpaScore = new GpaScore(
-                new Gpa(gpa, gpaCriteria, "https://example.com/gpa-report.pdf"),
+                new Gpa(gpa, gpaCriteria, "/gpa-report.pdf"),
                 siteUser,
                 LocalDate.now()
         );
@@ -177,7 +177,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     private LanguageTestScore createLanguageTestScore(SiteUser siteUser, LanguageTestType languageTestType, String score) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(languageTestType, score, "https://example.com/gpa-report.pdf"),
+                new LanguageTest(languageTestType, score, "/gpa-report.pdf"),
                 LocalDate.now(),
                 siteUser
         );
@@ -189,7 +189,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 3.5,
                 4.5,
                 LocalDate.now(),
-                "https://example.com/gpa-report.pdf"
+                "/gpa-report.pdf"
         );
     }
 
@@ -198,7 +198,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 LanguageTestType.TOEFL_IBT,
                 "100",
                 LocalDate.now(),
-                "https://example.com/gpa-report.pdf"
+                "/gpa-report.pdf"
         );
     }
 }
