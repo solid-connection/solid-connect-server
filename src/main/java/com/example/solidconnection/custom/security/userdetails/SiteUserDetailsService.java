@@ -21,8 +21,8 @@ public class SiteUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         long siteUserId = getSiteUserId(username);
-        SiteUser siteUser = siteUserRepository.findById(siteUserId)
-                .orElseThrow(() -> new CustomException(AUTHENTICATION_FAILED, "인증 정보에 해당하는 사용자를 찾을 수 없습니다."));
+        SiteUser siteUser = getSiteUser(siteUserId);
+        validateNotQuit(siteUser);
 
         return new SiteUserDetails(siteUser);
     }
@@ -32,6 +32,17 @@ public class SiteUserDetailsService implements UserDetailsService {
             return Long.parseLong(username);
         } catch (NumberFormatException e) {
             throw new CustomException(INVALID_TOKEN, "인증 정보가 지정된 형식과 일치하지 않습니다.");
+        }
+    }
+
+    private SiteUser getSiteUser(long siteUserId) {
+        return siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(AUTHENTICATION_FAILED, "인증 정보에 해당하는 사용자를 찾을 수 없습니다."));
+    }
+
+    private void validateNotQuit(SiteUser siteUser) {
+        if (siteUser.getQuitedAt() != null) {
+            throw new CustomException(AUTHENTICATION_FAILED, "탈퇴한 사용자입니다.");
         }
     }
 }
