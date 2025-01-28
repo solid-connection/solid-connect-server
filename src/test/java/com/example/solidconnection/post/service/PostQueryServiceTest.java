@@ -1,7 +1,6 @@
 package com.example.solidconnection.post.service;
 
 import com.example.solidconnection.board.domain.Board;
-import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.comment.repository.CommentRepository;
@@ -13,13 +12,8 @@ import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.repositories.PostImageRepository;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.BoardCode;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,12 +37,6 @@ class PostQueryServiceTest extends BaseIntegrationTest {
     private RedisUtils redisUtils;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
-    private BoardRepository boardRepository;
-
-    @Autowired
     private PostRepository postRepository;
 
     @Autowired
@@ -60,20 +48,18 @@ class PostQueryServiceTest extends BaseIntegrationTest {
     @Test
     void 게시글을_성공적으로_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
-        Board testBoard = createBoard(BoardCode.FREE);
         String expectedImageUrl = "test-image-url";
         List<String> imageUrls = List.of(expectedImageUrl);
-        Post testPost = createPost(testBoard, testUser, expectedImageUrl);
-        List<Comment> comments = createComments(testPost, testUser, List.of("첫번째 댓글", "두번째 댓글"));
+        Post testPost = createPost(자유게시판, 테스트유저_1, expectedImageUrl);
+        List<Comment> comments = createComments(testPost, 테스트유저_1, List.of("첫번째 댓글", "두번째 댓글"));
 
-        String validateKey = redisUtils.getValidatePostViewCountRedisKey(testUser.getEmail(), testPost.getId());
+        String validateKey = redisUtils.getValidatePostViewCountRedisKey(테스트유저_1.getEmail(), testPost.getId());
         String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
 
         // when
         PostFindResponse response = postQueryService.findPostById(
-                testUser.getEmail(),
-                testBoard.getCode(),
+                테스트유저_1.getEmail(),
+                자유게시판.getCode(),
                 testPost.getId()
         );
 
@@ -87,12 +73,12 @@ class PostQueryServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.viewCount()).isEqualTo(testPost.getViewCount()),
                 () -> assertThat(response.postCategory()).isEqualTo(String.valueOf(testPost.getCategory())),
 
-                () -> assertThat(response.postFindBoardResponse().code()).isEqualTo(testBoard.getCode()),
-                () -> assertThat(response.postFindBoardResponse().koreanName()).isEqualTo(testBoard.getKoreanName()),
+                () -> assertThat(response.postFindBoardResponse().code()).isEqualTo(자유게시판.getCode()),
+                () -> assertThat(response.postFindBoardResponse().koreanName()).isEqualTo(자유게시판.getKoreanName()),
 
-                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(testUser.getId()),
-                () -> assertThat(response.postFindSiteUserResponse().nickname()).isEqualTo(testUser.getNickname()),
-                () -> assertThat(response.postFindSiteUserResponse().profileImageUrl()).isEqualTo(testUser.getProfileImageUrl()),
+                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(테스트유저_1.getId()),
+                () -> assertThat(response.postFindSiteUserResponse().nickname()).isEqualTo(테스트유저_1.getNickname()),
+                () -> assertThat(response.postFindSiteUserResponse().profileImageUrl()).isEqualTo(테스트유저_1.getProfileImageUrl()),
 
                 () -> assertThat(response.postFindPostImageResponses())
                         .hasSize(imageUrls.size())
@@ -110,24 +96,6 @@ class PostQueryServiceTest extends BaseIntegrationTest {
                 () -> assertThat(redisService.isKeyExists(viewCountKey)).isTrue(),
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                "1999-01-01",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
-        );
-        return siteUserRepository.save(siteUser);
-    }
-
-    private Board createBoard(BoardCode boardCode) {
-        Board board = new Board(boardCode.name(), "자유게시판");
-        return boardRepository.save(board);
     }
 
     private Post createPost(Board board, SiteUser siteUser, String originImageUrl) {
