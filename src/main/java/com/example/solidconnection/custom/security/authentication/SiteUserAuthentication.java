@@ -1,6 +1,5 @@
 package com.example.solidconnection.custom.security.authentication;
 
-
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
 
 public class SiteUserAuthentication extends JwtAuthentication {

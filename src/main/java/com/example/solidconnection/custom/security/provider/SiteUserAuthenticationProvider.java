@@ -1,6 +1,5 @@
 package com.example.solidconnection.custom.security.provider;
 
-
 import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetailsService;
