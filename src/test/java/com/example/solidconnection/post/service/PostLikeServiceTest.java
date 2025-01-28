@@ -48,9 +48,9 @@ class PostLikeServiceTest extends BaseIntegrationTest {
                     자유게시판.getCode(),
                     testPost.getId()
             );
-            Post likedPost = postRepository.findById(testPost.getId()).orElseThrow();
 
             // then
+            Post likedPost = postRepository.findById(testPost.getId()).orElseThrow();
             assertAll(
                     () -> assertThat(response.likeCount()).isEqualTo(beforeLikeCount + 1),
                     () -> assertThat(response.isLiked()).isTrue(),
@@ -93,9 +93,9 @@ class PostLikeServiceTest extends BaseIntegrationTest {
                     자유게시판.getCode(),
                     testPost.getId()
             );
-            Post unlikedPost = postRepository.findById(testPost.getId()).orElseThrow();
 
             // then
+            Post unlikedPost = postRepository.findById(testPost.getId()).orElseThrow();
             assertAll(
                     () -> assertThat(response.likeCount()).isEqualTo(beforeLikeCount - 1),
                     () -> assertThat(response.isLiked()).isFalse(),

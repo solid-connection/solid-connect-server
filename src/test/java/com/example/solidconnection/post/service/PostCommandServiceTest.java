@@ -83,9 +83,9 @@ class PostCommandServiceTest extends BaseIntegrationTest {
                     request,
                     imageFiles
             );
-            Post savedPost = postRepository.findById(response.id()).orElseThrow();
 
             // then
+            Post savedPost = postRepository.findById(response.id()).orElseThrow();
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(savedPost.getId()),
                     () -> assertThat(savedPost.getTitle()).isEqualTo(request.title()),
