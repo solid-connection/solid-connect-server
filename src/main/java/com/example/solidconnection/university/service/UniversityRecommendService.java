@@ -23,7 +23,7 @@ public class UniversityRecommendService {
     public static final int RECOMMEND_UNIVERSITY_NUM = 6;
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final GeneralRecommendUniversities generalRecommendUniversities;
+    private final GeneralUniversityRecommendService generalUniversityRecommendService;
     private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
@@ -56,7 +56,7 @@ public class UniversityRecommendService {
     }
 
     private List<UniversityInfoForApply> getGeneralRecommendsExcludingSelected(List<UniversityInfoForApply> alreadyPicked) {
-        List<UniversityInfoForApply> generalRecommend = new ArrayList<>(generalRecommendUniversities.getRecommendUniversities());
+        List<UniversityInfoForApply> generalRecommend = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
         generalRecommend.removeAll(alreadyPicked);
         Collections.shuffle(generalRecommend);
         return generalRecommend.subList(0, RECOMMEND_UNIVERSITY_NUM - alreadyPicked.size());
@@ -68,7 +68,7 @@ public class UniversityRecommendService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityRecommendsResponse getGeneralRecommends() {
-        List<UniversityInfoForApply> generalRecommends = new ArrayList<>(generalRecommendUniversities.getRecommendUniversities());
+        List<UniversityInfoForApply> generalRecommends = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
         return new UniversityRecommendsResponse(generalRecommends.stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());

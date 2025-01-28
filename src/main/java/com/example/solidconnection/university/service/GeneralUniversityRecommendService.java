@@ -15,7 +15,7 @@ import static com.example.solidconnection.university.service.UniversityRecommend
 
 @Service
 @RequiredArgsConstructor
-public class GeneralRecommendUniversities {
+public class GeneralUniversityRecommendService {
 
     /*
      * 해당 시기에 열리는 대학교들 중 랜덤으로 선택해서 목록을 구성한다.

@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("공통 추천 대학 서비스 테스트")
 @TestContainerSpringBootTest
-class GeneralRecommendUniversitiesTest extends BaseIntegrationTest {
+class GeneralUniversityRecommendServiceTest extends BaseIntegrationTest {
 
     @Autowired
-    private GeneralRecommendUniversities generalRecommendUniversities;
+    private GeneralUniversityRecommendService generalUniversityRecommendService;
 
     @Value("${university.term}")
     private String term;
@@ -27,8 +27,8 @@ class GeneralRecommendUniversitiesTest extends BaseIntegrationTest {
     @Test
     void 모집_시기의_대학들_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
         // given
-        generalRecommendUniversities.init();
-        List<UniversityInfoForApply> universities = generalRecommendUniversities.getRecommendUniversities();
+        generalUniversityRecommendService.init();
+        List<UniversityInfoForApply> universities = generalUniversityRecommendService.getRecommendUniversities();
 
         // when & then
         assertAll(
