@@ -4,6 +4,8 @@ import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.comment.domain.Comment;
 import com.example.solidconnection.comment.dto.CommentCreateRequest;
 import com.example.solidconnection.comment.dto.CommentCreateResponse;
+import com.example.solidconnection.comment.dto.CommentUpdateRequest;
+import com.example.solidconnection.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.comment.repository.CommentRepository;
 import com.example.solidconnection.custom.exception.CustomException;
@@ -19,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_ID;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_LEVEL;
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -187,6 +191,74 @@ class CommentServiceTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    class 댓글_수정_테스트 {
+
+        @Test
+        void 댓글을_성공적으로_수정한다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment comment = createComment(testPost, 테스트유저_1, "원본 댓글");
+            CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
+
+            // when
+            CommentUpdateResponse response = commentService.updateComment(
+                    테스트유저_1.getEmail(),
+                    testPost.getId(),
+                    comment.getId(),
+                    request
+            );
+
+            // then
+            Comment updatedComment = commentRepository.findById(response.id()).orElseThrow();
+            assertAll(
+                    () -> assertThat(updatedComment.getId()).isEqualTo(comment.getId()),
+                    () -> assertThat(updatedComment.getContent()).isEqualTo(request.content()),
+                    () -> assertThat(updatedComment.getParentComment()).isNull(),
+                    () -> assertThat(updatedComment.getPost().getId()).isEqualTo(testPost.getId()),
+                    () -> assertThat(updatedComment.getSiteUser().getId()).isEqualTo(테스트유저_1.getId())
+            );
+        }
+
+        @Test
+        void 다른_사용자의_댓글을_수정하면_예외_응답을_반환한다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment comment = createComment(testPost, 테스트유저_1, "원본 댓글");
+            CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
+
+            // when & then
+            assertThatThrownBy(() ->
+                    commentService.updateComment(
+                            테스트유저_2.getEmail(),
+                            testPost.getId(),
+                            comment.getId(),
+                            request
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_POST_ACCESS.getMessage());
+        }
+
+        @Test
+        void 삭제된_댓글을_수정하면_예외_응답을_반환한다() {
+            // given
+            Post testPost = createPost(자유게시판, 테스트유저_1);
+            Comment comment = createComment(testPost, 테스트유저_1, null);
+            CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
+
+            // when & then
+            assertThatThrownBy(() ->
+                    commentService.updateComment(
+                            테스트유저_1.getEmail(),
+                            testPost.getId(),
+                            comment.getId(),
+                            request
+                    ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CAN_NOT_UPDATE_DEPRECATED_COMMENT.getMessage());
+        }
+    }
+
     private Post createPost(Board board, SiteUser siteUser) {
         Post post = new Post(
                 "테스트 제목",
@@ -213,4 +285,3 @@ class CommentServiceTest extends BaseIntegrationTest {
         return commentRepository.save(comment);
     }
 }
-
