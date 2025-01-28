@@ -69,7 +69,6 @@ public class UniversityRecommendService {
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityRecommendsResponse getGeneralRecommends() {
         List<UniversityInfoForApply> generalRecommends = new ArrayList<>(generalRecommendUniversities.getRecommendUniversities());
-        Collections.shuffle(generalRecommends);
         return new UniversityRecommendsResponse(generalRecommends.stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());
