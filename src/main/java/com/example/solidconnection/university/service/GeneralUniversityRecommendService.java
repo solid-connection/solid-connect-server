@@ -20,9 +20,10 @@ public class GeneralUniversityRecommendService {
     /*
      * 해당 시기에 열리는 대학교들 중 랜덤으로 선택해서 목록을 구성한다.
      * */
+    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+
     @Getter
     private List<UniversityInfoForApply> recommendUniversities;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     @Value("${university.term}")
     public String term;
