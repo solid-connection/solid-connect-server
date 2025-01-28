@@ -128,7 +128,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
                 () -> assertThat(savedScore.getGpa().getGpa()).isEqualTo(request.gpa()),
                 () -> assertThat(savedScore.getGpa().getGpaCriteria()).isEqualTo(request.gpaCriteria()),
-                () -> assertThat(savedScore.getIssueDate()).isEqualTo(request.issueDate())
+                () -> assertThat(savedScore.getIssueDate()).isEqualTo(request.issueDate()),
+                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
         );
     }
 
