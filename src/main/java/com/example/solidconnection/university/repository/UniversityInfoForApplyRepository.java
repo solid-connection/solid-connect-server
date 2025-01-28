@@ -45,6 +45,14 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
             """)
     List<UniversityInfoForApply> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
 
+    @Query("""
+        SELECT uifa
+        FROM UniversityInfoForApply uifa
+        WHERE uifa.term = :term
+        ORDER BY RAND() LIMIT :limitNum
+    """)
+    List<UniversityInfoForApply> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
+
     default UniversityInfoForApply getUniversityInfoForApplyById(Long id) {
         return findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
