@@ -38,11 +38,11 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
     private InterestedCountyRepository interestedCountyRepository;
 
     @Autowired
-    private GeneralRecommendUniversities generalRecommendUniversities;
+    private GeneralUniversityRecommendService generalUniversityRecommendService;
 
     @BeforeEach
     void setUp() {
-        generalRecommendUniversities.init();
+        generalUniversityRecommendService.init();
     }
 
     @Test
@@ -118,7 +118,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIVERSITY_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalRecommendUniversities.getRecommendUniversities().stream()
+                        generalUniversityRecommendService.getRecommendUniversities().stream()
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );
@@ -133,7 +133,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIVERSITY_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalRecommendUniversities.getRecommendUniversities().stream()
+                        generalUniversityRecommendService.getRecommendUniversities().stream()
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );

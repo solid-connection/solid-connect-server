@@ -7,8 +7,12 @@ import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.entity.Country;
+import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.entity.Region;
+import com.example.solidconnection.post.domain.Post;
+import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.repositories.CountryRepository;
+import com.example.solidconnection.repositories.PostImageRepository;
 import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -20,6 +24,7 @@ import com.example.solidconnection.support.DatabaseClearExtension;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;
@@ -101,6 +106,15 @@ public abstract class BaseIntegrationTest {
     public static Board 유럽권;
     public static Board 자유게시판;
 
+    public static Post 미주권_자유게시글;
+    public static Post 아시아권_자유게시글;
+    public static Post 유럽권_자유게시글;
+    public static Post 자유게시판_자유게시글;
+    public static Post 미주권_질문게시글;
+    public static Post 아시아권_질문게시글;
+    public static Post 유럽권_질문게시글;
+    public static Post 자유게시판_질문게시글;
+
     @Autowired
     private SiteUserRepository siteUserRepository;
 
@@ -131,6 +145,12 @@ public abstract class BaseIntegrationTest {
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private PostImageRepository postImageRepository;
+
     @Value("${university.term}")
     public String term;
 
@@ -144,6 +164,7 @@ public abstract class BaseIntegrationTest {
         setUpLanguageRequirements();
         setUpApplications();
         setUpBoards();
+        setUpPosts();
     }
 
     private void setUpSiteUsers() {
@@ -461,6 +482,17 @@ public abstract class BaseIntegrationTest {
         자유게시판 = boardRepository.save(new Board(FREE.name(), "자유게시판"));
     }
 
+    private void setUpPosts() {
+        미주권_자유게시글 = createPost(미주권, 테스트유저_1, "미주권 자유게시글", "미주권 자유게시글 내용", PostCategory.자유);
+        아시아권_자유게시글 = createPost(아시아권, 테스트유저_2, "아시아권 자유게시글", "아시아권 자유게시글 내용", PostCategory.자유);
+        유럽권_자유게시글 = createPost(유럽권, 테스트유저_1, "유럽권 자유게시글", "유럽권 자유게시글 내용", PostCategory.자유);
+        자유게시판_자유게시글 = createPost(자유게시판, 테스트유저_2, "자유게시판 자유게시글", "자유게시판 자유게시글 내용", PostCategory.자유);
+        미주권_질문게시글 = createPost(미주권, 테스트유저_1, "미주권 질문게시글", "미주권 질문게시글 내용", PostCategory.질문);
+        아시아권_질문게시글 = createPost(아시아권, 테스트유저_2, "아시아권 질문게시글", "아시아권 질문게시글 내용", PostCategory.질문);
+        유럽권_질문게시글 = createPost(유럽권, 테스트유저_1, "유럽권 질문게시글", "유럽권 질문게시글 내용", PostCategory.질문);
+        자유게시판_질문게시글 = createPost(자유게시판, 테스트유저_2, "자유게시판 질문게시글", "자유게시판 질문게시글 내용", PostCategory.질문);
+    }
+
     private void saveLanguageTestRequirement(
             UniversityInfoForApply universityInfoForApply,
             LanguageTestType testType,
@@ -494,5 +526,22 @@ public abstract class BaseIntegrationTest {
         );
         languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);
         return languageTestScoreRepository.save(languageTestScore);
+    }
+
+    private Post createPost (Board board, SiteUser siteUser, String title, String content, PostCategory category){
+        Post post = new Post(
+                title,
+                content,
+                false,
+                0L,
+                0L,
+                category
+        );
+        post.setBoardAndSiteUser(board, siteUser);
+        Post savedPost = postRepository.save(post);
+        PostImage postImage = new PostImage("imageUrl");
+        postImage.setPost(savedPost);
+        postImageRepository.save(postImage);
+        return savedPost;
     }
 }

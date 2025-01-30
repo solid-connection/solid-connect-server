@@ -10,7 +10,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
-import com.example.solidconnection.university.service.GeneralRecommendUniversities;
+import com.example.solidconnection.university.service.GeneralUniversityRecommendService;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +41,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
     private TokenProvider tokenProvider;
 
     @Autowired
-    private GeneralRecommendUniversities generalRecommendUniversities;
+    private GeneralUniversityRecommendService generalUniversityRecommendService;
 
     private SiteUser siteUser;
     private String accessToken;
@@ -51,7 +51,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         // setUp - 회원 정보 저장
         String email = "email@email.com";
         siteUser = siteUserRepository.save(createSiteUserByEmail(email));
-        generalRecommendUniversities.init();
+        generalUniversityRecommendService.init();
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
         accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
@@ -156,7 +156,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(UniversityRecommendsResponse.class);
 
         List<UniversityInfoForApplyPreviewResponse> generalRecommendUniversities
-                = this.generalRecommendUniversities.getRecommendUniversities().stream()
+                = this.generalUniversityRecommendService.getRecommendUniversities().stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList();
         assertAll(
@@ -179,7 +179,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(UniversityRecommendsResponse.class);
 
         List<UniversityInfoForApplyPreviewResponse> generalRecommendUniversities
-                = this.generalRecommendUniversities.getRecommendUniversities().stream()
+                = this.generalUniversityRecommendService.getRecommendUniversities().stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList();
         assertAll(
