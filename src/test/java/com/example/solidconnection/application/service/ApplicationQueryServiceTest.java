@@ -123,6 +123,10 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
                             List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false)))
             );
 
+            assertThat(response.secondChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(메이지대학_지원_정보, List.of())
+            );
+
             assertThat(response.thirdChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(메이지대학_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
