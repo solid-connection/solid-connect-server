@@ -1,5 +1,6 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.custom.security.filter;
 
+import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
