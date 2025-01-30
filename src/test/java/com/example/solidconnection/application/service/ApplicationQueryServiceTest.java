@@ -153,4 +153,72 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
             ));
         }
     }
+
+    @Nested
+    class 경쟁자_목록_조회_테스트 {
+
+        @Test
+        void 이번학기_지원한_대학의_경쟁자_목록을_조회한다() {
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
+                    테스트유저_2.getEmail()
+            );
+
+            // then
+            assertThat(response.firstChoice()).containsAnyElementsOf(List.of(
+                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
+            ));
+
+            assertThat(response.secondChoice()).containsAnyElementsOf(List.of(
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
+                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
+            ));
+
+            assertThat(response.thirdChoice()).containsAnyElementsOf(List.of(
+                    UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true)))
+            ));
+        }
+
+        @Test
+        void 이번학기_지원한_대학중_미선택이_있을_때_경쟁자_목록을_조회한다() {
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
+                    테스트유저_7.getEmail()
+            );
+
+            // then
+            assertThat(response.firstChoice()).containsAnyElementsOf(List.of(
+                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보,
+                            List.of(ApplicantResponse.of(테스트유저_7_코펜하겐IT대학_X_X_지원서, true)))
+            ));
+
+            assertThat(response.secondChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보, List.of())
+            );
+
+            assertThat(response.thirdChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보, List.of())
+            );
+        }
+
+
+        @Test
+        void 이번학기_지원한_대학이_모두_미선택일_때_경쟁자_목록을_조회한다() {
+            //when
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
+                    테스트유저_6.getEmail()
+            );
+
+            // then
+            assertThat(response.firstChoice()).isEmpty();
+            assertThat(response.secondChoice()).isEmpty();
+            assertThat(response.thirdChoice()).isEmpty();
+        }
+    }
 }
