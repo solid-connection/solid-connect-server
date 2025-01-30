@@ -211,7 +211,6 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
             );
         }
 
-
         @Test
         void 이번학기_지원한_대학이_모두_미선택일_때_경쟁자_목록을_조회한다() {
             //when
