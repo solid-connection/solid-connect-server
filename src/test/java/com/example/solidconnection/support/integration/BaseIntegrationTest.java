@@ -1,11 +1,19 @@
 package com.example.solidconnection.support.integration;
 
+import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.Region;
 import com.example.solidconnection.repositories.CountryRepository;
 import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.score.domain.LanguageTestScore;
+import com.example.solidconnection.score.repository.GpaScoreRepository;
+import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
@@ -14,6 +22,7 @@ import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
+import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -25,7 +34,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 
 import static com.example.solidconnection.type.BoardCode.AMERICAS;
 import static com.example.solidconnection.type.BoardCode.ASIA;
@@ -40,6 +51,12 @@ public abstract class BaseIntegrationTest {
 
     public static SiteUser 테스트유저_1;
     public static SiteUser 테스트유저_2;
+    public static SiteUser 테스트유저_3;
+    public static SiteUser 테스트유저_4;
+    public static SiteUser 테스트유저_5;
+    public static SiteUser 테스트유저_6;
+    public static SiteUser 테스트유저_7;
+    public static SiteUser 이전학기_지원자;
 
     public static Region 영미권;
     public static Region 유럽;
@@ -71,6 +88,14 @@ public abstract class BaseIntegrationTest {
     public static UniversityInfoForApply 린츠_카톨릭대학_지원_정보;
     public static UniversityInfoForApply 메이지대학_지원_정보;
 
+    public static Application 테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서;
+    public static Application 테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서;
+    public static Application 테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서;
+    public static Application 테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서;
+    public static Application 테스트유저_6_X_X_X_지원서;
+    public static Application 테스트유저_7_코펜하겐IT대학_X_X_지원서;
+    public static Application 이전학기_지원서;
+
     public static Board 미주권;
     public static Board 아시아권;
     public static Board 유럽권;
@@ -95,6 +120,15 @@ public abstract class BaseIntegrationTest {
     private LanguageRequirementRepository languageRequirementRepository;
 
     @Autowired
+    private ApplicationRepository applicationRepository;
+
+    @Autowired
+    private GpaScoreRepository gpaScoreRepository;
+
+    @Autowired
+    private LanguageTestScoreRepository languageTestScoreRepository;
+
+    @Autowired
     private BoardRepository boardRepository;
 
     @Value("${university.term}")
@@ -108,6 +142,7 @@ public abstract class BaseIntegrationTest {
         setUpUniversities();
         setUpUniversityInfos();
         setUpLanguageRequirements();
+        setUpApplications();
         setUpBoards();
     }
 
@@ -129,6 +164,60 @@ public abstract class BaseIntegrationTest {
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
                 Gender.FEMALE));
+
+        테스트유저_3 = siteUserRepository.save(new SiteUser(
+                "test3@example.com",
+                "nickname3",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE));
+
+        테스트유저_4 = siteUserRepository.save(new SiteUser(
+                "test4@example.com",
+                "nickname4",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.FEMALE));
+
+        테스트유저_5 = siteUserRepository.save(new SiteUser(
+                "test5@example.com",
+                "nickname5",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE));
+
+        테스트유저_6 = siteUserRepository.save(new SiteUser(
+                "test6@example.com",
+                "nickname6",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.FEMALE));
+
+        테스트유저_7 = siteUserRepository.save(new SiteUser(
+                "test7@example.com",
+                "nickname7",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.FEMALE));
+
+        이전학기_지원자 = siteUserRepository.save(new SiteUser(
+                "old@example.com",
+                "oldNickname",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE));
     }
 
     private void setUpRegions() {
@@ -330,6 +419,41 @@ public abstract class BaseIntegrationTest {
         saveLanguageTestRequirement(메이지대학_지원_정보, LanguageTestType.JLPT, "N2");
     }
 
+    private void setUpApplications() {
+        테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서 = new Application(테스트유저_2, createApprovedGpaScore(테스트유저_2).getGpa(), createApprovedLanguageTestScore(테스트유저_2).getLanguageTest(),
+                term, 괌대학_B_지원_정보, 괌대학_A_지원_정보, 린츠_카톨릭대학_지원_정보, "user2_nickname");
+
+        테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서 = new Application(테스트유저_3, createApprovedGpaScore(테스트유저_3).getGpa(), createApprovedLanguageTestScore(테스트유저_3).getLanguageTest(),
+                term, 괌대학_A_지원_정보, 괌대학_B_지원_정보, 그라츠공과대학_지원_정보, "user3_nickname");
+
+        테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서 = new Application(테스트유저_4, createApprovedGpaScore(테스트유저_4).getGpa(), createApprovedLanguageTestScore(테스트유저_4).getLanguageTest(),
+                term, 메이지대학_지원_정보, 그라츠대학_지원_정보, 서던덴마크대학교_지원_정보, "user4_nickname");
+
+        테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서 = new Application(테스트유저_5, createApprovedGpaScore(테스트유저_5).getGpa(), createApprovedLanguageTestScore(테스트유저_5).getLanguageTest(),
+                term, 네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "user5_nickname");
+
+        테스트유저_6_X_X_X_지원서 = new Application(테스트유저_6, createApprovedGpaScore(테스트유저_6).getGpa(), createApprovedLanguageTestScore(테스트유저_6).getLanguageTest(),
+                term, null, null, null, "user6_nickname");
+
+        테스트유저_7_코펜하겐IT대학_X_X_지원서 = new Application(테스트유저_7, createApprovedGpaScore(테스트유저_7).getGpa(), createApprovedLanguageTestScore(테스트유저_7).getLanguageTest(),
+                term, 코펜하겐IT대학_지원_정보, null, null, "user7_nickname");
+
+        이전학기_지원서 = new Application(이전학기_지원자, createApprovedGpaScore(이전학기_지원자).getGpa(), createApprovedLanguageTestScore(이전학기_지원자).getLanguageTest(),
+                "1988-1", 네바다주립대학_라스베이거스_지원_정보, 그라츠공과대학_지원_정보, 메이지대학_지원_정보, "old_nickname");
+
+        테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        테스트유저_6_X_X_X_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        테스트유저_7_코펜하겐IT대학_X_X_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+        이전학기_지원서.setVerifyStatus(VerifyStatus.APPROVED);
+
+        applicationRepository.saveAll(List.of(
+                테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, 테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, 테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, 테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서,
+                테스트유저_6_X_X_X_지원서, 테스트유저_7_코펜하겐IT대학_X_X_지원서, 이전학기_지원서));
+    }
+
     private void setUpBoards() {
         미주권 = boardRepository.save(new Board(AMERICAS.name(), "미주권"));
         아시아권 = boardRepository.save(new Board(ASIA.name(), "아시아권"));
@@ -350,5 +474,25 @@ public abstract class BaseIntegrationTest {
         universityInfoForApply.addLanguageRequirements(languageRequirement);
         universityInfoForApplyRepository.save(universityInfoForApply);
         languageRequirementRepository.save(languageRequirement);
+    }
+
+    private GpaScore createApprovedGpaScore(SiteUser siteUser) {
+        GpaScore gpaScore = new GpaScore(
+                new Gpa(4.0, 4.5, "/gpa-report.pdf"),
+                siteUser,
+                LocalDate.now()
+        );
+        gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
+        return gpaScoreRepository.save(gpaScore);
+    }
+
+    private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
+        LanguageTestScore languageTestScore = new LanguageTestScore(
+                new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
+                LocalDate.now(),
+                siteUser
+        );
+        languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);
+        return languageTestScoreRepository.save(languageTestScore);
     }
 }
