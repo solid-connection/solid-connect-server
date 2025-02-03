@@ -85,8 +85,8 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
-                네바다주립대학_라스베이거스_지원_정보.getId(),
-                메모리얼대학_세인트존스_A_지원_정보.getId()
+                null,
+                null
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
@@ -105,8 +105,8 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         LanguageTestScore languageTestScore = createUnapprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
-                네바다주립대학_라스베이거스_지원_정보.getId(),
-                메모리얼대학_세인트존스_A_지원_정보.getId()
+                null,
+                null
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
@@ -145,8 +145,8 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
-                네바다주립대학_라스베이거스_지원_정보.getId(),
-                메모리얼대학_세인트존스_A_지원_정보.getId()
+                null,
+                null
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
