@@ -1,12 +1,24 @@
 package com.example.solidconnection.support.integration;
 
+import com.example.solidconnection.board.domain.Board;
+import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.entity.Country;
+import com.example.solidconnection.entity.PostImage;
 import com.example.solidconnection.entity.Region;
+import com.example.solidconnection.post.domain.Post;
+import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.repositories.CountryRepository;
+import com.example.solidconnection.repositories.PostImageRepository;
 import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.type.PreparationStatus;
+import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -20,12 +32,19 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashSet;
 
+import static com.example.solidconnection.type.BoardCode.AMERICAS;
+import static com.example.solidconnection.type.BoardCode.ASIA;
+import static com.example.solidconnection.type.BoardCode.EUROPE;
+import static com.example.solidconnection.type.BoardCode.FREE;
 import static com.example.solidconnection.type.SemesterAvailableForDispatch.ONE_SEMESTER;
 import static com.example.solidconnection.type.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 
 @TestContainerSpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
 public abstract class BaseIntegrationTest {
+
+    public static SiteUser 테스트유저_1;
+    public static SiteUser 테스트유저_2;
 
     public static Region 영미권;
     public static Region 유럽;
@@ -57,6 +76,23 @@ public abstract class BaseIntegrationTest {
     public static UniversityInfoForApply 린츠_카톨릭대학_지원_정보;
     public static UniversityInfoForApply 메이지대학_지원_정보;
 
+    public static Board 미주권;
+    public static Board 아시아권;
+    public static Board 유럽권;
+    public static Board 자유게시판;
+
+    public static Post 미주권_자유게시글;
+    public static Post 아시아권_자유게시글;
+    public static Post 유럽권_자유게시글;
+    public static Post 자유게시판_자유게시글;
+    public static Post 미주권_질문게시글;
+    public static Post 아시아권_질문게시글;
+    public static Post 유럽권_질문게시글;
+    public static Post 자유게시판_질문게시글;
+
+    @Autowired
+    private SiteUserRepository siteUserRepository;
+
     @Autowired
     private RegionRepository regionRepository;
 
@@ -72,16 +108,48 @@ public abstract class BaseIntegrationTest {
     @Autowired
     private LanguageRequirementRepository languageRequirementRepository;
 
+    @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private PostImageRepository postImageRepository;
+
     @Value("${university.term}")
     public String term;
 
     @BeforeEach
     public void setUpBaseData() {
+        setUpSiteUsers();
         setUpRegions();
         setUpCountries();
         setUpUniversities();
         setUpUniversityInfos();
         setUpLanguageRequirements();
+        setUpBoards();
+        setUpPosts();
+    }
+
+    private void setUpSiteUsers() {
+        테스트유저_1 = siteUserRepository.save(new SiteUser(
+                "test1@example.com",
+                "nickname1",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.MALE));
+
+        테스트유저_2 = siteUserRepository.save(new SiteUser(
+                "test2@example.com",
+                "nickname2",
+                "profileImageUrl",
+                "1999-01-01",
+                PreparationStatus.CONSIDERING,
+                Role.MENTEE,
+                Gender.FEMALE));
     }
 
     private void setUpRegions() {
@@ -283,6 +351,24 @@ public abstract class BaseIntegrationTest {
         saveLanguageTestRequirement(메이지대학_지원_정보, LanguageTestType.JLPT, "N2");
     }
 
+    private void setUpBoards() {
+        미주권 = boardRepository.save(new Board(AMERICAS.name(), "미주권"));
+        아시아권 = boardRepository.save(new Board(ASIA.name(), "아시아권"));
+        유럽권 = boardRepository.save(new Board(EUROPE.name(), "유럽권"));
+        자유게시판 = boardRepository.save(new Board(FREE.name(), "자유게시판"));
+    }
+
+    private void setUpPosts() {
+        미주권_자유게시글 = createPost(미주권, 테스트유저_1, "미주권 자유게시글", "미주권 자유게시글 내용", PostCategory.자유);
+        아시아권_자유게시글 = createPost(아시아권, 테스트유저_2, "아시아권 자유게시글", "아시아권 자유게시글 내용", PostCategory.자유);
+        유럽권_자유게시글 = createPost(유럽권, 테스트유저_1, "유럽권 자유게시글", "유럽권 자유게시글 내용", PostCategory.자유);
+        자유게시판_자유게시글 = createPost(자유게시판, 테스트유저_2, "자유게시판 자유게시글", "자유게시판 자유게시글 내용", PostCategory.자유);
+        미주권_질문게시글 = createPost(미주권, 테스트유저_1, "미주권 질문게시글", "미주권 질문게시글 내용", PostCategory.질문);
+        아시아권_질문게시글 = createPost(아시아권, 테스트유저_2, "아시아권 질문게시글", "아시아권 질문게시글 내용", PostCategory.질문);
+        유럽권_질문게시글 = createPost(유럽권, 테스트유저_1, "유럽권 질문게시글", "유럽권 질문게시글 내용", PostCategory.질문);
+        자유게시판_질문게시글 = createPost(자유게시판, 테스트유저_2, "자유게시판 질문게시글", "자유게시판 질문게시글 내용", PostCategory.질문);
+    }
+
     private void saveLanguageTestRequirement(
             UniversityInfoForApply universityInfoForApply,
             LanguageTestType testType,
@@ -296,5 +382,22 @@ public abstract class BaseIntegrationTest {
         universityInfoForApply.addLanguageRequirements(languageRequirement);
         universityInfoForApplyRepository.save(universityInfoForApply);
         languageRequirementRepository.save(languageRequirement);
+    }
+
+    private Post createPost(Board board, SiteUser siteUser, String title, String content, PostCategory category) {
+        Post post = new Post(
+                title,
+                content,
+                false,
+                0L,
+                0L,
+                category
+        );
+        post.setBoardAndSiteUser(board, siteUser);
+        Post savedPost = postRepository.save(post);
+        PostImage postImage = new PostImage("imageUrl");
+        postImage.setPost(savedPost);
+        postImageRepository.save(postImage);
+        return savedPost;
     }
 }

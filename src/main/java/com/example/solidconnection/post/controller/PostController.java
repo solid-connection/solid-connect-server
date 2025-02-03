@@ -8,7 +8,9 @@ import com.example.solidconnection.post.dto.PostFindResponse;
 import com.example.solidconnection.post.dto.PostLikeResponse;
 import com.example.solidconnection.post.dto.PostUpdateRequest;
 import com.example.solidconnection.post.dto.PostUpdateResponse;
-import com.example.solidconnection.post.service.PostService;
+import com.example.solidconnection.post.service.PostCommandService;
+import com.example.solidconnection.post.service.PostLikeService;
+import com.example.solidconnection.post.service.PostQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,9 @@ import java.util.List;
 @RequestMapping("/communities")
 public class PostController {
 
-    private final PostService postService;
+    private final PostQueryService postQueryService;
+    private final PostCommandService postCommandService;
+    private final PostLikeService postLikeService;
 
     @PostMapping(value = "/{code}/posts")
     public ResponseEntity<?> createPost(
@@ -44,7 +48,7 @@ public class PostController {
         if (imageFile == null) {
             imageFile = Collections.emptyList();
         }
-        PostCreateResponse post = postService
+        PostCreateResponse post = postCommandService
                 .createPost(principal.getName(), code, postCreateRequest, imageFile);
         return ResponseEntity.ok().body(post);
     }
@@ -60,11 +64,10 @@ public class PostController {
         if (imageFile == null) {
             imageFile = Collections.emptyList();
         }
-        PostUpdateResponse postUpdateResponse = postService
+        PostUpdateResponse postUpdateResponse = postCommandService
                 .updatePost(principal.getName(), code, postId, postUpdateRequest, imageFile);
         return ResponseEntity.ok().body(postUpdateResponse);
     }
-
 
     @GetMapping("/{code}/posts/{post_id}")
     public ResponseEntity<?> findPostById(
@@ -72,7 +75,7 @@ public class PostController {
             @PathVariable("code") String code,
             @PathVariable("post_id") Long postId) {
 
-        PostFindResponse postFindResponse = postService
+        PostFindResponse postFindResponse = postQueryService
                 .findPostById(principal.getName(), code, postId);
         return ResponseEntity.ok().body(postFindResponse);
     }
@@ -83,7 +86,7 @@ public class PostController {
             @PathVariable("code") String code,
             @PathVariable("post_id") Long postId) {
 
-        PostDeleteResponse postDeleteResponse = postService.deletePostById(principal.getName(), code, postId);
+        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(principal.getName(), code, postId);
         return ResponseEntity.ok().body(postDeleteResponse);
     }
 
@@ -94,7 +97,7 @@ public class PostController {
             @PathVariable("post_id") Long postId
     ) {
 
-        PostLikeResponse postLikeResponse = postService.likePost(principal.getName(), code, postId);
+        PostLikeResponse postLikeResponse = postLikeService.likePost(principal.getName(), code, postId);
         return ResponseEntity.ok().body(postLikeResponse);
     }
 
@@ -105,7 +108,7 @@ public class PostController {
             @PathVariable("post_id") Long postId
     ) {
 
-        PostDislikeResponse postDislikeResponse = postService.dislikePost(principal.getName(), code, postId);
+        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(principal.getName(), code, postId);
         return ResponseEntity.ok().body(postDislikeResponse);
     }
 }

@@ -42,4 +42,8 @@ public class RedisService {
         return Boolean.TRUE.equals(redisTemplate.opsForValue()
                 .setIfAbsent(key, "1", Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()), TimeUnit.SECONDS));
     }
+
+    public boolean isKeyExists(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
 }
