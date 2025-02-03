@@ -45,19 +45,6 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
                             List.of(ApplicantResponse.of(테스트유저_7_코펜하겐IT대학_X_X_지원서, false)))
             ));
 
-            assertThat(response.firstChoice()).containsAnyElementsOf(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false))),
-                    UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false))),
-                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_7_코펜하겐IT대학_X_X_지원서, false)))
-            ));
-
             assertThat(response.secondChoice()).containsAnyElementsOf(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
