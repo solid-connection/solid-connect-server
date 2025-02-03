@@ -81,7 +81,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     @Test
     void 미승인된_GPA_성적으로_지원하면_예외_응답을_반환한다() {
         // given
-        GpaScore gpaScore = createUnApprovedGpaScore(테스트유저_1);
+        GpaScore gpaScore = createUnapprovedGpaScore(테스트유저_1);
         LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
@@ -102,7 +102,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     void 미승인된_어학성적으로_지원하면_예외_응답을_반환한다() {
         // given
         GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createUnApprovedLanguageTestScore(테스트유저_1);
+        LanguageTestScore languageTestScore = createUnapprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 네바다주립대학_라스베이거스_지원_정보.getId(),
@@ -122,7 +122,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     void 동일한_대학을_중복_선택하면_예외_응답을_반환한다() {
         // given
         GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createUnApprovedLanguageTestScore(테스트유저_1);
+        LanguageTestScore languageTestScore = createUnapprovedLanguageTestScore(테스트유저_1);
         UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 괌대학_A_지원_정보.getId(),
@@ -162,7 +162,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());
     }
 
-    private GpaScore createUnApprovedGpaScore(SiteUser siteUser) {
+    private GpaScore createUnapprovedGpaScore(SiteUser siteUser) {
         GpaScore gpaScore = new GpaScore(
                 new Gpa(4.0,  4.5, "/gpa-report.pdf"),
                 siteUser,
@@ -181,7 +181,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         return gpaScoreRepository.save(gpaScore);
     }
 
-    private LanguageTestScore createUnApprovedLanguageTestScore(SiteUser siteUser) {
+    private LanguageTestScore createUnapprovedLanguageTestScore(SiteUser siteUser) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
                 new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
                 LocalDate.now(),
