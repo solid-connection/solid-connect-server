@@ -55,7 +55,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
         );
 
         // when
-        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser.getEmail());
+        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser);
 
         // then
         assertThat(response.gpaScoreStatusList())
@@ -73,7 +73,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser.getEmail());
+        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser);
 
         // then
         assertThat(response.gpaScoreStatusList()).isEmpty();
@@ -87,9 +87,10 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 createLanguageTestScore(testUser, LanguageTestType.TOEIC, "100"),
                 createLanguageTestScore(testUser, LanguageTestType.TOEFL_IBT, "7.5")
         );
+        siteUserRepository.save(testUser);
 
         // when
-        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser.getEmail());
+        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser);
 
         // then
         assertThat(response.languageTestScoreStatusList())
@@ -107,7 +108,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser.getEmail());
+        LanguageTestScoreStatusResponse response = scoreService.getLanguageTestScoreStatus(testUser);
 
         // then
         assertThat(response.languageTestScoreStatusList()).isEmpty();
@@ -120,7 +121,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
         GpaScoreRequest request = createGpaScoreRequest();
 
         // when
-        long scoreId = scoreService.submitGpaScore(testUser.getEmail(), request);
+        long scoreId = scoreService.submitGpaScore(testUser, request);
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -140,7 +141,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
         LanguageTestScoreRequest request = createLanguageTestScoreRequest();
 
         // when
-        long scoreId = scoreService.submitLanguageTestScore(testUser.getEmail(), request);
+        long scoreId = scoreService.submitLanguageTestScore(testUser, request);
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then

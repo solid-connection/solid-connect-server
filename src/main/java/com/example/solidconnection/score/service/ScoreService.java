@@ -12,7 +12,6 @@ import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +27,9 @@ public class ScoreService {
 
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
-    private final SiteUserRepository siteUserRepository;
 
     @Transactional
-    public Long submitGpaScore(String email, GpaScoreRequest gpaScoreRequest) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
+    public Long submitGpaScore(SiteUser siteUser, GpaScoreRequest gpaScoreRequest) {
         GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser, gpaScoreRequest.issueDate());
         newGpaScore.setSiteUser(siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);  // 저장 후 반환된 객체
@@ -41,8 +37,7 @@ public class ScoreService {
     }
 
     @Transactional
-    public Long submitLanguageTestScore(String email, LanguageTestScoreRequest languageTestScoreRequest) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public Long submitLanguageTestScore(SiteUser siteUser, LanguageTestScoreRequest languageTestScoreRequest) {
         LanguageTest languageTest = languageTestScoreRequest.toLanguageTest();
 
         LanguageTestScore newScore = new LanguageTestScore(
@@ -53,8 +48,7 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public GpaScoreStatusResponse getGpaScoreStatus(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public GpaScoreStatusResponse getGpaScoreStatus(SiteUser siteUser) {
         List<GpaScoreStatus> gpaScoreStatusList =
                 Optional.ofNullable(siteUser.getGpaScoreList())
                         .map(scores -> scores.stream()
@@ -65,8 +59,7 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public LanguageTestScoreStatusResponse getLanguageTestScoreStatus(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public LanguageTestScoreStatusResponse getLanguageTestScoreStatus(SiteUser siteUser) {
         List<LanguageTestScoreStatus> languageTestScoreStatusList =
                 Optional.ofNullable(siteUser.getLanguageTestScoreList())
                         .map(scores -> scores.stream()
