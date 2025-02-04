@@ -7,11 +7,14 @@ import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -35,11 +38,12 @@ public class SignInService {
     public KakaoOauthResponse signIn(KakaoCodeRequest kakaoCodeRequest) {
         KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.processOauth(kakaoCodeRequest.code());
         String email = kakaoUserInfoDto.kakaoAccountDto().email();
-        boolean isAlreadyRegistered = siteUserRepository.existsByEmail(email);
+        Optional<SiteUser> optionalSiteUser = siteUserRepository.findByEmailAndAuthType(email, AuthType.KAKAO);
 
-        if (isAlreadyRegistered) {
-            resetQuitedAt(email);
-            return getSignInInfo(email);
+        if (optionalSiteUser.isPresent()) {
+            SiteUser siteUser = optionalSiteUser.get();
+            resetQuitedAt(siteUser);
+            return getSignInInfo(siteUser);
         }
 
         return getFirstAccessInfo(kakaoUserInfoDto);
@@ -47,8 +51,7 @@ public class SignInService {
 
     // 계적 복구 기한이 지난 회원은 자정마다 삭제된다. (UserRemovalScheduler 참고)
     // 따라서 DB 에서 조회되었다면 아직 기한이 지나지 않았다는 뜻이므로, 탈퇴 날짜를 초기화한다.
-    private void resetQuitedAt(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    private void resetQuitedAt(SiteUser siteUser) {
         if (siteUser.getQuitedAt() == null) {
             return;
         }
@@ -56,9 +59,9 @@ public class SignInService {
         siteUser.setQuitedAt(null);
     }
 
-    private SignInResponse getSignInInfo(String email) {
-        String accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+    private SignInResponse getSignInInfo(SiteUser siteUser) {
+        String accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
         tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
         return new SignInResponse(true, accessToken, refreshToken);
     }

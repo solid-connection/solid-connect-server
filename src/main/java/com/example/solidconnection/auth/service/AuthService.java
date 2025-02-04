@@ -4,7 +4,6 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,8 @@ import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOK
 @Service
 public class AuthService {
 
-    public static final String SIGN_OUT_VALUE = "signOut";
-
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
-    private final SiteUserRepository siteUserRepository;
 
     /*
      * 로그아웃 한다.
@@ -48,8 +44,7 @@ public class AuthService {
      * - e.g. 2024-01-01 18:00 탈퇴 시, 2024-01-02 00:00 가 탈퇴일이 된다.
      * */
     @Transactional
-    public void quit(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public void quit(SiteUser siteUser) {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         siteUser.setQuitedAt(tomorrow);
     }

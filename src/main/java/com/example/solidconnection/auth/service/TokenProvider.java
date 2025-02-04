@@ -2,6 +2,7 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,8 +23,13 @@ public class TokenProvider {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtProperties jwtProperties;
 
-    public String generateToken(String email, TokenType tokenType) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String generateToken(SiteUser siteUser, TokenType tokenType) {
+        String subject = siteUser.getId().toString();
+        return generateToken(subject, tokenType);
+    }
+
+    public String generateToken(String string, TokenType tokenType) {
+        Claims claims = Jwts.claims().setSubject(string);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + tokenType.getExpireTime());
         return Jwts.builder()

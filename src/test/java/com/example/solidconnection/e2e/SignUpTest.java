@@ -12,6 +12,7 @@ import com.example.solidconnection.repositories.CountryRepository;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.Gender;
@@ -86,7 +87,7 @@ class SignUpTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(SignUpResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
+        SiteUser savedSiteUser = siteUserRepository.findByEmailAndAuthType(email, AuthType.KAKAO).get();
         assertAll(
                 "회원 정보를 저장한다.",
                 () -> assertThat(savedSiteUser.getId()).isNotNull(),
@@ -109,7 +110,7 @@ class SignUpTest extends BaseEndToEndTest {
                 () -> assertThat(interestedCountries).containsExactlyInAnyOrderElementsOf(countries)
         );
 
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(savedSiteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }

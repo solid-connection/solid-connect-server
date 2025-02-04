@@ -79,7 +79,7 @@ class SignInTest extends BaseEndToEndTest {
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 사용자 정보 저장
-        siteUserRepository.save(createSiteUserByEmail(email));
+        SiteUser siteUser = siteUserRepository.save(createSiteUserByEmail(email));
 
         // request - body 생성 및 요청
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
@@ -95,7 +95,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.isRegistered()).isTrue(),
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(siteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }
@@ -112,7 +112,7 @@ class SignInTest extends BaseEndToEndTest {
         SiteUser siteUserFixture = createSiteUserByEmail(email);
         LocalDate justBeforeRemoval = LocalDate.now().minusDays(ACCOUNT_RECOVER_DURATION - 1);
         siteUserFixture.setQuitedAt(justBeforeRemoval);
-        siteUserRepository.save(siteUserFixture);
+        SiteUser siteUser = siteUserRepository.save(siteUserFixture);
 
         // request - body 생성 및 요청
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
@@ -124,12 +124,13 @@ class SignInTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(SignInResponse.class);
 
+        SiteUser updatedSiteUser = siteUserRepository.findById(siteUser.getId()).get();
         assertAll("리프레스 토큰과 엑세스 토큰을 응답하고, 탈퇴 날짜를 초기화한다.",
                 () -> assertThat(response.isRegistered()).isTrue(),
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull(),
-                () -> assertThat(siteUserRepository.getByEmail(email).getQuitedAt()).isNull());
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)))
+                () -> assertThat(updatedSiteUser.getQuitedAt()).isNull());
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(siteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }

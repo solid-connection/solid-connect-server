@@ -10,6 +10,7 @@ import com.example.solidconnection.repositories.CountryRepository;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.Role;
@@ -45,6 +46,7 @@ public class SignUpService {
      *   - 관심 국가와 지역은 site_user_id를 참조하므로, 사용자 저장 후 저장한다.
      * - 바로 로그인하도록 액세스 토큰과 리프레시 토큰을 발급한다.
      * */
+    // todo: 여러가지 가입 방법 적용해야 함
     @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 검증
@@ -62,14 +64,14 @@ public class SignUpService {
         saveInterestedCountry(signUpRequest, savedSiteUser);
 
         // 토큰 발급
-        String accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        String accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
         tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
         return new SignUpResponse(accessToken, refreshToken);
     }
 
     private void validateUserNotDuplicated(String email) {
-        if (siteUserRepository.existsByEmail(email)) {
+        if (siteUserRepository.existsByEmailAndAuthType(email, AuthType.KAKAO)) {
             throw new CustomException(USER_ALREADY_EXISTED);
         }
     }
