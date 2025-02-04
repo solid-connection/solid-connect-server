@@ -173,6 +173,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 siteUser,
                 LocalDate.now()
         );
+        gpaScore.setSiteUser(siteUser);
         return gpaScoreRepository.save(gpaScore);
     }
 
@@ -182,6 +183,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 LocalDate.now(),
                 siteUser
         );
+        languageTestScore.setSiteUser(siteUser);
         return languageTestScoreRepository.save(languageTestScore);
     }
 
