@@ -2,9 +2,9 @@ package com.example.solidconnection.auth.client;
 
 import com.example.solidconnection.auth.dto.kakao.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.config.client.KakaoOAuthClientProperties;
 import com.example.solidconnection.custom.exception.CustomException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,18 +25,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_
 public class KakaoOAuthClient {
 
     private final RestTemplate restTemplate;
-
-    @Value("${kakao.redirect_uri}")
-    public String redirectUri;
-
-    @Value("${kakao.client_id}")
-    private String clientId;
-
-    @Value("${kakao.token_url}")
-    private String tokenUrl;
-
-    @Value("${kakao.user_info_url}")
-    private String userInfoUrl;
+    private final KakaoOAuthClientProperties kakaoOAuthClientProperties;
 
     /*
      * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인가 코드'를 받아, 서버에 넘겨준다.
@@ -74,10 +63,10 @@ public class KakaoOAuthClient {
 
     // 카카오 엑세스 토큰 요청하는 URI 생성
     private String buildTokenUri(String code) {
-        return UriComponentsBuilder.fromHttpUrl(tokenUrl)
+        return UriComponentsBuilder.fromHttpUrl(kakaoOAuthClientProperties.tokenUrl())
                 .queryParam("grant_type", "authorization_code")
-                .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", redirectUri)
+                .queryParam("client_id", kakaoOAuthClientProperties.clientId())
+                .queryParam("redirect_uri", kakaoOAuthClientProperties.redirectUrl())
                 .queryParam("code", code)
                 .toUriString();
     }
@@ -89,7 +78,7 @@ public class KakaoOAuthClient {
 
         // 사용자의 정보 요청
         ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(
-                userInfoUrl,
+                kakaoOAuthClientProperties.userInfoUrl(),
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 KakaoUserInfoDto.class
