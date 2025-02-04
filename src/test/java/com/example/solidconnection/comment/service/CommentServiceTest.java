@@ -56,7 +56,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     testPost.getId()
             );
 
@@ -114,7 +114,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentCreateResponse response = commentService.createComment(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     testPost.getId(),
                     request
             );
@@ -139,7 +139,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentCreateResponse response = commentService.createComment(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     testPost.getId(),
                     request
             );
@@ -166,7 +166,7 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     commentService.createComment(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             testPost.getId(),
                             request
                     ))
@@ -184,7 +184,7 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     commentService.createComment(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             testPost.getId(),
                             request
                     ))
@@ -205,7 +205,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentUpdateResponse response = commentService.updateComment(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     testPost.getId(),
                     comment.getId(),
                     request
@@ -232,7 +232,7 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     commentService.updateComment(
-                            테스트유저_2.getEmail(),
+                            테스트유저_2,
                             testPost.getId(),
                             comment.getId(),
                             request
@@ -251,7 +251,7 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     commentService.updateComment(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             testPost.getId(),
                             comment.getId(),
                             request
@@ -275,7 +275,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     testPost.getId(),
                     comment.getId()
             );
@@ -300,7 +300,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     testPost.getId(),
                     parentComment.getId()
             );
@@ -330,7 +330,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     testPost.getId(),
                     childComment1.getId()
             );
@@ -361,7 +361,7 @@ class CommentServiceTest extends BaseIntegrationTest {
 
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     testPost.getId(),
                     childComment.getId()
             );
@@ -383,7 +383,7 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     commentService.deleteCommentById(
-                            테스트유저_2.getEmail(),
+                            테스트유저_2,
                             testPost.getId(),
                             comment.getId()
                     ))

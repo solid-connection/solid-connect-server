@@ -12,7 +12,6 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,25 +28,22 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POS
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final SiteUserRepository siteUserRepository;
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public List<PostFindCommentResponse> findCommentsByPostId(String email, Long postId) {
+    public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
         return commentRepository.findCommentTreeByPostId(postId)
                 .stream()
-                .map(comment -> PostFindCommentResponse.from(isOwner(comment, email), comment))
+                .map(comment -> PostFindCommentResponse.from(isOwner(comment, siteUser), comment))
                 .collect(Collectors.toList());
     }
 
-    private Boolean isOwner(Comment comment, String email) {
-        return comment.getSiteUser().getEmail().equals(email);
+    private Boolean isOwner(Comment comment, SiteUser siteUser) {
+        return comment.getSiteUser().getId().equals(siteUser.getId());
     }
 
     @Transactional
-    public CommentCreateResponse createComment(String email, Long postId, CommentCreateRequest commentCreateRequest) {
-
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public CommentCreateResponse createComment(SiteUser siteUser, Long postId, CommentCreateRequest commentCreateRequest) {
         Post post = postRepository.getById(postId);
 
         Comment parentComment = null;
@@ -68,13 +64,11 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentUpdateResponse updateComment(String email, Long postId, Long commentId, CommentUpdateRequest commentUpdateRequest) {
-
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public CommentUpdateResponse updateComment(SiteUser siteUser, Long postId, Long commentId, CommentUpdateRequest commentUpdateRequest) {
         Post post = postRepository.getById(postId);
         Comment comment = commentRepository.getById(commentId);
         validateDeprecated(comment);
-        validateOwnership(comment, email);
+        validateOwnership(comment, siteUser);
 
         comment.updateContent(commentUpdateRequest.content());
 
@@ -88,11 +82,10 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDeleteResponse deleteCommentById(String email, Long postId, Long commentId) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public CommentDeleteResponse deleteCommentById(SiteUser siteUser, Long postId, Long commentId) {
         Post post = postRepository.getById(postId);
         Comment comment = commentRepository.getById(commentId);
-        validateOwnership(comment, email);
+        validateOwnership(comment, siteUser);
 
         if (comment.getParentComment() != null) {
             // 대댓글인 경우
@@ -119,8 +112,8 @@ public class CommentService {
         return new CommentDeleteResponse(commentId);
     }
 
-    private void validateOwnership(Comment comment, String email) {
-        if (!comment.getSiteUser().getEmail().equals(email)) {
+    private void validateOwnership(Comment comment, SiteUser siteUser) {
+        if (!comment.getSiteUser().getId().equals(siteUser.getId())) {
             throw new CustomException(INVALID_POST_ACCESS);
         }
     }

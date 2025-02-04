@@ -6,6 +6,8 @@ import com.example.solidconnection.comment.dto.CommentDeleteResponse;
 import com.example.solidconnection.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.comment.service.CommentService;
+import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -28,35 +28,32 @@ public class CommentController {
 
     @PostMapping("/{post_id}/comments")
     public ResponseEntity<?> createComment(
-            Principal principal,
+            @AuthorizedUser SiteUser siteUser,
             @PathVariable("post_id") Long postId,
             @Valid @RequestBody CommentCreateRequest commentCreateRequest
     ) {
-        CommentCreateResponse commentCreateResponse = commentService.createComment(
-                principal.getName(), postId, commentCreateRequest);
-        return ResponseEntity.ok().body(commentCreateResponse);
+        CommentCreateResponse response = commentService.createComment(siteUser, postId, commentCreateRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/{post_id}/comments/{comment_id}")
     public ResponseEntity<?> updateComment(
-            Principal principal,
+            @AuthorizedUser SiteUser siteUser,
             @PathVariable("post_id") Long postId,
             @PathVariable("comment_id") Long commentId,
             @Valid @RequestBody CommentUpdateRequest commentUpdateRequest
     ) {
-        CommentUpdateResponse commentUpdateResponse = commentService.updateComment(
-                principal.getName(), postId, commentId, commentUpdateRequest
-        );
-        return ResponseEntity.ok().body(commentUpdateResponse);
+        CommentUpdateResponse response = commentService.updateComment(siteUser, postId, commentId, commentUpdateRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/{post_id}/comments/{comment_id}")
     public ResponseEntity<?> deleteCommentById(
-            Principal principal,
+            @AuthorizedUser SiteUser siteUser,
             @PathVariable("post_id") Long postId,
             @PathVariable("comment_id") Long commentId
     ) {
-        CommentDeleteResponse commentDeleteResponse = commentService.deleteCommentById(principal.getName(), postId, commentId);
-        return ResponseEntity.ok().body(commentDeleteResponse);
+        CommentDeleteResponse response = commentService.deleteCommentById(siteUser, postId, commentId);
+        return ResponseEntity.ok().body(response);
     }
 }
