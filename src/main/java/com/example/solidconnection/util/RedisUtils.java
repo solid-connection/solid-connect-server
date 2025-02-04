@@ -44,8 +44,8 @@ public class RedisUtils {
         return VIEW_COUNT_KEY_PREFIX.getValue() + postId;
     }
 
-    public String getValidatePostViewCountRedisKey(String email, Long postId) {
-        return VALIDATE_VIEW_COUNT_KEY_PREFIX.getValue() + postId + ":" + email;
+    public String getValidatePostViewCountRedisKey(long siteUserId, Long postId) {
+        return VALIDATE_VIEW_COUNT_KEY_PREFIX.getValue() + postId + ":" + siteUserId;
     }
 
     public Long getPostIdFromPostViewCountRedisKey(String key) {

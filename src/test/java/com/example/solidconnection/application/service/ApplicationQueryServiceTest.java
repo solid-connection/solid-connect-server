@@ -26,7 +26,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_전체_지원자를_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     "",
                     ""
             );
@@ -72,7 +72,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_특정_지역_지원자를_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     영미권.getCode(),
                     ""
             );
@@ -99,7 +99,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_지원자를_대학_국문_이름으로_필터링해서_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2.getEmail(),
+                    테스트유저_2,
                     null,
                     "일본"
             );
@@ -124,7 +124,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이전_학기_지원자는_조회되지_않는다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     "",
                     ""
             );
@@ -152,7 +152,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_2.getEmail()
+                    테스트유저_2
             );
 
             // then
@@ -180,7 +180,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_지원한_대학_중_미선택이_있을_때_경쟁자_목록을_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_7.getEmail()
+                    테스트유저_7
             );
 
             // then
@@ -202,7 +202,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_지원한_대학이_모두_미선택일_때_경쟁자_목록을_조회한다() {
             //when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_6.getEmail()
+                    테스트유저_6
             );
 
             // then

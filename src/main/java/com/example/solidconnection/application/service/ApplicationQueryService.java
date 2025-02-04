@@ -8,7 +8,6 @@ import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -34,7 +33,6 @@ public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final SiteUserRepository siteUserRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
 
     @Value("${university.term}")
@@ -49,9 +47,7 @@ public class ApplicationQueryService {
      * */
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "application:query:{1}:{2}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public ApplicationsResponse getApplicants(String email, String regionCode, String keyword) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
+    public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 국가와 키워드와 지역을 통해 대학을 필터링한다.
         List<University> universities
                 = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
@@ -64,9 +60,7 @@ public class ApplicationQueryService {
     }
 
     @Transactional(readOnly = true)
-    public ApplicationsResponse getApplicantsByUserApplications(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
+    public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
         List<University> userAppliedUniversities = Arrays.asList(
                         Optional.ofNullable(userLatestApplication.getFirstChoiceUniversity())
@@ -91,8 +85,7 @@ public class ApplicationQueryService {
     // 학기별로 상태가 관리된다.
     // 금학기에 지원이력이 있는 사용자만 지원정보를 확인할 수 있도록 한다.
     @Transactional(readOnly = true)
-    public void validateSiteUserCanViewApplicants(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public void validateSiteUserCanViewApplicants(SiteUser siteUser) {
         VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);

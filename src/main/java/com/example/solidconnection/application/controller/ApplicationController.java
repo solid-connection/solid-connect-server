@@ -5,6 +5,8 @@ import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
+import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.Principal;
 
 @RequiredArgsConstructor
 @RequestMapping("/application")
@@ -29,9 +29,10 @@ public class ApplicationController {
     // 지원서 제출하기 api
     @PostMapping()
     public ResponseEntity<ApplicationSubmissionResponse> apply(
-            Principal principal,
-            @Valid @RequestBody ApplyRequest applyRequest) {
-        boolean result = applicationSubmissionService.apply(principal.getName(), applyRequest);
+            @AuthorizedUser SiteUser siteUser,
+            @Valid @RequestBody ApplyRequest applyRequest
+    ) {
+        boolean result = applicationSubmissionService.apply(siteUser, applyRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApplicationSubmissionResponse(result));
@@ -39,20 +40,22 @@ public class ApplicationController {
 
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
-            Principal principal,
+            @AuthorizedUser SiteUser siteUser,
             @RequestParam(required = false, defaultValue = "") String region,
-            @RequestParam(required = false, defaultValue = "") String keyword) {
-        applicationQueryService.validateSiteUserCanViewApplicants(principal.getName());
-        ApplicationsResponse result = applicationQueryService.getApplicants(principal.getName(), region, keyword);
+            @RequestParam(required = false, defaultValue = "") String keyword
+    ) {
+        applicationQueryService.validateSiteUserCanViewApplicants(siteUser);
+        ApplicationsResponse result = applicationQueryService.getApplicants(siteUser, region, keyword);
         return ResponseEntity
                 .ok(result);
     }
 
     @GetMapping("/competitors")
     public ResponseEntity<ApplicationsResponse> getApplicantsForUserCompetitors(
-            Principal principal) {
-        applicationQueryService.validateSiteUserCanViewApplicants(principal.getName());
-        ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(principal.getName());
+            @AuthorizedUser SiteUser siteUser
+    ) {
+        applicationQueryService.validateSiteUserCanViewApplicants(siteUser);
+        ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(siteUser);
         return ResponseEntity
                 .ok(result);
     }

@@ -58,7 +58,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
         // when
-        boolean result = applicationSubmissionService.apply(테스트유저_1.getEmail(), request);
+        boolean result = applicationSubmissionService.apply(테스트유저_1, request);
 
         // then
         Application savedApplication = applicationRepository.findBySiteUserAndTerm(테스트유저_1, term).orElseThrow();
@@ -92,7 +92,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1.getEmail(), request)
+                applicationSubmissionService.apply(테스트유저_1, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_GPA_SCORE_STATUS.getMessage());
@@ -112,7 +112,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1.getEmail(), request)
+                applicationSubmissionService.apply(테스트유저_1, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_LANGUAGE_TEST_SCORE_STATUS.getMessage());
@@ -132,7 +132,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1.getEmail(), request)
+                applicationSubmissionService.apply(테스트유저_1, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(CANT_APPLY_FOR_SAME_UNIVERSITY.getMessage());
@@ -151,12 +151,12 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
         for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT + 1; i++) {
-            applicationSubmissionService.apply(테스트유저_1.getEmail(), request);
+            applicationSubmissionService.apply(테스트유저_1, request);
         }
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1.getEmail(), request)
+                applicationSubmissionService.apply(테스트유저_1, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());

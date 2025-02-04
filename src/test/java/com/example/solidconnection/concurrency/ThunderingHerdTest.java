@@ -66,9 +66,9 @@ public class ThunderingHerdTest {
             executorService.submit(() -> {
                 try {
                     List<Runnable> tasks = Arrays.asList(
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "", ""),
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "ASIA", ""),
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "", "추오")
+                            () -> applicationQueryService.getApplicants(siteUser, "", ""),
+                            () -> applicationQueryService.getApplicants(siteUser, "ASIA", ""),
+                            () -> applicationQueryService.getApplicants(siteUser, "", "추오")
                     );
                     Collections.shuffle(tasks);
                     tasks.forEach(Runnable::run);
