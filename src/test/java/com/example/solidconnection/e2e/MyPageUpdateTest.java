@@ -37,17 +37,15 @@ class MyPageUpdateTest extends BaseEndToEndTest {
 
     private SiteUser siteUser;
 
-    private final String email = "email@email.com";
-
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserByEmail(email);
+        siteUser = createSiteUserByEmail("email");
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
         tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
     }
 
@@ -62,10 +60,9 @@ class MyPageUpdateTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(MyPageUpdateResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
         assertAll("불러온 마이 페이지 정보가 DB의 정보와 일치한다.",
-                () -> assertThat(myPageUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
-                () -> assertThat(myPageUpdateResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()));
+                () -> assertThat(myPageUpdateResponse.nickname()).isEqualTo(siteUser.getNickname()),
+                () -> assertThat(myPageUpdateResponse.profileImageUrl()).isEqualTo(siteUser.getProfileImageUrl()));
     }
 
     @Test
@@ -82,9 +79,9 @@ class MyPageUpdateTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(NicknameUpdateResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
+        SiteUser updatedSiteUser = siteUserRepository.findById(siteUser.getId()).get();
         assertAll("마이 페이지 정보가 수정된다.",
-                () -> assertThat(nicknameUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()));
+                () -> assertThat(nicknameUpdateResponse.nickname()).isEqualTo(updatedSiteUser.getNickname()));
     }
 
     @Test

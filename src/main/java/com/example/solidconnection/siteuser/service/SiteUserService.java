@@ -42,9 +42,8 @@ public class SiteUserService {
      * 마이페이지 정보를 조회한다.
      * */
     @Transactional(readOnly = true)
-    public MyPageResponse getMyPageInfo(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-        int likedUniversityCount = likedUniversityRepository.countBySiteUser_Email(email);
+    public MyPageResponse getMyPageInfo(SiteUser siteUser) {
+        int likedUniversityCount = likedUniversityRepository.countBySiteUser_Id(siteUser.getId());
         return MyPageResponse.of(siteUser, likedUniversityCount);
     }
 
@@ -52,8 +51,7 @@ public class SiteUserService {
      * 내 정보를 수정하기 위한 마이페이지 정보를 조회한다. (닉네임, 프로필 사진)
      * */
     @Transactional(readOnly = true)
-    public MyPageUpdateResponse getMyPageInfoToUpdate(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public MyPageUpdateResponse getMyPageInfoToUpdate(SiteUser siteUser) {
         return MyPageUpdateResponse.from(siteUser);
     }
 
@@ -61,9 +59,8 @@ public class SiteUserService {
      * 관심 대학교 목록을 조회한다.
      * */
     @Transactional(readOnly = true)
-    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-        List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Email(siteUser.getEmail());
+    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
+        List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
         return likedUniversities.stream()
                 .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
                 .toList();
@@ -73,13 +70,12 @@ public class SiteUserService {
      * 프로필 이미지를 수정한다.
      * */
     @Transactional
-    public ProfileImageUpdateResponse updateProfileImage(String email, MultipartFile imageFile) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public ProfileImageUpdateResponse updateProfileImage(SiteUser siteUser, MultipartFile imageFile) {
         validateProfileImage(imageFile);
 
         // 프로필 이미지를 처음 수정하는 경우에는 deleteExProfile 수행하지 않음
         if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
-            s3Service.deleteExProfile(email);
+            s3Service.deleteExProfile(siteUser);
         }
         UploadedFileUrlResponse uploadedFileUrlResponse = s3Service.uploadFile(imageFile, ImgType.PROFILE);
         siteUser.setProfileImageUrl(uploadedFileUrlResponse.fileUrl());
@@ -102,9 +98,7 @@ public class SiteUserService {
      * 닉네임을 수정한다.
      * */
     @Transactional
-    public NicknameUpdateResponse updateNickname(String email, NicknameUpdateRequest nicknameUpdateRequest) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-
+    public NicknameUpdateResponse updateNickname(SiteUser siteUser, NicknameUpdateRequest nicknameUpdateRequest) {
         validateNicknameDuplicated(nicknameUpdateRequest.nickname());
         validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
 

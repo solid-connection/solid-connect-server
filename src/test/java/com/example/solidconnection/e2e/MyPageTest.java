@@ -19,21 +19,24 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("마이페이지 테스트")
 class MyPageTest extends BaseEndToEndTest {
 
-    private final String email = "email@email.com";
+    private SiteUser siteUser;
+
     @Autowired
     private SiteUserRepository siteUserRepository;
+
     @Autowired
     private TokenProvider tokenProvider;
+
     private String accessToken;
 
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUserRepository.save(createSiteUserByEmail(email));
+        siteUser = siteUserRepository.save(createSiteUserByEmail("email"));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
         tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
     }
 
@@ -48,11 +51,10 @@ class MyPageTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(MyPageResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
         assertAll("불러온 마이 페이지 정보가 DB의 정보와 일치한다.",
-                () -> assertThat(myPageResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
-                () -> assertThat(myPageResponse.birth()).isEqualTo(savedSiteUser.getBirth()),
-                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()),
-                () -> assertThat(myPageResponse.email()).isEqualTo(savedSiteUser.getEmail()));
+                () -> assertThat(myPageResponse.nickname()).isEqualTo(siteUser.getNickname()),
+                () -> assertThat(myPageResponse.birth()).isEqualTo(siteUser.getBirth()),
+                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(siteUser.getProfileImageUrl()),
+                () -> assertThat(myPageResponse.email()).isEqualTo(siteUser.getEmail()));
     }
 }

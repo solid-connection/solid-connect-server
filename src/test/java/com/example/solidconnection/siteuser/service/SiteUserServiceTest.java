@@ -64,7 +64,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         int likedUniversityCount = createLikedUniversities(testUser);
 
         // when
-        MyPageResponse response = siteUserService.getMyPageInfo(testUser.getEmail());
+        MyPageResponse response = siteUserService.getMyPageInfo(testUser);
 
         // then
         Assertions.assertAll(
@@ -84,7 +84,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        MyPageUpdateResponse response = siteUserService.getMyPageInfoToUpdate(testUser.getEmail());
+        MyPageUpdateResponse response = siteUserService.getMyPageInfoToUpdate(testUser);
 
         // then
         Assertions.assertAll(
@@ -100,7 +100,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         int likedUniversityCount = createLikedUniversities(testUser);
 
         // when
-        List<UniversityInfoForApplyPreviewResponse> response = siteUserService.getWishUniversity(testUser.getEmail());
+        List<UniversityInfoForApplyPreviewResponse> response = siteUserService.getWishUniversity(testUser);
 
         // then
         assertThat(response)
@@ -127,7 +127,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
 
             // when
             ProfileImageUpdateResponse response = siteUserService.updateProfileImage(
-                    testUser.getEmail(),
+                    testUser,
                     imageFile
             );
 
@@ -144,7 +144,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+            siteUserService.updateProfileImage(testUser, imageFile);
 
             // then
             then(s3Service).should(never()).deleteExProfile(any());
@@ -159,10 +159,10 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateProfileImage(testUser.getEmail(), imageFile);
+            siteUserService.updateProfileImage(testUser, imageFile);
 
             // then
-            then(s3Service).should().deleteExProfile(testUser.getEmail());
+            then(s3Service).should().deleteExProfile(testUser);
         }
 
         @Test
@@ -172,7 +172,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             MockMultipartFile emptyFile = createEmptyImageFile();
 
             // when & then
-            assertThatCode(() -> siteUserService.updateProfileImage(testUser.getEmail(), emptyFile))
+            assertThatCode(() -> siteUserService.updateProfileImage(testUser, emptyFile))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
         }
@@ -190,12 +190,12 @@ class SiteUserServiceTest extends BaseIntegrationTest {
 
             // when
             NicknameUpdateResponse response = siteUserService.updateNickname(
-                    testUser.getEmail(),
+                    testUser,
                     request
             );
 
             // then
-            SiteUser updatedUser = siteUserRepository.getByEmail(testUser.getEmail());
+            SiteUser updatedUser = siteUserRepository.findById(testUser.getId()).get();
             assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
             assertThat(response.nickname()).isEqualTo(newNickname);
         }
@@ -208,7 +208,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             NicknameUpdateRequest request = new NicknameUpdateRequest("duplicatedNickname");
 
             // when & then
-            assertThatCode(() -> siteUserService.updateNickname(testUser.getEmail(), request))
+            assertThatCode(() -> siteUserService.updateNickname(testUser, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -225,7 +225,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatCode(() ->
-                    siteUserService.updateNickname(testUser.getEmail(), request))
+                    siteUserService.updateNickname(testUser, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }
@@ -278,7 +278,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         likedUniversityRepository.save(likedUniversity1);
         likedUniversityRepository.save(likedUniversity2);
         likedUniversityRepository.save(likedUniversity3);
-        return likedUniversityRepository.countBySiteUser_Email(testUser.getEmail());
+        return likedUniversityRepository.countBySiteUser_Id(testUser.getId());
     }
 
     private MockMultipartFile createValidImageFile() {
