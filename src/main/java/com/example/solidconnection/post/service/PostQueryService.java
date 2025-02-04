@@ -12,7 +12,6 @@ import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -28,28 +27,26 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOA
 public class PostQueryService {
 
     private final PostRepository postRepository;
-    private final SiteUserRepository siteUserRepository;
     private final CommentService commentService;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
     private final PostLikeRepository postLikeRepository;
 
     @Transactional(readOnly = true)
-    public PostFindResponse findPostById(String email, String code, Long postId) {
+    public PostFindResponse findPostById(SiteUser siteUser, String code, Long postId) {
         String boardCode = validateCode(code);
 
         Post post = postRepository.getByIdUsingEntityGraph(postId);
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-        Boolean isOwner = getIsOwner(post, email);
+        Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
 
         PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(post.getBoard());
         PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(post.getSiteUser());
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
-        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(email, postId);
+        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser, postId);
 
         // caching && 어뷰징 방지
-        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(email, postId))) {
+        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), postId))) {
             redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(postId));
         }
 
@@ -65,8 +62,8 @@ public class PostQueryService {
         }
     }
 
-    private Boolean getIsOwner(Post post, String email) {
-        return post.getSiteUser().getEmail().equals(email);
+    private Boolean getIsOwner(Post post, SiteUser siteUser) {
+        return post.getSiteUser().getId().equals(siteUser.getId());
     }
 
     private Boolean getIsLiked(Post post, SiteUser siteUser) {

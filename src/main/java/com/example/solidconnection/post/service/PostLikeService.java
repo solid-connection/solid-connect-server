@@ -8,7 +8,6 @@ import com.example.solidconnection.post.dto.PostLikeResponse;
 import com.example.solidconnection.post.repository.PostLikeRepository;
 import com.example.solidconnection.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.BoardCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,14 +22,12 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOA
 public class PostLikeService {
 
     private final PostRepository postRepository;
-    private final SiteUserRepository siteUserRepository;
     private final PostLikeRepository postLikeRepository;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public PostLikeResponse likePost(String email, String code, Long postId) {
+    public PostLikeResponse likePost(SiteUser siteUser, String code, Long postId) {
         String boardCode = validateCode(code);
         Post post = postRepository.getById(postId);
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
         validateDuplicatePostLike(post, siteUser);
 
         PostLike postLike = new PostLike();
@@ -42,10 +39,9 @@ public class PostLikeService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public PostDislikeResponse dislikePost(String email, String code, Long postId) {
+    public PostDislikeResponse dislikePost(SiteUser siteUser, String code, Long postId) {
         String boardCode = validateCode(code);
         Post post = postRepository.getById(postId);
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
 
         PostLike postLike = postLikeRepository.getByPostAndSiteUser(post, siteUser);
         postLike.resetPostAndSiteUser();

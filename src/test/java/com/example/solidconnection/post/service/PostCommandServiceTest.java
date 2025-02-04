@@ -78,7 +78,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when
             PostCreateResponse response = postCommandService.createPost(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     자유게시판.getCode(),
                     request,
                     imageFiles
@@ -108,7 +108,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1.getEmail(), 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -121,7 +121,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1.getEmail(), 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -134,7 +134,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1.getEmail(), 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -158,7 +158,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when
             PostUpdateResponse response = postCommandService.updatePost(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     자유게시판.getCode(),
                     testPost.getId(),
                     request,
@@ -189,7 +189,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_2.getEmail(),
+                            테스트유저_2,
                             자유게시판.getCode(),
                             testPost.getId(),
                             request,
@@ -209,7 +209,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             자유게시판.getCode(),
                             testPost.getId(),
                             request,
@@ -229,7 +229,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             자유게시판.getCode(),
                             testPost.getId(),
                             request,
@@ -253,7 +253,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when
             PostDeleteResponse response = postCommandService.deletePostById(
-                    테스트유저_1.getEmail(),
+                    테스트유저_1,
                     자유게시판.getCode(),
                     testPost.getId()
             );
@@ -275,7 +275,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
-                            테스트유저_2.getEmail(),
+                            테스트유저_2,
                             자유게시판.getCode(),
                             testPost.getId()
                     ))
@@ -291,7 +291,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
-                            테스트유저_1.getEmail(),
+                            테스트유저_1,
                             자유게시판.getCode(),
                             testPost.getId()
                     ))

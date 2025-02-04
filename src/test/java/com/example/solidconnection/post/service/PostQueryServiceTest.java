@@ -53,12 +53,12 @@ class PostQueryServiceTest extends BaseIntegrationTest {
         Post testPost = createPost(자유게시판, 테스트유저_1, expectedImageUrl);
         List<Comment> comments = createComments(testPost, 테스트유저_1, List.of("첫번째 댓글", "두번째 댓글"));
 
-        String validateKey = redisUtils.getValidatePostViewCountRedisKey(테스트유저_1.getEmail(), testPost.getId());
+        String validateKey = redisUtils.getValidatePostViewCountRedisKey(테스트유저_1.getId(), testPost.getId());
         String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
 
         // when
         PostFindResponse response = postQueryService.findPostById(
-                테스트유저_1.getEmail(),
+                테스트유저_1,
                 자유게시판.getCode(),
                 testPost.getId()
         );

@@ -96,7 +96,7 @@ public class PostViewCountConcurrencyTest {
     @Test
     public void 게시글을_조회할_때_조회수_동시성_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -126,7 +126,7 @@ public class PostViewCountConcurrencyTest {
     @Test
     public void 게시글을_조회할_때_조회수_조작_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -134,7 +134,7 @@ public class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }
@@ -147,7 +147,7 @@ public class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }

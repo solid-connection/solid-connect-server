@@ -15,7 +15,6 @@ import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PostCategory;
@@ -39,14 +38,13 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POS
 public class PostCommandService {
 
     private final PostRepository postRepository;
-    private final SiteUserRepository siteUserRepository;
     private final BoardRepository boardRepository;
     private final S3Service s3Service;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
 
     @Transactional
-    public PostCreateResponse createPost(String email, String code, PostCreateRequest postCreateRequest,
+    public PostCreateResponse createPost(SiteUser siteUser, String code, PostCreateRequest postCreateRequest,
                                          List<MultipartFile> imageFile) {
         // 유효성 검증
         String boardCode = validateCode(code);
@@ -54,7 +52,6 @@ public class PostCommandService {
         validateFileSize(imageFile);
 
         // 객체 생성
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
         Board board = boardRepository.getByCode(boardCode);
         Post post = postCreateRequest.toEntity(siteUser, board);
         // 이미지 처리
@@ -65,12 +62,12 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostUpdateResponse updatePost(String email, String code, Long postId, PostUpdateRequest postUpdateRequest,
+    public PostUpdateResponse updatePost(SiteUser siteUser, String code, Long postId, PostUpdateRequest postUpdateRequest,
                                          List<MultipartFile> imageFile) {
         // 유효성 검증
         String boardCode = validateCode(code);
         Post post = postRepository.getById(postId);
-        validateOwnership(post, email);
+        validateOwnership(post, siteUser);
         validateQuestion(post);
         validateFileSize(imageFile);
 
@@ -96,10 +93,10 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostDeleteResponse deletePostById(String email, String code, Long postId) {
+    public PostDeleteResponse deletePostById(SiteUser siteUser, String code, Long postId) {
         String boardCode = validateCode(code);
         Post post = postRepository.getById(postId);
-        validateOwnership(post, email);
+        validateOwnership(post, siteUser);
         validateQuestion(post);
 
         removePostImages(post);
@@ -119,8 +116,8 @@ public class PostCommandService {
         }
     }
 
-    private void validateOwnership(Post post, String email) {
-        if (!post.getSiteUser().getEmail().equals(email)) {
+    private void validateOwnership(Post post, SiteUser siteUser) {
+        if (!post.getSiteUser().getId().equals(siteUser.getId())) {
             throw new CustomException(INVALID_POST_ACCESS);
         }
     }

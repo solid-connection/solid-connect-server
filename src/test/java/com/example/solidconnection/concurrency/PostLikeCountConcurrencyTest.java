@@ -4,7 +4,6 @@ import com.example.solidconnection.board.domain.Board;
 import com.example.solidconnection.board.repository.BoardRepository;
 import com.example.solidconnection.post.domain.Post;
 import com.example.solidconnection.post.repository.PostRepository;
-import com.example.solidconnection.post.service.PostCommandService;
 import com.example.solidconnection.post.service.PostLikeService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -24,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestContainerSpringBootTest
@@ -57,7 +57,6 @@ class PostLikeCountConcurrencyTest {
         siteUserRepository.save(siteUser);
         post = createPost(board, siteUser);
         postRepository.save(post);
-        createSiteUsers();
     }
 
     private SiteUser createSiteUser() {
@@ -70,22 +69,6 @@ class PostLikeCountConcurrencyTest {
                 Role.MENTEE,
                 Gender.MALE
         );
-    }
-
-    private void createSiteUsers() {
-        for (int i = 0; i < 1000; i++) {
-
-            SiteUser siteUser = new SiteUser(
-                    "email" + i,
-                    "nickname",
-                    "profileImageUrl",
-                    "1999-01-01",
-                    PreparationStatus.CONSIDERING,
-                    Role.MENTEE,
-                    Gender.MALE
-            );
-            siteUserRepository.save(siteUser);
-        }
     }
 
     private Board createBoard() {
@@ -117,10 +100,11 @@ class PostLikeCountConcurrencyTest {
 
         for (int i = 0; i < THREAD_NUMS; i++) {
             String email = "email" + i;
+            SiteUser tmpSiteUser = siteUserRepository.save(createSiteUserByEmail(email));
             executorService.submit(() -> {
                 try {
-                    postLikeService.likePost(email, board.getCode(), post.getId());
-                    postLikeService.dislikePost(email, board.getCode(), post.getId());
+                    postLikeService.likePost(tmpSiteUser, board.getCode(), post.getId());
+                    postLikeService.dislikePost(tmpSiteUser, board.getCode(), post.getId());
                 } finally {
                     doneSignal.countDown();
                 }
