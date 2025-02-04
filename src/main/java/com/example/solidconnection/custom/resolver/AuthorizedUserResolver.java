@@ -13,7 +13,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 @RequiredArgsConstructor
-public class AuthorizedUserArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

@@ -19,10 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("인증된 사용자 argument resolver 테스트")
-class AuthorizedUserArgumentResolverTest {
+class AuthorizedUserResolverTest {
 
     @Autowired
-    private AuthorizedUserArgumentResolver authorizedUserArgumentResolver;
+    private AuthorizedUserResolver authorizedUserResolver;
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -41,7 +41,7 @@ class AuthorizedUserArgumentResolverTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
-        SiteUser resolveSiteUser = (SiteUser) authorizedUserArgumentResolver.resolveArgument(null, null, null, null);
+        SiteUser resolveSiteUser = (SiteUser) authorizedUserResolver.resolveArgument(null, null, null, null);
 
         // then
         assertThat(resolveSiteUser).isEqualTo(siteUser);
@@ -50,7 +50,7 @@ class AuthorizedUserArgumentResolverTest {
     @Test
     void security_context_에_저장된_사용자가_없으면_null_을_반환한다() throws Exception {
         // when, then
-        assertThat(authorizedUserArgumentResolver.resolveArgument(null, null, null, null)).isNull();
+        assertThat(authorizedUserResolver.resolveArgument(null, null, null, null)).isNull();
     }
 
     private SiteUser createSiteUser() {
