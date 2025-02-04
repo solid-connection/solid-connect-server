@@ -26,7 +26,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_전체_지원자를_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1.getEmail(),
+                    테스트유저_2.getEmail(),
                     "",
                     ""
             );
@@ -36,7 +36,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, false))),
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
                     UniversityApplicantsResponse.of(메이지대학_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false))),
                     UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
@@ -47,7 +47,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
 
             assertThat(response.secondChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, false))),
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
                     UniversityApplicantsResponse.of(그라츠대학_지원_정보,
@@ -58,7 +58,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
 
             assertThat(response.thirdChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, false))),
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
                     UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
                     UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
@@ -72,7 +72,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_특정_지역_지원자를_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1.getEmail(),
+                    테스트유저_2.getEmail(),
                     영미권.getCode(),
                     ""
             );
@@ -82,14 +82,14 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, false))),
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
                     UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
             ));
 
             assertThat(response.secondChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, false))),
+                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
                             List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
             ));
@@ -99,7 +99,7 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
         void 이번_학기_지원자를_대학_국문_이름으로_필터링해서_조회한다() {
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1.getEmail(),
+                    테스트유저_2.getEmail(),
                     null,
                     "일본"
             );
