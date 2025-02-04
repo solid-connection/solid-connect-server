@@ -109,8 +109,8 @@ public class S3Service {
      * - 기존 파일의 key(S3파일명)를 찾는다.
      * - S3에서 파일을 삭제한다.
      * */
-    public void deleteExProfile(String email) {
-        String key = getExProfileImageUrl(email);
+    public void deleteExProfile(SiteUser siteUser) {
+        String key = siteUser.getProfileImageUrl();
         deleteFile(key);
     }
 
@@ -128,10 +128,5 @@ public class S3Service {
             log.error("파일 삭제 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
             throw new CustomException(S3_CLIENT_EXCEPTION);
         }
-    }
-
-    private String getExProfileImageUrl(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
-        return siteUser.getProfileImageUrl();
     }
 }
