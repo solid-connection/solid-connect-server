@@ -2,7 +2,6 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
@@ -24,7 +23,6 @@ public class UniversityRecommendService {
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final GeneralUniversityRecommendService generalUniversityRecommendService;
-    private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
     private String term;
@@ -36,8 +34,7 @@ public class UniversityRecommendService {
      * - 맞춤 추천 대학교의 수가 6개보다 적다면, 공통 추천 대학교 후보에서 이번 term 에 열리는 학교들을 부족한 수 만큼 불러온다.
      * */
     @Transactional(readOnly = true)
-    public UniversityRecommendsResponse getPersonalRecommends(String email) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
         List<UniversityInfoForApply> personalRecommends = universityInfoForApplyRepository
                 .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);

@@ -52,7 +52,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         interestedRegionRepository.save(new InterestedRegion(testUser, 영미권));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -72,7 +72,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -91,7 +91,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -112,7 +112,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser.getEmail());
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
 
         // then
         assertThat(response.recommendedUniversities())

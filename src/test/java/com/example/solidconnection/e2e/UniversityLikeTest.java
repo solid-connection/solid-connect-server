@@ -33,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("대학교 좋아요 테스트")
 class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
 
-    private final String email = "email@email.com";
-
     @Autowired
     private SiteUserRepository siteUserRepository;
 
@@ -53,12 +51,12 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserByEmail(email);
+        siteUser = createSiteUserByEmail("email@email.com");
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(email, TokenType.REFRESH);
+        accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
+        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
         tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
     }
 
@@ -102,7 +100,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(LikeResultResponse.class);
 
         Optional<LikedUniversity> likedUniversity
-                = likedUniversityRepository.findAllBySiteUser_Email(email).stream().findFirst();
+                = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId()).stream().findFirst();
         assertAll("좋아요 누른 대학교를 저장하고 좋아요 성공 응답을 반환한다.",
                 () -> assertThat(likedUniversity).isPresent(),
                 () -> assertThat(likedUniversity.get().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
@@ -125,7 +123,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(LikeResultResponse.class);
 
         Optional<LikedUniversity> likedUniversity
-                = likedUniversityRepository.findAllBySiteUser_Email(email).stream().findFirst();
+                = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId()).stream().findFirst();
         assertAll("좋아요 누른 대학교를 삭제하고, 좋아요 취소 응답을 반환한다.",
                 () -> assertThat(likedUniversity).isEmpty(),
                 () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE)

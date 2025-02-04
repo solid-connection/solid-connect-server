@@ -2,7 +2,6 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.IsLikeResponse;
@@ -24,7 +23,6 @@ public class UniversityLikeService {
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final LikedUniversityRepository likedUniversityRepository;
-    private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
     public String term;
@@ -34,8 +32,7 @@ public class UniversityLikeService {
      * - 이미 좋아요가 눌러져있다면, 좋아요를 취소한다.
      * */
     @Transactional
-    public LikeResultResponse likeUniversity(String email, Long universityInfoForApplyId) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
         UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
         Optional<LikedUniversity> alreadyLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
@@ -56,8 +53,7 @@ public class UniversityLikeService {
      * '좋아요'한 대학교인지 확인한다.
      * */
     @Transactional(readOnly = true)
-    public IsLikeResponse getIsLiked(String email, Long universityInfoForApplyId) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public IsLikeResponse getIsLiked(SiteUser siteUser, Long universityInfoForApplyId) {
         UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
         boolean isLike = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply).isPresent();
         return new IsLikeResponse(isLike);

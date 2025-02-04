@@ -40,8 +40,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        LikeResultResponse response = universityLikeService.likeUniversity(
-                testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE);
@@ -56,8 +55,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         saveLikedUniversity(testUser, 괌대학_A_지원_정보);
 
         // when
-        LikeResultResponse response = universityLikeService.likeUniversity(
-                testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE);
@@ -72,7 +70,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         Long invalidUniversityId = 9999L;
 
         // when & then
-        assertThatCode(() -> universityLikeService.likeUniversity(testUser.getEmail(), invalidUniversityId))
+        assertThatCode(() -> universityLikeService.likeUniversity(testUser, invalidUniversityId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
@@ -84,7 +82,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         saveLikedUniversity(testUser, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(testUser, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -96,7 +94,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser.getEmail(), 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(testUser, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -109,7 +107,7 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
         Long invalidUniversityId = 9999L;
 
         // when & then
-        assertThatCode(() -> universityLikeService.getIsLiked(testUser.getEmail(), invalidUniversityId))
+        assertThatCode(() -> universityLikeService.getIsLiked(testUser, invalidUniversityId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
