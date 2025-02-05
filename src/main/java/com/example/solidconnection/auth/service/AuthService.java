@@ -5,24 +5,18 @@ import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDate;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
-import static com.example.solidconnection.auth.domain.TokenType.ACCESS;
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
-import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
 
-    private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
 
     /*
@@ -30,12 +24,7 @@ public class AuthService {
      * - 엑세스 토큰을 블랙리스트에 추가한다.
      * */
     public void signOut(String accessToken) {
-        redisTemplate.opsForValue().set(
-                BLACKLIST.addPrefixToSubject(accessToken),
-                accessToken,
-                BLACKLIST.getExpireTime(),
-                TimeUnit.MILLISECONDS
-        );
+        tokenProvider.generateAndSaveBlackListToken(accessToken);
     }
 
     /*
@@ -56,14 +45,12 @@ public class AuthService {
      * */
     public ReissueResponse reissue(String subject) {
         // 리프레시 토큰 만료 확인
-        String refreshTokenKey = REFRESH.addPrefixToSubject(subject);
-        String refreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
-        if (ObjectUtils.isEmpty(refreshToken)) {
+        Optional<String> optionalRefreshToken = tokenProvider.findRefreshToken(subject);
+        if (optionalRefreshToken.isEmpty()) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
-        String newAccessToken = tokenProvider.generateToken(subject, ACCESS);
-        tokenProvider.saveToken(newAccessToken, ACCESS);
+        String newAccessToken = tokenProvider.generateAccessToken(subject);
         return new ReissueResponse(newAccessToken);
     }
 }

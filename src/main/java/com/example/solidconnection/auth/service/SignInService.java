@@ -60,12 +60,12 @@ public class SignInService {
     }
 
     private SignInResponse getSignInInfo(SiteUser siteUser) {
-        String accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
-        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
+        String accessToken = tokenProvider.generateAccessToken(siteUser);
+        String refreshToken = tokenProvider.generateAndSaveRefreshToken(siteUser);
         return new SignInResponse(true, accessToken, refreshToken);
     }
 
+    // todo: SignUpTokenProvider 를 만들어서 거기에만 의존하도록 변경 필요
     private FirstAccessResponse getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
         String kakaoOauthToken = tokenProvider.generateToken(kakaoUserInfoDto.kakaoAccountDto().email(), TokenType.KAKAO_OAUTH);
         tokenProvider.saveToken(kakaoOauthToken, TokenType.KAKAO_OAUTH);

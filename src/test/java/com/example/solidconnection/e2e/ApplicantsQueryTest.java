@@ -65,17 +65,14 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         SiteUser 사용자6 = siteUserRepository.save(createSiteUserByEmail("email6"));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(나, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(나, TokenType.REFRESH);
-        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = tokenProvider.generateAccessToken(나);
+        tokenProvider.generateAndSaveRefreshToken(나);
 
-        adminAccessToken = tokenProvider.generateToken(사용자5_관리자, TokenType.ACCESS);
-        String adminRefreshToken = tokenProvider.generateToken(사용자5_관리자, TokenType.REFRESH);
-        tokenProvider.saveToken(adminRefreshToken, TokenType.REFRESH);
+        adminAccessToken = tokenProvider.generateAccessToken(사용자5_관리자);
+        tokenProvider.generateAndSaveRefreshToken(사용자5_관리자);
 
-        user6AccessToken = tokenProvider.generateToken(사용자6, TokenType.ACCESS);
-        String user6RefreshToken = tokenProvider.generateToken(사용자6, TokenType.REFRESH);
-        tokenProvider.saveToken(user6RefreshToken, TokenType.REFRESH);
+        user6AccessToken = tokenProvider.generateAccessToken(사용자6);
+        tokenProvider.generateAndSaveRefreshToken(사용자6);
 
         // setUp - 지원 정보 저장
         Gpa gpa = createDummyGpa();

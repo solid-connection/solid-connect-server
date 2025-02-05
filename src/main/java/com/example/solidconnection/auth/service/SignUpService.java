@@ -2,7 +2,6 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
@@ -64,9 +63,8 @@ public class SignUpService {
         saveInterestedCountry(signUpRequest, savedSiteUser);
 
         // 토큰 발급
-        String accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
-        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
+        String accessToken = tokenProvider.generateAccessToken(siteUser);
+        String refreshToken = tokenProvider.generateAndSaveRefreshToken(siteUser);
         return new SignUpResponse(accessToken, refreshToken);
     }
 

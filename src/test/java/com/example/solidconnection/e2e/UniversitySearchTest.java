@@ -1,6 +1,5 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -35,9 +34,8 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
-        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = tokenProvider.generateAccessToken(siteUser);
+        tokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test

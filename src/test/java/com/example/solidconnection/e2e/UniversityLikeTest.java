@@ -1,7 +1,6 @@
 package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.auth.service.TokenProvider;
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -28,7 +27,7 @@ import static com.example.solidconnection.e2e.DynamicFixture.createUniversityFor
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("대학교 좋아요 테스트")
 class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
@@ -55,9 +54,8 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateToken(siteUser, TokenType.ACCESS);
-        String refreshToken = tokenProvider.generateToken(siteUser, TokenType.REFRESH);
-        tokenProvider.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = tokenProvider.generateAccessToken(siteUser);
+        tokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test
@@ -138,7 +136,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         IsLikeResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .get("/university/"+ 괌대학_A_지원_정보.getId() +"/like")
+                .get("/university/" + 괌대학_A_지원_정보.getId() + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(IsLikeResponse.class);

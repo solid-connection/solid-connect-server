@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
@@ -23,11 +24,37 @@ public class TokenProvider {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtProperties jwtProperties;
 
-    public String generateToken(SiteUser siteUser, TokenType tokenType) {
+    public String generateAccessToken(SiteUser siteUser) {
         String subject = siteUser.getId().toString();
-        return generateToken(subject, tokenType);
+        return generateToken(subject, TokenType.ACCESS);
     }
 
+    public String generateAccessToken(String subject) {
+        return generateToken(subject, TokenType.ACCESS);
+    }
+
+    public String generateAndSaveRefreshToken(SiteUser siteUser) {
+        String subject = siteUser.getId().toString();
+        String refreshToken = generateToken(subject, TokenType.REFRESH);
+        return saveToken(refreshToken, TokenType.REFRESH);
+    }
+
+    public String generateAndSaveBlackListToken(String accessToken) {
+        String refreshToken = generateToken(accessToken, TokenType.BLACKLIST);
+        return saveToken(refreshToken, TokenType.BLACKLIST);
+    }
+
+    public Optional<String> findRefreshToken(String subject) {
+        String refreshTokenKey = TokenType.REFRESH.addPrefixToSubject(subject);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
+    }
+
+    public Optional<String> findBlackListToken(String subject) {
+        String refreshTokenKey = TokenType.BLACKLIST.addPrefixToSubject(subject);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
+    }
+
+    // todo: SignUpTokenProvider 가 생기면 private 으로 변경
     public String generateToken(String string, TokenType tokenType) {
         Claims claims = Jwts.claims().setSubject(string);
         Date now = new Date();
@@ -40,6 +67,7 @@ public class TokenProvider {
                 .compact();
     }
 
+    // todo: SignUpTokenProvider 가 생기면 private 으로 변경
     public String saveToken(String token, TokenType tokenType) {
         String subject = parseSubject(token, jwtProperties.secret());
         redisTemplate.opsForValue().set(
