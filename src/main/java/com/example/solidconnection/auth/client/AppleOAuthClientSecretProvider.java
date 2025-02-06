@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import static com.example.solidconnection.custom.exception.ErrorCode.FAILED_TO_READ_APPLE_PRIVATE_KEY;
 
 /*
+ * 애플 OAuth 에 필요하 클라이언트 시크릿은 매번 동적으로 생성해야 한다.
+ * 클라이언트 시크릿은 애플 개발자 계정에서 발급받은 개인키(*.p8)를 사용하여 JWT 를 생성한다.
  * https://developer.apple.com/documentation/accountorganizationaldatasharing/creating-a-client-secret
  * */
 @Component

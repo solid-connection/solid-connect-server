@@ -7,6 +7,7 @@ public record AppleOAuthClientProperties(
         String tokenUrl,
         String clientSecretAudienceUrl,
         String redirectUrl,
+        String publicKeyUrl,
         String clientId,
         String teamId,
         String keyId
