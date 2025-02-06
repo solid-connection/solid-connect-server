@@ -6,7 +6,7 @@ import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.KakaoOAuthService;
+import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
 import com.example.solidconnection.auth.service.SignUpService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.custom.resolver.ExpiredToken;

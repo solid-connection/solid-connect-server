@@ -1,6 +1,7 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.service.oauth.SignUpTokenProvider;
 import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.JwtUtils;

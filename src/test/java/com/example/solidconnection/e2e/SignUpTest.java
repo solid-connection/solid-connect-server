@@ -3,7 +3,7 @@ package com.example.solidconnection.e2e;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.auth.service.AuthTokenProvider;
-import com.example.solidconnection.auth.service.SignUpTokenProvider;
+import com.example.solidconnection.auth.service.oauth.SignUpTokenProvider;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.InterestedCountry;
