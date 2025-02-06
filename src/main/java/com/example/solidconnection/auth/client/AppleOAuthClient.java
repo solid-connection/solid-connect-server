@@ -22,6 +22,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.APPLE_AUTHO
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLE_ID_TOKEN_MISSING_EMAIL;
 
 /*
+ * 애플 인증을 위한 OAuth2 클라이언트
  * https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens
  * */
 @Component

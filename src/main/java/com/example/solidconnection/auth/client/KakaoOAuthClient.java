@@ -20,6 +20,12 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_OR_
 import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
 import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
 
+/*
+ * 카카오 인증을 위한 OAuth2 클라이언트
+ * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
+ * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
+ * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+ * */
 @Component
 @RequiredArgsConstructor
 public class KakaoOAuthClient {
@@ -27,20 +33,11 @@ public class KakaoOAuthClient {
     private final RestTemplate restTemplate;
     private final KakaoOAuthClientProperties kakaoOAuthClientProperties;
 
-    /*
-     * 클라이언트에서 사용자가 카카오 로그인을 하면, 클라이언트는 '카카오 인가 코드'를 받아, 서버에 넘겨준다.
-     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
-     * 서버는 카카오 인증 코드를 사용해 카카오 서버로부터 '카카오 토큰'을 받아온다.
-     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
-     * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
-     *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
-     * */
     public KakaoUserInfoDto getUserInfo(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);
     }
 
-    // 카카오 토큰 요청
     private String getKakaoAccessToken(String code) {
         try {
             ResponseEntity<KakaoTokenDto> response = restTemplate.exchange(
@@ -61,7 +58,6 @@ public class KakaoOAuthClient {
         }
     }
 
-    // 카카오 엑세스 토큰 요청하는 URI 생성
     private String buildTokenUri(String code) {
         return UriComponentsBuilder.fromHttpUrl(kakaoOAuthClientProperties.tokenUrl())
                 .queryParam("grant_type", "authorization_code")
@@ -71,12 +67,10 @@ public class KakaoOAuthClient {
                 .toUriString();
     }
 
-    // 카카오 사용자 정보 요청
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
 
-        // 사용자의 정보 요청
         ResponseEntity<KakaoUserInfoDto> response = restTemplate.exchange(
                 kakaoOAuthClientProperties.userInfoUrl(),
                 HttpMethod.GET,
@@ -84,7 +78,6 @@ public class KakaoOAuthClient {
                 KakaoUserInfoDto.class
         );
 
-        // 응답 예외처리
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return response.getBody();
         } else {

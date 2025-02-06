@@ -15,13 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-
 /*
  * OAuth 제공자로부터 이메일을 받아 기존 회원인지, 신규 회원인지 판별하고, 이에 따라 다르게 응답한다.
- * 기존 회원
- * - 로그인한다.
- * 신규 회원
- * - 회원가입할 때 필요한 정보를 제공한다.
+ * 기존 회원 : 로그인한다.
+ * 신규 회원 : 회원가입할 때 필요한 정보를 제공한다.
  * */
 public abstract class OAuthService {
 
