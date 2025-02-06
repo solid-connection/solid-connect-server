@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.client;
 
-import com.example.solidconnection.auth.dto.kakao.KakaoTokenDto;
-import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.KakaoTokenDto;
+import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.config.client.KakaoOAuthClientProperties;
 import com.example.solidconnection.custom.exception.CustomException;
 import lombok.RequiredArgsConstructor;

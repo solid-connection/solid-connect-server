@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public record SignUpRequest(
-        String kakaoOauthToken,
+        String signUpToken,
         List<String> interestedRegions,
         List<String> interestedCountries,
         PreparationStatus preparationStatus,

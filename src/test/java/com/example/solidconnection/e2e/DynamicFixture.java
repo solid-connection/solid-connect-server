@@ -2,7 +2,7 @@ package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;

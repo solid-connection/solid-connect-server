@@ -1,10 +1,10 @@
 package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.auth.client.KakaoOAuthClient;
-import com.example.solidconnection.auth.dto.OAuthSignInResponse;
-import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
-import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
-import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
+import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
+import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import io.restassured.RestAssured;
@@ -49,14 +49,14 @@ class SignInTest extends BaseEndToEndTest {
                 .willReturn(kakaoUserInfoDto);
 
         // request - body 생성 및 요청
-        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
-        FirstAccessResponse response = RestAssured.given().log().all()
+        OAuthCodeRequest OAuthCodeRequest = new OAuthCodeRequest(kakaoCode);
+        SignUpPrepareResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(kakaoCodeRequest)
+                .body(OAuthCodeRequest)
                 .when().post("/auth/kakao")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(FirstAccessResponse.class);
+                .extract().as(SignUpPrepareResponse.class);
 
         KakaoUserInfoDto.KakaoAccountDto.KakaoProfileDto kakaoProfileDto = kakaoUserInfoDto.kakaoAccountDto().profile();
         assertAll("카카오톡 사용자 정보를 응답한다.",
@@ -82,10 +82,10 @@ class SignInTest extends BaseEndToEndTest {
         SiteUser siteUser = siteUserRepository.save(createSiteUserByEmail(email));
 
         // request - body 생성 및 요청
-        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
+        OAuthCodeRequest oAuthCodeRequest = new OAuthCodeRequest(kakaoCode);
         OAuthSignInResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(kakaoCodeRequest)
+                .body(oAuthCodeRequest)
                 .when().post("/auth/kakao")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
@@ -115,10 +115,10 @@ class SignInTest extends BaseEndToEndTest {
         SiteUser siteUser = siteUserRepository.save(siteUserFixture);
 
         // request - body 생성 및 요청
-        KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
+        OAuthCodeRequest OAuthCodeRequest = new OAuthCodeRequest(kakaoCode);
         OAuthSignInResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(kakaoCodeRequest)
+                .body(OAuthCodeRequest)
                 .when().post("/auth/kakao")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())

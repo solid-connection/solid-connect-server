@@ -36,7 +36,7 @@ public class SignUpService {
 
     /*
      * 회원가입을 한다.
-     * - 카카오로 최초 로그인 시 우리 서비스에서 발급한 카카오 토큰 kakaoOauthToken 을 검증한다.
+     * - 카카오로 최초 로그인 시 우리 서비스에서 발급한 카카오 토큰 signUpToken 을 검증한다.
      *   - 이는 '카카오 인증을 하지 않고 회원가입 api 만으로 회원가입 하는 상황'을 방지하기 위함이다.
      *   - 만약 api 만으로 회원가입을 한다면, 카카오 인증과 이메일에 대한 검증 없이 회원가입이 가능해진다.
      *   - 이메일은 우리 서비스에서 사용자를 식별하는 중요한 정보이기 때문에 '우리 서비스에서 발급한 카카오 토큰인지 검증하는' 단계가 필요하다.
@@ -49,8 +49,8 @@ public class SignUpService {
     @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 검증
-        tokenValidator.validateKakaoToken(signUpRequest.kakaoOauthToken());
-        String email = authTokenProvider.getEmail(signUpRequest.kakaoOauthToken());
+        tokenValidator.validateKakaoToken(signUpRequest.signUpToken());
+        String email = authTokenProvider.getEmail(signUpRequest.signUpToken());
         validateNicknameDuplicated(signUpRequest.nickname());
         validateUserNotDuplicated(email);
 

@@ -1,12 +1,12 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.client.KakaoOAuthClient;
-import com.example.solidconnection.auth.dto.OAuthSignInResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
-import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
-import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
-import com.example.solidconnection.auth.dto.kakao.KakaoOAuthResponse;
-import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
+import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -23,22 +23,21 @@ import java.util.Optional;
  * - 액세스 토큰과 리프레시 토큰을 발급한다.
  * 신규 회원 : 회원가입 페이지로 리다이렉트할 때 필요한 정보 제공
  * - 회원가입 시 입력하는 '닉네임'과 '프로필 사진' 부분을 미리 채우기 위해 사용자 정보를 리턴한다.
- * - 또한, 우리 서비스에서 카카오 인증을 받았는지 나타내기 위한 'kakaoOauthToken' 을 발급해서 응답한다.
- * - 회원가입할 때 클라이언트는 이때 발급받은 kakaoOauthToken 를 요청에 포함해 요청한다. (SignUpService 참고)
+ * - 또한, 우리 서비스에서 카카오 인증을 받았는지 나타내기 위한 'signUpToken' 을 발급해서 응답한다.
+ * - 회원가입할 때 클라이언트는 이때 발급받은 signUpToken 를 요청에 포함해 요청한다. (SignUpService 참고)
  * */
 @Service
 @RequiredArgsConstructor
 public class KakaoOAuthService {
 
-    private final AuthTokenProvider authTokenProvider;
     private final SignUpTokenProvider signUpTokenProvider;
     private final SignInService signInService;
     private final SiteUserRepository siteUserRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
 
     @Transactional
-    public KakaoOAuthResponse processOAuth(KakaoCodeRequest kakaoCodeRequest) {
-        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.getUserInfo(kakaoCodeRequest.code());
+    public OAuthResponse processOAuth(OAuthCodeRequest oAuthCodeRequest) {
+        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.getUserInfo(oAuthCodeRequest.code());
         String email = kakaoUserInfoDto.kakaoAccountDto().email();
         Optional<SiteUser> optionalSiteUser = siteUserRepository.findByEmailAndAuthType(email, AuthType.KAKAO);
 
@@ -46,7 +45,7 @@ public class KakaoOAuthService {
             return getSignInInfo(optionalSiteUser.get());
         }
 
-        return getFirstAccessInfo(kakaoUserInfoDto);
+        return getSignUpPrepareResponse(kakaoUserInfoDto);
     }
 
     private OAuthSignInResponse getSignInInfo(SiteUser siteUser) {
@@ -54,8 +53,8 @@ public class KakaoOAuthService {
         return new OAuthSignInResponse(true, signInResponse.accessToken(), signInResponse.refreshToken());
     }
 
-    private FirstAccessResponse getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
+    private SignUpPrepareResponse getSignUpPrepareResponse(KakaoUserInfoDto kakaoUserInfoDto) {
         String kakaoOauthToken = signUpTokenProvider.generateAndSaveSignUpToken(kakaoUserInfoDto.kakaoAccountDto().email());
-        return FirstAccessResponse.of(kakaoUserInfoDto, kakaoOauthToken);
+        return SignUpPrepareResponse.of(kakaoUserInfoDto, kakaoOauthToken);
     }
 }
