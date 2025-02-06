@@ -6,7 +6,7 @@ import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoOAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.SignInService;
+import com.example.solidconnection.auth.service.KakaoOAuthService;
 import com.example.solidconnection.auth.service.SignUpService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.custom.resolver.ExpiredToken;
@@ -28,13 +28,13 @@ public class AuthController {
 
     private final AuthService authService;
     private final SignUpService signUpService;
-    private final SignInService signInService;
+    private final KakaoOAuthService kakaoOAuthService;
 
     @PostMapping("/kakao")
     public ResponseEntity<KakaoOAuthResponse> processKakaoOAuth(
             @RequestBody KakaoCodeRequest kakaoCodeRequest
     ) {
-        KakaoOAuthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);
+        KakaoOAuthResponse kakaoOauthResponse = kakaoOAuthService.processOAuth(kakaoCodeRequest);
         return ResponseEntity.ok(kakaoOauthResponse);
     }
 

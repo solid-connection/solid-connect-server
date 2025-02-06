@@ -1,7 +1,7 @@
 package com.example.solidconnection.e2e;
 
 import com.example.solidconnection.auth.client.KakaoOAuthClient;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
@@ -45,7 +45,7 @@ class SignInTest extends BaseEndToEndTest {
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
         KakaoUserInfoDto kakaoUserInfoDto = createKakaoUserInfoDtoByEmail(email);
-        given(kakaoOAuthClient.processOAuth(kakaoCode))
+        given(kakaoOAuthClient.getUserInfo(kakaoCode))
                 .willReturn(kakaoUserInfoDto);
 
         // request - body 생성 및 요청
@@ -75,7 +75,7 @@ class SignInTest extends BaseEndToEndTest {
         // stub - kakaoOAuthClient 가 정해진 사용자 프로필 정보를 반환하도록
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
-        given(kakaoOAuthClient.processOAuth(kakaoCode))
+        given(kakaoOAuthClient.getUserInfo(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 사용자 정보 저장
@@ -83,13 +83,13 @@ class SignInTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
-        SignInResponse response = RestAssured.given().log().all()
+        OAuthSignInResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(kakaoCodeRequest)
                 .when().post("/auth/kakao")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(SignInResponse.class);
+                .extract().as(OAuthSignInResponse.class);
 
         assertAll("리프레스 토큰과 엑세스 토큰을 응답한다.",
                 () -> assertThat(response.isRegistered()).isTrue(),
@@ -105,7 +105,7 @@ class SignInTest extends BaseEndToEndTest {
         // stub - kakaoOAuthClient 가 정해진 사용자 프로필 정보를 반환하도록
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
-        given(kakaoOAuthClient.processOAuth(kakaoCode))
+        given(kakaoOAuthClient.getUserInfo(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 계정 복구 기간이 되지 않은 사용자 저장
@@ -116,13 +116,13 @@ class SignInTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         KakaoCodeRequest kakaoCodeRequest = new KakaoCodeRequest(kakaoCode);
-        SignInResponse response = RestAssured.given().log().all()
+        OAuthSignInResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(kakaoCodeRequest)
                 .when().post("/auth/kakao")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(SignInResponse.class);
+                .extract().as(OAuthSignInResponse.class);
 
         SiteUser updatedSiteUser = siteUserRepository.findById(siteUser.getId()).get();
         assertAll("리프레스 토큰과 엑세스 토큰을 응답하고, 탈퇴 날짜를 초기화한다.",
