@@ -1,6 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.entity.InterestedCountry;
 import com.example.solidconnection.entity.InterestedRegion;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
@@ -37,7 +37,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
     private InterestedCountyRepository interestedCountyRepository;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private AuthTokenProvider authTokenProvider;
 
     @Autowired
     private GeneralUniversityRecommendService generalUniversityRecommendService;
@@ -53,8 +53,8 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         generalUniversityRecommendService.init();
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateAccessToken(siteUser);
-        tokenProvider.generateAndSaveRefreshToken(siteUser);
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test

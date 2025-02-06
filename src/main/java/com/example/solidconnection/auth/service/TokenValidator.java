@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.example.solidconnection.auth.domain.TokenType.ACCESS;
-import static com.example.solidconnection.auth.domain.TokenType.KAKAO_OAUTH;
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.SIGN_UP;
 import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_TOKEN_EXPIRED;
 import static com.example.solidconnection.custom.exception.ErrorCode.EMPTY_TOKEN;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN;
@@ -38,7 +38,7 @@ public class TokenValidator {
 
     public void validateKakaoToken(String token) {
         validateTokenNotEmpty(token);
-        validateTokenNotExpired(token, KAKAO_OAUTH);
+        validateTokenNotExpired(token, SIGN_UP);
         validateKakaoTokenNotUsed(token);
     }
 
@@ -55,7 +55,7 @@ public class TokenValidator {
             if (tokenType.equals(ACCESS)) {
                 throw new CustomException(ACCESS_TOKEN_EXPIRED);
             }
-            if (token.equals(KAKAO_OAUTH)) {
+            if (token.equals(SIGN_UP)) {
                 throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
             }
         }
@@ -70,7 +70,7 @@ public class TokenValidator {
 
     private void validateKakaoTokenNotUsed(String token) {
         String email = getClaim(token).getSubject();
-        if (!Objects.equals(redisTemplate.opsForValue().get(KAKAO_OAUTH.addPrefixToSubject(email)), token)) {
+        if (!Objects.equals(redisTemplate.opsForValue().get(SIGN_UP.addPrefixToSubject(email)), token)) {
             throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
         }
     }

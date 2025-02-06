@@ -1,6 +1,6 @@
 package com.example.solidconnection.custom.security.filter;
 
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.custom.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,7 +21,7 @@ import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 @RequiredArgsConstructor
 public class SignOutCheckFilter extends OncePerRequestFilter {
 
-    private final TokenProvider tokenProvider;
+    private final AuthTokenProvider authTokenProvider;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -35,7 +35,7 @@ public class SignOutCheckFilter extends OncePerRequestFilter {
     }
 
     private boolean hasSignedOut(String accessToken) {
-        Optional<String> blackListToken = tokenProvider.findBlackListToken(accessToken);
+        Optional<String> blackListToken = authTokenProvider.findBlackListToken(accessToken);
         return blackListToken.isPresent();
     }
 }

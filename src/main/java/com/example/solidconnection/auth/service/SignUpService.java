@@ -27,7 +27,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREAD
 public class SignUpService {
 
     private final TokenValidator tokenValidator;
-    private final TokenProvider tokenProvider;
+    private final AuthTokenProvider authTokenProvider;
     private final SiteUserRepository siteUserRepository;
     private final RegionRepository regionRepository;
     private final InterestedRegionRepository interestedRegionRepository;
@@ -50,7 +50,7 @@ public class SignUpService {
     public SignUpResponse signUp(SignUpRequest signUpRequest) {
         // 검증
         tokenValidator.validateKakaoToken(signUpRequest.kakaoOauthToken());
-        String email = tokenProvider.getEmail(signUpRequest.kakaoOauthToken());
+        String email = authTokenProvider.getEmail(signUpRequest.kakaoOauthToken());
         validateNicknameDuplicated(signUpRequest.nickname());
         validateUserNotDuplicated(email);
 
@@ -63,8 +63,8 @@ public class SignUpService {
         saveInterestedCountry(signUpRequest, savedSiteUser);
 
         // 토큰 발급
-        String accessToken = tokenProvider.generateAccessToken(siteUser);
-        String refreshToken = tokenProvider.generateAndSaveRefreshToken(siteUser);
+        String accessToken = authTokenProvider.generateAccessToken(siteUser);
+        String refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
         return new SignUpResponse(accessToken, refreshToken);
     }
 

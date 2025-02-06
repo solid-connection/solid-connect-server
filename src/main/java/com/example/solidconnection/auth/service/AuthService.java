@@ -17,14 +17,14 @@ import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOK
 @Service
 public class AuthService {
 
-    private final TokenProvider tokenProvider;
+    private final AuthTokenProvider authTokenProvider;
 
     /*
      * 로그아웃 한다.
      * - 엑세스 토큰을 블랙리스트에 추가한다.
      * */
     public void signOut(String accessToken) {
-        tokenProvider.generateAndSaveBlackListToken(accessToken);
+        authTokenProvider.generateAndSaveBlackListToken(accessToken);
     }
 
     /*
@@ -45,12 +45,12 @@ public class AuthService {
      * */
     public ReissueResponse reissue(String subject) {
         // 리프레시 토큰 만료 확인
-        Optional<String> optionalRefreshToken = tokenProvider.findRefreshToken(subject);
+        Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
         if (optionalRefreshToken.isEmpty()) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
-        String newAccessToken = tokenProvider.generateAccessToken(subject);
+        String newAccessToken = authTokenProvider.generateAccessToken(subject);
         return new ReissueResponse(newAccessToken);
     }
 }

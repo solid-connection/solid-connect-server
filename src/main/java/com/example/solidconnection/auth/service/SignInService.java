@@ -6,7 +6,6 @@ import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
 import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -20,7 +19,8 @@ import java.util.Optional;
 @Service
 public class SignInService {
 
-    private final TokenProvider tokenProvider;
+    private final AuthTokenProvider authTokenProvider;
+    private final SignUpTokenProvider signUpTokenProvider;
     private final SiteUserRepository siteUserRepository;
     private final KakaoOAuthClient kakaoOAuthClient;
 
@@ -60,15 +60,14 @@ public class SignInService {
     }
 
     private SignInResponse getSignInInfo(SiteUser siteUser) {
-        String accessToken = tokenProvider.generateAccessToken(siteUser);
-        String refreshToken = tokenProvider.generateAndSaveRefreshToken(siteUser);
+        String accessToken = authTokenProvider.generateAccessToken(siteUser);
+        String refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
         return new SignInResponse(true, accessToken, refreshToken);
     }
 
     // todo: SignUpTokenProvider 를 만들어서 거기에만 의존하도록 변경 필요
     private FirstAccessResponse getFirstAccessInfo(KakaoUserInfoDto kakaoUserInfoDto) {
-        String kakaoOauthToken = tokenProvider.generateToken(kakaoUserInfoDto.kakaoAccountDto().email(), TokenType.KAKAO_OAUTH);
-        tokenProvider.saveToken(kakaoOauthToken, TokenType.KAKAO_OAUTH);
+        String kakaoOauthToken = signUpTokenProvider.generateAndSaveSignUpToken(kakaoUserInfoDto.kakaoAccountDto().email());
         return FirstAccessResponse.of(kakaoUserInfoDto, kakaoOauthToken);
     }
 }

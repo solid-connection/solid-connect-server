@@ -23,11 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
-@DisplayName("TokenProvider 테스트")
-class TokenProviderTest {
+@DisplayName("인증 토큰 제공자 테스트")
+class AuthTokenProviderTest {
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private AuthTokenProvider authTokenProvider;
     
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -54,7 +54,7 @@ class TokenProviderTest {
         @Test
         void SiteUser_로_액세스_토큰을_생성한다() {
             // when
-            String token = tokenProvider.generateAccessToken(siteUser);
+            String token = authTokenProvider.generateAccessToken(siteUser);
 
             // then
             String actualSubject = JwtUtils.parseSubject(token, jwtProperties.secret());
@@ -67,7 +67,7 @@ class TokenProviderTest {
             String subject = "subject123";
 
             // when
-            String token = tokenProvider.generateAccessToken(subject);
+            String token = authTokenProvider.generateAccessToken(subject);
 
             // then
             String actualSubject = JwtUtils.parseSubject(token, jwtProperties.secret());
@@ -81,7 +81,7 @@ class TokenProviderTest {
         @Test
         void SiteUser_로_리프레시_토큰을_생성하고_저장한다() {
             // when
-            String refreshToken = tokenProvider.generateAndSaveRefreshToken(siteUser);
+            String refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
 
             // then
             String actualSubject = JwtUtils.parseSubject(refreshToken, jwtProperties.secret());
@@ -99,7 +99,7 @@ class TokenProviderTest {
             redisTemplate.opsForValue().set(TokenType.REFRESH.addPrefixToSubject(subject), refreshToken);
 
             // when
-            Optional<String> optionalRefreshToken = tokenProvider.findRefreshToken(subject);
+            Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
 
             // then
             assertThat(optionalRefreshToken.get()).isEqualTo(refreshToken);
@@ -108,7 +108,7 @@ class TokenProviderTest {
         @Test
         void 저장되지_않은_리프레시_토큰을_조회한다() {
             // when
-            Optional<String> optionalRefreshToken = tokenProvider.findRefreshToken(subject);
+            Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
 
             // then
             assertThat(optionalRefreshToken).isEmpty();
@@ -122,7 +122,7 @@ class TokenProviderTest {
         void 엑세스_토큰으로_블랙리스트_토큰을_생성하고_저장한다() {
             // when
             String accessToken = "accessToken";
-            String blackListToken = tokenProvider.generateAndSaveBlackListToken(accessToken);
+            String blackListToken = authTokenProvider.generateAndSaveBlackListToken(accessToken);
 
             // then
             String actualSubject = JwtUtils.parseSubject(blackListToken, jwtProperties.secret());
@@ -141,16 +141,16 @@ class TokenProviderTest {
             redisTemplate.opsForValue().set(TokenType.BLACKLIST.addPrefixToSubject(accessToken), blackListToken);
 
             // when
-            Optional<String> optionalBlackListToken = tokenProvider.findBlackListToken(accessToken);
+            Optional<String> optionalBlackListToken = authTokenProvider.findBlackListToken(accessToken);
 
             // then
-            assertThat(optionalBlackListToken.get()).isEqualTo(blackListToken);
+            assertThat(optionalBlackListToken).hasValue(blackListToken);
         }
 
         @Test
         void 저장되지_않은_블랙리스트_토큰을_조회한다() {
             // when
-            Optional<String> optionalBlackListToken = tokenProvider.findBlackListToken("accessToken");
+            Optional<String> optionalBlackListToken = authTokenProvider.findBlackListToken("accessToken");
 
             // then
             assertThat(optionalBlackListToken).isEmpty();
@@ -161,7 +161,7 @@ class TokenProviderTest {
     void 토큰을_생성한다() {
         // when
         String subject = "subject123";
-        String token = tokenProvider.generateToken(subject, TokenType.ACCESS);
+        String token = authTokenProvider.generateToken(subject, TokenType.ACCESS);
 
         // then
         String extractedSubject = Jwts.parser()

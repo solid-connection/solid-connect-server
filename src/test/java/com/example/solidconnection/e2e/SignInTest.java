@@ -18,8 +18,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 
-import static com.example.solidconnection.auth.domain.TokenType.KAKAO_OAUTH;
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
+import static com.example.solidconnection.auth.domain.TokenType.SIGN_UP;
 import static com.example.solidconnection.e2e.DynamicFixture.createKakaoUserInfoDtoByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.scheduler.UserRemovalScheduler.ACCOUNT_RECOVER_DURATION;
@@ -65,7 +65,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.nickname()).isEqualTo(kakaoProfileDto.nickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(kakaoProfileDto.profileImageUrl()),
                 () -> assertThat(response.kakaoOauthToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(KAKAO_OAUTH.addPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(SIGN_UP.addPrefixToSubject(email)))
                 .as("카카오 인증 토큰을 저장한다.")
                 .isEqualTo(response.kakaoOauthToken());
     }

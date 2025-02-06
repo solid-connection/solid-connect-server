@@ -1,6 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -42,7 +42,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     private LikedUniversityRepository likedUniversityRepository;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private AuthTokenProvider authTokenProvider;
 
     private String accessToken;
     private SiteUser siteUser;
@@ -54,8 +54,8 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenProvider.generateAccessToken(siteUser);
-        tokenProvider.generateAndSaveRefreshToken(siteUser);
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test
