@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
@@ -35,7 +34,6 @@ public class SignOutCheckFilter extends OncePerRequestFilter {
     }
 
     private boolean hasSignedOut(String accessToken) {
-        Optional<String> blackListToken = authTokenProvider.findBlackListToken(accessToken);
-        return blackListToken.isPresent();
+        return authTokenProvider.findBlackListToken(accessToken).isPresent();
     }
 }

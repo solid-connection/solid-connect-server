@@ -33,8 +33,8 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public String generateAndSaveBlackListToken(String accessToken) {
-        String refreshToken = generateToken(accessToken, TokenType.BLACKLIST);
-        return saveToken(refreshToken, TokenType.BLACKLIST);
+        String blackListToken = generateToken(accessToken, TokenType.BLACKLIST);
+        return saveToken(blackListToken, TokenType.BLACKLIST);
     }
 
     public Optional<String> findRefreshToken(String subject) {
@@ -43,8 +43,8 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public Optional<String> findBlackListToken(String subject) {
-        String refreshTokenKey = TokenType.BLACKLIST.addPrefix(subject);
-        return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
+        String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(blackListTokenKey));
     }
 
     public String getEmail(String token) {
