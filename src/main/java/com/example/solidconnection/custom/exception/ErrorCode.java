@@ -11,12 +11,26 @@ import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_D
 @AllArgsConstructor
 public enum ErrorCode {
 
+    // apple
+    APPLE_AUTHORIZATION_FAILED(HttpStatus.BAD_REQUEST.value(), "애플 인증에 실패했습니다."),
+    APPLE_ID_TOKEN_MISSING_EMAIL(HttpStatus.BAD_REQUEST.value(), "애플 idToken 에 이메일이 없습니다."),
+    APPLE_ID_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST.value(), "애플 idToken 이 만료되었습니다."),
+    INVALID_APPLE_ID_TOKEN(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 애플 idToken 입니다."),
+    APPLE_ID_TOKEN_MALFORMED(HttpStatus.BAD_REQUEST.value(), "애플 idToken 의 형식이 잘못되었습니다."),
+    APPLE_PUBLIC_KEY_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "idToken 를 서명한 애플 공개키를 찾을 수 없습니다"),
+    FAILED_TO_READ_APPLE_PRIVATE_KEY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 private key 파일을 읽을 수 없습니다."),
+    APPLE_CLIENT_SECRET_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 client secret JWT 생성에 실패했습니다."),
+
     // kakao
     KAKAO_REDIRECT_URI_MISMATCH(HttpStatus.BAD_REQUEST.value(), "리다이렉트 uri가 잘못되었습니다."),
     INVALID_OR_EXPIRED_KAKAO_AUTH_CODE(HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 카카오 인증 코드입니다. 카카오 인증 코드는 일회용이며, 인증 만료 시간은 10분입니다."),
     KAKAO_ACCESS_TOKEN_FAIL(HttpStatus.NOT_FOUND.value(), "카카오 엑세스 토큰 발급에 실패했습니다"),
     KAKAO_USER_INFO_FAIL(HttpStatus.BAD_REQUEST.value(), "카카오 사용자 정보 조회에 실패했습니다."),
     INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN(HttpStatus.BAD_REQUEST.value(), "우리 서비스에서 발급한 카카오 토큰이 아닙니다"),
+
+    // oauth
+    OAUTH_SIGN_UP_TOKEN_INVALID(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 회원가입 토큰입니다."),
+    OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER(HttpStatus.BAD_REQUEST.value(), "회원가입 토큰이 우리 서버에서 발급되지 않았습니다."),
 
     // data not found
     UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),

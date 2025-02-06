@@ -1,6 +1,7 @@
 package com.example.solidconnection.util;
 
 import com.example.solidconnection.custom.exception.CustomException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class JwtUtils {
 
     public static String parseSubjectIgnoringExpiration(String token, String secretKey) {
         try {
-            return extractSubject(token, secretKey);
+            return parseClaims(token, secretKey).getSubject();
         } catch (ExpiredJwtException e) {
             return e.getClaims().getSubject();
         } catch (Exception e) {
@@ -39,7 +40,7 @@ public class JwtUtils {
 
     public static String parseSubject(String token, String secretKey) {
         try {
-            return extractSubject(token, secretKey);
+            return parseClaims(token, secretKey).getSubject();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }
@@ -58,11 +59,10 @@ public class JwtUtils {
         }
     }
 
-    private static String extractSubject(String token, String secretKey) throws ExpiredJwtException {
+    public static Claims parseClaims(String token, String secretKey) throws ExpiredJwtException {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 }
