@@ -5,15 +5,15 @@ public record SignUpPrepareResponse(
         String nickname,
         String email,
         String profileImageUrl,
-        String kakaoOauthToken) implements OAuthResponse {
+        String signUpToken) implements OAuthResponse {
 
-    public static SignUpPrepareResponse of(OAuthUserInfoDto oAuthUserInfoDto, String kakaoOauthToken) {
+    public static SignUpPrepareResponse of(OAuthUserInfoDto oAuthUserInfoDto, String signUpToken) {
         return new SignUpPrepareResponse(
                 false,
                 oAuthUserInfoDto.getNickname(),
                 oAuthUserInfoDto.getEmail(),
                 oAuthUserInfoDto.getProfileImageUrl(),
-                kakaoOauthToken
+                signUpToken
         );
     }
 }

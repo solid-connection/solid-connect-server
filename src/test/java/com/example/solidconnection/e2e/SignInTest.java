@@ -64,10 +64,10 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.email()).isEqualTo(email),
                 () -> assertThat(response.nickname()).isEqualTo(kakaoProfileDto.nickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(kakaoProfileDto.profileImageUrl()),
-                () -> assertThat(response.kakaoOauthToken()).isNotNull());
+                () -> assertThat(response.signUpToken()).isNotNull());
         assertThat(redisTemplate.opsForValue().get(SIGN_UP.addPrefix(email)))
                 .as("카카오 인증 토큰을 저장한다.")
-                .isEqualTo(response.kakaoOauthToken());
+                .isEqualTo(response.signUpToken());
     }
 
     @Test
