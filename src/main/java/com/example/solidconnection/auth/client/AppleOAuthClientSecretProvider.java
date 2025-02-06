@@ -31,7 +31,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.FAILED_TO_R
 public class AppleOAuthClientSecretProvider {
 
     private static final String KEY_ID_HEADER = "kid";
-    private static final long TOKEN_DURATION = 1000 * 60; // 10min
+    private static final long TOKEN_DURATION = 1000 * 60 * 10; // 10min
     private static final String SECRET_KEY_PATH = "secret/AppleOAuthKey.p8";
 
     private final AppleOAuthClientProperties appleOAuthClientProperties;
