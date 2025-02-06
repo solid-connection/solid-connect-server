@@ -1,13 +1,13 @@
 package com.example.solidconnection.auth.controller;
 
 import com.example.solidconnection.auth.dto.ReissueResponse;
+import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
-import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
-import com.example.solidconnection.auth.service.SignUpService;
+import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.custom.resolver.ExpiredToken;
 import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final SignUpService signUpService;
+    private final OAuthSignUpService oAuthSignUpService;
     private final KakaoOAuthService kakaoOAuthService;
 
     @PostMapping("/kakao")
@@ -39,11 +39,11 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<SignUpResponse> signUp(
+    public ResponseEntity<SignInResponse> signUp(
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
-        SignUpResponse signUpResponseDto = signUpService.signUp(signUpRequest);
-        return ResponseEntity.ok(signUpResponseDto);
+        SignInResponse signInResponse = oAuthSignUpService.signUp(signUpRequest);
+        return ResponseEntity.ok(signInResponse);
     }
 
     @PostMapping("/sign-out")
