@@ -34,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/apple")
     public ResponseEntity<OAuthResponse> processAppleOAuth(
-            @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
     ) {
         OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
         return ResponseEntity.ok(oAuthResponse);
@@ -42,7 +42,7 @@ public class AuthController {
 
     @PostMapping("/kakao")
     public ResponseEntity<OAuthResponse> processKakaoOAuth(
-            @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
     ) {
         OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
         return ResponseEntity.ok(oAuthResponse);
