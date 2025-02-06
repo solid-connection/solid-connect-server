@@ -17,6 +17,7 @@ public enum ErrorCode {
     APPLE_ID_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST.value(), "애플 idToken 이 만료되었습니다."),
     INVALID_APPLE_ID_TOKEN(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 애플 idToken 입니다."),
     APPLE_ID_TOKEN_MALFORMED(HttpStatus.BAD_REQUEST.value(), "애플 idToken 의 형식이 잘못되었습니다."),
+    APPLE_PUBLIC_KEY_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "idToken 를 서명한 애플 공개키를 찾을 수 없습니다"),
     FAILED_TO_READ_APPLE_PRIVATE_KEY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 private key 파일을 읽을 수 없습니다."),
     APPLE_CLIENT_SECRET_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 client secret JWT 생성에 실패했습니다."),
 
