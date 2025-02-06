@@ -112,7 +112,7 @@ class SignUpTest extends BaseEndToEndTest {
                 () -> assertThat(interestedCountries).containsExactlyInAnyOrderElementsOf(countries)
         );
 
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(savedSiteUser.getId().toString())))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefix(savedSiteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }

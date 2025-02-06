@@ -65,7 +65,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.nickname()).isEqualTo(kakaoProfileDto.nickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(kakaoProfileDto.profileImageUrl()),
                 () -> assertThat(response.kakaoOauthToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(SIGN_UP.addPrefixToSubject(email)))
+        assertThat(redisTemplate.opsForValue().get(SIGN_UP.addPrefix(email)))
                 .as("카카오 인증 토큰을 저장한다.")
                 .isEqualTo(response.kakaoOauthToken());
     }
@@ -95,7 +95,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.isRegistered()).isTrue(),
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull());
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(siteUser.getId().toString())))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefix(siteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }
@@ -130,7 +130,7 @@ class SignInTest extends BaseEndToEndTest {
                 () -> assertThat(response.accessToken()).isNotNull(),
                 () -> assertThat(response.refreshToken()).isNotNull(),
                 () -> assertThat(updatedSiteUser.getQuitedAt()).isNull());
-        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(siteUser.getId().toString())))
+        assertThat(redisTemplate.opsForValue().get(REFRESH.addPrefix(siteUser.getId().toString())))
                 .as("리프레시 토큰을 저장한다.")
                 .isEqualTo(response.refreshToken());
     }

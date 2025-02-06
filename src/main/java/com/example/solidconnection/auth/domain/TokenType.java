@@ -19,7 +19,7 @@ public enum TokenType {
         this.expireTime = expireTime;
     }
 
-    public String addPrefixToSubject(String subject) {
-        return prefix + subject;
+    public String addPrefix(String string) {
+        return prefix + string;
     }
 }

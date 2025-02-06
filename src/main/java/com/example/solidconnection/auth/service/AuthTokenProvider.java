@@ -38,12 +38,12 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public Optional<String> findRefreshToken(String subject) {
-        String refreshTokenKey = TokenType.REFRESH.addPrefixToSubject(subject);
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
         return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
     }
 
     public Optional<String> findBlackListToken(String subject) {
-        String refreshTokenKey = TokenType.BLACKLIST.addPrefixToSubject(subject);
+        String refreshTokenKey = TokenType.BLACKLIST.addPrefix(subject);
         return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
     }
 

@@ -37,7 +37,7 @@ public abstract class TokenProvider {
     protected final String saveToken(String token, TokenType tokenType) {
         String subject = parseSubject(token, jwtProperties.secret());
         redisTemplate.opsForValue().set(
-                tokenType.addPrefixToSubject(subject),
+                tokenType.addPrefix(subject),
                 token,
                 tokenType.getExpireTime(),
                 TimeUnit.MILLISECONDS

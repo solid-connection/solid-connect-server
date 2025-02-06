@@ -63,14 +63,14 @@ public class TokenValidator {
 
     private void validateRefreshToken(String token) {
         String email = getClaim(token).getSubject();
-        if (redisTemplate.opsForValue().get(REFRESH.addPrefixToSubject(email)) == null) {
+        if (redisTemplate.opsForValue().get(REFRESH.addPrefix(email)) == null) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
     }
 
     private void validateKakaoTokenNotUsed(String token) {
         String email = getClaim(token).getSubject();
-        if (!Objects.equals(redisTemplate.opsForValue().get(SIGN_UP.addPrefixToSubject(email)), token)) {
+        if (!Objects.equals(redisTemplate.opsForValue().get(SIGN_UP.addPrefix(email)), token)) {
             throw new CustomException(INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN);
         }
     }

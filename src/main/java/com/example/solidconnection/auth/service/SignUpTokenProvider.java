@@ -20,7 +20,7 @@ public class SignUpTokenProvider extends TokenProvider {
     }
 
     public Optional<String> findSignUpToken(String email) {
-        String signUpKey = TokenType.SIGN_UP.addPrefixToSubject(email);
+        String signUpKey = TokenType.SIGN_UP.addPrefix(email);
         return Optional.ofNullable(redisTemplate.opsForValue().get(signUpKey));
     }
 }

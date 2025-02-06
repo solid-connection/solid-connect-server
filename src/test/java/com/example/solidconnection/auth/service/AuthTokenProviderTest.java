@@ -85,7 +85,7 @@ class AuthTokenProviderTest {
 
             // then
             String actualSubject = JwtUtils.parseSubject(refreshToken, jwtProperties.secret());
-            String refreshTokenKey = TokenType.REFRESH.addPrefixToSubject(subject);
+            String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(subject),
                     () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isEqualTo(refreshToken)
@@ -96,7 +96,7 @@ class AuthTokenProviderTest {
         void 저장된_리프레시_토큰을_조회한다() {
             // given
             String refreshToken = "refreshToken";
-            redisTemplate.opsForValue().set(TokenType.REFRESH.addPrefixToSubject(subject), refreshToken);
+            redisTemplate.opsForValue().set(TokenType.REFRESH.addPrefix(subject), refreshToken);
 
             // when
             Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
@@ -126,7 +126,7 @@ class AuthTokenProviderTest {
 
             // then
             String actualSubject = JwtUtils.parseSubject(blackListToken, jwtProperties.secret());
-            String blackListTokenKey = TokenType.BLACKLIST.addPrefixToSubject(accessToken);
+            String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(accessToken),
                     () -> assertThat(redisTemplate.opsForValue().get(blackListTokenKey)).isEqualTo(blackListToken)
@@ -138,7 +138,7 @@ class AuthTokenProviderTest {
             // given
             String accessToken = "accessToken";
             String blackListToken = "token";
-            redisTemplate.opsForValue().set(TokenType.BLACKLIST.addPrefixToSubject(accessToken), blackListToken);
+            redisTemplate.opsForValue().set(TokenType.BLACKLIST.addPrefix(accessToken), blackListToken);
 
             // when
             Optional<String> optionalBlackListToken = authTokenProvider.findBlackListToken(accessToken);

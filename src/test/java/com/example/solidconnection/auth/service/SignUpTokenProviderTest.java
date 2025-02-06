@@ -35,7 +35,7 @@ class SignUpTokenProviderTest {
 
         // then
         String actualSubject = JwtUtils.parseSubject(signUpToken, jwtProperties.secret());
-        String signUpTokenKey = TokenType.SIGN_UP.addPrefixToSubject(email);
+        String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
         assertAll(
                 () -> assertThat(actualSubject).isEqualTo(email),
                 () -> assertThat(redisTemplate.opsForValue().get(signUpTokenKey)).isEqualTo(signUpToken)
@@ -47,7 +47,7 @@ class SignUpTokenProviderTest {
         // given
         String email = "email";
         String signUpToken = "token";
-        redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefixToSubject(email), signUpToken);
+        redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), signUpToken);
 
         // when
         Optional<String> actualSignUpToken = signUpTokenProvider.findSignUpToken(email);
