@@ -24,6 +24,10 @@ public enum ErrorCode {
     KAKAO_USER_INFO_FAIL(HttpStatus.BAD_REQUEST.value(), "카카오 사용자 정보 조회에 실패했습니다."),
     INVALID_SERVICE_PUBLISHED_KAKAO_TOKEN(HttpStatus.BAD_REQUEST.value(), "우리 서비스에서 발급한 카카오 토큰이 아닙니다"),
 
+    // oauth
+    OAUTH_SIGN_UP_TOKEN_INVALID(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 회원가입 토큰입니다."),
+    OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER(HttpStatus.BAD_REQUEST.value(), "회원가입 토큰이 우리 서버에서 발급되지 않았습니다."),
+
     // data not found
     UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),
     UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND_FOR_TERM(HttpStatus.NOT_FOUND.value(), "해당하는 대학교가 이번 모집 기간에 열리지 않았습니다."),

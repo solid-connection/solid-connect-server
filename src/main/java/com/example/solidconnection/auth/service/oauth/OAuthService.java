@@ -52,7 +52,7 @@ public abstract class OAuthService {
     }
 
     protected final SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto) {
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail());
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), getAuthType());
         return SignUpPrepareResponse.of(userInfoDto, signUpToken);
     }
 

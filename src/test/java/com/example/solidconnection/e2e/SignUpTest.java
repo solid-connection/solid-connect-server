@@ -29,8 +29,8 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static com.example.solidconnection.auth.domain.TokenType.REFRESH;
-import static com.example.solidconnection.custom.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.custom.exception.ErrorCode.OAUTH_SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_EXISTED;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByNickName;
@@ -181,6 +181,6 @@ class SignUpTest extends BaseEndToEndTest {
                 .extract().as(ErrorResponse.class);
 
         assertThat(errorResponse.message())
-                .contains(JWT_EXCEPTION.getMessage());
+                .contains(OAUTH_SIGN_UP_TOKEN_INVALID.getMessage());
     }
 }
