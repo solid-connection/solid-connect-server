@@ -6,6 +6,7 @@ import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
+import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
 import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
@@ -28,7 +29,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final OAuthSignUpService oAuthSignUpService;
+    private final AppleOAuthService appleOAuthService;
     private final KakaoOAuthService kakaoOAuthService;
+
+    @PostMapping("/apple")
+    public ResponseEntity<OAuthResponse> processAppleOAuth(
+            @RequestBody OAuthCodeRequest oAuthCodeRequest
+    ) {
+        OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
+        return ResponseEntity.ok(oAuthResponse);
+    }
 
     @PostMapping("/kakao")
     public ResponseEntity<OAuthResponse> processKakaoOAuth(
