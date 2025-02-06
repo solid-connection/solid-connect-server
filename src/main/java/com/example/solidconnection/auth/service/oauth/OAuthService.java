@@ -21,7 +21,7 @@ import java.util.Optional;
  * 기존 회원
  * - 로그인한다.
  * 신규 회원
- * - 회원가입 페이지로 리다이렉트할 때 필요한 정보를 제공한다.
+ * - 회원가입할 때 필요한 정보를 제공한다.
  * */
 public abstract class OAuthService {
 
@@ -43,18 +43,18 @@ public abstract class OAuthService {
 
         if (optionalSiteUser.isPresent()) {
             SiteUser siteUser = optionalSiteUser.get();
-            return getSignInInfo(siteUser);
+            return getSignInResponse(siteUser);
         }
 
         return getSignUpPrepareResponse(userInfoDto);
     }
 
-    protected OAuthSignInResponse getSignInInfo(SiteUser siteUser) {
+    protected final OAuthSignInResponse getSignInResponse(SiteUser siteUser) {
         SignInResponse signInResponse = signInService.signIn(siteUser);
         return new OAuthSignInResponse(true, signInResponse.accessToken(), signInResponse.refreshToken());
     }
 
-    protected SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto) {
+    protected final SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto) {
         String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail());
         return SignUpPrepareResponse.of(userInfoDto, signUpToken);
     }
