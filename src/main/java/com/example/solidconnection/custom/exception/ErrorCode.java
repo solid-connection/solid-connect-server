@@ -11,6 +11,12 @@ import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_D
 @AllArgsConstructor
 public enum ErrorCode {
 
+    // apple
+    APPLE_AUTHORIZATION_FAILED(HttpStatus.BAD_REQUEST.value(), "애플 인증에 실패했습니다."),
+    APPLE_ID_TOKEN_MISSING_EMAIL(HttpStatus.BAD_REQUEST.value(), "애플 idToken 에 email 이 포함되어 있지 않습니다."),
+    FAILED_TO_READ_APPLE_PRIVATE_KEY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 private key 파일을 읽을 수 없습니다."),
+    APPLE_CLIENT_SECRET_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "애플 client secret JWT 생성에 실패했습니다."),
+
     // kakao
     KAKAO_REDIRECT_URI_MISMATCH(HttpStatus.BAD_REQUEST.value(), "리다이렉트 uri가 잘못되었습니다."),
     INVALID_OR_EXPIRED_KAKAO_AUTH_CODE(HttpStatus.BAD_REQUEST.value(), "사용할 수 없는 카카오 인증 코드입니다. 카카오 인증 코드는 일회용이며, 인증 만료 시간은 10분입니다."),
