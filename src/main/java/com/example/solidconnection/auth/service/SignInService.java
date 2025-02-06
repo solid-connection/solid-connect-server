@@ -4,7 +4,7 @@ import com.example.solidconnection.auth.client.KakaoOAuthClient;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.kakao.FirstAccessResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
-import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
+import com.example.solidconnection.auth.dto.kakao.KakaoOAuthResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -35,8 +35,8 @@ public class SignInService {
      * - 회원가입할 때 클라이언트는 이때 발급받은 kakaoOauthToken 를 요청에 포함해 요청한다. (SignUpService 참고)
      * */
     @Transactional
-    public KakaoOauthResponse signIn(KakaoCodeRequest kakaoCodeRequest) {
-        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.processOauth(kakaoCodeRequest.code());
+    public KakaoOAuthResponse signIn(KakaoCodeRequest kakaoCodeRequest) {
+        KakaoUserInfoDto kakaoUserInfoDto = kakaoOAuthClient.processOAuth(kakaoCodeRequest.code());
         String email = kakaoUserInfoDto.kakaoAccountDto().email();
         Optional<SiteUser> optionalSiteUser = siteUserRepository.findByEmailAndAuthType(email, AuthType.KAKAO);
 

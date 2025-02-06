@@ -4,7 +4,7 @@ import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.SignUpResponse;
 import com.example.solidconnection.auth.dto.kakao.KakaoCodeRequest;
-import com.example.solidconnection.auth.dto.kakao.KakaoOauthResponse;
+import com.example.solidconnection.auth.dto.kakao.KakaoOAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.auth.service.SignUpService;
@@ -31,10 +31,10 @@ public class AuthController {
     private final SignInService signInService;
 
     @PostMapping("/kakao")
-    public ResponseEntity<KakaoOauthResponse> processKakaoOauth(
+    public ResponseEntity<KakaoOAuthResponse> processKakaoOAuth(
             @RequestBody KakaoCodeRequest kakaoCodeRequest
     ) {
-        KakaoOauthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);
+        KakaoOAuthResponse kakaoOauthResponse = signInService.signIn(kakaoCodeRequest);
         return ResponseEntity.ok(kakaoOauthResponse);
     }
 

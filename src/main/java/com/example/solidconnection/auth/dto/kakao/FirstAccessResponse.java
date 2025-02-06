@@ -5,7 +5,7 @@ public record FirstAccessResponse(
         String nickname,
         String email,
         String profileImageUrl,
-        String kakaoOauthToken) implements KakaoOauthResponse {
+        String kakaoOauthToken) implements KakaoOAuthResponse {
 
     public static FirstAccessResponse of(KakaoUserInfoDto kakaoUserInfoDto, String kakaoOauthToken) {
         return new FirstAccessResponse(

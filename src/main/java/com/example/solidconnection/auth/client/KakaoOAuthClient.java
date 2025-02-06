@@ -35,7 +35,7 @@ public class KakaoOAuthClient {
      * 그리고 카카오 엑세스 토큰으로 카카오 서버에 요청해 '카카오 사용자 정보'를 받아온다.
      *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
      * */
-    public KakaoUserInfoDto processOauth(String code) {
+    public KakaoUserInfoDto processOAuth(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);
     }

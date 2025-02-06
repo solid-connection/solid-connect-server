@@ -45,7 +45,7 @@ class SignInTest extends BaseEndToEndTest {
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
         KakaoUserInfoDto kakaoUserInfoDto = createKakaoUserInfoDtoByEmail(email);
-        given(kakaoOAuthClient.processOauth(kakaoCode))
+        given(kakaoOAuthClient.processOAuth(kakaoCode))
                 .willReturn(kakaoUserInfoDto);
 
         // request - body 생성 및 요청
@@ -75,7 +75,7 @@ class SignInTest extends BaseEndToEndTest {
         // stub - kakaoOAuthClient 가 정해진 사용자 프로필 정보를 반환하도록
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
-        given(kakaoOAuthClient.processOauth(kakaoCode))
+        given(kakaoOAuthClient.processOAuth(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 사용자 정보 저장
@@ -105,7 +105,7 @@ class SignInTest extends BaseEndToEndTest {
         // stub - kakaoOAuthClient 가 정해진 사용자 프로필 정보를 반환하도록
         String kakaoCode = "kakaoCode";
         String email = "email@email.com";
-        given(kakaoOAuthClient.processOauth(kakaoCode))
+        given(kakaoOAuthClient.processOAuth(kakaoCode))
                 .willReturn(createKakaoUserInfoDtoByEmail(email));
 
         // setUp - 계정 복구 기간이 되지 않은 사용자 저장
