@@ -4,8 +4,6 @@ import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.type.VerifyStatus;
 
-import java.time.LocalDate;
-
 public record LanguageTestScoreStatus(
         Long id,
         LanguageTest languageTest,

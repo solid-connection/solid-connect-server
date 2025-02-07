@@ -4,8 +4,6 @@ import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.type.VerifyStatus;
 
-import java.time.LocalDate;
-
 public record GpaScoreStatus(
         Long id,
         Gpa gpa,

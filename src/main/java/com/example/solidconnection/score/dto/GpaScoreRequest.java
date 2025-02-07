@@ -4,8 +4,6 @@ import com.example.solidconnection.application.domain.Gpa;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
-
 public record GpaScoreRequest(
         @NotNull(message = "학점을 입력해주세요.")
         Double gpa,
