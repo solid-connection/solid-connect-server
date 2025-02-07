@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record BoardFindPostResponse(
+public record PostListResponse(
         Long id,
         String title,
         String content,
@@ -19,8 +19,8 @@ public record BoardFindPostResponse(
         String url
 ) {
 
-    public static BoardFindPostResponse from(Post post) {
-        return new BoardFindPostResponse(
+    public static PostListResponse from(Post post) {
+        return new PostListResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
@@ -33,9 +33,9 @@ public record BoardFindPostResponse(
         );
     }
 
-    public static List<BoardFindPostResponse> from(List<Post> postList) {
+    public static List<PostListResponse> from(List<Post> postList) {
         return postList.stream()
-                .map(BoardFindPostResponse::from)
+                .map(PostListResponse::from)
                 .collect(Collectors.toList());
     }
 
