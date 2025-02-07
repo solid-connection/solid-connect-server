@@ -16,17 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.OAUTH_SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.custom.exception.ErrorCode.OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 import static com.example.solidconnection.util.JwtUtils.parseClaims;
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
 
 @Component
-public class SignUpTokenProvider extends TokenProvider {
+public class OAuthSignUpTokenProvider extends TokenProvider {
 
     static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
-    public SignUpTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
+    public OAuthSignUpTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
         super(jwtProperties, redisTemplate);
     }
 
@@ -58,14 +58,14 @@ public class SignUpTokenProvider extends TokenProvider {
             String serializedAuthType = claims.get(AUTH_TYPE_CLAIM_KEY, String.class);
             AuthType.valueOf(serializedAuthType);
         } catch (Exception e) {
-            throw new CustomException(OAUTH_SIGN_UP_TOKEN_INVALID);
+            throw new CustomException(SIGN_UP_TOKEN_INVALID);
         }
     }
 
     private void validateIssuedByServer(String email) {
         String key = TokenType.SIGN_UP.addPrefix(email);
         if (redisTemplate.opsForValue().get(key) == null) {
-            throw new CustomException(OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER);
+            throw new CustomException(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER);
         }
     }
 

@@ -12,9 +12,9 @@ public class KakaoOAuthService extends OAuthService {
 
     private final KakaoOAuthClient kakaoOAuthClient;
 
-    public KakaoOAuthService(SignUpTokenProvider signUpTokenProvider, SiteUserRepository siteUserRepository,
+    public KakaoOAuthService(OAuthSignUpTokenProvider OAuthSignUpTokenProvider, SiteUserRepository siteUserRepository,
                              KakaoOAuthClient kakaoOAuthClient, SignInService signInService) {
-        super(signUpTokenProvider, siteUserRepository, signInService);
+        super(OAuthSignUpTokenProvider, siteUserRepository, signInService);
         this.kakaoOAuthClient = kakaoOAuthClient;
     }
 

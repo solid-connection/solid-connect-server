@@ -12,9 +12,9 @@ public class AppleOAuthService extends OAuthService {
 
     private final AppleOAuthClient appleOAuthClient;
 
-    public AppleOAuthService(SignUpTokenProvider signUpTokenProvider, SiteUserRepository siteUserRepository,
+    public AppleOAuthService(OAuthSignUpTokenProvider OAuthSignUpTokenProvider, SiteUserRepository siteUserRepository,
                              AppleOAuthClient appleOAuthClient, SignInService signInService) {
-        super(signUpTokenProvider, siteUserRepository, signInService);
+        super(OAuthSignUpTokenProvider, siteUserRepository, signInService);
         this.appleOAuthClient = appleOAuthClient;
     }
 

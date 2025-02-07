@@ -20,19 +20,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.solidconnection.auth.service.oauth.SignUpTokenProvider.AUTH_TYPE_CLAIM_KEY;
-import static com.example.solidconnection.custom.exception.ErrorCode.OAUTH_SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.custom.exception.ErrorCode.OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static com.example.solidconnection.auth.service.oauth.OAuthSignUpTokenProvider.AUTH_TYPE_CLAIM_KEY;
+import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
-@DisplayName("회원가입 토큰 제공자 테스트")
-class SignUpTokenProviderTest {
+@DisplayName("OAuth 회원가입 토큰 제공자 테스트")
+class OAuthSignUpTokenProviderTest {
 
     @Autowired
-    private SignUpTokenProvider signUpTokenProvider;
+    private OAuthSignUpTokenProvider OAuthSignUpTokenProvider;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -47,7 +47,7 @@ class SignUpTokenProviderTest {
         AuthType authType = AuthType.KAKAO;
 
         // when
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+        String signUpToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(email, authType);
 
         // then
         Claims claims = JwtUtils.parseClaims(signUpToken, jwtProperties.secret());
@@ -73,7 +73,7 @@ class SignUpTokenProviderTest {
             redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(validToken)).doesNotThrowAnyException();
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(validToken)).doesNotThrowAnyException();
         }
 
         @Test
@@ -82,9 +82,9 @@ class SignUpTokenProviderTest {
             String expiredToken = createExpiredToken();
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(expiredToken))
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(expiredToken))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(OAUTH_SIGN_UP_TOKEN_INVALID.getMessage());
+                    .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
         }
 
         @Test
@@ -93,9 +93,9 @@ class SignUpTokenProviderTest {
             String notJwt = "not jwt";
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(notJwt))
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(notJwt))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(OAUTH_SIGN_UP_TOKEN_INVALID.getMessage());
+                    .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
         }
 
         @Test
@@ -105,9 +105,9 @@ class SignUpTokenProviderTest {
             String wrongAuthType = createBaseJwtBuilder().addClaims(wrongClaim).compact();
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthType))
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(wrongAuthType))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(OAUTH_SIGN_UP_TOKEN_INVALID.getMessage());
+                    .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
         }
 
         @Test
@@ -117,9 +117,9 @@ class SignUpTokenProviderTest {
             String noSubject = createBaseJwtBuilder().addClaims(claim).compact();
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(noSubject))
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(noSubject))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(OAUTH_SIGN_UP_TOKEN_INVALID.getMessage());
+                    .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
         }
 
         @Test
@@ -129,9 +129,9 @@ class SignUpTokenProviderTest {
             String signUpToken = createBaseJwtBuilder().addClaims(validClaim).setSubject("email").compact();
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(signUpToken))
+            assertThatCode(() -> OAuthSignUpTokenProvider.validateSignUpToken(signUpToken))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(OAUTH_SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER.getMessage());
+                    .hasMessageContaining(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ class SignUpTokenProviderTest {
         redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
 
         // when
-        String extractedEmail = signUpTokenProvider.parseEmail(validToken);
+        String extractedEmail = OAuthSignUpTokenProvider.parseEmail(validToken);
 
         // then
         assertThat(extractedEmail).isEqualTo(email);
@@ -158,7 +158,7 @@ class SignUpTokenProviderTest {
         String validToken = createBaseJwtBuilder().setSubject("email").addClaims(claim).compact();
 
         // when
-        AuthType extractedAuthType = signUpTokenProvider.parseAuthType(validToken);
+        AuthType extractedAuthType = OAuthSignUpTokenProvider.parseAuthType(validToken);
 
         // then
         assertThat(extractedAuthType).isEqualTo(authType);

@@ -22,12 +22,12 @@ import java.util.Optional;
  * */
 public abstract class OAuthService {
 
-    private final SignUpTokenProvider signUpTokenProvider;
+    private final OAuthSignUpTokenProvider OAuthSignUpTokenProvider;
     private final SignInService signInService;
     private final SiteUserRepository siteUserRepository;
 
-    protected OAuthService(SignUpTokenProvider signUpTokenProvider, SiteUserRepository siteUserRepository, SignInService signInService) {
-        this.signUpTokenProvider = signUpTokenProvider;
+    protected OAuthService(OAuthSignUpTokenProvider OAuthSignUpTokenProvider, SiteUserRepository siteUserRepository, SignInService signInService) {
+        this.OAuthSignUpTokenProvider = OAuthSignUpTokenProvider;
         this.siteUserRepository = siteUserRepository;
         this.signInService = signInService;
     }
@@ -52,7 +52,7 @@ public abstract class OAuthService {
     }
 
     protected final SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto) {
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), getAuthType());
+        String signUpToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), getAuthType());
         return SignUpPrepareResponse.of(userInfoDto, signUpToken);
     }
 
