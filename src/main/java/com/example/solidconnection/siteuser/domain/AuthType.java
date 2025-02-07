@@ -6,4 +6,8 @@ public enum AuthType {
     APPLE,
     EMAIL,
     ;
+
+    public static boolean isEmail(AuthType authType) {
+        return EMAIL.equals(authType);
+    }
 }

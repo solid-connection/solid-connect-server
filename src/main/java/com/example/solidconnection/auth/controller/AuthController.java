@@ -1,20 +1,25 @@
 package com.example.solidconnection.auth.controller;
 
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
+import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
+import com.example.solidconnection.auth.dto.EmailSignUpTokenResponse;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
+import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
 import com.example.solidconnection.auth.service.EmailSignUpService;
+import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
 import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
 import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.custom.resolver.ExpiredToken;
 import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +41,8 @@ public class AuthController {
     private final KakaoOAuthService kakaoOAuthService;
     private final EmailSignInService emailSignInService;
     private final EmailSignUpService emailSignUpService;
+    private final EmailSignUpTokenProvider emailSignUpTokenProvider;
+    private final CommonSignUpTokenProvider commonSignUpTokenProvider;
 
     @PostMapping("/apple")
     public ResponseEntity<OAuthResponse> processAppleOAuth(
@@ -61,18 +68,24 @@ public class AuthController {
         return ResponseEntity.ok(signInResponse);
     }
 
+    /* 이메일 회원가입 시 signUpToken 을 발급받기 위한 api */
     @PostMapping("/email/sign-up")
-    public ResponseEntity<SignInResponse> signUpWithEmail(
-            @Valid @RequestBody SignUpRequest signUpRequest
+    public ResponseEntity<EmailSignUpTokenResponse> signUpWithEmail(
+            @Valid @RequestBody EmailSignUpTokenRequest signUpRequest
     ) {
-        SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
-        return ResponseEntity.ok(signInResponse);
+        String signUpToken = emailSignUpTokenProvider.generateAndSaveSignUpToken(signUpRequest);
+        return ResponseEntity.ok(new EmailSignUpTokenResponse(signUpToken));
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<SignInResponse> signUp(
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
+        AuthType authType = commonSignUpTokenProvider.parseAuthType(signUpRequest.signUpToken());
+        if (AuthType.isEmail(authType)) {
+            SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
+            return ResponseEntity.ok(signInResponse);
+        }
         SignInResponse signInResponse = oAuthSignUpService.signUp(signUpRequest);
         return ResponseEntity.ok(signInResponse);
     }

@@ -1,8 +1,10 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,6 +26,7 @@ import static com.example.solidconnection.util.JwtUtils.parseSubject;
 public class EmailSignUpTokenProvider extends TokenProvider {
 
     static final String PASSWORD_CLAIM_KEY = "password";
+    static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
     private final PasswordEncoder passwordEncoder;
 
@@ -33,10 +36,15 @@ public class EmailSignUpTokenProvider extends TokenProvider {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String generateAndSaveSignUpToken(String email, String password) {
+    public String generateAndSaveSignUpToken(EmailSignUpTokenRequest request) {
+        String email = request.email();
+        String password = request.password();
         String encodedPassword = passwordEncoder.encode(password);
-        Map<String, Object> passwordClaims = new HashMap<>(Map.of(PASSWORD_CLAIM_KEY, encodedPassword));
-        Claims claims = Jwts.claims(passwordClaims).setSubject(email);
+        Map<String, Object> emailSignUpClaims = new HashMap<>(Map.of(
+                PASSWORD_CLAIM_KEY, encodedPassword,
+                AUTH_TYPE_CLAIM_KEY, AuthType.EMAIL
+        ));
+        Claims claims = Jwts.claims(emailSignUpClaims).setSubject(email);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + TokenType.SIGN_UP.getExpireTime());
 
