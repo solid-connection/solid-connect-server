@@ -1,11 +1,14 @@
 package com.example.solidconnection.auth.controller;
 
+import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.service.AuthService;
+import com.example.solidconnection.auth.service.EmailSignInService;
+import com.example.solidconnection.auth.service.EmailSignUpService;
 import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
 import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
@@ -31,6 +34,8 @@ public class AuthController {
     private final OAuthSignUpService oAuthSignUpService;
     private final AppleOAuthService appleOAuthService;
     private final KakaoOAuthService kakaoOAuthService;
+    private final EmailSignInService emailSignInService;
+    private final EmailSignUpService emailSignUpService;
 
     @PostMapping("/apple")
     public ResponseEntity<OAuthResponse> processAppleOAuth(
@@ -46,6 +51,22 @@ public class AuthController {
     ) {
         OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
         return ResponseEntity.ok(oAuthResponse);
+    }
+
+    @PostMapping("/email/sign-in")
+    public ResponseEntity<SignInResponse> signInWithEmail(
+            @Valid @RequestBody EmailSignInRequest signInRequest
+    ) {
+        SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
+        return ResponseEntity.ok(signInResponse);
+    }
+
+    @PostMapping("/email/sign-up")
+    public ResponseEntity<SignInResponse> signUpWithEmail(
+            @Valid @RequestBody SignUpRequest signUpRequest
+    ) {
+        SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
+        return ResponseEntity.ok(signInResponse);
     }
 
     @PostMapping("/sign-up")
