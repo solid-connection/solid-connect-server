@@ -24,7 +24,7 @@ public record SignUpRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
         String birth) {
 
-    public SiteUser toSiteUser(String email, AuthType authType) {
+    public SiteUser toOAuthSiteUser(String email, AuthType authType) {
         return new SiteUser(
                 email,
                 this.nickname,
@@ -34,6 +34,20 @@ public record SignUpRequest(
                 Role.MENTEE,
                 this.gender,
                 authType
+        );
+    }
+
+    public SiteUser toEmailSiteUser(String email, String encodedPassword) {
+        return new SiteUser(
+                email,
+                this.nickname,
+                this.profileImageUrl,
+                this.birth,
+                this.preparationStatus,
+                Role.MENTEE,
+                this.gender,
+                AuthType.EMAIL,
+                encodedPassword
         );
     }
 }
