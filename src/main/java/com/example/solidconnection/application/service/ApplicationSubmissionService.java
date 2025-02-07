@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -49,7 +51,6 @@ public class ApplicationSubmissionService {
     @Transactional
     public boolean apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
-        validateUniversityChoices(universityChoiceRequest);
 
         Long gpaScoreId = applyRequest.gpaScoreId();
         Long languageTestScoreId = applyRequest.languageTestScoreId();
@@ -115,25 +116,6 @@ public class ApplicationSubmissionService {
     private void validateUpdateLimitNotExceed(Application application) {
         if (application.getUpdateCount() >= APPLICATION_UPDATE_COUNT_LIMIT) {
             throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
-        }
-    }
-
-    // 입력값 유효성 검증
-    private void validateUniversityChoices(UniversityChoiceRequest universityChoiceRequest) {
-        Set<Long> uniqueUniversityIds = new HashSet<>();
-        uniqueUniversityIds.add(universityChoiceRequest.firstChoiceUniversityId());
-        if (universityChoiceRequest.secondChoiceUniversityId() != null) {
-            addUniversityChoice(uniqueUniversityIds, universityChoiceRequest.secondChoiceUniversityId());
-        }
-        if (universityChoiceRequest.thirdChoiceUniversityId() != null) {
-            addUniversityChoice(uniqueUniversityIds, universityChoiceRequest.thirdChoiceUniversityId());
-        }
-    }
-
-    private void addUniversityChoice(Set<Long> uniqueUniversityIds, Long universityId) {
-        boolean notAdded = !uniqueUniversityIds.add(universityId);
-        if (notAdded) {
-            throw new CustomException(CANT_APPLY_FOR_SAME_UNIVERSITY);
         }
     }
 }
