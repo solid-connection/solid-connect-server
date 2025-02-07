@@ -1,4 +1,4 @@
-package com.example.solidconnection.comment.service;
+package com.example.solidconnection.community.service.comment;
 
 import com.example.solidconnection.community.domain.board.Board;
 import com.example.solidconnection.community.domain.comment.Comment;

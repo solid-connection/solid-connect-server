@@ -1,10 +1,10 @@
-package com.example.solidconnection.post.service;
+package com.example.solidconnection.community.service.post;
 
 import com.example.solidconnection.community.domain.board.Board;
 import com.example.solidconnection.community.domain.comment.Comment;
 import com.example.solidconnection.community.dto.comment.PostFindCommentResponse;
+import com.example.solidconnection.community.dto.post.PostListResponse;
 import com.example.solidconnection.community.repository.comment.CommentRepository;
-import com.example.solidconnection.community.service.post.PostQueryService;
 import com.example.solidconnection.community.domain.post.PostImage;
 import com.example.solidconnection.community.domain.post.Post;
 import com.example.solidconnection.community.dto.post.PostFindPostImageResponse;
@@ -14,12 +14,14 @@ import com.example.solidconnection.community.repository.post.PostImageRepository
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
+import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +47,56 @@ class PostQueryServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private PostImageRepository postImageRepository;
+
+    @Test
+    void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
+        // given
+        List<Post> posts = List.of(
+                미주권_자유게시글, 아시아권_자유게시글, 유럽권_자유게시글, 자유게시판_자유게시글,
+                미주권_질문게시글, 아시아권_질문게시글, 유럽권_질문게시글, 자유게시판_질문게시글
+        );
+        List<Post> expectedPosts = posts.stream()
+                .filter(post -> post.getCategory().equals(PostCategory.자유) && post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                .toList();
+        List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.자유.name()
+        );
+
+        // then
+        assertThat(actualResponses)
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(ZonedDateTime.class)
+                .isEqualTo(expectedResponses);
+    }
+
+    @Test
+    void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
+        // given
+        List<Post> posts = List.of(
+                미주권_자유게시글, 아시아권_자유게시글, 유럽권_자유게시글, 자유게시판_자유게시글,
+                미주권_질문게시글, 아시아권_질문게시글, 유럽권_질문게시글, 자유게시판_질문게시글
+        );
+        List<Post> expectedPosts = posts.stream()
+                .filter(post -> post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                .toList();
+        List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
+        );
+
+        // then
+        assertThat(actualResponses)
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(ZonedDateTime.class)
+                .isEqualTo(expectedResponses);
+    }
 
     @Test
     void 게시글을_성공적으로_조회한다() {
