@@ -39,7 +39,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
@@ -511,8 +510,7 @@ public abstract class BaseIntegrationTest {
     private GpaScore createApprovedGpaScore(SiteUser siteUser) {
         GpaScore gpaScore = new GpaScore(
                 new Gpa(4.0, 4.5, "/gpa-report.pdf"),
-                siteUser,
-                LocalDate.now()
+                siteUser
         );
         gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
         return gpaScoreRepository.save(gpaScore);
@@ -521,7 +519,6 @@ public abstract class BaseIntegrationTest {
     private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
                 new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                LocalDate.now(),
                 siteUser
         );
         languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);

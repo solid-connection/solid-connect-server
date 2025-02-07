@@ -19,8 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
 import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
@@ -165,8 +163,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     private GpaScore createUnapprovedGpaScore(SiteUser siteUser) {
         GpaScore gpaScore = new GpaScore(
                 new Gpa(4.0,  4.5, "/gpa-report.pdf"),
-                siteUser,
-                LocalDate.now()
+                siteUser
         );
         return gpaScoreRepository.save(gpaScore);
     }
@@ -174,8 +171,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     private GpaScore createApprovedGpaScore(SiteUser siteUser) {
         GpaScore gpaScore = new GpaScore(
                 new Gpa(4.0, 4.5, "/gpa-report.pdf"),
-                siteUser,
-                LocalDate.now()
+                siteUser
         );
         gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
         return gpaScoreRepository.save(gpaScore);
@@ -184,7 +180,6 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     private LanguageTestScore createUnapprovedLanguageTestScore(SiteUser siteUser) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
                 new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                LocalDate.now(),
                 siteUser
         );
         return languageTestScoreRepository.save(languageTestScore);
@@ -193,7 +188,6 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
                 new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                LocalDate.now(),
                 siteUser
         );
         languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);

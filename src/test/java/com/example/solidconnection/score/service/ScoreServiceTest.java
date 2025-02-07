@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,7 +128,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
                 () -> assertThat(savedScore.getGpa().getGpa()).isEqualTo(request.gpa()),
                 () -> assertThat(savedScore.getGpa().getGpaCriteria()).isEqualTo(request.gpaCriteria()),
-                () -> assertThat(savedScore.getIssueDate()).isEqualTo(request.issueDate()),
                 () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
         );
     }
@@ -149,7 +147,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestType()).isEqualTo(request.languageTestType()),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestScore()).isEqualTo(request.languageTestScore()),
-                () -> assertThat(savedScore.getIssueDate()).isEqualTo(request.issueDate()),
                 () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
         );
     }
@@ -170,8 +167,7 @@ class ScoreServiceTest extends BaseIntegrationTest {
     private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
         GpaScore gpaScore = new GpaScore(
                 new Gpa(gpa, gpaCriteria, "/gpa-report.pdf"),
-                siteUser,
-                LocalDate.now()
+                siteUser
         );
         gpaScore.setSiteUser(siteUser);
         return gpaScoreRepository.save(gpaScore);
@@ -180,7 +176,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
     private LanguageTestScore createLanguageTestScore(SiteUser siteUser, LanguageTestType languageTestType, String score) {
         LanguageTestScore languageTestScore = new LanguageTestScore(
                 new LanguageTest(languageTestType, score, "/gpa-report.pdf"),
-                LocalDate.now(),
                 siteUser
         );
         languageTestScore.setSiteUser(siteUser);
@@ -191,7 +186,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
         return new GpaScoreRequest(
                 3.5,
                 4.5,
-                LocalDate.now(),
                 "/gpa-report.pdf"
         );
     }
@@ -200,7 +194,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
         return new LanguageTestScoreRequest(
                 LanguageTestType.TOEFL_IBT,
                 "100",
-                LocalDate.now(),
                 "/gpa-report.pdf"
         );
     }
