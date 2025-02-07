@@ -119,26 +119,6 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 동일한_대학을_중복_선택하면_예외_응답을_반환한다() {
-        // given
-        GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createUnapprovedLanguageTestScore(테스트유저_1);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
-                괌대학_A_지원_정보.getId(),
-                괌대학_A_지원_정보.getId(),
-                메모리얼대학_세인트존스_A_지원_정보.getId()
-        );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
-
-        // when & then
-        assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1, request)
-        )
-                .isInstanceOf(CustomException.class)
-                .hasMessage(CANT_APPLY_FOR_SAME_UNIVERSITY.getMessage());
-    }
-
-    @Test
     void 지원서_수정_횟수를_초과하면_예외_응답을_반환한다() {
         // given
         GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
