@@ -30,7 +30,7 @@ public class ScoreService {
 
     @Transactional
     public Long submitGpaScore(SiteUser siteUser, GpaScoreRequest gpaScoreRequest) {
-        GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser, gpaScoreRequest.issueDate());
+        GpaScore newGpaScore = new GpaScore(gpaScoreRequest.toGpa(), siteUser);
         newGpaScore.setSiteUser(siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);  // 저장 후 반환된 객체
         return savedNewGpaScore.getId();  // 저장된 GPA Score의 ID 반환
@@ -41,7 +41,7 @@ public class ScoreService {
         LanguageTest languageTest = languageTestScoreRequest.toLanguageTest();
 
         LanguageTestScore newScore = new LanguageTestScore(
-                languageTest, languageTestScoreRequest.issueDate(), siteUser);
+                languageTest, siteUser);
         newScore.setSiteUser(siteUser);
         LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);  // 새로 저장한 객체
         return savedNewScore.getId();  // 저장된 객체의 ID 반환

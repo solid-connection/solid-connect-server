@@ -15,9 +15,6 @@ public record LanguageTestScoreRequest(
         @NotBlank(message = "어학 점수를 입력해주세요.")
         String languageTestScore,
 
-        @NotNull(message = "발급일자를 입력해주세요.")
-        LocalDate issueDate,
-
         @NotBlank(message = "어학 증명서를 첨부해주세요.")
         String languageTestReportUrl) {
 

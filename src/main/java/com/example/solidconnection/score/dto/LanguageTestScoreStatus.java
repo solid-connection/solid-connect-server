@@ -9,7 +9,6 @@ import java.time.LocalDate;
 public record LanguageTestScoreStatus(
         Long id,
         LanguageTest languageTest,
-        LocalDate issueDate,
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
@@ -17,7 +16,6 @@ public record LanguageTestScoreStatus(
         return new LanguageTestScoreStatus(
                 languageTestScore.getId(),
                 languageTestScore.getLanguageTest(),
-                languageTestScore.getIssueDate(),
                 languageTestScore.getVerifyStatus(),
                 languageTestScore.getRejectedReason()
         );

@@ -13,9 +13,6 @@ public record GpaScoreRequest(
         @NotNull(message = "학점 기준을 입력해주세요.")
         Double gpaCriteria,
 
-        @NotNull(message = "발급일자를 입력해주세요.")
-        LocalDate issueDate,
-
         @NotBlank(message = "대학 성적 증명서를 첨부해주세요.")
         String gpaReportUrl) {
 

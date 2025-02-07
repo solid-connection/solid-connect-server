@@ -33,8 +33,6 @@ public class LanguageTestScore extends BaseEntity {
     @Embedded
     private LanguageTest languageTest;
 
-    private LocalDate issueDate;
-
     @Setter
     @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
     @Enumerated(EnumType.STRING)
@@ -45,9 +43,8 @@ public class LanguageTestScore extends BaseEntity {
     @ManyToOne
     private SiteUser siteUser;
 
-    public LanguageTestScore(LanguageTest languageTest, LocalDate issueDate, SiteUser siteUser) {
+    public LanguageTestScore(LanguageTest languageTest, SiteUser siteUser) {
         this.languageTest = languageTest;
-        this.issueDate = issueDate;
         this.verifyStatus = VerifyStatus.PENDING;
         this.siteUser = siteUser;
     }

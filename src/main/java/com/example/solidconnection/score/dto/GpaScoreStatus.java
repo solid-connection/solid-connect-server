@@ -9,7 +9,6 @@ import java.time.LocalDate;
 public record GpaScoreStatus(
         Long id,
         Gpa gpa,
-        LocalDate issueDate,
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
@@ -17,7 +16,6 @@ public record GpaScoreStatus(
         return new GpaScoreStatus(
                 gpaScore.getId(),
                 gpaScore.getGpa(),
-                gpaScore.getIssueDate(),
                 gpaScore.getVerifyStatus(),
                 gpaScore.getRejectedReason()
         );
