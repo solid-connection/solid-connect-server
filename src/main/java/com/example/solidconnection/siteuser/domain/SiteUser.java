@@ -82,6 +82,9 @@ public class SiteUser {
     @Setter
     private LocalDate quitedAt;
 
+    @Column(nullable = true)
+    private String password;
+
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
 
@@ -132,5 +135,27 @@ public class SiteUser {
         this.role = role;
         this.gender = gender;
         this.authType = authType;
+    }
+
+    // todo: 가입 방법에 따라서 정해진 인자만 받고, 그렇지 않을 경우 예외 발생하도록 수정 필요
+    public SiteUser(
+            String email,
+            String nickname,
+            String profileImageUrl,
+            String birth,
+            PreparationStatus preparationStage,
+            Role role,
+            Gender gender,
+            AuthType authType,
+            String password) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.birth = birth;
+        this.preparationStage = preparationStage;
+        this.role = role;
+        this.gender = gender;
+        this.authType = authType;
+        this.password = password;
     }
 }
