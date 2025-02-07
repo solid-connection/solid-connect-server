@@ -1,8 +1,8 @@
 package com.example.solidconnection.siteuser.domain;
 
-import com.example.solidconnection.comment.domain.Comment;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.domain.PostLike;
+import com.example.solidconnection.community.domain.comment.Comment;
+import com.example.solidconnection.community.domain.post.Post;
+import com.example.solidconnection.community.domain.post.PostLike;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.type.Gender;

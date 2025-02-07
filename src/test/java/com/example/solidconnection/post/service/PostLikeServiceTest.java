@@ -1,12 +1,13 @@
 package com.example.solidconnection.post.service;
 
-import com.example.solidconnection.board.domain.Board;
+import com.example.solidconnection.community.domain.board.Board;
+import com.example.solidconnection.community.service.post.PostLikeService;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.dto.PostDislikeResponse;
-import com.example.solidconnection.post.dto.PostLikeResponse;
-import com.example.solidconnection.post.repository.PostLikeRepository;
-import com.example.solidconnection.post.repository.PostRepository;
+import com.example.solidconnection.community.domain.post.Post;
+import com.example.solidconnection.community.dto.post.PostDislikeResponse;
+import com.example.solidconnection.community.dto.post.PostLikeResponse;
+import com.example.solidconnection.community.repository.post.PostLikeRepository;
+import com.example.solidconnection.community.repository.post.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.PostCategory;

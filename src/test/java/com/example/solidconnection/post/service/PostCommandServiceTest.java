@@ -1,16 +1,17 @@
 package com.example.solidconnection.post.service;
 
-import com.example.solidconnection.board.domain.Board;
+import com.example.solidconnection.community.domain.board.Board;
+import com.example.solidconnection.community.service.post.PostCommandService;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.PostImage;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.dto.PostCreateRequest;
-import com.example.solidconnection.post.dto.PostCreateResponse;
-import com.example.solidconnection.post.dto.PostDeleteResponse;
-import com.example.solidconnection.post.dto.PostUpdateRequest;
-import com.example.solidconnection.post.dto.PostUpdateResponse;
-import com.example.solidconnection.post.repository.PostRepository;
-import com.example.solidconnection.repositories.PostImageRepository;
+import com.example.solidconnection.community.domain.post.PostImage;
+import com.example.solidconnection.community.domain.post.Post;
+import com.example.solidconnection.community.dto.post.PostCreateRequest;
+import com.example.solidconnection.community.dto.post.PostCreateResponse;
+import com.example.solidconnection.community.dto.post.PostDeleteResponse;
+import com.example.solidconnection.community.dto.post.PostUpdateRequest;
+import com.example.solidconnection.community.dto.post.PostUpdateResponse;
+import com.example.solidconnection.community.repository.post.PostRepository;
+import com.example.solidconnection.community.repository.post.PostImageRepository;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;

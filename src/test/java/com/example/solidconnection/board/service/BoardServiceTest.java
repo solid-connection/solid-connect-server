@@ -1,7 +1,8 @@
 package com.example.solidconnection.board.service;
 
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.dto.BoardFindPostResponse;
+import com.example.solidconnection.community.domain.post.Post;
+import com.example.solidconnection.community.dto.post.BoardFindPostResponse;
+import com.example.solidconnection.community.service.board.BoardService;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.PostCategory;

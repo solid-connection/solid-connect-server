@@ -1,15 +1,16 @@
 package com.example.solidconnection.post.service;
 
-import com.example.solidconnection.board.domain.Board;
-import com.example.solidconnection.comment.domain.Comment;
-import com.example.solidconnection.comment.dto.PostFindCommentResponse;
-import com.example.solidconnection.comment.repository.CommentRepository;
-import com.example.solidconnection.entity.PostImage;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.dto.PostFindPostImageResponse;
-import com.example.solidconnection.post.dto.PostFindResponse;
-import com.example.solidconnection.post.repository.PostRepository;
-import com.example.solidconnection.repositories.PostImageRepository;
+import com.example.solidconnection.community.domain.board.Board;
+import com.example.solidconnection.community.domain.comment.Comment;
+import com.example.solidconnection.community.dto.comment.PostFindCommentResponse;
+import com.example.solidconnection.community.repository.comment.CommentRepository;
+import com.example.solidconnection.community.service.post.PostQueryService;
+import com.example.solidconnection.community.domain.post.PostImage;
+import com.example.solidconnection.community.domain.post.Post;
+import com.example.solidconnection.community.dto.post.PostFindPostImageResponse;
+import com.example.solidconnection.community.dto.post.PostFindResponse;
+import com.example.solidconnection.community.repository.post.PostRepository;
+import com.example.solidconnection.community.repository.post.PostImageRepository;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
