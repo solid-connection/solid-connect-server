@@ -76,7 +76,6 @@ class ValidUniversityChoiceValidatorTest {
         Set<ConstraintViolation<UniversityChoiceRequest>> violations = validator.validate(request);
 
         // then
-
         assertThat(violations)
                 .isNotEmpty()
                 .extracting(MESSAGE)
