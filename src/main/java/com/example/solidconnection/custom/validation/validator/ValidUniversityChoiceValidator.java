@@ -6,42 +6,57 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
 import static com.example.solidconnection.custom.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
 import static com.example.solidconnection.custom.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
 public class ValidUniversityChoiceValidator implements ConstraintValidator<ValidUniversityChoice, UniversityChoiceRequest> {
+
     @Override
     public boolean isValid(UniversityChoiceRequest request, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
 
-        if (request.firstChoiceUniversityId() == null) {
+        if (isFirstChoiceNotSelected(request)) {
             context.buildConstraintViolationWithTemplate(FIRST_CHOICE_REQUIRED.getMessage())
                     .addConstraintViolation();
             return false;
         }
 
-        if (request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null) {
+        if (isThirdChoiceWithoutSecond(request)) {
             context.buildConstraintViolationWithTemplate(THIRD_CHOICE_REQUIRES_SECOND.getMessage())
                     .addConstraintViolation();
             return false;
         }
 
-        Set<Long> uniqueUniversityIds = new HashSet<>();
-        uniqueUniversityIds.add(request.firstChoiceUniversityId());
-        return isValidChoice(request.secondChoiceUniversityId(), uniqueUniversityIds, context) &&
-                isValidChoice(request.thirdChoiceUniversityId(), uniqueUniversityIds, context);
-    }
-
-    private boolean isValidChoice(Long choiceId, Set<Long> uniqueIds, ConstraintValidatorContext context) {
-        if (choiceId == null) return true;
-        if (!uniqueIds.add(choiceId)) {
+        if (isDuplicate(request)) {
             context.buildConstraintViolationWithTemplate(DUPLICATE_UNIVERSITY_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
         }
+
         return true;
+    }
+
+    private boolean isFirstChoiceNotSelected(UniversityChoiceRequest request) {
+        return request.firstChoiceUniversityId() == null;
+    }
+
+    private boolean isThirdChoiceWithoutSecond(UniversityChoiceRequest request) {
+        return request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null;
+    }
+
+    private boolean isDuplicate(UniversityChoiceRequest request) {
+        Set<Long> uniqueIds = new HashSet<>();
+        return Stream.of(
+                        request.firstChoiceUniversityId(),
+                        request.secondChoiceUniversityId(),
+                        request.thirdChoiceUniversityId()
+                )
+                .filter(Objects::nonNull)
+                .anyMatch(id -> !uniqueIds.add(id));
     }
 }
