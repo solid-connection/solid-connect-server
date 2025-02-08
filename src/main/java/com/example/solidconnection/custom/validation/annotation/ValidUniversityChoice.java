@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ValidUniversityChoiceValidator.class)
 public @interface ValidUniversityChoice {
 
-    String message() default "2지망 없이 3지망을 선택할 수 없습니다";
+    String message() default "유효하지 않은 지망 대학 선택입니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
