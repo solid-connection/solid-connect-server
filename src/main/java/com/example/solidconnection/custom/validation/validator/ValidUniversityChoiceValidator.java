@@ -8,16 +8,16 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ValidUniversityChoiceValidator implements ConstraintValidator<ValidUniversityChoice, UniversityChoiceRequest> {
+import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
+import static com.example.solidconnection.custom.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
-    public static final String ERROR_THIRD_CHOICE_WITHOUT_SECOND = "2지망 없이 3지망을 선택할 수 없습니다.";
-    public static final String ERROR_DUPLICATE_CHOICE = "지망 선택이 중복되었습니다";
+public class ValidUniversityChoiceValidator implements ConstraintValidator<ValidUniversityChoice, UniversityChoiceRequest> {
 
     @Override
     public boolean isValid(UniversityChoiceRequest request, ConstraintValidatorContext context) {
         if (request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ERROR_THIRD_CHOICE_WITHOUT_SECOND)
+            context.buildConstraintViolationWithTemplate(THIRD_CHOICE_REQUIRES_SECOND.getMessage())
                     .addConstraintViolation();
             return false;
         }
@@ -35,7 +35,7 @@ public class ValidUniversityChoiceValidator implements ConstraintValidator<Valid
 
         if (!uniqueIds.add(choiceId)) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(ERROR_DUPLICATE_CHOICE)
+            context.buildConstraintViolationWithTemplate(DUPLICATE_UNIVERSITY_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
         }

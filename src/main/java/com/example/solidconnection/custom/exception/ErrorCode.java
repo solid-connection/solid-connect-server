@@ -52,6 +52,9 @@ public enum ErrorCode {
     CANT_APPLY_FOR_SAME_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "1, 2, 3지망에 동일한 대학교를 입력할 수 없습니다."),
     CAN_NOT_CHANGE_NICKNAME_YET(HttpStatus.BAD_REQUEST.value(), "마지막 닉네임 변경으로부터 " + MIN_DAYS_BETWEEN_NICKNAME_CHANGES + "일이 지나지 않았습니다."),
     PROFILE_IMAGE_NEEDED(HttpStatus.BAD_REQUEST.value(), "프로필 이미지가 필요합니다."),
+    FIRST_CHOICE_REQUIRED(HttpStatus.BAD_REQUEST.value(), "1지망 대학교를 입력해주세요."),
+    THIRD_CHOICE_REQUIRES_SECOND(HttpStatus.BAD_REQUEST.value(), "2지망 없이 3지망을 선택할 수 없습니다."),
+    DUPLICATE_UNIVERSITY_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
 
     // community
     INVALID_POST_CATEGORY(HttpStatus.BAD_REQUEST.value(), "잘못된 카테고리명입니다."),

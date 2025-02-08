@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.example.solidconnection.custom.validation.validator.ValidUniversityChoiceValidator.ERROR_DUPLICATE_CHOICE;
-import static com.example.solidconnection.custom.validation.validator.ValidUniversityChoiceValidator.ERROR_THIRD_CHOICE_WITHOUT_SECOND;
+import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
+import static com.example.solidconnection.custom.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
+import static com.example.solidconnection.custom.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("대학 선택 유효성 검사 테스트")
 class ValidUniversityChoiceValidatorTest {
 
     private static final String MESSAGE = "message";
-    private static final String ERROR_FIRST_CHOICE_IS_NULL = "1지망 대학교를 입력해주세요.";
 
     private Validator validator;
 
@@ -64,7 +64,7 @@ class ValidUniversityChoiceValidatorTest {
         // then
         assertThat(violations)
                 .extracting(MESSAGE)
-                .contains(ERROR_THIRD_CHOICE_WITHOUT_SECOND);
+                .contains(THIRD_CHOICE_REQUIRES_SECOND.getMessage());
     }
 
     @Test
@@ -80,7 +80,7 @@ class ValidUniversityChoiceValidatorTest {
         assertThat(violations)
                 .isNotEmpty()
                 .extracting(MESSAGE)
-                .contains(ERROR_FIRST_CHOICE_IS_NULL);
+                .contains(FIRST_CHOICE_REQUIRED.getMessage());
     }
 
     @Test
@@ -95,6 +95,6 @@ class ValidUniversityChoiceValidatorTest {
         assertThat(violations)
                 .isNotEmpty()
                 .extracting(MESSAGE)
-                .contains(ERROR_DUPLICATE_CHOICE);
+                .contains(DUPLICATE_UNIVERSITY_CHOICE.getMessage());
     }
 }
