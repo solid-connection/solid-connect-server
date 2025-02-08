@@ -9,14 +9,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
+import static com.example.solidconnection.custom.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
 import static com.example.solidconnection.custom.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
 public class ValidUniversityChoiceValidator implements ConstraintValidator<ValidUniversityChoice, UniversityChoiceRequest> {
-
     @Override
     public boolean isValid(UniversityChoiceRequest request, ConstraintValidatorContext context) {
+        context.disableDefaultConstraintViolation();
+
+        if (request.firstChoiceUniversityId() == null) {
+            context.buildConstraintViolationWithTemplate(FIRST_CHOICE_REQUIRED.getMessage())
+                    .addConstraintViolation();
+            return false;
+        }
+
         if (request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null) {
-            context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(THIRD_CHOICE_REQUIRES_SECOND.getMessage())
                     .addConstraintViolation();
             return false;
@@ -24,17 +31,13 @@ public class ValidUniversityChoiceValidator implements ConstraintValidator<Valid
 
         Set<Long> uniqueUniversityIds = new HashSet<>();
         uniqueUniversityIds.add(request.firstChoiceUniversityId());
-
         return isValidChoice(request.secondChoiceUniversityId(), uniqueUniversityIds, context) &&
                 isValidChoice(request.thirdChoiceUniversityId(), uniqueUniversityIds, context);
     }
 
     private boolean isValidChoice(Long choiceId, Set<Long> uniqueIds, ConstraintValidatorContext context) {
-        if (choiceId == null)
-            return true;
-
+        if (choiceId == null) return true;
         if (!uniqueIds.add(choiceId)) {
-            context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(DUPLICATE_UNIVERSITY_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
