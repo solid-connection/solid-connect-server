@@ -26,6 +26,12 @@ public class EmailSignUpService extends SignUpService {
         this.emailSignUpTokenProvider = emailSignUpTokenProvider;
     }
 
+    public void validateUniqueEmail(String email) {
+        if (siteUserRepository.existsByEmailAndAuthType(email, AuthType.EMAIL)) {
+            throw new CustomException(USER_ALREADY_EXISTED);
+        }
+    }
+
     @Override
     protected void validateSignUpToken(SignUpRequest signUpRequest) {
         emailSignUpTokenProvider.validateSignUpToken(signUpRequest.signUpToken());
