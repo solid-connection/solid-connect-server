@@ -12,7 +12,9 @@ public abstract class JwtAuthentication extends AbstractAuthenticationToken {
     private final Object principal;
 
     public JwtAuthentication(String token, Object principal) {
-        super(principal != null ? ((UserDetails)principal).getAuthorities() : Collections.emptyList());
+        super(principal instanceof UserDetails ?
+                ((UserDetails)principal).getAuthorities() :
+                Collections.emptyList());
         this.credentials = token;
         this.principal = principal;
     }
