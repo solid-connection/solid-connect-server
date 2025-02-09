@@ -27,7 +27,7 @@ public class SiteUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return siteUser.getRole().getAuthorities();
     }
 
     @Override
