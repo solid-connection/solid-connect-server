@@ -13,8 +13,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.stream.Stream;
@@ -82,10 +85,46 @@ class ExceptionHandlerFilterTest {
         assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
+    @Test
+    void 익명_사용자의_접근_거부시_401_예외_응답을_반환한다() throws Exception {
+        // given
+        Authentication anonymousAuth = getAnonymousAuth();
+        SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
+        willThrow(new AccessDeniedException("Access Denied")).given(filterChain).doFilter(request, response);
+
+        // when
+        exceptionHandlerFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    void 인증된_사용자의_접근_거부하면_403_예외_응답을_반환한다() throws Exception {
+        // given
+        Authentication auth = new TestingAuthenticationToken("user", "password", "ROLE_USER");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        willThrow(new AccessDeniedException("Access Denied")).given(filterChain).doFilter(request, response);
+
+        // when
+        exceptionHandlerFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_FORBIDDEN);
+    }
+
     private static Stream<Throwable> provideException() {
         return Stream.of(
                 new RuntimeException(),
                 new CustomException(ErrorCode.INVALID_TOKEN)
+        );
+    }
+
+    private Authentication getAnonymousAuth() {
+        return new AnonymousAuthenticationToken(
+                "key",
+                "anonymousUser",
+                AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")
         );
     }
 }
