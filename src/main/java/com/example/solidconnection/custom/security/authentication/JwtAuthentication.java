@@ -1,6 +1,9 @@
 package com.example.solidconnection.custom.security.authentication;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collections;
 
 public abstract class JwtAuthentication extends AbstractAuthenticationToken {
 
@@ -9,7 +12,7 @@ public abstract class JwtAuthentication extends AbstractAuthenticationToken {
     private final Object principal;
 
     public JwtAuthentication(String token, Object principal) {
-        super(null);
+        super(principal != null ? ((UserDetails)principal).getAuthorities() : Collections.emptyList());
         this.credentials = token;
         this.principal = principal;
     }
