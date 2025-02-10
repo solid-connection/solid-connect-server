@@ -73,7 +73,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         List<UniversityInfoForApplyPreviewResponse> wishUniversities = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/like")
+                .get("/universities/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -92,7 +92,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         LikeResultResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .post("/university/" + 괌대학_A_지원_정보.getId() + "/like")
+                .post("/universities/" + 괌대학_A_지원_정보.getId() + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(LikeResultResponse.class);
@@ -115,7 +115,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         LikeResultResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .post("/university/" + 괌대학_A_지원_정보.getId() + "/like")
+                .post("/universities/" + 괌대학_A_지원_정보.getId() + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(LikeResultResponse.class);
@@ -136,7 +136,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         IsLikeResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .get("/university/" + 괌대학_A_지원_정보.getId() + "/like")
+                .get("/universities/" + 괌대학_A_지원_정보.getId() + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(IsLikeResponse.class);
