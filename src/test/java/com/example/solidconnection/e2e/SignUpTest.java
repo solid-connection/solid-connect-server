@@ -125,7 +125,7 @@ class SignUpTest extends BaseEndToEndTest {
         siteUserRepository.save(alreadyExistUser);
 
         // setup - 카카오 토큰 발급
-        String email = "email@email.com";
+        String email = "test@email.com";
         String generatedKakaoToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(email, AuthType.KAKAO);
 
         // request - body 생성 및 요청
