@@ -15,6 +15,7 @@ import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
@@ -30,6 +31,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DEL
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class PostCommandService {
     private final S3Service s3Service;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
+    private final SiteUserRepository siteUserRepository;
 
     @Transactional
     public PostCreateResponse createPost(SiteUser siteUser, PostCreateRequest postCreateRequest,
@@ -50,7 +53,13 @@ public class PostCommandService {
 
         // 객체 생성
         Board board = boardRepository.getByCode(postCreateRequest.boardCode());
-        Post post = postCreateRequest.toEntity(siteUser, board);
+        /*
+         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
+         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
+         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
+         */
+        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Post post = postCreateRequest.toEntity(siteUser1, board);
         // 이미지 처리
         savePostImages(imageFile, post);
         Post createdPost = postRepository.save(post);
