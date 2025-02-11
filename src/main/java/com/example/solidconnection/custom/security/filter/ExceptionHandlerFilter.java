@@ -38,11 +38,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             customCommence(response, e);
         } catch (AccessDeniedException e) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth instanceof AnonymousAuthenticationToken) {
-                generalCommence(response, e, AUTHENTICATION_FAILED);
-            } else {
-                generalCommence(response, e, ACCESS_DENIED);
-            }
+            ErrorCode errorCode = auth instanceof AnonymousAuthenticationToken ? AUTHENTICATION_FAILED : ACCESS_DENIED;
+            generalCommence(response, e, errorCode);
         } catch (Exception e) {
             generalCommence(response, e, AUTHENTICATION_FAILED);
         }
