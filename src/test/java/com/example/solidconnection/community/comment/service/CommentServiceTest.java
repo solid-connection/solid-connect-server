@@ -9,9 +9,9 @@ import com.example.solidconnection.community.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.PostCategory;
@@ -110,12 +110,11 @@ class CommentServiceTest extends BaseIntegrationTest {
         void 댓글을_성공적으로_생성한다() {
             // given
             Post testPost = createPost(자유게시판, 테스트유저_1);
-            CommentCreateRequest request = new CommentCreateRequest("테스트 댓글", null);
+            CommentCreateRequest request = new CommentCreateRequest(testPost.getId(), "테스트 댓글", null);
 
             // when
             CommentCreateResponse response = commentService.createComment(
                     테스트유저_1,
-                    testPost.getId(),
                     request
             );
 
@@ -135,12 +134,11 @@ class CommentServiceTest extends BaseIntegrationTest {
             // given
             Post testPost = createPost(자유게시판, 테스트유저_1);
             Comment parentComment = createComment(testPost, 테스트유저_1, "부모 댓글");
-            CommentCreateRequest request = new CommentCreateRequest("테스트 대댓글", parentComment.getId());
+            CommentCreateRequest request = new CommentCreateRequest(testPost.getId(), "테스트 대댓글", parentComment.getId());
 
             // when
             CommentCreateResponse response = commentService.createComment(
                     테스트유저_2,
-                    testPost.getId(),
                     request
             );
 
@@ -161,13 +159,12 @@ class CommentServiceTest extends BaseIntegrationTest {
             Post testPost = createPost(자유게시판, 테스트유저_1);
             Comment parentComment = createComment(testPost, 테스트유저_1, "부모 댓글");
             Comment childComment = createChildComment(testPost, 테스트유저_2, parentComment, "자식 댓글");
-            CommentCreateRequest request = new CommentCreateRequest("테스트 대대댓글", childComment.getId());
+            CommentCreateRequest request = new CommentCreateRequest(testPost.getId(), "테스트 대대댓글", childComment.getId());
 
             // when & then
             assertThatThrownBy(() ->
                     commentService.createComment(
                             테스트유저_1,
-                            testPost.getId(),
                             request
                     ))
                     .isInstanceOf(CustomException.class)
@@ -179,13 +176,12 @@ class CommentServiceTest extends BaseIntegrationTest {
             // given
             Post testPost = createPost(자유게시판, 테스트유저_1);
             long invalidCommentId = 9999L;
-            CommentCreateRequest request = new CommentCreateRequest("테스트 대댓글", invalidCommentId);
+            CommentCreateRequest request = new CommentCreateRequest(testPost.getId(), "테스트 대댓글", invalidCommentId);
 
             // when & then
             assertThatThrownBy(() ->
                     commentService.createComment(
                             테스트유저_1,
-                            testPost.getId(),
                             request
                     ))
                     .isInstanceOf(CustomException.class)
@@ -206,7 +202,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when
             CommentUpdateResponse response = commentService.updateComment(
                     테스트유저_1,
-                    testPost.getId(),
                     comment.getId(),
                     request
             );
@@ -233,7 +228,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     commentService.updateComment(
                             테스트유저_2,
-                            testPost.getId(),
                             comment.getId(),
                             request
                     ))
@@ -252,7 +246,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     commentService.updateComment(
                             테스트유저_1,
-                            testPost.getId(),
                             comment.getId(),
                             request
                     ))
@@ -276,7 +269,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
                     테스트유저_1,
-                    testPost.getId(),
                     comment.getId()
             );
 
@@ -301,7 +293,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
                     테스트유저_1,
-                    testPost.getId(),
                     parentComment.getId()
             );
 
@@ -331,7 +322,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
                     테스트유저_2,
-                    testPost.getId(),
                     childComment1.getId()
             );
 
@@ -362,7 +352,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             // when
             CommentDeleteResponse response = commentService.deleteCommentById(
                     테스트유저_2,
-                    testPost.getId(),
                     childComment.getId()
             );
 
@@ -384,7 +373,6 @@ class CommentServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     commentService.deleteCommentById(
                             테스트유저_2,
-                            testPost.getId(),
                             comment.getId()
                     ))
                     .isInstanceOf(CustomException.class)
