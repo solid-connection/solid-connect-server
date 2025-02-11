@@ -35,7 +35,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (CustomException e) {
-            customCommence(response, e, e.getCode());
+            customCommence(response, e);
         } catch (AccessDeniedException e) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth instanceof AnonymousAuthenticationToken) {
@@ -48,10 +48,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         }
     }
 
-    public void customCommence(HttpServletResponse response, CustomException customException, int statusCode) throws IOException {
+    public void customCommence(HttpServletResponse response, CustomException customException) throws IOException {
         SecurityContextHolder.clearContext();
         ErrorResponse errorResponse = new ErrorResponse(customException);
-        writeResponse(response, errorResponse, statusCode);
+        writeResponse(response, errorResponse, customException.getCode());
     }
 
     public void generalCommence(HttpServletResponse response, Exception exception, ErrorCode errorCode) throws IOException {
