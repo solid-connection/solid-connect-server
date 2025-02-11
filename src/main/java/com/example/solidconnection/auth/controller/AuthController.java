@@ -93,7 +93,8 @@ public class AuthController {
 
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(
-            @ExpiredToken ExpiredTokenAuthentication expiredToken
+            @ExpiredToken ExpiredTokenAuthentication expiredToken,
+            @AuthorizedUser SiteUser siteUser
     ) {
         authService.signOut(expiredToken.getToken());
         return ResponseEntity.ok().build();
