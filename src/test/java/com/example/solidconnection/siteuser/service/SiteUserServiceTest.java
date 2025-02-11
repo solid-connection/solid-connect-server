@@ -5,10 +5,7 @@ import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
-import com.example.solidconnection.siteuser.dto.NicknameUpdateResponse;
-import com.example.solidconnection.siteuser.dto.ProfileImageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
@@ -19,6 +16,7 @@ import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,11 +34,11 @@ import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_D
 import static com.example.solidconnection.siteuser.service.SiteUserService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.then;
 
 @DisplayName("유저 서비스 테스트")
 class SiteUserServiceTest extends BaseIntegrationTest {
@@ -79,21 +77,6 @@ class SiteUserServiceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void 내_정보를_수정하기_위한_마이페이지_정보를_조회한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
-        // when
-        MyPageUpdateResponse response = siteUserService.getMyPageInfoToUpdate(testUser);
-
-        // then
-        Assertions.assertAll(
-                () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
-                () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl())
-        );
-    }
-
-    @Test
     void 관심_대학교_목록을_조회한다() {
         // given
         SiteUser testUser = createSiteUser();
@@ -126,13 +109,10 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
-            ProfileImageUpdateResponse response = siteUserService.updateProfileImage(
-                    testUser,
-                    imageFile
-            );
+            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
-            assertThat(response.profileImageUrl()).isEqualTo(expectedUrl);
+            assertThat(testUser.getProfileImageUrl()).isEqualTo(expectedUrl);
         }
 
         @Test
@@ -144,7 +124,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateProfileImage(testUser, imageFile);
+            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
             then(s3Service).should(never()).deleteExProfile(any());
@@ -159,7 +139,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateProfileImage(testUser, imageFile);
+            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
             then(s3Service).should().deleteExProfile(testUser);
@@ -172,7 +152,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             MockMultipartFile emptyFile = createEmptyImageFile();
 
             // when & then
-            assertThatCode(() -> siteUserService.updateProfileImage(testUser, emptyFile))
+            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, emptyFile, "newNickname"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
         }
@@ -181,23 +161,26 @@ class SiteUserServiceTest extends BaseIntegrationTest {
     @Nested
     class 닉네임_수정_테스트 {
 
+        @BeforeEach
+        void setUp() {
+            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+                    .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
+        }
+
         @Test
         void 닉네임을_성공적으로_수정한다() {
             // given
             SiteUser testUser = createSiteUser();
+            MockMultipartFile imageFile = createValidImageFile();
             String newNickname = "newNickname";
-            NicknameUpdateRequest request = new NicknameUpdateRequest(newNickname);
 
             // when
-            NicknameUpdateResponse response = siteUserService.updateNickname(
-                    testUser,
-                    request
-            );
+            siteUserService.updateMyPageInfo(testUser, imageFile, newNickname);
 
             // then
             SiteUser updatedUser = siteUserRepository.findById(testUser.getId()).get();
             assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
-            assertThat(response.nickname()).isEqualTo(newNickname);
+            assertThat(updatedUser.getNickname()).isEqualTo(newNickname);
         }
 
         @Test
@@ -205,10 +188,10 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             // given
             createDuplicatedSiteUser();
             SiteUser testUser = createSiteUser();
-            NicknameUpdateRequest request = new NicknameUpdateRequest("duplicatedNickname");
+            MockMultipartFile imageFile = createValidImageFile();
 
             // when & then
-            assertThatCode(() -> siteUserService.updateNickname(testUser, request))
+            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, imageFile, "duplicatedNickname"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -217,6 +200,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
             // given
             SiteUser testUser = createSiteUser();
+            MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
             testUser.setNicknameModifiedAt(modifiedAt);
             siteUserRepository.save(testUser);
@@ -224,8 +208,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
 
             // when & then
-            assertThatCode(() ->
-                    siteUserService.updateNickname(testUser, request))
+            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }
