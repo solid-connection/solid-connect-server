@@ -49,18 +49,17 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     }
 
     public void customCommence(HttpServletResponse response, CustomException customException) throws IOException {
-        SecurityContextHolder.clearContext();
         ErrorResponse errorResponse = new ErrorResponse(customException);
         writeResponse(response, errorResponse, customException.getCode());
     }
 
     public void generalCommence(HttpServletResponse response, Exception exception, ErrorCode errorCode) throws IOException {
-        SecurityContextHolder.clearContext();
         ErrorResponse errorResponse = new ErrorResponse(errorCode, exception.getMessage());
         writeResponse(response, errorResponse, errorCode.getCode());
     }
 
     private void writeResponse(HttpServletResponse response, ErrorResponse errorResponse, int statusCode) throws IOException {
+        SecurityContextHolder.clearContext();
         response.setStatus(statusCode);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
