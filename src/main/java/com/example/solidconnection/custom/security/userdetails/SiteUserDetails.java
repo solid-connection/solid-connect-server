@@ -1,5 +1,6 @@
 package com.example.solidconnection.custom.security.userdetails;
 
+import com.example.solidconnection.custom.security.mapper.SecurityRoleMapper;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +28,7 @@ public class SiteUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return siteUser.getRole().getAuthorities();
+        return SecurityRoleMapper.mapRoleToAuthorities(siteUser.getRole());
     }
 
     @Override
