@@ -14,6 +14,7 @@ import com.example.solidconnection.university.service.UniversityQueryService;
 import com.example.solidconnection.university.service.UniversityRecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,6 +68,15 @@ public class UniversityController {
             @PathVariable Long universityInfoForApplyId
     ) {
         LikeResultResponse likeResultResponse = universityLikeService.likeUniversity(siteUser, universityInfoForApplyId);
+        return ResponseEntity.ok(likeResultResponse);
+    }
+
+    @DeleteMapping("/{universityInfoForApplyId}/like")
+    public ResponseEntity<LikeResultResponse> cancelWishUniversity(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable Long universityInfoForApplyId
+    ) {
+        LikeResultResponse likeResultResponse = universityLikeService.cancelLikeUniversity(siteUser, universityInfoForApplyId);
         return ResponseEntity.ok(likeResultResponse);
     }
 

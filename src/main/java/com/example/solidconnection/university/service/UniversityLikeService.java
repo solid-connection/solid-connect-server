@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.service;
 
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.example.solidconnection.custom.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
+import static com.example.solidconnection.custom.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
 
 @RequiredArgsConstructor
 @Service
@@ -29,16 +33,14 @@ public class UniversityLikeService {
 
     /*
      * 대학교를 '좋아요' 한다.
-     * - 이미 좋아요가 눌러져있다면, 좋아요를 취소한다.
      * */
     @Transactional
     public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
         UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
-        Optional<LikedUniversity> alreadyLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
-        if (alreadyLikedUniversity.isPresent()) {
-            likedUniversityRepository.delete(alreadyLikedUniversity.get());
-            return new LikeResultResponse(LIKE_CANCELED_MESSAGE);
+        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
+        if (optionalLikedUniversity.isPresent()) {
+            throw new CustomException(ALREADY_LIKED_UNIVERSITY);
         }
 
         LikedUniversity likedUniversity = LikedUniversity.builder()
@@ -47,6 +49,22 @@ public class UniversityLikeService {
                 .build();
         likedUniversityRepository.save(likedUniversity);
         return new LikeResultResponse(LIKE_SUCCESS_MESSAGE);
+    }
+
+    /*
+     * 대학교 '좋아요'를 취소한다.
+     * */
+    @Transactional
+    public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
+        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+
+        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
+        if (optionalLikedUniversity.isEmpty()) {
+            throw new CustomException(NOT_LIKED_UNIVERSITY);
+        }
+
+        likedUniversityRepository.delete(optionalLikedUniversity.get());
+        return new LikeResultResponse(LIKE_CANCELED_MESSAGE);
     }
 
     /*

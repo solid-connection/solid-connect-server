@@ -13,14 +13,18 @@ import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
+import static com.example.solidconnection.custom.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
 import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("대학교 좋아요 서비스 테스트")
 class UniversityLikeServiceTest extends BaseIntegrationTest {
@@ -34,33 +38,70 @@ class UniversityLikeServiceTest extends BaseIntegrationTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
 
-    @Test
-    void 대학_좋아요를_등록한다() {
-        // given
-        SiteUser testUser = createSiteUser();
+    @Nested
+    class 대학_좋아요를_등록한다 {
 
-        // when
-        LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
+        @Test
+        void 성공적으로_좋아요를_등록한다() {
+            // given
+            SiteUser testUser = createSiteUser();
 
-        // then
-        assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE);
-        assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                testUser, 괌대학_A_지원_정보)).isPresent();
+            // when
+            LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
+                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
+                            testUser, 괌대학_A_지원_정보
+                    )).isPresent()
+            );
+        }
+
+        @Test
+        void 이미_좋아요한_대학이면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+
+            // when & then
+            assertThatCode(() -> universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ALREADY_LIKED_UNIVERSITY.getMessage());
+        }
     }
 
-    @Test
-    void 대학_좋아요를_취소한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-        saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+    @Nested
+    class 대학_좋아요를_취소한다 {
 
-        // when
-        LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
+        @Test
+        void 성공적으로_좋아요를_취소한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+            saveLikedUniversity(testUser, 괌대학_A_지원_정보);
 
-        // then
-        assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE);
-        assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                testUser, 괌대학_A_지원_정보)).isEmpty();
+            // when
+            LikeResultResponse response = universityLikeService.cancelLikeUniversity(testUser, 괌대학_A_지원_정보.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
+                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
+                            testUser, 괌대학_A_지원_정보
+                    )).isEmpty()
+            );
+        }
+
+        @Test
+        void 좋아요하지_않은_대학이면_예외_응답을_반환한다() {
+            // given
+            SiteUser testUser = createSiteUser();
+
+            // when & then
+            assertThatCode(() -> universityLikeService.cancelLikeUniversity(testUser, 괌대학_A_지원_정보.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(NOT_LIKED_UNIVERSITY.getMessage());
+        }
     }
 
     @Test

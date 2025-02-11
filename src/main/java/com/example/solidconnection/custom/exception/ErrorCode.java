@@ -83,6 +83,8 @@ public enum ErrorCode {
     CAN_NOT_UPDATE_DEPRECATED_COMMENT(HttpStatus.BAD_REQUEST.value(), "이미 삭제된 댓글을 수정할 수 없습니다."),
     INVALID_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글 좋아요입니다."),
     DUPLICATE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 게시글입니다."),
+    ALREADY_LIKED_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 대학입니다."),
+    NOT_LIKED_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "좋아요하지 않은 대학입니다."),
 
     // score
     INVALID_GPA_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 학점입니다."),

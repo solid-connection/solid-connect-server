@@ -24,7 +24,6 @@ import java.util.Set;
 import static com.example.solidconnection.e2e.DynamicFixture.createLikedUniversity;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createUniversityForApply;
-import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -103,28 +102,6 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 () -> assertThat(likedUniversity).isPresent(),
                 () -> assertThat(likedUniversity.get().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
                 () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE)
-        );
-    }
-
-    @Test
-    void 이미_좋아요한_대학교에_좋아요를_누른다() {
-        // setUp - 대학교 좋아요 저장
-        likedUniversityRepository.save(createLikedUniversity(siteUser, 괌대학_A_지원_정보));
-
-        // request - 요청
-        LikeResultResponse response = RestAssured.given()
-                .header("Authorization", "Bearer " + accessToken)
-                .log().all()
-                .post("/universities/" + 괌대학_A_지원_정보.getId() + "/like")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract().as(LikeResultResponse.class);
-
-        Optional<LikedUniversity> likedUniversity
-                = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId()).stream().findFirst();
-        assertAll("좋아요 누른 대학교를 삭제하고, 좋아요 취소 응답을 반환한다.",
-                () -> assertThat(likedUniversity).isEmpty(),
-                () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE)
         );
     }
 
