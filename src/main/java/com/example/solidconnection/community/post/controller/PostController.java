@@ -1,7 +1,5 @@
 package com.example.solidconnection.community.post.controller;
 
-import com.example.solidconnection.community.post.dto.PostListResponse;
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.community.post.dto.PostCreateRequest;
 import com.example.solidconnection.community.post.dto.PostCreateResponse;
 import com.example.solidconnection.community.post.dto.PostDeleteResponse;
@@ -13,6 +11,7 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.service.PostCommandService;
 import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.community.post.service.PostQueryService;
+import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +38,6 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostCommandService postCommandService;
     private final PostLikeService postLikeService;
-
-    @GetMapping("/{code}")
-    public ResponseEntity<?> findPostsByCodeAndCategory(
-            @PathVariable(value = "code") String code,
-            @RequestParam(value = "category", defaultValue = "전체") String category) {
-
-        List<PostListResponse> postsByCodeAndPostCategory = postQueryService
-                .findPostsByCodeAndPostCategory(code, category);
-        return ResponseEntity.ok().body(postsByCodeAndPostCategory);
-    }
 
     @PostMapping(value = "/{code}/posts")
     public ResponseEntity<?> createPost(
