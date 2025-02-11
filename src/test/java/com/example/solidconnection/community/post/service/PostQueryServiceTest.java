@@ -112,7 +112,6 @@ class PostQueryServiceTest extends BaseIntegrationTest {
         // when
         PostFindResponse response = postQueryService.findPostById(
                 테스트유저_1,
-                자유게시판.getCode(),
                 testPost.getId()
         );
 

@@ -103,8 +103,8 @@ class PostLikeCountConcurrencyTest {
             SiteUser tmpSiteUser = siteUserRepository.save(createSiteUserByEmail(email));
             executorService.submit(() -> {
                 try {
-                    postLikeService.likePost(tmpSiteUser, board.getCode(), post.getId());
-                    postLikeService.dislikePost(tmpSiteUser, board.getCode(), post.getId());
+                    postLikeService.likePost(tmpSiteUser, post.getId());
+                    postLikeService.dislikePost(tmpSiteUser, post.getId());
                 } finally {
                     doneSignal.countDown();
                 }

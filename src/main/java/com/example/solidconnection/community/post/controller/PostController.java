@@ -32,31 +32,29 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/communities")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostQueryService postQueryService;
     private final PostCommandService postCommandService;
     private final PostLikeService postLikeService;
 
-    @PostMapping(value = "/{code}/posts")
+    @PostMapping
     public ResponseEntity<?> createPost(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @Valid @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,
             @RequestParam(value = "file", required = false) List<MultipartFile> imageFile
     ) {
         if (imageFile == null) {
             imageFile = Collections.emptyList();
         }
-        PostCreateResponse post = postCommandService.createPost(siteUser, code, postCreateRequest, imageFile);
+        PostCreateResponse post = postCommandService.createPost(siteUser, postCreateRequest, imageFile);
         return ResponseEntity.ok().body(post);
     }
 
-    @PatchMapping(value = "/{code}/posts/{post_id}")
+    @PatchMapping(value = "/{post_id}")
     public ResponseEntity<?> updatePost(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @PathVariable("post_id") Long postId,
             @Valid @RequestPart("postUpdateRequest") PostUpdateRequest postUpdateRequest,
             @RequestParam(value = "file", required = false) List<MultipartFile> imageFile
@@ -65,48 +63,44 @@ public class PostController {
             imageFile = Collections.emptyList();
         }
         PostUpdateResponse postUpdateResponse = postCommandService.updatePost(
-                siteUser, code, postId, postUpdateRequest, imageFile
+                siteUser, postId, postUpdateRequest, imageFile
         );
         return ResponseEntity.ok().body(postUpdateResponse);
     }
 
-    @GetMapping("/{code}/posts/{post_id}")
+    @GetMapping("/{post_id}")
     public ResponseEntity<?> findPostById(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @PathVariable("post_id") Long postId
     ) {
-        PostFindResponse postFindResponse = postQueryService.findPostById(siteUser, code, postId);
+        PostFindResponse postFindResponse = postQueryService.findPostById(siteUser, postId);
         return ResponseEntity.ok().body(postFindResponse);
     }
 
-    @DeleteMapping(value = "/{code}/posts/{post_id}")
+    @DeleteMapping(value = "/{post_id}")
     public ResponseEntity<?> deletePostById(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @PathVariable("post_id") Long postId
     ) {
-        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(siteUser, code, postId);
+        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(siteUser, postId);
         return ResponseEntity.ok().body(postDeleteResponse);
     }
 
-    @PostMapping(value = "/{code}/posts/{post_id}/like")
+    @PostMapping(value = "/{post_id}/like")
     public ResponseEntity<?> likePost(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @PathVariable("post_id") Long postId
     ) {
-        PostLikeResponse postLikeResponse = postLikeService.likePost(siteUser, code, postId);
+        PostLikeResponse postLikeResponse = postLikeService.likePost(siteUser, postId);
         return ResponseEntity.ok().body(postLikeResponse);
     }
 
-    @DeleteMapping(value = "/{code}/posts/{post_id}/like")
+    @DeleteMapping(value = "/{post_id}/like")
     public ResponseEntity<?> dislikePost(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("code") String code,
             @PathVariable("post_id") Long postId
     ) {
-        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(siteUser, code, postId);
+        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(siteUser, postId);
         return ResponseEntity.ok().body(postDislikeResponse);
     }
 }
