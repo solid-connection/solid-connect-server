@@ -1,7 +1,6 @@
 package com.example.solidconnection.siteuser.controller;
 
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
-import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.service.SiteUserService;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 class SiteUserController {
 
     private final SiteUserService siteUserService;
-    private final S3Service s3Service;
 
     @GetMapping
     public ResponseEntity<MyPageResponse> getMyPageInfo(
