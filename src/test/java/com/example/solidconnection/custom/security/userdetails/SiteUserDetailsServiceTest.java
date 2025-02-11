@@ -46,6 +46,21 @@ class SiteUserDetailsServiceTest {
         );
     }
 
+    @Test
+    void 사용자_권한_정보를_정상적으로_반환한다() {
+        // given
+        SiteUser siteUser = siteUserRepository.save(createSiteUser());
+        String username = getUserName(siteUser);
+
+        // when
+        SiteUserDetails userDetails = (SiteUserDetails) userDetailsService.loadUserByUsername(username);
+
+        // then
+        assertThat(userDetails.getAuthorities())
+                .extracting("authority")
+                .containsExactly("ROLE_" + siteUser.getRole().name());
+    }
+
     @Nested
     class 예외_응답을_반환한다 {
 
