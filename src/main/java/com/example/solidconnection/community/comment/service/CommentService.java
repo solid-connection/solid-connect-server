@@ -31,6 +31,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
     public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
@@ -53,7 +54,15 @@ public class CommentService {
             parentComment = commentRepository.getById(commentCreateRequest.parentId());
             validateCommentDepth(parentComment);
         }
-        Comment createdComment = commentRepository.save(commentCreateRequest.toEntity(siteUser, post, parentComment));
+
+        /*
+         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
+         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
+         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
+         */
+        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Comment comment = commentCreateRequest.toEntity(siteUser1, post, parentComment);
+        Comment createdComment = commentRepository.save(comment);
 
         return CommentCreateResponse.from(createdComment);
     }
