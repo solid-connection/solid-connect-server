@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface LikedUniversityRepository extends JpaRepository<LikedUniversity, Long> {
 
-    List<LikedUniversity> findAllBySiteUser_Email(String email);
+    List<LikedUniversity> findAllBySiteUser_Id(long siteUserId);
 
-    int countBySiteUser_Email(String email);
+    int countBySiteUser_Id(long siteUserId);
 
     Optional<LikedUniversity> findBySiteUserAndUniversityInfoForApply(SiteUser siteUser, UniversityInfoForApply universityInfoForApply);
 }

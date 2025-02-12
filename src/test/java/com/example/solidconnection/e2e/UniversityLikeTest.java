@@ -1,7 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.config.token.TokenService;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -25,15 +24,13 @@ import java.util.Set;
 import static com.example.solidconnection.e2e.DynamicFixture.createLikedUniversity;
 import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
 import static com.example.solidconnection.e2e.DynamicFixture.createUniversityForApply;
-import static com.example.solidconnection.university.service.UniversityService.LIKE_CANCELED_MESSAGE;
-import static com.example.solidconnection.university.service.UniversityService.LIKE_SUCCESS_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_CANCELED_MESSAGE;
+import static com.example.solidconnection.university.service.UniversityLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("대학교 좋아요 테스트")
 class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
-
-    private final String email = "email@email.com";
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -45,7 +42,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     private LikedUniversityRepository likedUniversityRepository;
 
     @Autowired
-    private TokenService tokenService;
+    private AuthTokenProvider authTokenProvider;
 
     private String accessToken;
     private SiteUser siteUser;
@@ -53,13 +50,12 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserByEmail(email);
+        siteUser = createSiteUserByEmail("email@email.com");
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test
@@ -102,7 +98,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(LikeResultResponse.class);
 
         Optional<LikedUniversity> likedUniversity
-                = likedUniversityRepository.findAllBySiteUser_Email(email).stream().findFirst();
+                = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId()).stream().findFirst();
         assertAll("좋아요 누른 대학교를 저장하고 좋아요 성공 응답을 반환한다.",
                 () -> assertThat(likedUniversity).isPresent(),
                 () -> assertThat(likedUniversity.get().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
@@ -125,7 +121,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
                 .extract().as(LikeResultResponse.class);
 
         Optional<LikedUniversity> likedUniversity
-                = likedUniversityRepository.findAllBySiteUser_Email(email).stream().findFirst();
+                = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId()).stream().findFirst();
         assertAll("좋아요 누른 대학교를 삭제하고, 좋아요 취소 응답을 반환한다.",
                 () -> assertThat(likedUniversity).isEmpty(),
                 () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE)
@@ -140,7 +136,7 @@ class UniversityLikeTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         IsLikeResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .get("/university/"+ 괌대학_A_지원_정보.getId() +"/like")
+                .get("/university/" + 괌대학_A_지원_정보.getId() + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(IsLikeResponse.class);

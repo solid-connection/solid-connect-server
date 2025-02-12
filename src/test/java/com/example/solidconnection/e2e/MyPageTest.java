@@ -1,7 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.config.token.TokenService;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -19,22 +18,24 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("마이페이지 테스트")
 class MyPageTest extends BaseEndToEndTest {
 
-    private final String email = "email@email.com";
+    private SiteUser siteUser;
+
     @Autowired
     private SiteUserRepository siteUserRepository;
+
     @Autowired
-    private TokenService tokenService;
+    private AuthTokenProvider authTokenProvider;
+
     private String accessToken;
 
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUserRepository.save(createSiteUserByEmail(email));
+        siteUser = siteUserRepository.save(createSiteUserByEmail("email"));
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test
@@ -48,11 +49,10 @@ class MyPageTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(MyPageResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
         assertAll("불러온 마이 페이지 정보가 DB의 정보와 일치한다.",
-                () -> assertThat(myPageResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
-                () -> assertThat(myPageResponse.birth()).isEqualTo(savedSiteUser.getBirth()),
-                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()),
-                () -> assertThat(myPageResponse.email()).isEqualTo(savedSiteUser.getEmail()));
+                () -> assertThat(myPageResponse.nickname()).isEqualTo(siteUser.getNickname()),
+                () -> assertThat(myPageResponse.birth()).isEqualTo(siteUser.getBirth()),
+                () -> assertThat(myPageResponse.profileImageUrl()).isEqualTo(siteUser.getProfileImageUrl()),
+                () -> assertThat(myPageResponse.email()).isEqualTo(siteUser.getEmail()));
     }
 }

@@ -18,8 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Entity
 @NoArgsConstructor
@@ -33,8 +31,6 @@ public class LanguageTestScore extends BaseEntity {
     @Embedded
     private LanguageTest languageTest;
 
-    private LocalDate issueDate;
-
     @Setter
     @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
     @Enumerated(EnumType.STRING)
@@ -45,9 +41,8 @@ public class LanguageTestScore extends BaseEntity {
     @ManyToOne
     private SiteUser siteUser;
 
-    public LanguageTestScore(LanguageTest languageTest, LocalDate issueDate, SiteUser siteUser) {
+    public LanguageTestScore(LanguageTest languageTest, SiteUser siteUser) {
         this.languageTest = languageTest;
-        this.issueDate = issueDate;
         this.verifyStatus = VerifyStatus.PENDING;
         this.siteUser = siteUser;
     }

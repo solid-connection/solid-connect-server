@@ -1,7 +1,7 @@
 package com.example.solidconnection.service;
 
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.repository.PostRepository;
+import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

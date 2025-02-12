@@ -32,17 +32,18 @@ public class DatabaseCleaner {
     }
 
     private void truncate() {
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
+        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
         getTruncateQueries().forEach(query -> em.createNativeQuery(query).executeUpdate());
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
+        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
     private List<String> getTruncateQueries() {
         String sql = """
-                SELECT Concat('TRUNCATE TABLE ', TABLE_NAME, ' RESTART IDENTITY', ';') AS q
+                SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q
                 FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = 'PUBLIC'
+                WHERE TABLE_SCHEMA = (SELECT DATABASE())
+                AND TABLE_TYPE = 'BASE TABLE'
                 """;
 
         return em.createNativeQuery(sql).getResultList();

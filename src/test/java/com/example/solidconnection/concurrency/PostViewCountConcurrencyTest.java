@@ -1,12 +1,13 @@
 package com.example.solidconnection.concurrency;
 
-import com.example.solidconnection.board.domain.Board;
-import com.example.solidconnection.board.repository.BoardRepository;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.repository.PostRepository;
+import com.example.solidconnection.community.board.domain.Board;
+import com.example.solidconnection.community.board.repository.BoardRepository;
+import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
@@ -17,8 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -28,8 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static com.example.solidconnection.type.RedisConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@TestContainerSpringBootTest
 @DisplayName("게시글 조회수 동시성 테스트")
 public class PostViewCountConcurrencyTest {
 
@@ -98,7 +96,7 @@ public class PostViewCountConcurrencyTest {
     @Test
     public void 게시글을_조회할_때_조회수_동시성_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -128,7 +126,7 @@ public class PostViewCountConcurrencyTest {
     @Test
     public void 게시글을_조회할_때_조회수_조작_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -136,7 +134,7 @@ public class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }
@@ -149,7 +147,7 @@ public class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getEmail(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }

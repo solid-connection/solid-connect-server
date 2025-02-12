@@ -3,6 +3,7 @@ package com.example.solidconnection.concurrency;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -10,9 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,8 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@TestContainerSpringBootTest
 @DisplayName("ThunderingHerd 테스트")
 public class ThunderingHerdTest {
     @Autowired
@@ -68,9 +66,9 @@ public class ThunderingHerdTest {
             executorService.submit(() -> {
                 try {
                     List<Runnable> tasks = Arrays.asList(
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "", ""),
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "ASIA", ""),
-                            () -> applicationQueryService.getApplicants(siteUser.getEmail(), "", "추오")
+                            () -> applicationQueryService.getApplicants(siteUser, "", ""),
+                            () -> applicationQueryService.getApplicants(siteUser, "ASIA", ""),
+                            () -> applicationQueryService.getApplicants(siteUser, "", "추오")
                     );
                     Collections.shuffle(tasks);
                     tasks.forEach(Runnable::run);

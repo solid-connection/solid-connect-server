@@ -1,7 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.config.token.TokenService;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.custom.response.ErrorResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
@@ -31,24 +30,21 @@ class MyPageUpdateTest extends BaseEndToEndTest {
     private SiteUserRepository siteUserRepository;
 
     @Autowired
-    private TokenService tokenService;
+    private AuthTokenProvider authTokenProvider;
 
     private String accessToken;
 
     private SiteUser siteUser;
 
-    private final String email = "email@email.com";
-
     @BeforeEach
     public void setUpUserAndToken() {
         // setUp - 회원 정보 저장
-        siteUser = createSiteUserByEmail(email);
+        siteUser = createSiteUserByEmail("email");
         siteUserRepository.save(siteUser);
 
         // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.generateAndSaveRefreshToken(siteUser);
     }
 
     @Test
@@ -62,10 +58,9 @@ class MyPageUpdateTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(MyPageUpdateResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
         assertAll("불러온 마이 페이지 정보가 DB의 정보와 일치한다.",
-                () -> assertThat(myPageUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()),
-                () -> assertThat(myPageUpdateResponse.profileImageUrl()).isEqualTo(savedSiteUser.getProfileImageUrl()));
+                () -> assertThat(myPageUpdateResponse.nickname()).isEqualTo(siteUser.getNickname()),
+                () -> assertThat(myPageUpdateResponse.profileImageUrl()).isEqualTo(siteUser.getProfileImageUrl()));
     }
 
     @Test
@@ -82,9 +77,9 @@ class MyPageUpdateTest extends BaseEndToEndTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(NicknameUpdateResponse.class);
 
-        SiteUser savedSiteUser = siteUserRepository.getByEmail(email);
+        SiteUser updatedSiteUser = siteUserRepository.findById(siteUser.getId()).get();
         assertAll("마이 페이지 정보가 수정된다.",
-                () -> assertThat(nicknameUpdateResponse.nickname()).isEqualTo(savedSiteUser.getNickname()));
+                () -> assertThat(nicknameUpdateResponse.nickname()).isEqualTo(updatedSiteUser.getNickname()));
     }
 
     @Test

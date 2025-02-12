@@ -1,5 +1,6 @@
 package com.example.solidconnection.auth.dto;
 
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
@@ -10,7 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public record SignUpRequest(
-        String kakaoOauthToken,
+        String signUpToken,
         List<String> interestedRegions,
         List<String> interestedCountries,
         PreparationStatus preparationStatus,
@@ -23,15 +24,30 @@ public record SignUpRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
         String birth) {
 
-    public SiteUser toSiteUser(String email, Role role) {
+    public SiteUser toOAuthSiteUser(String email, AuthType authType) {
         return new SiteUser(
                 email,
                 this.nickname,
                 this.profileImageUrl,
                 this.birth,
                 this.preparationStatus,
-                role,
-                this.gender
+                Role.MENTEE,
+                this.gender,
+                authType
+        );
+    }
+
+    public SiteUser toEmailSiteUser(String email, String encodedPassword) {
+        return new SiteUser(
+                email,
+                this.nickname,
+                this.profileImageUrl,
+                this.birth,
+                this.preparationStatus,
+                Role.MENTEE,
+                this.gender,
+                AuthType.EMAIL,
+                encodedPassword
         );
     }
 }

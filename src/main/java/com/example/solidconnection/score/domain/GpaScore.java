@@ -18,8 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Entity
 @NoArgsConstructor
@@ -33,8 +31,6 @@ public class GpaScore extends BaseEntity {
     @Embedded
     private Gpa gpa;
 
-    private LocalDate issueDate;
-
     @Setter
     @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
     @Enumerated(EnumType.STRING)
@@ -45,10 +41,9 @@ public class GpaScore extends BaseEntity {
     @ManyToOne
     private SiteUser siteUser;
 
-    public GpaScore(Gpa gpa, SiteUser siteUser, LocalDate issueDate) {
+    public GpaScore(Gpa gpa, SiteUser siteUser) {
         this.gpa = gpa;
         this.siteUser = siteUser;
-        this.issueDate = issueDate;
         this.verifyStatus = VerifyStatus.PENDING;
         this.rejectedReason = null;
     }

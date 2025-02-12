@@ -10,7 +10,6 @@ import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
@@ -19,7 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,7 +39,6 @@ public class ApplicationSubmissionService {
 
     private final ApplicationRepository applicationRepository;
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final SiteUserRepository siteUserRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
 
@@ -48,10 +48,8 @@ public class ApplicationSubmissionService {
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
-    public boolean apply(String email, ApplyRequest applyRequest) {
-        SiteUser siteUser = siteUserRepository.getByEmail(email);
+    public boolean apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
-        validateUniversityChoices(universityChoiceRequest);
 
         Long gpaScoreId = applyRequest.gpaScoreId();
         Long languageTestScoreId = applyRequest.languageTestScoreId();
@@ -117,25 +115,6 @@ public class ApplicationSubmissionService {
     private void validateUpdateLimitNotExceed(Application application) {
         if (application.getUpdateCount() >= APPLICATION_UPDATE_COUNT_LIMIT) {
             throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
-        }
-    }
-
-    // 입력값 유효성 검증
-    private void validateUniversityChoices(UniversityChoiceRequest universityChoiceRequest) {
-        Set<Long> uniqueUniversityIds = new HashSet<>();
-        uniqueUniversityIds.add(universityChoiceRequest.firstChoiceUniversityId());
-        if (universityChoiceRequest.secondChoiceUniversityId() != null) {
-            addUniversityChoice(uniqueUniversityIds, universityChoiceRequest.secondChoiceUniversityId());
-        }
-        if (universityChoiceRequest.thirdChoiceUniversityId() != null) {
-            addUniversityChoice(uniqueUniversityIds, universityChoiceRequest.thirdChoiceUniversityId());
-        }
-    }
-
-    private void addUniversityChoice(Set<Long> uniqueUniversityIds, Long universityId) {
-        boolean notAdded = !uniqueUniversityIds.add(universityId);
-        if (notAdded) {
-            throw new CustomException(CANT_APPLY_FOR_SAME_UNIVERSITY);
         }
     }
 }

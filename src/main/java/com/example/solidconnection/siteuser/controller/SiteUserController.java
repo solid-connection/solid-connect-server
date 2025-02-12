@@ -1,5 +1,7 @@
 package com.example.solidconnection.siteuser.controller;
 
+import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
 import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
-
 @RequiredArgsConstructor
 @RequestMapping("/my-page")
 @RestController
@@ -27,32 +27,36 @@ class SiteUserController {
     private final SiteUserService siteUserService;
 
     @GetMapping
-    public ResponseEntity<MyPageResponse> getMyPageInfo(Principal principal) {
-        MyPageResponse myPageResponse = siteUserService.getMyPageInfo(principal.getName());
-        return ResponseEntity
-                .ok(myPageResponse);
+    public ResponseEntity<MyPageResponse> getMyPageInfo(
+            @AuthorizedUser SiteUser siteUser
+    ) {
+        MyPageResponse myPageResponse = siteUserService.getMyPageInfo(siteUser);
+        return ResponseEntity.ok(myPageResponse);
     }
 
     @GetMapping("/update")
-    public ResponseEntity<MyPageUpdateResponse> getMyPageInfoToUpdate(Principal principal) {
-        MyPageUpdateResponse myPageUpdateDto = siteUserService.getMyPageInfoToUpdate(principal.getName());
-        return ResponseEntity
-                .ok(myPageUpdateDto);
+    public ResponseEntity<MyPageUpdateResponse> getMyPageInfoToUpdate(
+            @AuthorizedUser SiteUser siteUser
+    ) {
+        MyPageUpdateResponse myPageUpdateDto = siteUserService.getMyPageInfoToUpdate(siteUser);
+        return ResponseEntity.ok(myPageUpdateDto);
     }
 
     @PatchMapping("/update/profileImage")
     public ResponseEntity<ProfileImageUpdateResponse> updateProfileImage(
-            Principal principal,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile) {
-        ProfileImageUpdateResponse profileImageUpdateResponse = siteUserService.updateProfileImage(principal.getName(), imageFile);
+            @AuthorizedUser SiteUser siteUser,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile
+    ) {
+        ProfileImageUpdateResponse profileImageUpdateResponse = siteUserService.updateProfileImage(siteUser, imageFile);
         return ResponseEntity.ok().body(profileImageUpdateResponse);
     }
 
     @PatchMapping("/update/nickname")
     public ResponseEntity<NicknameUpdateResponse> updateNickname(
-            Principal principal,
-            @Valid @RequestBody NicknameUpdateRequest nicknameUpdateRequest) {
-        NicknameUpdateResponse nicknameUpdateResponse = siteUserService.updateNickname(principal.getName(), nicknameUpdateRequest);
+            @AuthorizedUser SiteUser siteUser,
+            @Valid @RequestBody NicknameUpdateRequest nicknameUpdateRequest
+    ) {
+        NicknameUpdateResponse nicknameUpdateResponse = siteUserService.updateNickname(siteUser, nicknameUpdateRequest);
         return ResponseEntity.ok().body(nicknameUpdateResponse);
     }
 }

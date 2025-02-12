@@ -1,8 +1,8 @@
 package com.example.solidconnection.siteuser.domain;
 
-import com.example.solidconnection.comment.domain.Comment;
-import com.example.solidconnection.post.domain.Post;
-import com.example.solidconnection.post.domain.PostLike;
+import com.example.solidconnection.community.comment.domain.Comment;
+import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostLike;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.type.Gender;
@@ -17,6 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,14 +34,24 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @AllArgsConstructor
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_site_user_email_auth_type",
+                columnNames = {"email", "auth_type"}
+        )
+})
 public class SiteUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
+
+    @Column(name = "auth_type", nullable = false, length = 100)
+    @Enumerated(EnumType.STRING)
+    private AuthType authType;
 
     @Setter
     @Column(nullable = false, length = 100)
@@ -69,6 +81,9 @@ public class SiteUser {
 
     @Setter
     private LocalDate quitedAt;
+
+    @Column(nullable = true)
+    private String password;
 
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
@@ -100,5 +115,47 @@ public class SiteUser {
         this.preparationStage = preparationStage;
         this.role = role;
         this.gender = gender;
+        this.authType = AuthType.KAKAO;
+    }
+
+    public SiteUser(
+            String email,
+            String nickname,
+            String profileImageUrl,
+            String birth,
+            PreparationStatus preparationStage,
+            Role role,
+            Gender gender,
+            AuthType authType) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.birth = birth;
+        this.preparationStage = preparationStage;
+        this.role = role;
+        this.gender = gender;
+        this.authType = authType;
+    }
+
+    // todo: 가입 방법에 따라서 정해진 인자만 받고, 그렇지 않을 경우 예외 발생하도록 수정 필요
+    public SiteUser(
+            String email,
+            String nickname,
+            String profileImageUrl,
+            String birth,
+            PreparationStatus preparationStage,
+            Role role,
+            Gender gender,
+            AuthType authType,
+            String password) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.birth = birth;
+        this.preparationStage = preparationStage;
+        this.role = role;
+        this.gender = gender;
+        this.authType = authType;
+        this.password = password;
     }
 }

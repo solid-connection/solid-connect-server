@@ -7,8 +7,7 @@ import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.config.token.TokenService;
-import com.example.solidconnection.config.token.TokenType;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.VerifyStatus;
@@ -30,13 +29,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
 
     @Autowired
-    SiteUserRepository siteUserRepository;
+    private SiteUserRepository siteUserRepository;
 
     @Autowired
-    ApplicationRepository applicationRepository;
+    private ApplicationRepository applicationRepository;
 
     @Autowired
-    TokenService tokenService;
+    private AuthTokenProvider authTokenProvider;
 
     private String accessToken;
     private String adminAccessToken;
@@ -55,24 +54,8 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
 
     @BeforeEach
     public void setUpUserAndToken() {
-        // setUp - 회원 정보 저장
-        String email = "email@email.com";
-        SiteUser siteUser = siteUserRepository.save(createSiteUserByEmail(email));
-
-        // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
-        accessToken = tokenService.generateToken(email, TokenType.ACCESS);
-        String refreshToken = tokenService.generateToken(email, TokenType.REFRESH);
-        tokenService.saveToken(refreshToken, TokenType.REFRESH);
-
-        adminAccessToken = tokenService.generateToken("email5", TokenType.ACCESS);
-        String adminRefreshToken = tokenService.generateToken("email5", TokenType.REFRESH);
-        tokenService.saveToken(adminRefreshToken, TokenType.REFRESH);
-
-        user6AccessToken = tokenService.generateToken("email6", TokenType.ACCESS);
-        String user6RefreshToken = tokenService.generateToken("email6", TokenType.REFRESH);
-        tokenService.saveToken(user6RefreshToken, TokenType.REFRESH);
-
         // setUp - 사용자 정보 저장
+        SiteUser 나 = siteUserRepository.save(createSiteUserByEmail("my-email"));
         SiteUser 사용자1 = siteUserRepository.save(createSiteUserByEmail("email1"));
         SiteUser 사용자2 = siteUserRepository.save(createSiteUserByEmail("email2"));
         SiteUser 사용자3 = siteUserRepository.save(createSiteUserByEmail("email3"));
@@ -80,16 +63,27 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         SiteUser 사용자5_관리자 = siteUserRepository.save(createSiteUserByEmail("email5"));
         SiteUser 사용자6 = siteUserRepository.save(createSiteUserByEmail("email6"));
 
+        // setUp - 엑세스 토큰 생성과 리프레시 토큰 생성 및 저장
+        accessToken = authTokenProvider.generateAccessToken(나);
+        authTokenProvider.generateAndSaveRefreshToken(나);
+
+        adminAccessToken = authTokenProvider.generateAccessToken(사용자5_관리자);
+        authTokenProvider.generateAndSaveRefreshToken(사용자5_관리자);
+
+        user6AccessToken = authTokenProvider.generateAccessToken(사용자6);
+        authTokenProvider.generateAndSaveRefreshToken(사용자6);
+
         // setUp - 지원 정보 저장
         Gpa gpa = createDummyGpa();
         LanguageTest languageTest = createDummyLanguageTest();
-        나의_지원정보 = new Application(siteUser, gpa, languageTest, term);
+        나의_지원정보 = new Application(나, gpa, languageTest, term);
         사용자1_지원정보 = new Application(사용자1, gpa, languageTest, term);
         사용자2_지원정보 = new Application(사용자2, gpa, languageTest, term);
         사용자3_지원정보 = new Application(사용자3, gpa, languageTest, term);
         사용자4_이전학기_지원정보 = new Application(사용자4_이전학기_지원자, gpa, languageTest, beforeTerm);
         사용자5_관리자_지원정보 = new Application(사용자5_관리자, gpa, languageTest, term);
         사용자6_지원정보 = new Application(사용자6, gpa, languageTest, term);
+
         나의_지원정보.updateUniversityChoice(괌대학_B_지원_정보, 괌대학_A_지원_정보, 린츠_카톨릭대학_지원_정보, "0");
         사용자1_지원정보.updateUniversityChoice(괌대학_A_지원_정보, 괌대학_B_지원_정보, 그라츠공과대학_지원_정보, "1");
         사용자2_지원정보.updateUniversityChoice(메이지대학_지원_정보, 그라츠대학_지원_정보, 서던덴마크대학교_지원_정보, "2");
@@ -337,5 +331,4 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         assertThat(secondChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
         assertThat(thirdChoiceApplicants.size()).isEqualTo(choicedUniversityCount);
     }
-
 }
