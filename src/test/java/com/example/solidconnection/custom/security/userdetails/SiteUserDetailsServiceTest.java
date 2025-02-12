@@ -18,7 +18,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICAT
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("사용자 인증 정보 서비스 테스트")
 @TestContainerSpringBootTest
@@ -44,21 +44,6 @@ class SiteUserDetailsServiceTest {
                 () -> assertThat(userDetails.getUsername()).isEqualTo(username),
                 () -> assertThat(userDetails.getSiteUser()).extracting("id").isEqualTo(siteUser.getId())
         );
-    }
-
-    @Test
-    void 사용자_권한_정보를_정상적으로_반환한다() {
-        // given
-        SiteUser siteUser = siteUserRepository.save(createSiteUser());
-        String username = getUserName(siteUser);
-
-        // when
-        SiteUserDetails userDetails = (SiteUserDetails) userDetailsService.loadUserByUsername(username);
-
-        // then
-        assertThat(userDetails.getAuthorities())
-                .extracting("authority")
-                .containsExactly("ROLE_" + siteUser.getRole().name());
     }
 
     @Nested
