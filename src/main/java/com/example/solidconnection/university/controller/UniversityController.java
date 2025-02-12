@@ -14,6 +14,7 @@ import com.example.solidconnection.university.service.UniversityQueryService;
 import com.example.solidconnection.university.service.UniversityRecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/university")
+@RequestMapping("/universities")
 @RestController
 public class UniversityController {
 
@@ -33,7 +34,7 @@ public class UniversityController {
     private final UniversityRecommendService universityRecommendService;
     private final SiteUserService siteUserService;
 
-    @GetMapping("/recommends")
+    @GetMapping("/recommend")
     public ResponseEntity<UniversityRecommendsResponse> getUniversityRecommends(
             @AuthorizedUser SiteUser siteUser
     ) {
@@ -70,7 +71,16 @@ public class UniversityController {
         return ResponseEntity.ok(likeResultResponse);
     }
 
-    @GetMapping("/detail/{universityInfoForApplyId}")
+    @DeleteMapping("/{universityInfoForApplyId}/like")
+    public ResponseEntity<LikeResultResponse> cancelWishUniversity(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable Long universityInfoForApplyId
+    ) {
+        LikeResultResponse likeResultResponse = universityLikeService.cancelLikeUniversity(siteUser, universityInfoForApplyId);
+        return ResponseEntity.ok(likeResultResponse);
+    }
+
+    @GetMapping("/{universityInfoForApplyId}")
     public ResponseEntity<UniversityDetailResponse> getUniversityDetails(
             @PathVariable Long universityInfoForApplyId
     ) {

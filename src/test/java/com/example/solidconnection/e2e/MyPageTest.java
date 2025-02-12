@@ -44,7 +44,7 @@ class MyPageTest extends BaseEndToEndTest {
         MyPageResponse myPageResponse = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/my-page")
+                .get("/my")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(MyPageResponse.class);

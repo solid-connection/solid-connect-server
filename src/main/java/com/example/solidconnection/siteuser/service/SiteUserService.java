@@ -5,10 +5,6 @@ import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.dto.MyPageUpdateResponse;
-import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
-import com.example.solidconnection.siteuser.dto.NicknameUpdateResponse;
-import com.example.solidconnection.siteuser.dto.ProfileImageUpdateResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ImgType;
@@ -48,68 +44,27 @@ public class SiteUserService {
     }
 
     /*
-     * 내 정보를 수정하기 위한 마이페이지 정보를 조회한다. (닉네임, 프로필 사진)
-     * */
-    @Transactional(readOnly = true)
-    public MyPageUpdateResponse getMyPageInfoToUpdate(SiteUser siteUser) {
-        return MyPageUpdateResponse.from(siteUser);
-    }
-
-    /*
-     * 관심 대학교 목록을 조회한다.
-     * */
-    @Transactional(readOnly = true)
-    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
-        List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
-        return likedUniversities.stream()
-                .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
-                .toList();
-    }
-
-    /*
-     * 프로필 이미지를 수정한다.
+     * 마이페이지 정보를 수정한다.
      * */
     @Transactional
-    public ProfileImageUpdateResponse updateProfileImage(SiteUser siteUser, MultipartFile imageFile) {
-        validateProfileImage(imageFile);
+    public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
+        validateNicknameUnique(nickname);
+        validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
+        validateProfileImageNotEmpty(imageFile);
 
-        // 프로필 이미지를 처음 수정하는 경우에는 deleteExProfile 수행하지 않음
         if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
             s3Service.deleteExProfile(siteUser);
         }
-        UploadedFileUrlResponse uploadedFileUrlResponse = s3Service.uploadFile(imageFile, ImgType.PROFILE);
-        siteUser.setProfileImageUrl(uploadedFileUrlResponse.fileUrl());
-        siteUserRepository.save(siteUser);
+        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+        String profileImageUrl = uploadedFile.fileUrl();
 
-        return ProfileImageUpdateResponse.from(siteUser);
-    }
-
-    private void validateProfileImage(MultipartFile imageFile) {
-        if (imageFile == null || imageFile.isEmpty()) {
-            throw new CustomException(PROFILE_IMAGE_NEEDED);
-        }
-    }
-    private boolean isDefaultProfileImage(String profileImageUrl) {
-        String prefix = "profile/";
-        return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
-    }
-
-    /*
-     * 닉네임을 수정한다.
-     * */
-    @Transactional
-    public NicknameUpdateResponse updateNickname(SiteUser siteUser, NicknameUpdateRequest nicknameUpdateRequest) {
-        validateNicknameDuplicated(nicknameUpdateRequest.nickname());
-        validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-
-        siteUser.setNickname(nicknameUpdateRequest.nickname());
+        siteUser.setProfileImageUrl(profileImageUrl);
+        siteUser.setNickname(nickname);
         siteUser.setNicknameModifiedAt(LocalDateTime.now());
         siteUserRepository.save(siteUser);
-
-        return NicknameUpdateResponse.from(siteUser);
     }
 
-    private void validateNicknameDuplicated(String nickname) {
+    private void validateNicknameUnique(String nickname) {
         if (siteUserRepository.existsByNickname(nickname)) {
             throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
@@ -124,5 +79,27 @@ public class SiteUserService {
                     = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
             throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
         }
+    }
+
+    private void validateProfileImageNotEmpty(MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new CustomException(PROFILE_IMAGE_NEEDED);
+        }
+    }
+
+    private boolean isDefaultProfileImage(String profileImageUrl) {
+        String prefix = "profile/";
+        return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
+    }
+
+    /*
+     * 관심 대학교 목록을 조회한다.
+     * */
+    @Transactional(readOnly = true)
+    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
+        List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
+        return likedUniversities.stream()
+                .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
+                .toList();
     }
 }

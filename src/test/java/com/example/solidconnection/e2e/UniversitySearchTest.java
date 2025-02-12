@@ -43,7 +43,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search")
+                .when().get("/universities/search")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -67,7 +67,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?region=" + 영미권.getCode())
+                .when().get("/universities/search?region=" + 영미권.getCode())
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -85,7 +85,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?keyword=라")
+                .when().get("/universities/search?keyword=라")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -102,7 +102,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?keyword=라&keyword=일본")
+                .when().get("/universities/search?keyword=라&keyword=일본")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -120,7 +120,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?testType=TOEFL_IBT")
+                .when().get("/universities/search?testType=TOEFL_IBT")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -139,7 +139,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?testType=TOEFL_IBT&testScore=70")
+                .when().get("/universities/search?testType=TOEFL_IBT&testScore=70")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);
@@ -155,7 +155,7 @@ class UniversitySearchTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         List<UniversityInfoForApplyPreviewResponse> response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
-                .when().get("/university/search?region=EUROPE&testType=TOEFL_IBT&testScore=70")
+                .when().get("/universities/search?region=EUROPE&testType=TOEFL_IBT&testScore=70")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", UniversityInfoForApplyPreviewResponse.class);

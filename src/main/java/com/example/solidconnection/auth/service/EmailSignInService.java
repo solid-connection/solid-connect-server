@@ -35,7 +35,7 @@ public class EmailSignInService {
         throw new CustomException(USER_NOT_FOUND, "이메일과 비밀번호를 확인해주세요.");
     }
 
-    private void validatePassword(String rawPassword, String encodedPassword) throws CustomException {
+    private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new CustomException(USER_NOT_FOUND, "이메일과 비밀번호를 확인해주세요.");
         }
