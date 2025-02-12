@@ -1,16 +1,16 @@
 package com.example.solidconnection.community.post.service;
 
 import com.example.solidconnection.community.board.domain.Board;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.dto.PostCreateRequest;
 import com.example.solidconnection.community.post.dto.PostCreateResponse;
 import com.example.solidconnection.community.post.dto.PostDeleteResponse;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.community.post.dto.PostUpdateResponse;
-import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.community.post.repository.PostImageRepository;
+import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
@@ -37,9 +37,9 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POS
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @DisplayName("게시글 생성/수정/삭제 서비스 테스트")
@@ -79,7 +79,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when
             PostCreateResponse response = postCommandService.createPost(
                     테스트유저_1,
-                    자유게시판.getCode(),
                     request,
                     imageFiles
             );
@@ -108,7 +107,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -121,7 +120,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -134,7 +133,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, 자유게시판.getCode(), request, imageFiles))
+                    postCommandService.createPost(테스트유저_1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -159,7 +158,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when
             PostUpdateResponse response = postCommandService.updatePost(
                     테스트유저_1,
-                    자유게시판.getCode(),
                     testPost.getId(),
                     request,
                     imageFiles
@@ -190,7 +188,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
                             테스트유저_2,
-                            자유게시판.getCode(),
                             testPost.getId(),
                             request,
                             imageFiles
@@ -210,7 +207,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
                             테스트유저_1,
-                            자유게시판.getCode(),
                             testPost.getId(),
                             request,
                             imageFiles
@@ -230,7 +226,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
                             테스트유저_1,
-                            자유게시판.getCode(),
                             testPost.getId(),
                             request,
                             imageFiles
@@ -254,7 +249,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // when
             PostDeleteResponse response = postCommandService.deletePostById(
                     테스트유저_1,
-                    자유게시판.getCode(),
                     testPost.getId()
             );
 
@@ -276,7 +270,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
                             테스트유저_2,
-                            자유게시판.getCode(),
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)
@@ -292,7 +285,6 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
                             테스트유저_1,
-                            자유게시판.getCode(),
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)
@@ -302,6 +294,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
     private PostCreateRequest createPostCreateRequest(String category) {
         return new PostCreateRequest(
+                자유게시판.getCode(),
                 category,
                 "테스트 제목",
                 "테스트 내용",

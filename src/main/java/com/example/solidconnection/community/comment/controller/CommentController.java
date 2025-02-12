@@ -21,39 +21,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/posts")
+@RequestMapping("/comments")
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/{post_id}/comments")
+    @PostMapping
     public ResponseEntity<?> createComment(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("post_id") Long postId,
             @Valid @RequestBody CommentCreateRequest commentCreateRequest
     ) {
-        CommentCreateResponse response = commentService.createComment(siteUser, postId, commentCreateRequest);
+        CommentCreateResponse response = commentService.createComment(siteUser, commentCreateRequest);
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/{post_id}/comments/{comment_id}")
+    @PatchMapping("/{comment_id}")
     public ResponseEntity<?> updateComment(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("post_id") Long postId,
             @PathVariable("comment_id") Long commentId,
             @Valid @RequestBody CommentUpdateRequest commentUpdateRequest
     ) {
-        CommentUpdateResponse response = commentService.updateComment(siteUser, postId, commentId, commentUpdateRequest);
+        CommentUpdateResponse response = commentService.updateComment(siteUser, commentId, commentUpdateRequest);
         return ResponseEntity.ok().body(response);
     }
 
-    @DeleteMapping("/{post_id}/comments/{comment_id}")
+    @DeleteMapping("/{comment_id}")
     public ResponseEntity<?> deleteCommentById(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("post_id") Long postId,
             @PathVariable("comment_id") Long commentId
     ) {
-        CommentDeleteResponse response = commentService.deleteCommentById(siteUser, postId, commentId);
+        CommentDeleteResponse response = commentService.deleteCommentById(siteUser, commentId);
         return ResponseEntity.ok().body(response);
     }
 }

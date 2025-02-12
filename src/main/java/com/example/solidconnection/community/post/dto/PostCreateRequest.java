@@ -10,6 +10,9 @@ import jakarta.validation.constraints.Size;
 
 public record PostCreateRequest(
         @NotNull(message = "게시글 카테고리를 설정해주세요.")
+        String boardCode,
+
+        @NotNull(message = "게시글 카테고리를 설정해주세요.")
         String postCategory,
 
         @NotBlank(message = "게시글 제목은 빈 값일 수 없습니다.")

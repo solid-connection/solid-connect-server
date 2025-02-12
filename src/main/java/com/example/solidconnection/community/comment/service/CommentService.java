@@ -8,10 +8,11 @@ import com.example.solidconnection.community.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_LEVEL;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
     public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
@@ -43,15 +46,23 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentCreateResponse createComment(SiteUser siteUser, Long postId, CommentCreateRequest commentCreateRequest) {
-        Post post = postRepository.getById(postId);
+    public CommentCreateResponse createComment(SiteUser siteUser, CommentCreateRequest commentCreateRequest) {
+        Post post = postRepository.getById(commentCreateRequest.postId());
 
         Comment parentComment = null;
         if (commentCreateRequest.parentId() != null) {
             parentComment = commentRepository.getById(commentCreateRequest.parentId());
             validateCommentDepth(parentComment);
         }
-        Comment createdComment = commentRepository.save(commentCreateRequest.toEntity(siteUser, post, parentComment));
+
+        /*
+         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
+         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
+         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
+         */
+        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Comment comment = commentCreateRequest.toEntity(siteUser1, post, parentComment);
+        Comment createdComment = commentRepository.save(comment);
 
         return CommentCreateResponse.from(createdComment);
     }
@@ -64,8 +75,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentUpdateResponse updateComment(SiteUser siteUser, Long postId, Long commentId, CommentUpdateRequest commentUpdateRequest) {
-        Post post = postRepository.getById(postId);
+    public CommentUpdateResponse updateComment(SiteUser siteUser, Long commentId, CommentUpdateRequest commentUpdateRequest) {
         Comment comment = commentRepository.getById(commentId);
         validateDeprecated(comment);
         validateOwnership(comment, siteUser);
@@ -82,8 +92,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDeleteResponse deleteCommentById(SiteUser siteUser, Long postId, Long commentId) {
-        Post post = postRepository.getById(postId);
+    public CommentDeleteResponse deleteCommentById(SiteUser siteUser, Long commentId) {
         Comment comment = commentRepository.getById(commentId);
         validateOwnership(comment, siteUser);
 

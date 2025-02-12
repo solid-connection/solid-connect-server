@@ -4,9 +4,13 @@ import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record CommentCreateRequest(
+        @NotNull(message = "게시글 ID를 설정해주세요.")
+        Long postId,
+
         @NotBlank(message = "댓글 내용은 빈 값일 수 없습니다.")
         @Size(min = 1, max = 255, message = "댓글 내용은 최소 1자 이상, 최대 255자 이하여야 합니다.")
         String content,

@@ -53,9 +53,7 @@ public class PostQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PostFindResponse findPostById(SiteUser siteUser, String code, Long postId) {
-        String boardCode = validateCode(code);
-
+    public PostFindResponse findPostById(SiteUser siteUser, Long postId) {
         Post post = postRepository.getByIdUsingEntityGraph(postId);
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
