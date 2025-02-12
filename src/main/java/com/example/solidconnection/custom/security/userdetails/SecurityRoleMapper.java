@@ -1,4 +1,4 @@
-package com.example.solidconnection.custom.security.mapper;
+package com.example.solidconnection.custom.security.userdetails;
 
 import com.example.solidconnection.type.Role;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

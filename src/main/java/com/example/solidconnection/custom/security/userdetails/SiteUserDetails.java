@@ -1,6 +1,5 @@
 package com.example.solidconnection.custom.security.userdetails;
 
-import com.example.solidconnection.custom.security.mapper.SecurityRoleMapper;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
