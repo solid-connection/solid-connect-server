@@ -28,7 +28,6 @@ public class ScoreVerificationAdminController {
             Pageable pageable
     ) {
         PagingUtils.validatePage(pageable.getPageNumber(), pageable.getPageSize());
-        PagingUtils.validatePage(pageable.getPageNumber(), pageable.getPageSize());
         Page<GpaScoreSearchResponse> page = scoreVerificationAdminService.searchGpaScores(scoreSearchCondition, pageable);
         return ResponseEntity.ok(PageResponse.of(page));
     }
