@@ -21,7 +21,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA
 
 @RequiredArgsConstructor
 @Service
-public class ScoreVerificationAdminService {
+public class GpaScoreVerificationAdminService {
 
     private final GpaScoreRepository gpaScoreRepository;
 

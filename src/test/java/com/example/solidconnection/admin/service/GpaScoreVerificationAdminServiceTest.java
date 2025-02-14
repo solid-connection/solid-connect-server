@@ -33,10 +33,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("성적 검증 관리자 서비스 테스트")
-class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
+class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
 
     @Autowired
-    private ScoreVerificationAdminService scoreVerificationAdminService;
+    private GpaScoreVerificationAdminService gpaScoreVerificationAdminService;
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -72,7 +72,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2);
 
             // when
-            Page<GpaScoreSearchResponse> response = scoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
@@ -98,7 +98,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2, gpaScore3);
 
             // when
-            Page<GpaScoreSearchResponse> response = scoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
@@ -124,7 +124,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1);
 
             // when
-            Page<GpaScoreSearchResponse> response = scoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
@@ -155,7 +155,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when
-            GpaScoreVerificationResponse response = scoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
+            GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
 
             // then
             assertAll(
@@ -173,7 +173,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when
-            GpaScoreVerificationResponse response = scoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
+            GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
 
             // then
             assertAll(
@@ -192,7 +192,7 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when & then
-            assertThatCode(() -> scoreVerificationAdminService.verifyGpaScore(invalidGpaScoreId, request))
+            assertThatCode(() -> gpaScoreVerificationAdminService.verifyGpaScore(invalidGpaScoreId, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_GPA_SCORE.getMessage());
         }

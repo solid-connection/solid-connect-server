@@ -6,7 +6,7 @@ import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
 import com.example.solidconnection.admin.dto.GpaUpdateRequest;
 import com.example.solidconnection.admin.dto.GpaUpdateResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
-import com.example.solidconnection.admin.service.ScoreVerificationAdminService;
+import com.example.solidconnection.admin.service.GpaScoreVerificationAdminService;
 import com.example.solidconnection.custom.response.PageResponse;
 import com.example.solidconnection.util.PagingUtils;
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ScoreVerificationAdminController {
 
-    private final ScoreVerificationAdminService scoreVerificationAdminService;
+    private final GpaScoreVerificationAdminService gpaScoreVerificationAdminService;
 
     @GetMapping("/gpas")
     public ResponseEntity<PageResponse<GpaScoreSearchResponse>> searchGpaScores(
@@ -35,7 +35,7 @@ public class ScoreVerificationAdminController {
             Pageable pageable
     ) {
         PagingUtils.validatePage(pageable.getPageNumber(), pageable.getPageSize());
-        Page<GpaScoreSearchResponse> page = scoreVerificationAdminService.searchGpaScores(scoreSearchCondition, pageable);
+        Page<GpaScoreSearchResponse> page = gpaScoreVerificationAdminService.searchGpaScores(scoreSearchCondition, pageable);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
@@ -44,7 +44,7 @@ public class ScoreVerificationAdminController {
             @PathVariable("gpa_score_id") Long gpaScoreId,
             @Valid @RequestBody GpaUpdateRequest gpaUpdateRequest
     ) {
-        GpaUpdateResponse response = scoreVerificationAdminService.updateGpa(gpaScoreId, gpaUpdateRequest);
+        GpaUpdateResponse response = gpaScoreVerificationAdminService.updateGpa(gpaScoreId, gpaUpdateRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -53,7 +53,7 @@ public class ScoreVerificationAdminController {
             @PathVariable("gpa_score_id") Long gpaScoreId,
             @Valid @RequestBody GpaScoreVerifyRequest gpaScoreVerifyRequest
     ) {
-        GpaScoreVerificationResponse response = scoreVerificationAdminService.verifyGpaScore(gpaScoreId, gpaScoreVerifyRequest);
+        GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScoreId, gpaScoreVerifyRequest);
         return ResponseEntity.ok(response);
     }
 }
