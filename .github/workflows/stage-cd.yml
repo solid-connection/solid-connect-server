@@ -2,7 +2,7 @@ name: [STAGE] Build Gradle and Deploy
 
 on:
   push:
-    branches: [ "real-release" ]
+    branches: [ "release" ]
   workflow_dispatch:
 
 jobs:
