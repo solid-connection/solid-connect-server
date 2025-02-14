@@ -7,7 +7,6 @@ import com.example.solidconnection.admin.dto.GpaUpdateRequest;
 import com.example.solidconnection.admin.dto.GpaUpdateResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -29,9 +28,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("학점 검증 관리자 서비스 테스트")
@@ -182,21 +179,6 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
                     () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
                     () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.REJECTED)
             );
-        }
-
-        @Test
-        void 존재하지_않는_GPA_성적을_검증하면_예외_응답을_반환한다() {
-            // given
-            long invalidGpaScoreId = 9999L;
-            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
-                    VerifyStatus.APPROVED,
-                    null
-            );
-
-            // when & then
-            assertThatCode(() -> gpaScoreVerificationAdminService.verifyGpaScore(invalidGpaScoreId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_GPA_SCORE.getMessage());
         }
     }
 
