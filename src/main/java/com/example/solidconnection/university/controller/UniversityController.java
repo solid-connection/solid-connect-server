@@ -36,7 +36,7 @@ public class UniversityController {
 
     @GetMapping("/recommend")
     public ResponseEntity<UniversityRecommendsResponse> getUniversityRecommends(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser(required = false) SiteUser siteUser
     ) {
         if (siteUser == null) {
             return ResponseEntity.ok(universityRecommendService.getGeneralRecommends());
