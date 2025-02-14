@@ -1,4 +1,4 @@
-name: [PROD] Build Gradle and Deploy
+name: "[PROD] Build Gradle and Deploy"
 
 on:
   push:
