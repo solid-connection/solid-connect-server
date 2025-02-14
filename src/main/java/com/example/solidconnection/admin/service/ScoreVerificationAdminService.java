@@ -35,7 +35,7 @@ public class ScoreVerificationAdminService {
     }
 
     @Transactional
-    public GpaUpdateResponse updateGpaScore(Long gpaScoreId, GpaUpdateRequest request) {
+    public GpaUpdateResponse updateGpa(Long gpaScoreId, GpaUpdateRequest request) {
         GpaScore gpaScore = gpaScoreRepository.findById(gpaScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
         gpaScore.updateGpa(new Gpa(

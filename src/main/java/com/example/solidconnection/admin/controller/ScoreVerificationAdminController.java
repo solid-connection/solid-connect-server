@@ -40,11 +40,11 @@ public class ScoreVerificationAdminController {
     }
 
     @PatchMapping("/gpas/{gpa_score_id}")
-    public ResponseEntity<GpaUpdateResponse> updateGpaScore(
+    public ResponseEntity<GpaUpdateResponse> updateGpa(
             @PathVariable("gpa_score_id") Long gpaScoreId,
             @Valid @RequestBody GpaUpdateRequest gpaUpdateRequest
     ) {
-        GpaUpdateResponse response = scoreVerificationAdminService.updateGpaScore(gpaScoreId, gpaUpdateRequest);
+        GpaUpdateResponse response = scoreVerificationAdminService.updateGpa(gpaScoreId, gpaUpdateRequest);
         return ResponseEntity.ok(response);
     }
 
