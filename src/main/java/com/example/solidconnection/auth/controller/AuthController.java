@@ -16,14 +16,15 @@ import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
 import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
 import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
+import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.custom.exception.ErrorCode;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
-import com.example.solidconnection.custom.resolver.ExpiredToken;
-import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,9 +94,13 @@ public class AuthController {
 
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(
-            @ExpiredToken ExpiredTokenAuthentication expiredToken
+            Authentication authentication
     ) {
-        authService.signOut(expiredToken.getToken());
+        String token = authentication.getCredentials().toString();
+        if (token == null) {
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
+        }
+        authService.signOut(token);
         return ResponseEntity.ok().build();
     }
 
@@ -109,9 +114,13 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            @ExpiredToken ExpiredTokenAuthentication expiredToken
+            Authentication authentication
     ) {
-        ReissueResponse reissueResponse = authService.reissue(expiredToken.getSubject());
+        String token = authentication.getCredentials().toString();
+        if (token == null) {
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
+        }
+        ReissueResponse reissueResponse = authService.reissue(token);
         return ResponseEntity.ok(reissueResponse);
     }
 }
