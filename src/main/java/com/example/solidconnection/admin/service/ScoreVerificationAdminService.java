@@ -3,7 +3,10 @@ package com.example.solidconnection.admin.service;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
+import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
@@ -29,6 +32,18 @@ public class ScoreVerificationAdminService {
                 pageable.getPageSize()
         );
         return gpaScoreRepository.searchGpaScores(scoreSearchCondition, sortedPageable);
+    }
+
+    @Transactional
+    public GpaUpdateResponse updateGpaScore(Long gpaScoreId, GpaUpdateRequest request) {
+        GpaScore gpaScore = gpaScoreRepository.findById(gpaScoreId)
+                .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
+        gpaScore.updateGpa(new Gpa(
+                request.gpa(),
+                request.gpaCriteria(),
+                gpaScore.getGpa().getGpaReportUrl()
+        ));
+        return GpaUpdateResponse.of(gpaScore);
     }
 
     @Transactional

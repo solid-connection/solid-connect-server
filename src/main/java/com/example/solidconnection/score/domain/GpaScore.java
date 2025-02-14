@@ -60,4 +60,8 @@ public class GpaScore extends BaseEntity {
         this.verifyStatus = verifyStatus;
         this.rejectedReason = rejectedReason;
     }
+
+    public void updateGpa(Gpa gpa) {
+        this.gpa = gpa;
+    }
 }

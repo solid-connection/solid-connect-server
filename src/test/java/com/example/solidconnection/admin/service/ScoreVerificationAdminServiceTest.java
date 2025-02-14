@@ -1,8 +1,11 @@
 package com.example.solidconnection.admin.service;
 
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
+import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
+import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -24,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("성적 검증 관리자 서비스 테스트")
@@ -135,6 +140,61 @@ class ScoreVerificationAdminServiceTest extends BaseIntegrationTest {
                             () -> assertThat(actual.siteUserDto().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
                             () -> assertThat(actual.siteUserDto().nickname()).isEqualTo(expected.getSiteUser().getNickname())
                     ));
+        }
+    }
+
+    @Nested
+    class GPA_점수_검증 {
+
+        @Test
+        void GPA_점수를_정상적으로_승인한다() {
+            // given
+            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
+                    VerifyStatus.APPROVED,
+                    null
+            );
+
+            // when
+            GpaScoreVerificationResponse response = scoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.APPROVED)
+            );
+        }
+
+        @Test
+        void GPA_점수를_정상적으로_거절한다() {
+            // given
+            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
+                    VerifyStatus.REJECTED,
+                    "잘못된 성적입니다."
+            );
+
+            // when
+            GpaScoreVerificationResponse response = scoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.REJECTED)
+            );
+        }
+
+        @Test
+        void 존재하지_않는_GPA_성적을_검증하면_예외_응답을_반환한다() {
+            // given
+            long invalidGpaScoreId = 9999L;
+            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
+                    VerifyStatus.APPROVED,
+                    null
+            );
+
+            // when & then
+            assertThatCode(() -> scoreVerificationAdminService.verifyGpaScore(invalidGpaScoreId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_GPA_SCORE.getMessage());
         }
     }
 

@@ -3,6 +3,8 @@ package com.example.solidconnection.admin.controller;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.service.ScoreVerificationAdminService;
 import com.example.solidconnection.custom.response.PageResponse;
@@ -35,6 +37,15 @@ public class ScoreVerificationAdminController {
         PagingUtils.validatePage(pageable.getPageNumber(), pageable.getPageSize());
         Page<GpaScoreSearchResponse> page = scoreVerificationAdminService.searchGpaScores(scoreSearchCondition, pageable);
         return ResponseEntity.ok(PageResponse.of(page));
+    }
+
+    @PatchMapping("/gpas/{gpa_score_id}")
+    public ResponseEntity<GpaUpdateResponse> updateGpaScore(
+            @PathVariable("gpa_score_id") Long gpaScoreId,
+            @Valid @RequestBody GpaUpdateRequest gpaUpdateRequest
+    ) {
+        GpaUpdateResponse response = scoreVerificationAdminService.updateGpaScore(gpaScoreId, gpaUpdateRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/gpas/{gpa_score_id}/verify")
