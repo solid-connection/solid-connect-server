@@ -91,6 +91,8 @@ public enum ErrorCode {
     INVALID_LANGUAGE_TEST_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 어학성적입니다."),
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
+    REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 상태일 경우에만 거절 사유가 필요합니다."),
+    REJECTED_REASON_NOT_ALLOWED(HttpStatus.BAD_REQUEST.value(), "거절 상태가 아닐 경우 거절 사유를 입력할 수 없습니다."),
 
     // page
     INVALID_PAGE(HttpStatus.BAD_REQUEST.value(), "페이지 번호가 최소값보다 작습니다."),
