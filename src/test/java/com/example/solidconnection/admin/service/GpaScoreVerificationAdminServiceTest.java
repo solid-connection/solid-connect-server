@@ -3,6 +3,8 @@ package com.example.solidconnection.admin.service;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
 import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateRequest;
+import com.example.solidconnection.admin.dto.GpaUpdateResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.custom.exception.CustomException;
@@ -32,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DisplayName("성적 검증 관리자 서비스 테스트")
+@DisplayName("학점 검증 관리자 서비스 테스트")
 class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
 
     @Autowired
@@ -195,6 +197,30 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             assertThatCode(() -> gpaScoreVerificationAdminService.verifyGpaScore(invalidGpaScoreId, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_GPA_SCORE.getMessage());
+        }
+    }
+
+    @Nested
+    class GPA_수정 {
+
+        @Test
+        void GPA와_GPA_기준을_정상적으로_수정한다() {
+            // given
+            GpaUpdateRequest request = new GpaUpdateRequest(
+                    3.8,
+                    4.3
+            );
+
+            // when
+            GpaUpdateResponse response = gpaScoreVerificationAdminService.updateGpa(gpaScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
+                    () -> assertThat(response.gpa()).isEqualTo(request.gpa()),
+                    () -> assertThat(response.gpaCriteria()).isEqualTo(request.gpaCriteria()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(gpaScore1.getVerifyStatus())
+            );
         }
     }
 
