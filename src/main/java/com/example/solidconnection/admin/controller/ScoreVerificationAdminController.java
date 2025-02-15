@@ -1,10 +1,8 @@
 package com.example.solidconnection.admin.controller;
 
+import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateResponse;
+import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.service.GpaScoreVerificationAdminService;
 import com.example.solidconnection.custom.response.PageResponse;
@@ -43,20 +41,11 @@ public class ScoreVerificationAdminController {
     }
 
     @PatchMapping("/gpas/{gpa_score_id}")
-    public ResponseEntity<GpaUpdateResponse> updateGpa(
+    public ResponseEntity<GpaScoreResponse> updateGpaScore(
             @PathVariable("gpa_score_id") Long gpaScoreId,
-            @Valid @RequestBody GpaUpdateRequest gpaUpdateRequest
+            @Valid @RequestBody GpaScoreUpdateRequest request
     ) {
-        GpaUpdateResponse response = gpaScoreVerificationAdminService.updateGpa(gpaScoreId, gpaUpdateRequest);
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/gpas/{gpa_score_id}/verify")
-    public ResponseEntity<GpaScoreVerificationResponse> verifyGpaScore(
-            @PathVariable("gpa_score_id") Long gpaScoreId,
-            @Valid @RequestBody GpaScoreVerifyRequest gpaScoreVerifyRequest
-    ) {
-        GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScoreId, gpaScoreVerifyRequest);
+        GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScoreId, request);
         return ResponseEntity.ok(response);
     }
 }

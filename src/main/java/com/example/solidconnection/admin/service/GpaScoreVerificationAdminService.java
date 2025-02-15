@@ -1,15 +1,14 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateResponse;
+import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
+import com.example.solidconnection.type.VerifyStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,22 +29,18 @@ public class GpaScoreVerificationAdminService {
     }
 
     @Transactional
-    public GpaUpdateResponse updateGpa(Long gpaScoreId, GpaUpdateRequest request) {
+    public GpaScoreResponse updateGpaScore(Long gpaScoreId, GpaScoreUpdateRequest request) {
         GpaScore gpaScore = gpaScoreRepository.findById(gpaScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
-        gpaScore.updateGpa(new Gpa(
-                request.gpa(),
-                request.gpaCriteria(),
-                gpaScore.getGpa().getGpaReportUrl()
-        ));
-        return GpaUpdateResponse.of(gpaScore);
-    }
-
-    @Transactional
-    public GpaScoreVerificationResponse verifyGpaScore(Long gpaScoreId, GpaScoreVerifyRequest request) {
-        GpaScore gpaScore = gpaScoreRepository.findById(gpaScoreId)
-                .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
-        gpaScore.updateGpaScore(request.verifyStatus(), request.rejectedReason());
-        return GpaScoreVerificationResponse.of(gpaScore);
+        gpaScore.updateGpaScore(
+                new Gpa(
+                        request.gpa(),
+                        request.gpaCriteria(),
+                        gpaScore.getGpa().getGpaReportUrl()
+                ),
+                request.verifyStatus(),
+                request.verifyStatus() == VerifyStatus.REJECTED ? request.rejectedReason() : null
+        );
+        return GpaScoreResponse.of(gpaScore);
     }
 }

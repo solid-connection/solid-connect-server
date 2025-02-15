@@ -56,7 +56,8 @@ public class GpaScore extends BaseEntity {
         siteUser.getGpaScoreList().add(this);
     }
 
-    public void updateGpaScore(VerifyStatus verifyStatus, String rejectedReason) {
+    public void updateGpaScore(Gpa gpa, VerifyStatus verifyStatus, String rejectedReason) {
+        this.gpa = gpa;
         this.verifyStatus = verifyStatus;
         this.rejectedReason = rejectedReason;
     }
