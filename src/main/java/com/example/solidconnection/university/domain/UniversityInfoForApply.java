@@ -73,7 +73,7 @@ public class UniversityInfoForApply {
     @Column(length = 1000)
     private String detailsForEnglishCourse;
 
-    @Column(length = 500)
+    @Column(length = 1000)
     private String details;
 
     @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.EAGER)
