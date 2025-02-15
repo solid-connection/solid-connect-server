@@ -69,6 +69,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(testUser.getRole()),
+                () -> assertThat(response.authType()).isEqualTo(testUser.getAuthType()),
                 () -> assertThat(response.birth()).isEqualTo(testUser.getBirth()),
                 () -> assertThat(response.email()).isEqualTo(testUser.getEmail()),
                 () -> assertThat(response.likedPostCount()).isEqualTo(testUser.getPostLikeList().size()),
