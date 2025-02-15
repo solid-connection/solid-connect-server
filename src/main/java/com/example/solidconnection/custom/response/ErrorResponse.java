@@ -9,6 +9,10 @@ public record ErrorResponse(String message) {
         this(e.getMessage());
     }
 
+    public ErrorResponse(ErrorCode e) {
+        this(e.getMessage());
+    }
+
     public ErrorResponse(ErrorCode e, String detail) {
         this(e.getMessage() + " : " + detail);
     }
