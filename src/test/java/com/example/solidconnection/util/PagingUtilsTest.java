@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_PAGE;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @DisplayName("PagingUtils 테스트")
 class PagingUtilsTest {
@@ -31,7 +30,7 @@ class PagingUtilsTest {
         int validSize = 10;
 
         // when & then
-        assertThatThrownBy(() -> PagingUtils.validatePage(invalidPage, validSize))
+        assertThatCode(() -> PagingUtils.validatePage(invalidPage, validSize))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_PAGE.getMessage());
     }
@@ -43,7 +42,7 @@ class PagingUtilsTest {
         int invalidSize = 0;
 
         // when & then
-        assertThatThrownBy(() -> PagingUtils.validatePage(validPage, invalidSize))
+        assertThatCode(() -> PagingUtils.validatePage(validPage, invalidSize))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_SIZE.getMessage());
     }

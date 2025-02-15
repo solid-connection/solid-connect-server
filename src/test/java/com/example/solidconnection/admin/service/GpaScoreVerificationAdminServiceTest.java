@@ -1,12 +1,11 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerificationResponse;
-import com.example.solidconnection.admin.dto.GpaScoreVerifyRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateRequest;
-import com.example.solidconnection.admin.dto.GpaUpdateResponse;
+import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -28,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("학점 검증 관리자 서비스 테스트")
@@ -67,7 +68,7 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
         void 검증_상태를_조건으로_페이징하여_조회한다() {
             // given
             ScoreSearchCondition condition = new ScoreSearchCondition(VerifyStatus.PENDING, null, null);
-            Pageable pageable = PageRequest.of(1, 10);
+            Pageable pageable = PageRequest.of(0, 10);
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2);
 
             // when
@@ -93,7 +94,7 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
         void 닉네임으로_페이징하여_조회한다() {
             // given
             ScoreSearchCondition condition = new ScoreSearchCondition(null, "test", null);
-            Pageable pageable = PageRequest.of(1, 10);
+            Pageable pageable = PageRequest.of(0, 10);
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2, gpaScore3);
 
             // when
@@ -119,7 +120,7 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
         void 모든_조건으로_페이징하여_조회한다() {
             // given
             ScoreSearchCondition condition = new ScoreSearchCondition(VerifyStatus.PENDING, "test1", LocalDate.now());
-            Pageable pageable = PageRequest.of(1, 10);
+            Pageable pageable = PageRequest.of(0, 10);
             List<GpaScore> expectedGpaScores = List.of(gpaScore1);
 
             // when
@@ -143,66 +144,69 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
     }
 
     @Nested
-    class GPA_점수_검증 {
+    class GPA_점수_검증_및_수정 {
 
         @Test
-        void GPA_점수를_정상적으로_승인한다() {
+        void GPA와_검증상태를_정상적으로_수정한다() {
             // given
-            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.8,
+                    4.3,
                     VerifyStatus.APPROVED,
                     null
             );
 
             // when
-            GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
-                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.APPROVED)
-            );
-        }
-
-        @Test
-        void GPA_점수를_정상적으로_거절한다() {
-            // given
-            GpaScoreVerifyRequest request = new GpaScoreVerifyRequest(
-                    VerifyStatus.REJECTED,
-                    "잘못된 성적입니다."
-            );
-
-            // when
-            GpaScoreVerificationResponse response = gpaScoreVerificationAdminService.verifyGpaScore(gpaScore1.getId(), request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
-                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.REJECTED)
-            );
-        }
-    }
-
-    @Nested
-    class GPA_수정 {
-
-        @Test
-        void GPA와_GPA_기준을_정상적으로_수정한다() {
-            // given
-            GpaUpdateRequest request = new GpaUpdateRequest(
-                    3.8,
-                    4.3
-            );
-
-            // when
-            GpaUpdateResponse response = gpaScoreVerificationAdminService.updateGpa(gpaScore1.getId(), request);
+            GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScore1.getId(), request);
 
             // then
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
                     () -> assertThat(response.gpa()).isEqualTo(request.gpa()),
                     () -> assertThat(response.gpaCriteria()).isEqualTo(request.gpaCriteria()),
-                    () -> assertThat(response.verifyStatus()).isEqualTo(gpaScore1.getVerifyStatus())
+                    () -> assertThat(response.verifyStatus()).isEqualTo(request.verifyStatus()),
+                    () -> assertThat(response.rejectedReason()).isNull()
             );
+        }
+
+        @Test
+        void 승인상태로_변경_시_거절사유가_입력되어도_null로_저장된다() {
+            // given
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.8,
+                    4.3,
+                    VerifyStatus.APPROVED,
+                    "이 거절사유는 무시되어야 함"
+            );
+
+            // when
+            GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(gpaScore1.getId()),
+                    () -> assertThat(response.gpa()).isEqualTo(request.gpa()),
+                    () -> assertThat(response.gpaCriteria()).isEqualTo(request.gpaCriteria()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.APPROVED),
+                    () -> assertThat(response.rejectedReason()).isNull()
+            );
+        }
+
+        @Test
+        void 존재하지_않는_GPA_수정_시_예외_응답을_반환한다() {
+            // given
+            long invalidGpaScoreId = 9999L;
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.8,
+                    4.3,
+                    VerifyStatus.APPROVED,
+                    null
+            );
+
+            // when & then
+            assertThatCode(() -> gpaScoreVerificationAdminService.updateGpaScore(invalidGpaScoreId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(INVALID_GPA_SCORE.getMessage());
         }
     }
 
