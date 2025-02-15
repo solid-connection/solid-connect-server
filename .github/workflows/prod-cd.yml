@@ -2,7 +2,7 @@ name: "[PROD] Build Gradle and Deploy"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "release" ] # todo: 스테이지 서버 cd 테스트 후 master 로 변경 필요
   workflow_dispatch:
 
 jobs:

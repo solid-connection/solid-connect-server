@@ -2,7 +2,7 @@ name: "[STAGE] Build Gradle and Deploy"
 
 on:
   push:
-    branches: [ "release" ]
+    branches: [ "stage-test" ] # todo: 스테이지 서버 cd 테스트 후 release 로 변경 필요
   workflow_dispatch:
 
 jobs:
