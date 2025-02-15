@@ -12,7 +12,6 @@ import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +26,7 @@ public class GpaScoreVerificationAdminService {
 
     @Transactional(readOnly = true)
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition scoreSearchCondition, Pageable pageable) {
-        Pageable sortedPageable = PageRequest.of(
-                pageable.getPageNumber() - 1,
-                pageable.getPageSize()
-        );
-        return gpaScoreRepository.searchGpaScores(scoreSearchCondition, sortedPageable);
+        return gpaScoreRepository.searchGpaScores(scoreSearchCondition, pageable);
     }
 
     @Transactional
