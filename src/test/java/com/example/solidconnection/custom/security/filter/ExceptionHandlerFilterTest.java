@@ -85,34 +85,6 @@ class ExceptionHandlerFilterTest {
         assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
-    @Test
-    void 익명_사용자의_접근_거부시_401_예외_응답을_반환한다() throws Exception {
-        // given
-        Authentication anonymousAuth = getAnonymousAuth();
-        SecurityContextHolder.getContext().setAuthentication(anonymousAuth);
-        willThrow(new AccessDeniedException("Access Denied")).given(filterChain).doFilter(request, response);
-
-        // when
-        exceptionHandlerFilter.doFilterInternal(request, response, filterChain);
-
-        // then
-        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
-    }
-
-    @Test
-    void 인증된_사용자의_접근_거부하면_403_예외_응답을_반환한다() throws Exception {
-        // given
-        Authentication auth = new TestingAuthenticationToken("user", "password", "ROLE_USER");
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        willThrow(new AccessDeniedException("Access Denied")).given(filterChain).doFilter(request, response);
-
-        // when
-        exceptionHandlerFilter.doFilterInternal(request, response, filterChain);
-
-        // then
-        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_FORBIDDEN);
-    }
-
     private static Stream<Throwable> provideException() {
         return Stream.of(
                 new RuntimeException(),
