@@ -33,7 +33,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew bootJar -Dspring.profiles.active=stage
+        run: ./gradlew bootJar
 
       - name: Copy jar file to remote
         uses: appleboy/scp-action@master
@@ -59,7 +59,7 @@ jobs:
           host: ${{ secrets.STAGE_HOST }}
           username: ${{ secrets.STAGE_USERNAME }}
           key: ${{ secrets.STAGE_PRIVATE_KEY }}
-          source: "./docker-compose.yml"
+          source: "./docker-compose.stage.yml"
           target: "/home/${{ secrets.STAGE_USERNAME }}/solid-connect-stage/"
 
       - name: Run docker compose
@@ -72,4 +72,4 @@ jobs:
           script: |
             cd /home/${{ secrets.STAGE_USERNAME }}/solid-connect-stage
             docker compose down
-            docker compose up -d --build
+            docker compose -f docker-compose.stage.yml up -d --build

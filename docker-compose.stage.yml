@@ -6,6 +6,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    network_mode: host
 
   redis-exporter:
     image: oliver006/redis_exporter
@@ -13,19 +14,20 @@ services:
     ports:
       - "9121:9121"
     environment:
-      REDIS_ADDR: "redis:6379"
+      REDIS_ADDR: "localhost:6379"
     depends_on:
       - redis
+    network_mode: host
 
-  solid-connection-server:
+  solid-connection-stage:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: solid-connection-server
+    container_name: solid-connection-stage
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATA_REDIS_HOST=redis
-      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_PROFILES_ACTIVE=stage
     depends_on:
       - redis
+    network_mode: host
