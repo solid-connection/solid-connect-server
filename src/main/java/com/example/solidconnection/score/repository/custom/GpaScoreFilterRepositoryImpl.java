@@ -6,6 +6,7 @@ import com.example.solidconnection.admin.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.dto.SiteUserResponse;
 import com.example.solidconnection.type.VerifyStatus;
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -28,6 +29,35 @@ import static org.springframework.util.StringUtils.hasText;
 @Repository
 public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
 
+    private static final ZoneId systemZoneId = ZoneId.systemDefault();
+
+    private static final ConstructorExpression<GpaResponse> gpaResponseProjection = Projections.constructor(
+            GpaResponse.class,
+            gpaScore.gpa.gpa,
+            gpaScore.gpa.gpaCriteria,
+            gpaScore.gpa.gpaReportUrl
+    );
+    private static final ConstructorExpression<SiteUserResponse> siteUserResponseProjection = Projections.constructor(
+            SiteUserResponse.class,
+            siteUser.id,
+            siteUser.nickname,
+            siteUser.profileImageUrl
+    );
+    private static final ConstructorExpression<GpaScoreStatusResponse> gpaScoreStatusResponseProjection = Projections.constructor(
+            GpaScoreStatusResponse.class,
+            gpaScore.id,
+            gpaResponseProjection,
+            gpaScore.verifyStatus,
+            gpaScore.rejectedReason,
+            gpaScore.createdAt,
+            gpaScore.updatedAt
+    );
+    private static final ConstructorExpression<GpaScoreSearchResponse> gpaScoreSearchResponseProjection = Projections.constructor(
+            GpaScoreSearchResponse.class,
+            gpaScoreStatusResponseProjection,
+            siteUserResponseProjection
+    );
+
     private final JPAQueryFactory queryFactory;
 
     @Autowired
@@ -38,24 +68,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
     @Override
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition condition, Pageable pageable) {
         List<GpaScoreSearchResponse> content = queryFactory
-                .select(Projections.constructor(GpaScoreSearchResponse.class,
-                        Projections.constructor(GpaScoreStatusResponse.class,
-                                gpaScore.id,
-                                Projections.constructor(GpaResponse.class,
-                                        gpaScore.gpa.gpa,
-                                        gpaScore.gpa.gpaCriteria,
-                                        gpaScore.gpa.gpaReportUrl),
-                                gpaScore.verifyStatus,
-                                gpaScore.rejectedReason,
-                                gpaScore.createdAt,
-                                gpaScore.updatedAt
-                        ),
-                        Projections.constructor(SiteUserResponse.class,
-                                siteUser.id,
-                                siteUser.nickname,
-                                siteUser.profileImageUrl
-                        )
-                ))
+                .select(gpaScoreSearchResponseProjection)
                 .from(gpaScore)
                 .join(gpaScore.siteUser, siteUser)
                 .where(
@@ -99,8 +112,8 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         LocalDateTime endOfDay = createdAt.plusDays(1).atStartOfDay().minusNanos(1);
 
         return gpaScore.createdAt.between(
-                startOfDay.atZone(ZoneId.systemDefault()),
-                endOfDay.atZone(ZoneId.systemDefault())
+                startOfDay.atZone(systemZoneId),
+                endOfDay.atZone(systemZoneId)
         );
     }
 }
