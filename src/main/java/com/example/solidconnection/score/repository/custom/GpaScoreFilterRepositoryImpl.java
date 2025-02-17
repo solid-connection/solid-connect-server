@@ -1,5 +1,6 @@
 package com.example.solidconnection.score.repository.custom;
 
+import com.example.solidconnection.admin.dto.GpaResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
@@ -40,7 +41,10 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
                 .select(Projections.constructor(GpaScoreSearchResponse.class,
                         Projections.constructor(GpaScoreStatusResponse.class,
                                 gpaScore.id,
-                                gpaScore.gpa,
+                                Projections.constructor(GpaResponse.class,
+                                        gpaScore.gpa.gpa,
+                                        gpaScore.gpa.gpaCriteria,
+                                        gpaScore.gpa.gpaReportUrl),
                                 gpaScore.verifyStatus,
                                 gpaScore.rejectedReason,
                                 gpaScore.createdAt,
