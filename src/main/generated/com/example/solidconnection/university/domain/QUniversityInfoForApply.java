@@ -40,6 +40,8 @@ public class QUniversityInfoForApply extends EntityPathBase<UniversityInfoForApp
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath koreanName = createString("koreanName");
+
     public final SetPath<LanguageRequirement, QLanguageRequirement> languageRequirements = this.<LanguageRequirement, QLanguageRequirement>createSet("languageRequirements", LanguageRequirement.class, QLanguageRequirement.class, PathInits.DIRECT2);
 
     public final EnumPath<com.example.solidconnection.type.SemesterAvailableForDispatch> semesterAvailableForDispatch = createEnum("semesterAvailableForDispatch", com.example.solidconnection.type.SemesterAvailableForDispatch.class);

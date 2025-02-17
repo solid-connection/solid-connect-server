@@ -18,15 +18,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
+import static com.example.solidconnection.custom.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
@@ -87,7 +82,7 @@ public class ApplicationSubmissionService {
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
         GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserAndId(siteUser, gpaScoreId)
-                .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
+                .orElseThrow(() -> new CustomException(GPA_SCORE_NOT_FOUND));
         if (gpaScore.getVerifyStatus() != VerifyStatus.APPROVED) {
             throw new CustomException(INVALID_GPA_SCORE_STATUS);
         }

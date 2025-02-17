@@ -12,7 +12,7 @@ public record GpaScoreUpdateRequest(
         @NotNull(message = "GPA 기준을 입력해주세요.")
         Double gpaCriteria,
 
-        @NotNull(message = "승인 여부를 설정해주세요.")
+        @NotNull(message = "승인 상태를 설정해주세요.")
         VerifyStatus verifyStatus,
 
         String rejectedReason

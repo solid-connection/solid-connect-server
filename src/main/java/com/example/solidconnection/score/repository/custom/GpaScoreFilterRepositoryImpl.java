@@ -1,9 +1,9 @@
 package com.example.solidconnection.score.repository.custom;
 
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
-import com.example.solidconnection.admin.dto.GpaScoreStatus;
+import com.example.solidconnection.admin.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
-import com.example.solidconnection.admin.dto.SiteUserDto;
+import com.example.solidconnection.admin.dto.SiteUserResponse;
 import com.example.solidconnection.type.VerifyStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -26,6 +26,7 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
+
     private final JPAQueryFactory queryFactory;
 
     @Autowired
@@ -37,7 +38,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition condition, Pageable pageable) {
         List<GpaScoreSearchResponse> content = queryFactory
                 .select(Projections.constructor(GpaScoreSearchResponse.class,
-                        Projections.constructor(GpaScoreStatus.class,
+                        Projections.constructor(GpaScoreStatusResponse.class,
                                 gpaScore.id,
                                 gpaScore.gpa,
                                 gpaScore.verifyStatus,
@@ -45,7 +46,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
                                 gpaScore.createdAt,
                                 gpaScore.updatedAt
                         ),
-                        Projections.constructor(SiteUserDto.class,
+                        Projections.constructor(SiteUserResponse.class,
                                 siteUser.id,
                                 siteUser.nickname,
                                 siteUser.profileImageUrl

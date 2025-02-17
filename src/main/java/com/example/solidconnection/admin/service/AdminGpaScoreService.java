@@ -15,11 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
+import static com.example.solidconnection.custom.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
-public class GpaScoreVerificationAdminService {
+public class AdminGpaScoreService {
 
     private final GpaScoreRepository gpaScoreRepository;
 
@@ -31,7 +31,7 @@ public class GpaScoreVerificationAdminService {
     @Transactional
     public GpaScoreResponse updateGpaScore(Long gpaScoreId, GpaScoreUpdateRequest request) {
         GpaScore gpaScore = gpaScoreRepository.findById(gpaScoreId)
-                .orElseThrow(() -> new CustomException(INVALID_GPA_SCORE));
+                .orElseThrow(() -> new CustomException(GPA_SCORE_NOT_FOUND));
         gpaScore.updateGpaScore(
                 new Gpa(
                         request.gpa(),
@@ -41,6 +41,6 @@ public class GpaScoreVerificationAdminService {
                 request.verifyStatus(),
                 request.verifyStatus() == VerifyStatus.REJECTED ? request.rejectedReason() : null
         );
-        return GpaScoreResponse.of(gpaScore);
+        return GpaScoreResponse.from(gpaScore);
     }
 }

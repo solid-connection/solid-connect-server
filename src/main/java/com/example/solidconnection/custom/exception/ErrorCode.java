@@ -40,6 +40,7 @@ public enum ErrorCode {
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "대학교를 찾을 수 없습니다."),
     REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
+    GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -86,7 +87,6 @@ public enum ErrorCode {
     DUPLICATE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 게시글입니다."),
 
     // score
-    INVALID_GPA_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 학점입니다."),
     INVALID_GPA_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "학점이 승인되지 않았습니다."),
     INVALID_LANGUAGE_TEST_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 어학성적입니다."),
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),

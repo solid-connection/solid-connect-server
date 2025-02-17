@@ -4,13 +4,13 @@ import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.type.VerifyStatus;
 
 public record GpaScoreResponse(
-        Long id,
-        Double gpa,
-        Double gpaCriteria,
+        long id,
+        double gpa,
+        double gpaCriteria,
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
-    public static GpaScoreResponse of(GpaScore gpaScore) {
+    public static GpaScoreResponse from(GpaScore gpaScore) {
         return new GpaScoreResponse(
                 gpaScore.getId(),
                 gpaScore.getGpa().getGpa(),

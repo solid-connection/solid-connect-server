@@ -4,7 +4,7 @@ import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
-import com.example.solidconnection.admin.service.GpaScoreVerificationAdminService;
+import com.example.solidconnection.admin.service.AdminGpaScoreService;
 import com.example.solidconnection.custom.response.PageResponse;
 import com.example.solidconnection.util.PagingUtils;
 import jakarta.validation.Valid;
@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/admin/scores")
 @RestController
-public class ScoreVerificationAdminController {
+public class AdminScoreController {
 
-    private final GpaScoreVerificationAdminService gpaScoreVerificationAdminService;
+    private final AdminGpaScoreService adminGpaScoreService;
 
     @GetMapping("/gpas")
     public ResponseEntity<PageResponse<GpaScoreSearchResponse>> searchGpaScores(
@@ -36,7 +36,7 @@ public class ScoreVerificationAdminController {
     ) {
         PagingUtils.validatePage(pageable.getPageNumber(), pageable.getPageSize());
         Pageable internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize());
-        Page<GpaScoreSearchResponse> page = gpaScoreVerificationAdminService.searchGpaScores(scoreSearchCondition, internalPageable);
+        Page<GpaScoreSearchResponse> page = adminGpaScoreService.searchGpaScores(scoreSearchCondition, internalPageable);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
@@ -45,7 +45,7 @@ public class ScoreVerificationAdminController {
             @PathVariable("gpa_score_id") Long gpaScoreId,
             @Valid @RequestBody GpaScoreUpdateRequest request
     ) {
-        GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScoreId, request);
+        GpaScoreResponse response = adminGpaScoreService.updateGpaScore(gpaScoreId, request);
         return ResponseEntity.ok(response);
     }
 }

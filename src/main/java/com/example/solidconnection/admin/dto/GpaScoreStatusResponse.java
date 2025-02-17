@@ -5,8 +5,8 @@ import com.example.solidconnection.type.VerifyStatus;
 
 import java.time.ZonedDateTime;
 
-public record GpaScoreStatus(
-        Long id,
+public record GpaScoreStatusResponse(
+        long id,
         Gpa gpa,
         VerifyStatus verifyStatus,
         String rejectedReason,

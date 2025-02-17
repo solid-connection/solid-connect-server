@@ -27,7 +27,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
+import static com.example.solidconnection.custom.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
 
     @Autowired
-    private GpaScoreVerificationAdminService gpaScoreVerificationAdminService;
+    private AdminGpaScoreService adminGpaScoreService;
 
     @Autowired
     private SiteUserRepository siteUserRepository;
@@ -72,21 +72,21 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2);
 
             // when
-            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
                     .hasSize(expectedGpaScores.size())
                     .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatus().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatus().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
 
-                            () -> assertThat(actual.siteUserDto().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserDto().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserDto().nickname()).isEqualTo(expected.getSiteUser().getNickname())
+                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
+                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
+                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
                     ));
         }
 
@@ -98,21 +98,21 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1, gpaScore2, gpaScore3);
 
             // when
-            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
                     .hasSize(expectedGpaScores.size())
                     .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatus().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatus().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
 
-                            () -> assertThat(actual.siteUserDto().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserDto().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserDto().nickname()).isEqualTo(expected.getSiteUser().getNickname())
+                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
+                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
+                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
                     ));
         }
 
@@ -124,21 +124,21 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             List<GpaScore> expectedGpaScores = List.of(gpaScore1);
 
             // when
-            Page<GpaScoreSearchResponse> response = gpaScoreVerificationAdminService.searchGpaScores(condition, pageable);
+            Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
             assertThat(response.getContent())
                     .hasSize(expectedGpaScores.size())
                     .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatus().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatus().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatus().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpa()).isEqualTo(expected.getGpa().getGpa()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().gpa().getGpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
+                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
 
-                            () -> assertThat(actual.siteUserDto().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserDto().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserDto().nickname()).isEqualTo(expected.getSiteUser().getNickname())
+                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
+                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
+                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
                     ));
         }
     }
@@ -157,7 +157,7 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when
-            GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScore1.getId(), request);
+            GpaScoreResponse response = adminGpaScoreService.updateGpaScore(gpaScore1.getId(), request);
 
             // then
             assertAll(
@@ -180,7 +180,7 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when
-            GpaScoreResponse response = gpaScoreVerificationAdminService.updateGpaScore(gpaScore1.getId(), request);
+            GpaScoreResponse response = adminGpaScoreService.updateGpaScore(gpaScore1.getId(), request);
 
             // then
             assertAll(
@@ -204,9 +204,9 @@ class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
             );
 
             // when & then
-            assertThatCode(() -> gpaScoreVerificationAdminService.updateGpaScore(invalidGpaScoreId, request))
+            assertThatCode(() -> adminGpaScoreService.updateGpaScore(invalidGpaScoreId, request))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_GPA_SCORE.getMessage());
+                    .hasMessage(GPA_SCORE_NOT_FOUND.getMessage());
         }
     }
 
