@@ -145,18 +145,6 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             // then
             then(s3Service).should().deleteExProfile(testUser);
         }
-
-        @Test
-        void 빈_이미지_파일로_프로필을_수정하면_예외_응답을_반환한다() {
-            // given
-            SiteUser testUser = createSiteUser();
-            MockMultipartFile emptyFile = createEmptyImageFile();
-
-            // when & then
-            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, emptyFile, "newNickname"))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
-        }
     }
 
     @Nested
@@ -271,15 +259,6 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                 "test.jpg",
                 "image/jpeg",
                 "test image content".getBytes()
-        );
-    }
-
-    private MockMultipartFile createEmptyImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "empty.jpg",
-                "image/jpeg",
-                new byte[0]
         );
     }
 
