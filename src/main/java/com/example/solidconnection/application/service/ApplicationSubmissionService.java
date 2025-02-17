@@ -4,6 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.cache.annotation.DefaultCacheOut;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -18,14 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
@@ -48,6 +44,11 @@ public class ApplicationSubmissionService {
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
+    // todo: 임시로 새로운 신청 생성 시 기존 캐싱 데이터를 삭제한다. 추후 수정 필요
+    @DefaultCacheOut(
+            key = {"applications:all"},
+            cacheManager = "customCacheManager"
+    )
     public boolean apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
 
