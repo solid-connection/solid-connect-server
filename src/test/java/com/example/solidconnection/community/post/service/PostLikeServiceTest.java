@@ -45,7 +45,6 @@ class PostLikeServiceTest extends BaseIntegrationTest {
             // when
             PostLikeResponse response = postLikeService.likePost(
                     테스트유저_1,
-                    자유게시판.getCode(),
                     testPost.getId()
             );
 
@@ -63,13 +62,12 @@ class PostLikeServiceTest extends BaseIntegrationTest {
         void 이미_좋아요한_게시글을_다시_좋아요하면_예외_응답을_반환한다() {
             // given
             Post testPost = createPost(자유게시판, 테스트유저_1);
-            postLikeService.likePost(테스트유저_1, 자유게시판.getCode(), testPost.getId());
+            postLikeService.likePost(테스트유저_1,  testPost.getId());
 
             // when & then
             assertThatThrownBy(() ->
                     postLikeService.likePost(
                             테스트유저_1,
-                            자유게시판.getCode(),
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)
@@ -84,13 +82,12 @@ class PostLikeServiceTest extends BaseIntegrationTest {
         void 게시글_좋아요를_성공적으로_취소한다() {
             // given
             Post testPost = createPost(자유게시판, 테스트유저_1);
-            PostLikeResponse beforeResponse = postLikeService.likePost(테스트유저_1, 자유게시판.getCode(), testPost.getId());
+            PostLikeResponse beforeResponse = postLikeService.likePost(테스트유저_1,  testPost.getId());
             long beforeLikeCount = beforeResponse.likeCount();
 
             // when
             PostDislikeResponse response = postLikeService.dislikePost(
                     테스트유저_1,
-                    자유게시판.getCode(),
                     testPost.getId()
             );
 
@@ -113,7 +110,6 @@ class PostLikeServiceTest extends BaseIntegrationTest {
             assertThatThrownBy(() ->
                     postLikeService.dislikePost(
                             테스트유저_1,
-                            자유게시판.getCode(),
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)

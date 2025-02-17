@@ -2,20 +2,20 @@ package com.example.solidconnection.community.post.service;
 
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.repository.BoardRepository;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.dto.PostCreateRequest;
 import com.example.solidconnection.community.post.dto.PostCreateResponse;
 import com.example.solidconnection.community.post.dto.PostDeleteResponse;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.BoardCode;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
@@ -29,9 +29,9 @@ import java.util.List;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +42,24 @@ public class PostCommandService {
     private final S3Service s3Service;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
+    private final SiteUserRepository siteUserRepository;
 
     @Transactional
-    public PostCreateResponse createPost(SiteUser siteUser, String code, PostCreateRequest postCreateRequest,
+    public PostCreateResponse createPost(SiteUser siteUser, PostCreateRequest postCreateRequest,
                                          List<MultipartFile> imageFile) {
         // 유효성 검증
-        String boardCode = validateCode(code);
         validatePostCategory(postCreateRequest.postCategory());
         validateFileSize(imageFile);
 
         // 객체 생성
-        Board board = boardRepository.getByCode(boardCode);
-        Post post = postCreateRequest.toEntity(siteUser, board);
+        Board board = boardRepository.getByCode(postCreateRequest.boardCode());
+        /*
+         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
+         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
+         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
+         */
+        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Post post = postCreateRequest.toEntity(siteUser1, board);
         // 이미지 처리
         savePostImages(imageFile, post);
         Post createdPost = postRepository.save(post);
@@ -62,10 +68,9 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostUpdateResponse updatePost(SiteUser siteUser, String code, Long postId, PostUpdateRequest postUpdateRequest,
+    public PostUpdateResponse updatePost(SiteUser siteUser, Long postId, PostUpdateRequest postUpdateRequest,
                                          List<MultipartFile> imageFile) {
         // 유효성 검증
-        String boardCode = validateCode(code);
         Post post = postRepository.getById(postId);
         validateOwnership(post, siteUser);
         validateQuestion(post);
@@ -93,8 +98,7 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostDeleteResponse deletePostById(SiteUser siteUser, String code, Long postId) {
-        String boardCode = validateCode(code);
+    public PostDeleteResponse deletePostById(SiteUser siteUser, Long postId) {
         Post post = postRepository.getById(postId);
         validateOwnership(post, siteUser);
         validateQuestion(post);
@@ -106,14 +110,6 @@ public class PostCommandService {
         postRepository.deleteById(post.getId());
 
         return new PostDeleteResponse(postId);
-    }
-
-    private String validateCode(String code) {
-        try {
-            return String.valueOf(BoardCode.valueOf(code));
-        } catch (IllegalArgumentException ex) {
-            throw new CustomException(INVALID_BOARD_CODE);
-        }
     }
 
     private void validateOwnership(Post post, SiteUser siteUser) {

@@ -105,7 +105,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application")
+                .get("/applications")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -151,7 +151,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application?region=" + 영미권.getCode())
+                .get("/applications?region=" + 영미권.getCode())
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -178,7 +178,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application?keyword=라")
+                .get("/applications?keyword=라")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -204,7 +204,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application?keyword=일본")
+                .get("/applications?keyword=일본")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -224,7 +224,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application")
+                .get("/applications")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -253,7 +253,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/application/competitors")
+                .get("/applications/competitors")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -295,7 +295,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + user6AccessToken)
                 .when().log().all()
-                .get("/application/competitors")
+                .get("/applications/competitors")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -316,7 +316,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + adminAccessToken)
                 .when().log().all()
-                .get("/application/competitors")
+                .get("/applications/competitors")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);

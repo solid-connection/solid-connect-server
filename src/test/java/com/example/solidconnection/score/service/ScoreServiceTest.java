@@ -2,6 +2,8 @@ package com.example.solidconnection.score.service;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.s3.S3Service;
+import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
@@ -16,6 +18,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.Gender;
+import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -23,11 +26,14 @@ import com.example.solidconnection.type.VerifyStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("점수 서비스 테스트")
 class ScoreServiceTest extends BaseIntegrationTest {
@@ -43,6 +49,9 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private LanguageTestScoreRepository languageTestScoreRepository;
+
+    @MockBean
+    private S3Service s3Service;
 
     @Test
     void GPA_점수_상태를_조회한다() {
@@ -118,9 +127,12 @@ class ScoreServiceTest extends BaseIntegrationTest {
         // given
         SiteUser testUser = createSiteUser();
         GpaScoreRequest request = createGpaScoreRequest();
+        MockMultipartFile file = createFile();
+        String fileUrl = "/gpa-report.pdf";
+        given(s3Service.uploadFile(file, ImgType.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitGpaScore(testUser, request);
+        long scoreId = scoreService.submitGpaScore(testUser, request, file);
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -128,7 +140,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
                 () -> assertThat(savedScore.getGpa().getGpa()).isEqualTo(request.gpa()),
                 () -> assertThat(savedScore.getGpa().getGpaCriteria()).isEqualTo(request.gpaCriteria()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
+                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
+                () -> assertThat(savedScore.getGpa().getGpaReportUrl()).isEqualTo(fileUrl)
         );
     }
 
@@ -137,9 +150,12 @@ class ScoreServiceTest extends BaseIntegrationTest {
         // given
         SiteUser testUser = createSiteUser();
         LanguageTestScoreRequest request = createLanguageTestScoreRequest();
+        MockMultipartFile file = createFile();
+        String fileUrl = "/gpa-report.pdf";
+        given(s3Service.uploadFile(file, ImgType.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitLanguageTestScore(testUser, request);
+        long scoreId = scoreService.submitLanguageTestScore(testUser, request, file);
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -147,7 +163,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestType()).isEqualTo(request.languageTestType()),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestScore()).isEqualTo(request.languageTestScore()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
+                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
+                () -> assertThat(savedScore.getLanguageTest().getLanguageTestReportUrl()).isEqualTo(fileUrl)
         );
     }
 
@@ -185,16 +202,23 @@ class ScoreServiceTest extends BaseIntegrationTest {
     private GpaScoreRequest createGpaScoreRequest() {
         return new GpaScoreRequest(
                 3.5,
-                4.5,
-                "/gpa-report.pdf"
+                4.5
         );
     }
 
     private LanguageTestScoreRequest createLanguageTestScoreRequest() {
         return new LanguageTestScoreRequest(
                 LanguageTestType.TOEFL_IBT,
-                "100",
-                "/gpa-report.pdf"
+                "100"
+        );
+    }
+
+    private MockMultipartFile createFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
         );
     }
 }

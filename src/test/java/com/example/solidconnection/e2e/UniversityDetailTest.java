@@ -45,7 +45,7 @@ class UniversityDetailTest extends UniversityDataSetUpEndToEndTest {
         UniversityDetailResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/detail/" + 메이지대학_지원_정보.getId())
+                .get("/universities/" + 메이지대학_지원_정보.getId())
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityDetailResponse.class);

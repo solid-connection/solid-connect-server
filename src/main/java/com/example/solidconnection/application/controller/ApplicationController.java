@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/application")
+@RequestMapping("/applications")
 @RestController
 public class ApplicationController {
 
@@ -27,7 +27,7 @@ public class ApplicationController {
     private final ApplicationQueryService applicationQueryService;
 
     // 지원서 제출하기 api
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApplicationSubmissionResponse> apply(
             @AuthorizedUser SiteUser siteUser,
             @Valid @RequestBody ApplyRequest applyRequest

@@ -10,6 +10,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+// todo: 사용되지 않음, 다른 PR에서 삭제하고 더 효율적인 구조를 고민해봐야 함
 @Component
 @RequiredArgsConstructor
 public class ExpiredTokenResolver implements HandlerMethodArgumentResolver {

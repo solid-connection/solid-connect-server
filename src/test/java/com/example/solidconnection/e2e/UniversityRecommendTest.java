@@ -66,7 +66,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         UniversityRecommendsResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/recommends")
+                .get("/universities/recommend")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityRecommendsResponse.class);
@@ -94,7 +94,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         UniversityRecommendsResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/recommends")
+                .get("/universities/recommend")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityRecommendsResponse.class);
@@ -121,7 +121,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         UniversityRecommendsResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/recommends")
+                .get("/universities/recommend")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityRecommendsResponse.class);
@@ -148,7 +148,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         UniversityRecommendsResponse response = RestAssured.given()
                 .header("Authorization", "Bearer " + accessToken)
                 .log().all()
-                .get("/university/recommends")
+                .get("/universities/recommend")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityRecommendsResponse.class);
@@ -171,7 +171,7 @@ class UniversityRecommendTest extends UniversityDataSetUpEndToEndTest {
         // request - 요청
         UniversityRecommendsResponse response = RestAssured.given()
                 .log().all()
-                .get("/university/recommends")
+                .get("/universities/recommend")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract().as(UniversityRecommendsResponse.class);

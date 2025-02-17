@@ -12,39 +12,43 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/score")
+@RequestMapping("/scores")
 @RequiredArgsConstructor
 public class ScoreController {
 
     private final ScoreService scoreService;
 
     // 학점을 등록하는 api
-    @PostMapping("/gpa")
+    @PostMapping("/gpas")
     public ResponseEntity<Long> submitGpaScore(
             @AuthorizedUser SiteUser siteUser,
-            @Valid @RequestBody GpaScoreRequest gpaScoreRequest
+            @Valid @RequestPart("gpaScoreRequest") GpaScoreRequest gpaScoreRequest,
+            @RequestParam("file") MultipartFile file
     ) {
-        Long id = scoreService.submitGpaScore(siteUser, gpaScoreRequest);
+        Long id = scoreService.submitGpaScore(siteUser, gpaScoreRequest, file);
         return ResponseEntity.ok(id);
     }
 
     // 어학성적을 등록하는 api
-    @PostMapping("/languageTest")
+    @PostMapping("/language-tests")
     public ResponseEntity<Long> submitLanguageTestScore(
             @AuthorizedUser SiteUser siteUser,
-            @Valid @RequestBody LanguageTestScoreRequest languageTestScoreRequest
+            @Valid @RequestPart("languageTestScoreRequest") LanguageTestScoreRequest languageTestScoreRequest,
+            @RequestParam("file") MultipartFile file
     ) {
-        Long id = scoreService.submitLanguageTestScore(siteUser, languageTestScoreRequest);
+        Long id = scoreService.submitLanguageTestScore(siteUser, languageTestScoreRequest, file);
         return ResponseEntity.ok(id);
     }
 
     // 학점 상태를 확인하는 api
-    @GetMapping("/gpa")
+    @GetMapping("/gpas")
     public ResponseEntity<GpaScoreStatusResponse> getGpaScoreStatus(
             @AuthorizedUser SiteUser siteUser
     ) {
@@ -53,7 +57,7 @@ public class ScoreController {
     }
 
     // 어학 성적 상태를 확인하는 api
-    @GetMapping("/languageTest")
+    @GetMapping("/language-tests")
     public ResponseEntity<LanguageTestScoreStatusResponse> getLanguageTestScoreStatus(
             @AuthorizedUser SiteUser siteUser
     ) {

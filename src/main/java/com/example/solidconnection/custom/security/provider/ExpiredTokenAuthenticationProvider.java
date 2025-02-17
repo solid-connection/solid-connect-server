@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 
+// todo: 사용되지 않음, 다른 PR에서 삭제하고 더 효율적인 구조를 고민해봐야 함
 @Component
 @RequiredArgsConstructor
 public class ExpiredTokenAuthenticationProvider implements AuthenticationProvider {
