@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 @RejectedReasonRequired
 public record GpaScoreUpdateRequest(
+
         @NotNull(message = "GPA를 입력해주세요.")
         Double gpa,
 
