@@ -40,9 +40,9 @@ public class AdminScoreController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PatchMapping("/gpas/{gpa_score_id}")
+    @PatchMapping("/gpas/{gpa-score-id}")
     public ResponseEntity<GpaScoreResponse> updateGpaScore(
-            @PathVariable("gpa_score_id") Long gpaScoreId,
+            @PathVariable("gpa-score-id") Long gpaScoreId,
             @Valid @RequestBody GpaScoreUpdateRequest request
     ) {
         GpaScoreResponse response = adminGpaScoreService.updateGpaScore(gpaScoreId, request);

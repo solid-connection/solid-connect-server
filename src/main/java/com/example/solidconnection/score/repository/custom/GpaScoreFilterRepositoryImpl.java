@@ -29,33 +29,33 @@ import static org.springframework.util.StringUtils.hasText;
 @Repository
 public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
 
-    private static final ZoneId systemZoneId = ZoneId.systemDefault();
+    private static final ZoneId SYSTEM_ZONE_ID = ZoneId.systemDefault();
 
-    private static final ConstructorExpression<GpaResponse> gpaResponseProjection = Projections.constructor(
+    private static final ConstructorExpression<GpaResponse> GPA_RESPONSE_PROJECTION = Projections.constructor(
             GpaResponse.class,
             gpaScore.gpa.gpa,
             gpaScore.gpa.gpaCriteria,
             gpaScore.gpa.gpaReportUrl
     );
-    private static final ConstructorExpression<SiteUserResponse> siteUserResponseProjection = Projections.constructor(
-            SiteUserResponse.class,
-            siteUser.id,
-            siteUser.nickname,
-            siteUser.profileImageUrl
-    );
-    private static final ConstructorExpression<GpaScoreStatusResponse> gpaScoreStatusResponseProjection = Projections.constructor(
+    private static final ConstructorExpression<GpaScoreStatusResponse> GPA_SCORE_STATUS_RESPONSE_PROJECTION = Projections.constructor(
             GpaScoreStatusResponse.class,
             gpaScore.id,
-            gpaResponseProjection,
+            GPA_RESPONSE_PROJECTION,
             gpaScore.verifyStatus,
             gpaScore.rejectedReason,
             gpaScore.createdAt,
             gpaScore.updatedAt
     );
-    private static final ConstructorExpression<GpaScoreSearchResponse> gpaScoreSearchResponseProjection = Projections.constructor(
+    private static final ConstructorExpression<SiteUserResponse> SITE_USER_RESPONSE_PROJECTION = Projections.constructor(
+            SiteUserResponse.class,
+            siteUser.id,
+            siteUser.nickname,
+            siteUser.profileImageUrl
+    );
+    private static final ConstructorExpression<GpaScoreSearchResponse> GPA_SCORE_SEARCH_RESPONSE_PROJECTION = Projections.constructor(
             GpaScoreSearchResponse.class,
-            gpaScoreStatusResponseProjection,
-            siteUserResponseProjection
+            GPA_SCORE_STATUS_RESPONSE_PROJECTION,
+            SITE_USER_RESPONSE_PROJECTION
     );
 
     private final JPAQueryFactory queryFactory;
@@ -68,7 +68,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
     @Override
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition condition, Pageable pageable) {
         List<GpaScoreSearchResponse> content = queryFactory
-                .select(gpaScoreSearchResponseProjection)
+                .select(GPA_SCORE_SEARCH_RESPONSE_PROJECTION)
                 .from(gpaScore)
                 .join(gpaScore.siteUser, siteUser)
                 .where(
@@ -112,8 +112,8 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         LocalDateTime endOfDay = createdAt.plusDays(1).atStartOfDay().minusNanos(1);
 
         return gpaScore.createdAt.between(
-                startOfDay.atZone(systemZoneId),
-                endOfDay.atZone(systemZoneId)
+                startOfDay.atZone(SYSTEM_ZONE_ID),
+                endOfDay.atZone(SYSTEM_ZONE_ID)
         );
     }
 }
