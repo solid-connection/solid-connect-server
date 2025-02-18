@@ -56,10 +56,10 @@ public class SiteUserService {
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
             if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
                 s3Service.deleteExProfile(siteUser);
             }
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
             String profileImageUrl = uploadedFile.fileUrl();
             siteUser.setProfileImageUrl(profileImageUrl);
         }
