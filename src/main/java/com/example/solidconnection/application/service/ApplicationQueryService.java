@@ -97,7 +97,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
@@ -105,7 +105,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
@@ -113,7 +113,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
