@@ -15,7 +15,9 @@ public enum LanguageTestType {
     TEF(LanguageTestType::compareIntegerScores),
     TOEFL_IBT(LanguageTestType::compareIntegerScores),
     TOEFL_ITP(LanguageTestType::compareIntegerScores),
-    TOEIC(LanguageTestType::compareIntegerScores);
+    TOEIC(LanguageTestType::compareIntegerScores),
+    ETC((s1, s2) -> 1), // 기타 언어시험은 점수를 비교할 수 없으므로 항상 크다고 비교한다.
+    ;
 
     private final Comparator<String> comparator;
 
