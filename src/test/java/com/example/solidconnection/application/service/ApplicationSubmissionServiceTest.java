@@ -61,12 +61,11 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         // then
         Application savedApplication = applicationRepository.findBySiteUserAndTerm(테스트유저_1, term).orElseThrow();
         assertAll(
-                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount() + 1),
+                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount()),
                 () -> assertThat(savedApplication.getGpa()).isEqualTo(gpaScore.getGpa()),
                 () -> assertThat(savedApplication.getLanguageTest()).isEqualTo(languageTestScore.getLanguageTest()),
                 () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
                 () -> assertThat(savedApplication.getNicknameForApply()).isNotNull(),
-                () -> assertThat(savedApplication.getUpdateCount()).isZero(),
                 () -> assertThat(savedApplication.getTerm()).isEqualTo(term),
                 () -> assertThat(savedApplication.isDelete()).isFalse(),
                 () -> assertThat(savedApplication.getFirstChoiceUniversity().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
@@ -128,7 +127,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
-        for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT + 1; i++) {
+        for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT; i++) {
             applicationSubmissionService.apply(테스트유저_1, request);
         }
 
