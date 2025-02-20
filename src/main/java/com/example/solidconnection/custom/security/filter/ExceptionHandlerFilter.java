@@ -10,16 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_DENIED;
 import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICATION_FAILED;
 
 @Component
@@ -36,10 +32,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (CustomException e) {
             customCommence(response, e);
-        } catch (AccessDeniedException e) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            ErrorCode errorCode = auth instanceof AnonymousAuthenticationToken ? AUTHENTICATION_FAILED : ACCESS_DENIED;
-            generalCommence(response, e, errorCode);
         } catch (Exception e) {
             generalCommence(response, e, AUTHENTICATION_FAILED);
         }

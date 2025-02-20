@@ -1,5 +1,7 @@
 package com.example.solidconnection.config.security;
 
+import com.example.solidconnection.custom.exception.CustomAccessDeniedHandler;
+import com.example.solidconnection.custom.exception.CustomAuthenticationEntryPoint;
 import com.example.solidconnection.custom.security.filter.ExceptionHandlerFilter;
 import com.example.solidconnection.custom.security.filter.JwtAuthenticationFilter;
 import com.example.solidconnection.custom.security.filter.SignOutCheckFilter;
@@ -13,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,6 +31,8 @@ public class SecurityConfiguration {
     private final ExceptionHandlerFilter exceptionHandlerFilter;
     private final SignOutCheckFilter signOutCheckFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -62,9 +65,13 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**").hasRole(ADMIN.name())
                         .anyRequest().permitAll()
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(signOutCheckFilter, JwtAuthenticationFilter.class)
-                .addFilterAfter(exceptionHandlerFilter, ExceptionTranslationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, SignOutCheckFilter.class)
                 .build();
     }
 }

@@ -1,9 +1,21 @@
 package com.example.solidconnection.application.service;
 
+import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
+import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.score.domain.LanguageTestScore;
+import com.example.solidconnection.score.repository.GpaScoreRepository;
+import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
+import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +30,15 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private ApplicationQueryService applicationQueryService;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
+    @Autowired
+    private GpaScoreRepository gpaScoreRepository;
+
+    @Autowired
+    private LanguageTestScoreRepository languageTestScoreRepository;
 
     @Nested
     class 지원자_목록_조회_테스트 {
@@ -143,6 +164,26 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
                             List.of(ApplicantResponse.of(이전학기_지원서, false)))
             ));
         }
+
+        @Test
+        void 동일_유저의_여러_지원서_중_최신_지원서만_조회된다() {
+            // given
+            Application firstApplication = createApplication(테스트유저_1, 괌대학_A_지원_정보);
+            firstApplication.setIsDeleteTrue();
+            applicationRepository.save(firstApplication);
+            Application secondApplication = createApplication(테스트유저_1, 네바다주립대학_라스베이거스_지원_정보);
+
+
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicants(
+                    테스트유저_1, "", "");
+
+            // then
+            assertThat(response.firstChoice().stream()
+                    .flatMap(univ -> univ.applicants().stream())
+                    .filter(ApplicantResponse::isMine))
+                    .containsExactly(ApplicantResponse.of(secondApplication, true));
+        }
     }
 
     @Nested
@@ -210,5 +251,40 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
             assertThat(response.secondChoice()).isEmpty();
             assertThat(response.thirdChoice()).isEmpty();
         }
+    }
+
+    private GpaScore createApprovedGpaScore(SiteUser siteUser) {
+        GpaScore gpaScore = new GpaScore(
+                new Gpa(4.0, 4.5, "/gpa-report.pdf"),
+                siteUser
+        );
+        gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
+        return gpaScoreRepository.save(gpaScore);
+    }
+
+    private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
+        LanguageTestScore languageTestScore = new LanguageTestScore(
+                new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
+                siteUser
+        );
+        languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);
+        return languageTestScoreRepository.save(languageTestScore);
+    }
+
+    private Application createApplication(
+            SiteUser siteUser,
+            UniversityInfoForApply universityInfoForApply) {
+        Application application = new Application(
+                siteUser,
+                createApprovedGpaScore(siteUser).getGpa(),
+                createApprovedLanguageTestScore(siteUser).getLanguageTest(),
+                term,
+                universityInfoForApply,
+                null,
+                null,
+                null
+        );
+        application.setVerifyStatus(VerifyStatus.APPROVED);
+        return applicationRepository.save(application);
     }
 }

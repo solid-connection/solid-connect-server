@@ -46,7 +46,8 @@ public class ApplicationQueryService {
      * - 1지망, 2지망 지원자들을 조회한다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "application:query:{1}:{2}", cacheManager = "customCacheManager", ttlSec = 86400)
+    // todo: 임시로 단일 키로 캐시 적용. 추후 캐싱 전략 재검토 필요.
+    @ThunderingHerdCaching(key = "applications:all", cacheManager = "customCacheManager", ttlSec = 86400)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 국가와 키워드와 지역을 통해 대학을 필터링한다.
         List<University> universities
@@ -96,7 +97,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
@@ -104,7 +105,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
@@ -112,7 +113,7 @@ public class ApplicationQueryService {
         return getApplicantsByChoice(
                 universities,
                 siteUser,
-                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(uia, VerifyStatus.APPROVED, term)
+                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
         );
     }
 
