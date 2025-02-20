@@ -31,8 +31,8 @@ class SiteUserController {
     @PatchMapping
     public ResponseEntity<Void> updateMyPageInfo(
             @AuthorizedUser SiteUser siteUser,
-            @RequestParam("file") MultipartFile imageFile,
-            @RequestParam("nickname") String nickname
+            @RequestParam(value = "file", required = false) MultipartFile imageFile,
+            @RequestParam(value = "nickname", required = false) String nickname
     ) {
         siteUserService.updateMyPageInfo(siteUser, imageFile, nickname);
         return ResponseEntity.ok().build();

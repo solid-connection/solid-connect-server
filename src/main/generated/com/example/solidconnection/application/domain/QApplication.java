@@ -28,6 +28,8 @@ public class QApplication extends EntityPathBase<Application> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final BooleanPath isDelete = createBoolean("isDelete");
+
     public final QLanguageTest languageTest;
 
     public final StringPath nicknameForApply = createString("nicknameForApply");
@@ -35,6 +37,10 @@ public class QApplication extends EntityPathBase<Application> {
     public final com.example.solidconnection.university.domain.QUniversityInfoForApply secondChoiceUniversity;
 
     public final com.example.solidconnection.siteuser.domain.QSiteUser siteUser;
+
+    public final StringPath term = createString("term");
+
+    public final com.example.solidconnection.university.domain.QUniversityInfoForApply thirdChoiceUniversity;
 
     public final NumberPath<Integer> updateCount = createNumber("updateCount", Integer.class);
 
@@ -63,6 +69,7 @@ public class QApplication extends EntityPathBase<Application> {
         this.languageTest = inits.isInitialized("languageTest") ? new QLanguageTest(forProperty("languageTest")) : null;
         this.secondChoiceUniversity = inits.isInitialized("secondChoiceUniversity") ? new com.example.solidconnection.university.domain.QUniversityInfoForApply(forProperty("secondChoiceUniversity"), inits.get("secondChoiceUniversity")) : null;
         this.siteUser = inits.isInitialized("siteUser") ? new com.example.solidconnection.siteuser.domain.QSiteUser(forProperty("siteUser")) : null;
+        this.thirdChoiceUniversity = inits.isInitialized("thirdChoiceUniversity") ? new com.example.solidconnection.university.domain.QUniversityInfoForApply(forProperty("thirdChoiceUniversity"), inits.get("thirdChoiceUniversity")) : null;
     }
 
 }
