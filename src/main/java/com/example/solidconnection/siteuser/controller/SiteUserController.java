@@ -17,7 +17,9 @@ public class SiteUserController {
     private final SiteUserService siteUserService;
 
     @GetMapping("/exists")
-    public ResponseEntity<NicknameExistsResponse> existsByNickname(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<NicknameExistsResponse> existsByNickname(
+            @RequestParam("nickname") String nickname
+    ) {
         NicknameExistsResponse nicknameExistsResponse = siteUserService.existsByNickname(nickname);
         return ResponseEntity.ok(nicknameExistsResponse);
     }
