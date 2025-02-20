@@ -155,6 +155,7 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
 
     @Nested
     class 어학점수_검증_및_수정 {
+
         @Test
         void 어학점수와_검증상태를_정상적으로_수정한다() {
             // given
