@@ -40,6 +40,7 @@ dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.5.0'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.26'
