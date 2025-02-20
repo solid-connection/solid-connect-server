@@ -1,8 +1,11 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.admin.dto.LanguageTestScoreResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
+import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -24,8 +27,10 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.solidconnection.custom.exception.ErrorCode.LANGUAGE_TEST_SCORE_NOT_FOUND;
 import static com.example.solidconnection.type.LanguageTestType.TOEIC;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("어학 검증 관리자 서비스 테스트")
@@ -145,6 +150,72 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
                             () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
                             () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
                     ));
+        }
+    }
+
+    @Nested
+    class 어학점수_검증_및_수정 {
+        @Test
+        void 어학점수와_검증상태를_정상적으로_수정한다() {
+            // given
+            LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
+                    TOEIC,
+                    "850",
+                    VerifyStatus.APPROVED,
+                    null
+            );
+
+            // when
+            LanguageTestScoreResponse response = adminLanguageTestScoreService.updateLanguageTestScore(languageTestScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(languageTestScore1.getId()),
+                    () -> assertThat(response.languageTestType()).isEqualTo(request.languageTestType()),
+                    () -> assertThat(response.languageTestScore()).isEqualTo(request.languageTestScore()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(request.verifyStatus()),
+                    () -> assertThat(response.rejectedReason()).isNull()
+            );
+        }
+
+        @Test
+        void 승인상태로_변경_시_거절사유가_입력되어도_null로_저장된다() {
+            // given
+            LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
+                    TOEIC,
+                    "850",
+                    VerifyStatus.APPROVED,
+                    "이 거절사유는 무시되어야 함"
+            );
+
+            // when
+            LanguageTestScoreResponse response = adminLanguageTestScoreService.updateLanguageTestScore(languageTestScore1.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(languageTestScore1.getId()),
+                    () -> assertThat(response.languageTestType()).isEqualTo(request.languageTestType()),
+                    () -> assertThat(response.languageTestScore()).isEqualTo(request.languageTestScore()),
+                    () -> assertThat(response.verifyStatus()).isEqualTo(VerifyStatus.APPROVED),
+                    () -> assertThat(response.rejectedReason()).isNull()
+            );
+        }
+
+        @Test
+        void 존재하지_않는_어학점수_수정_시_예외_응답을_반환한다() {
+            // given
+            long invalidLanguageTestScoreId = 9999L;
+            LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
+                    TOEIC,
+                    "850",
+                    VerifyStatus.APPROVED,
+                    null
+            );
+
+            // when & then
+            assertThatCode(() -> adminLanguageTestScoreService.updateLanguageTestScore(invalidLanguageTestScoreId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(LANGUAGE_TEST_SCORE_NOT_FOUND.getMessage());
         }
     }
 

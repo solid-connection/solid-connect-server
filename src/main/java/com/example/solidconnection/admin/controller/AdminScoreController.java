@@ -3,7 +3,9 @@ package com.example.solidconnection.admin.controller;
 import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
+import com.example.solidconnection.admin.dto.LanguageTestScoreResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
+import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.service.AdminGpaScoreService;
 import com.example.solidconnection.admin.service.AdminLanguageTestScoreService;
@@ -63,5 +65,14 @@ public class AdminScoreController {
         Pageable internalPageable = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize());
         Page<LanguageTestScoreSearchResponse> page = adminLanguageTestScoreService.searchLanguageTestScores(scoreSearchCondition, internalPageable);
         return ResponseEntity.ok(PageResponse.of(page));
+    }
+
+    @PatchMapping("/language-tests/{language-test-score-id}")
+    public ResponseEntity<LanguageTestScoreResponse> updateLanguageTestScore(
+            @PathVariable("language-test-score-id") Long languageTestScoreId,
+            @Valid @RequestBody LanguageTestScoreUpdateRequest request
+    ) {
+        LanguageTestScoreResponse response = adminLanguageTestScoreService.updateLanguageTestScore(languageTestScoreId, request);
+        return ResponseEntity.ok(response);
     }
 }
