@@ -20,13 +20,13 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByNicknameForApply(String nicknameForApply);
 
-    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTerm(
+    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
             UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
 
-    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTerm(
+    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
             UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
 
-    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTerm(
+    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
             UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     @Query("""

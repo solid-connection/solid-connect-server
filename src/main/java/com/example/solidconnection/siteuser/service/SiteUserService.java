@@ -48,19 +48,21 @@ public class SiteUserService {
      * */
     @Transactional
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
-        validateNicknameUnique(nickname);
-        validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-        validateProfileImageNotEmpty(imageFile);
-
-        if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
-            s3Service.deleteExProfile(siteUser);
+        if (nickname != null) {
+            validateNicknameUnique(nickname);
+            validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
+            siteUser.setNickname(nickname);
+            siteUser.setNicknameModifiedAt(LocalDateTime.now());
         }
-        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
-        String profileImageUrl = uploadedFile.fileUrl();
 
-        siteUser.setProfileImageUrl(profileImageUrl);
-        siteUser.setNickname(nickname);
-        siteUser.setNicknameModifiedAt(LocalDateTime.now());
+        if (imageFile != null && !imageFile.isEmpty()) {
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+            if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
+                s3Service.deleteExProfile(siteUser);
+            }
+            String profileImageUrl = uploadedFile.fileUrl();
+            siteUser.setProfileImageUrl(profileImageUrl);
+        }
         siteUserRepository.save(siteUser);
     }
 
@@ -78,12 +80,6 @@ public class SiteUserService {
             String formatLastModifiedAt
                     = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
             throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
-        }
-    }
-
-    private void validateProfileImageNotEmpty(MultipartFile imageFile) {
-        if (imageFile == null || imageFile.isEmpty()) {
-            throw new CustomException(PROFILE_IMAGE_NEEDED);
         }
     }
 

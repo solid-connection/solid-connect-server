@@ -40,6 +40,7 @@ public enum ErrorCode {
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "대학교를 찾을 수 없습니다."),
     REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
+    GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -88,11 +89,15 @@ public enum ErrorCode {
     NOT_LIKED_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "좋아요하지 않은 대학입니다."),
 
     // score
-    INVALID_GPA_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 학점입니다."),
     INVALID_GPA_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "학점이 승인되지 않았습니다."),
     INVALID_LANGUAGE_TEST_SCORE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 어학성적입니다."),
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
+    REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 사유가 필요합니다."),
+
+    // page
+    INVALID_PAGE(HttpStatus.BAD_REQUEST.value(), "페이지 번호는 1 이상 50 이하만 가능합니다."),
+    INVALID_SIZE(HttpStatus.BAD_REQUEST.value(), "페이지 크기는 1 이상 50 이하만 가능합니다."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
