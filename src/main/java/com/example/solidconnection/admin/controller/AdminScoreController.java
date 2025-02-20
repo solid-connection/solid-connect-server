@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +47,7 @@ public class AdminScoreController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PatchMapping("/gpas/{gpa-score-id}")
+    @PutMapping("/gpas/{gpa-score-id}")
     public ResponseEntity<GpaScoreResponse> updateGpaScore(
             @PathVariable("gpa-score-id") Long gpaScoreId,
             @Valid @RequestBody GpaScoreUpdateRequest request
@@ -67,7 +68,7 @@ public class AdminScoreController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PatchMapping("/language-tests/{language-test-score-id}")
+    @PutMapping("/language-tests/{language-test-score-id}")
     public ResponseEntity<LanguageTestScoreResponse> updateLanguageTestScore(
             @PathVariable("language-test-score-id") Long languageTestScoreId,
             @Valid @RequestBody LanguageTestScoreUpdateRequest request
