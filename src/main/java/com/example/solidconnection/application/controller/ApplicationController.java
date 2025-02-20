@@ -32,10 +32,10 @@ public class ApplicationController {
             @AuthorizedUser SiteUser siteUser,
             @Valid @RequestBody ApplyRequest applyRequest
     ) {
-        boolean result = applicationSubmissionService.apply(siteUser, applyRequest);
+        ApplicationSubmissionResponse applicationSubmissionResponse = applicationSubmissionService.apply(siteUser, applyRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApplicationSubmissionResponse(result));
+                .body(applicationSubmissionResponse);
     }
 
     @GetMapping

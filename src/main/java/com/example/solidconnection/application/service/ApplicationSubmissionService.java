@@ -1,6 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
@@ -49,7 +50,7 @@ public class ApplicationSubmissionService {
             key = {"applications:all"},
             cacheManager = "customCacheManager"
     )
-    public boolean apply(SiteUser siteUser, ApplyRequest applyRequest) {
+    public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
 
         Long gpaScoreId = applyRequest.gpaScoreId();
@@ -73,6 +74,7 @@ public class ApplicationSubmissionService {
                     term, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
             newApplication.setVerifyStatus(VerifyStatus.APPROVED);
             applicationRepository.save(newApplication);
+            return ApplicationSubmissionResponse.from(newApplication);
         } else {
             Application before = application.get();
             validateUpdateLimitNotExceed(before);
@@ -82,8 +84,8 @@ public class ApplicationSubmissionService {
                     term, before.getUpdateCount() + 1, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
             newApplication.setVerifyStatus(VerifyStatus.APPROVED);
             applicationRepository.save(newApplication);
+            return ApplicationSubmissionResponse.from(newApplication);
         }
-        return true;
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {

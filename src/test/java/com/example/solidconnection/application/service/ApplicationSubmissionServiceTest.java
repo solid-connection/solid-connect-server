@@ -3,6 +3,7 @@ package com.example.solidconnection.application.service;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,12 +56,12 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
         // when
-        boolean result = applicationSubmissionService.apply(테스트유저_1, request);
+        ApplicationSubmissionResponse response = applicationSubmissionService.apply(테스트유저_1, request);
 
         // then
         Application savedApplication = applicationRepository.findBySiteUserAndTerm(테스트유저_1, term).orElseThrow();
         assertAll(
-                () -> assertThat(result).isTrue(),
+                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount() + 1),
                 () -> assertThat(savedApplication.getGpa()).isEqualTo(gpaScore.getGpa()),
                 () -> assertThat(savedApplication.getLanguageTest()).isEqualTo(languageTestScore.getLanguageTest()),
                 () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
