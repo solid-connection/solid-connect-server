@@ -3,6 +3,7 @@ package com.example.solidconnection.application.service;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.CANT_APPLY_FOR_SAME_UNIVERSITY;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,17 +56,16 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
         // when
-        boolean result = applicationSubmissionService.apply(테스트유저_1, request);
+        ApplicationSubmissionResponse response = applicationSubmissionService.apply(테스트유저_1, request);
 
         // then
         Application savedApplication = applicationRepository.findBySiteUserAndTerm(테스트유저_1, term).orElseThrow();
         assertAll(
-                () -> assertThat(result).isTrue(),
+                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount()),
                 () -> assertThat(savedApplication.getGpa()).isEqualTo(gpaScore.getGpa()),
                 () -> assertThat(savedApplication.getLanguageTest()).isEqualTo(languageTestScore.getLanguageTest()),
                 () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
                 () -> assertThat(savedApplication.getNicknameForApply()).isNotNull(),
-                () -> assertThat(savedApplication.getUpdateCount()).isZero(),
                 () -> assertThat(savedApplication.getTerm()).isEqualTo(term),
                 () -> assertThat(savedApplication.isDelete()).isFalse(),
                 () -> assertThat(savedApplication.getFirstChoiceUniversity().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
@@ -128,7 +127,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
 
-        for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT + 1; i++) {
+        for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT; i++) {
             applicationSubmissionService.apply(테스트유저_1, request);
         }
 
