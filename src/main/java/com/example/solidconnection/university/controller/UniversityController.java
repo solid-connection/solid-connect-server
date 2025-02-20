@@ -2,7 +2,7 @@ package com.example.solidconnection.university.controller;
 
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.service.SiteUserService;
+import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
@@ -32,7 +32,7 @@ public class UniversityController {
     private final UniversityQueryService universityQueryService;
     private final UniversityLikeService universityLikeService;
     private final UniversityRecommendService universityRecommendService;
-    private final SiteUserService siteUserService;
+    private final MyPageService myPageService;
 
     @GetMapping("/recommend")
     public ResponseEntity<UniversityRecommendsResponse> getUniversityRecommends(
@@ -49,7 +49,7 @@ public class UniversityController {
     public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity(
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<UniversityInfoForApplyPreviewResponse> wishUniversities = siteUserService.getWishUniversity(siteUser);
+        List<UniversityInfoForApplyPreviewResponse> wishUniversities = myPageService.getWishUniversity(siteUser);
         return ResponseEntity.ok(wishUniversities);
     }
 
