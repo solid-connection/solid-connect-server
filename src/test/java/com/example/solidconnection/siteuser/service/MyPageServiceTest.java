@@ -30,8 +30,8 @@ import java.util.List;
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMAGE_NEEDED;
-import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
-import static com.example.solidconnection.siteuser.service.SiteUserService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
+import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
+import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.BDDMockito.any;
@@ -40,11 +40,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.then;
 
-@DisplayName("유저 서비스 테스트")
-class SiteUserServiceTest extends BaseIntegrationTest {
+@DisplayName("마이페이지 서비스 테스트")
+class MyPageServiceTest extends BaseIntegrationTest {
 
     @Autowired
-    private SiteUserService siteUserService;
+    private MyPageService myPageService;
 
     @MockBean
     private S3Service s3Service;
@@ -62,7 +62,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         int likedUniversityCount = createLikedUniversities(testUser);
 
         // when
-        MyPageResponse response = siteUserService.getMyPageInfo(testUser);
+        MyPageResponse response = myPageService.getMyPageInfo(testUser);
 
         // then
         Assertions.assertAll(
@@ -83,7 +83,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         int likedUniversityCount = createLikedUniversities(testUser);
 
         // when
-        List<UniversityInfoForApplyPreviewResponse> response = siteUserService.getWishUniversity(testUser);
+        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(testUser);
 
         // then
         assertThat(response)
@@ -109,7 +109,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
-            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
             assertThat(testUser.getProfileImageUrl()).isEqualTo(expectedUrl);
@@ -124,7 +124,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
             then(s3Service).should(never()).deleteExProfile(any());
@@ -139,7 +139,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            siteUserService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
 
             // then
             then(s3Service).should().deleteExProfile(testUser);
@@ -152,7 +152,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             MockMultipartFile emptyFile = createEmptyImageFile();
 
             // when & then
-            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, emptyFile, "newNickname"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, emptyFile, "newNickname"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
         }
@@ -175,7 +175,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             String newNickname = "newNickname";
 
             // when
-            siteUserService.updateMyPageInfo(testUser, imageFile, newNickname);
+            myPageService.updateMyPageInfo(testUser, imageFile, newNickname);
 
             // then
             SiteUser updatedUser = siteUserRepository.findById(testUser.getId()).get();
@@ -191,7 +191,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             MockMultipartFile imageFile = createValidImageFile();
 
             // when & then
-            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, imageFile, "duplicatedNickname"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, imageFile, "duplicatedNickname"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -208,7 +208,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
             NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
 
             // when & then
-            assertThatCode(() -> siteUserService.updateMyPageInfo(testUser, imageFile, "nickname12"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }

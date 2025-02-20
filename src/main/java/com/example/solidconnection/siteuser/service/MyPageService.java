@@ -25,7 +25,7 @@ import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMA
 
 @RequiredArgsConstructor
 @Service
-public class SiteUserService {
+public class MyPageService {
 
     public static final int MIN_DAYS_BETWEEN_NICKNAME_CHANGES = 7;
     public static final DateTimeFormatter NICKNAME_LAST_CHANGE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

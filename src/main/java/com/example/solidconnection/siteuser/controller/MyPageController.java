@@ -3,7 +3,7 @@ package com.example.solidconnection.siteuser.controller;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.service.SiteUserService;
+import com.example.solidconnection.siteuser.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +16,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/my")
 @RestController
-class SiteUserController {
+class MyPageController {
 
-    private final SiteUserService siteUserService;
+    private final MyPageService myPageService;
 
     @GetMapping
     public ResponseEntity<MyPageResponse> getMyPageInfo(
             @AuthorizedUser SiteUser siteUser
     ) {
-        MyPageResponse myPageResponse = siteUserService.getMyPageInfo(siteUser);
+        MyPageResponse myPageResponse = myPageService.getMyPageInfo(siteUser);
         return ResponseEntity.ok(myPageResponse);
     }
 
@@ -34,7 +34,7 @@ class SiteUserController {
             @RequestParam("file") MultipartFile imageFile,
             @RequestParam("nickname") String nickname
     ) {
-        siteUserService.updateMyPageInfo(siteUser, imageFile, nickname);
+        myPageService.updateMyPageInfo(siteUser, imageFile, nickname);
         return ResponseEntity.ok().build();
     }
 }
