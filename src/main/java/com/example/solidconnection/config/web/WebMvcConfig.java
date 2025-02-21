@@ -2,6 +2,7 @@ package com.example.solidconnection.config.web;
 
 
 import com.example.solidconnection.custom.resolver.AuthorizedUserResolver;
+import com.example.solidconnection.custom.resolver.CustomPageRequestArgumentResolver;
 import com.example.solidconnection.custom.resolver.ExpiredTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +17,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthorizedUserResolver authorizedUserResolver;
     private final ExpiredTokenResolver expiredTokenResolver;
+    private final CustomPageRequestArgumentResolver customPageRequestArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.addAll(List.of(
                 authorizedUserResolver,
-                expiredTokenResolver
+                expiredTokenResolver,
+                customPageRequestArgumentResolver
         ));
     }
 }
