@@ -33,7 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("학점 검증 관리자 서비스 테스트")
-class GpaScoreVerificationAdminServiceTest extends BaseIntegrationTest {
+class AdminGpaScoreServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private AdminGpaScoreService adminGpaScoreService;

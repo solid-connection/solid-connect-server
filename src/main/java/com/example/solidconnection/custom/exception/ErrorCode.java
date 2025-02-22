@@ -41,6 +41,7 @@ public enum ErrorCode {
     REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
+    LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),

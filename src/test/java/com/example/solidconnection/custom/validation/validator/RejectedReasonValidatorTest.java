@@ -1,6 +1,8 @@
 package com.example.solidconnection.custom.validation.validator;
 
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
+import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
+import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.VerifyStatus;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -8,6 +10,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -28,39 +31,83 @@ class RejectedReasonValidatorTest {
         validator = factory.getValidator();
     }
 
-    @Test
-    void 거절_상태일_때_거절사유가_있으면_유효하다() {
-        // given
-        GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
-                3.0,
-                4.5,
-                VerifyStatus.REJECTED,
-                "부적합"
-        );
+    @Nested
+    class GPA_점수_거절_사유_검증 {
 
-        // when
-        Set<ConstraintViolation<GpaScoreUpdateRequest>> violations = validator.validate(request);
+        @Test
+        void 거절_상태일_때_거절사유가_있으면_유효하다() {
+            // given
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.0,
+                    4.5,
+                    VerifyStatus.REJECTED,
+                    "부적합"
+            );
 
-        // then
-        assertThat(violations).isEmpty();
+            // when
+            Set<ConstraintViolation<GpaScoreUpdateRequest>> violations = validator.validate(request);
+
+            // then
+            assertThat(violations).isEmpty();
+        }
+
+        @Test
+        void 거절_상태일_때_거절사유가_없으면_예외_응답을_반환한다() {
+            // given
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.0,
+                    4.5,
+                    VerifyStatus.REJECTED,
+                    null
+            );
+
+            // when
+            Set<ConstraintViolation<GpaScoreUpdateRequest>> violations = validator.validate(request);
+
+            // then
+            assertThat(violations)
+                    .extracting(MESSAGE)
+                    .contains(REJECTED_REASON_REQUIRED.getMessage());
+        }
     }
 
-    @Test
-    void 거절_상태일_때_거절사유가_없으면_예외_응답을_반환한다() {
-        // given
-        GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
-                3.0,
-                4.5,
-                VerifyStatus.REJECTED,
-                null
-        );
+    @Nested
+    class 어학_점수_거절_사유_검증 {
 
-        // when
-        Set<ConstraintViolation<GpaScoreUpdateRequest>> violations = validator.validate(request);
+        @Test
+        void 거절_상태일_때_거절사유가_있으면_유효하다() {
+            // given
+            LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
+                    LanguageTestType.TOEIC,
+                    "900",
+                    VerifyStatus.REJECTED,
+                    "부적합"
+            );
 
-        // then
-        assertThat(violations)
-                .extracting(MESSAGE)
-                .contains(REJECTED_REASON_REQUIRED.getMessage());
+            // when
+            Set<ConstraintViolation<LanguageTestScoreUpdateRequest>> violations = validator.validate(request);
+
+            // then
+            assertThat(violations).isEmpty();
+        }
+
+        @Test
+        void 거절_상태일_때_거절사유가_없으면_예외_응답을_반환한다() {
+            // given
+            LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
+                    LanguageTestType.TOEIC,
+                    "900",
+                    VerifyStatus.REJECTED,
+                    null
+            );
+
+            // when
+            Set<ConstraintViolation<LanguageTestScoreUpdateRequest>> violations = validator.validate(request);
+
+            // then
+            assertThat(violations)
+                    .extracting(MESSAGE)
+                    .contains(REJECTED_REASON_REQUIRED.getMessage());
+        }
     }
 }
