@@ -1,6 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
@@ -49,15 +50,10 @@ public class ApplicationSubmissionService {
             key = {"applications:all"},
             cacheManager = "customCacheManager"
     )
-    public boolean apply(SiteUser siteUser, ApplyRequest applyRequest) {
+    public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
-
-        Long gpaScoreId = applyRequest.gpaScoreId();
-        Long languageTestScoreId = applyRequest.languageTestScoreId();
-        GpaScore gpaScore = getValidGpaScore(siteUser, gpaScoreId);
-        LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, languageTestScoreId);
-
-        Optional<Application> application = applicationRepository.findBySiteUserAndTerm(siteUser, term);
+        GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
+        LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
         UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
                 .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
@@ -68,22 +64,19 @@ public class ApplicationSubmissionService {
                 .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
                 .orElse(null);
 
-        if (application.isEmpty()) {
-            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
-                    term, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
-            newApplication.setVerifyStatus(VerifyStatus.APPROVED);
-            applicationRepository.save(newApplication);
-        } else {
-            Application before = application.get();
-            validateUpdateLimitNotExceed(before);
-            before.setIsDeleteTrue(); // 기존 이력 soft delete 수행한다.
-
-            Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
-                    term, before.getUpdateCount() + 1, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
-            newApplication.setVerifyStatus(VerifyStatus.APPROVED);
-            applicationRepository.save(newApplication);
-        }
-        return true;
+        Optional<Application> existingApplication = applicationRepository.findBySiteUserAndTerm(siteUser, term);
+        int updateCount = existingApplication
+                .map(application -> {
+                    validateUpdateLimitNotExceed(application);
+                    application.setIsDeleteTrue();
+                    return application.getUpdateCount() + 1;
+                })
+                .orElse(1);
+        Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
+                term, updateCount, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
+        newApplication.setVerifyStatus(VerifyStatus.APPROVED);
+        applicationRepository.save(newApplication);
+        return ApplicationSubmissionResponse.from(newApplication);
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
