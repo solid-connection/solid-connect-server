@@ -54,4 +54,10 @@ public class LanguageTestScore extends BaseEntity {
         this.siteUser = siteUser;
         siteUser.getLanguageTestScoreList().add(this);
     }
+
+    public void updateLanguageTestScore(LanguageTest languageTest, VerifyStatus verifyStatus, String rejectedReason) {
+        this.languageTest = languageTest;
+        this.verifyStatus = verifyStatus;
+        this.rejectedReason = rejectedReason;
+    }
 }
