@@ -4,6 +4,7 @@ spring:
       - classpath:/secret/application-cloud.yml
       - classpath:/secret/application-db.yml
       - classpath:/secret/application-variable.yml
+      - classpath:/application-ci.yml
 
   tomcat:
     threads:

@@ -1,0 +1,58 @@
+spring:
+  config:
+    activate:
+      on-profile: ci
+
+cloud:
+  aws:
+    credentials:
+      access-key: access-key
+      secret-key: access-key
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: solid-connection-uploaded
+      url:
+        default: default-url
+        uploaded: uploaded-url
+    cloudFront:
+      url:
+        default: default-url
+        uploaded: uploaded-url
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    generate-ddl: true
+    show-sql: true
+    database: mysql
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: false
+
+oauth:
+  apple:
+    # 애플 OAuth 는 반드시 https 적용이 되어야 한다.
+    # 아래 url 은 ngrok 를 통해 localhost 에 https 를 적용한 임시 리다이렉트 url 이다.
+    # 로컬에서 개발 시, apple oauth 를 테스트하려면 ngrok 을 사용한 url 을 여기에 입력하면 된다.
+    redirect-url: "https://7521-59-6-70-20.ngrok-free.app/auth/apple"
+  kakao:
+    redirect-url: "http://localhost:8080/auth/kakao"
+    client-id: "028e410223fc2ad18e5c1809b3d11245"
+
+university:
+  term: "2024-1" # data.sql 과 통일
+
+jwt:
+  secret:
+    961ae5d3-7fc4-45b8-ae25-89cd46f3b918
+
+cors:
+  allowed-origins:
+    - "http://localhost:8080"
+    - "http://localhost:3000"
