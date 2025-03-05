@@ -5,9 +5,9 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
-import static com.example.solidconnection.custom.request.CustomPageRequest.MAX_SIZE;
-import static com.example.solidconnection.custom.request.CustomPageRequest.MIN_PAGE;
-import static com.example.solidconnection.custom.request.CustomPageRequest.MIN_SIZE;
+import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MAX_SIZE;
+import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MIN_PAGE;
+import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MIN_SIZE;
 import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 
 @Getter
