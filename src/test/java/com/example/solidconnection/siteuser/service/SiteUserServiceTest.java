@@ -37,7 +37,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         @Test
         void 존재하는_닉네임이면_true를_반환한다() {
             // when
-            NicknameExistsResponse response = siteUserService.existsByNickname(siteUser.getNickname());
+            NicknameExistsResponse response = siteUserService.checkNicknameExists(siteUser.getNickname());
 
             // then
             assertThat(response.exists()).isTrue();
@@ -46,7 +46,7 @@ class SiteUserServiceTest extends BaseIntegrationTest {
         @Test
         void 존재하지_않는_닉네임이면_false를_반환한다() {
             // when
-            NicknameExistsResponse response = siteUserService.existsByNickname("nonExistingNickname");
+            NicknameExistsResponse response = siteUserService.checkNicknameExists("nonExistingNickname");
 
             // then
             assertThat(response.exists()).isFalse();

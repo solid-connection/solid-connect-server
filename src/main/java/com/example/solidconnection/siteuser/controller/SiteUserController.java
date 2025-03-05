@@ -17,10 +17,10 @@ public class SiteUserController {
     private final SiteUserService siteUserService;
 
     @GetMapping("/exists")
-    public ResponseEntity<NicknameExistsResponse> existsByNickname(
+    public ResponseEntity<NicknameExistsResponse> checkNicknameExists(
             @RequestParam("nickname") String nickname
     ) {
-        NicknameExistsResponse nicknameExistsResponse = siteUserService.existsByNickname(nickname);
+        NicknameExistsResponse nicknameExistsResponse = siteUserService.checkNicknameExists(nickname);
         return ResponseEntity.ok(nicknameExistsResponse);
     }
 }

@@ -11,7 +11,7 @@ public class SiteUserService {
 
     private final SiteUserRepository siteUserRepository;
 
-    public NicknameExistsResponse existsByNickname(String nickname) {
+    public NicknameExistsResponse checkNicknameExists(String nickname) {
         boolean exists = siteUserRepository.existsByNickname(nickname);
         return NicknameExistsResponse.from(exists);
     }
