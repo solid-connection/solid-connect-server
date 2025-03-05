@@ -9,11 +9,11 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.service.AdminGpaScoreService;
 import com.example.solidconnection.admin.service.AdminLanguageTestScoreService;
-import com.example.solidconnection.custom.request.CustomPageRequest;
 import com.example.solidconnection.custom.response.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,11 +34,11 @@ public class AdminScoreController {
     @GetMapping("/gpas")
     public ResponseEntity<PageResponse<GpaScoreSearchResponse>> searchGpaScores(
             @Valid @ModelAttribute ScoreSearchCondition scoreSearchCondition,
-            CustomPageRequest customPageRequest
+            Pageable pageable
     ) {
         Page<GpaScoreSearchResponse> page = adminGpaScoreService.searchGpaScores(
                 scoreSearchCondition,
-                customPageRequest.toPageable()
+                pageable
         );
         return ResponseEntity.ok(PageResponse.of(page));
     }
@@ -55,11 +55,11 @@ public class AdminScoreController {
     @GetMapping("/language-tests")
     public ResponseEntity<PageResponse<LanguageTestScoreSearchResponse>> searchLanguageTestScores(
             @Valid @ModelAttribute ScoreSearchCondition scoreSearchCondition,
-            CustomPageRequest customPageRequest
+            Pageable pageable
     ) {
         Page<LanguageTestScoreSearchResponse> page = adminLanguageTestScoreService.searchLanguageTestScores(
                 scoreSearchCondition,
-                customPageRequest.toPageable()
+                pageable
         );
         return ResponseEntity.ok(PageResponse.of(page));
     }
