@@ -51,7 +51,8 @@ oauth:
     team-id: team-id
     key-id: key-id
     redirect-url: "https://localhost:8080/auth/apple"
-  kakao:
+    secret-key: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAfGIQ3TtNYAZG7i3m72odmdhfymkM9wAFg2rEL2RKUEA==
+kakao:
     redirect-url: "http://localhost:8080/auth/kakao"
     client-id: client-id
     token-url: "https://kauth.kakao.com/oauth/token"
