@@ -1,28 +1,25 @@
 package com.example.solidconnection.support;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-@TestConfiguration
-public class RedisTestContainer {
+public class RedisTestContainer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    @Container
-    private static final GenericContainer<?> CONTAINER = new GenericContainer<>("redis:7.0");
+    private static final int ORIGINAL_PORT = 6379;
+    private static final GenericContainer<?> CONTAINER = new GenericContainer<>("redis:7.0")
+            .withExposedPorts(ORIGINAL_PORT);
 
-    @DynamicPropertySource
-    static void redisProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.redis.host", CONTAINER::getHost);
-        registry.add("spring.redis.port", CONTAINER::getFirstMappedPort);
+    static {
+        CONTAINER.start();
     }
 
-    @PostConstruct
-    void startContainer() {
-        if (!CONTAINER.isRunning()) {
-            CONTAINER.start();
-        }
+    @Override
+    public void initialize(ConfigurableApplicationContext applicationContext) {
+        TestPropertyValues.of(
+                "spring.data.redis.host=" + CONTAINER.getHost(),
+                "spring.data.redis.port=" + CONTAINER.getMappedPort(ORIGINAL_PORT)
+        ).applyTo(applicationContext.getEnvironment());
     }
 }
