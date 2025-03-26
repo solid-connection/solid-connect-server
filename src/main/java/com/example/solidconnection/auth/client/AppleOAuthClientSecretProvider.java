@@ -35,7 +35,7 @@ public class AppleOAuthClientSecretProvider {
 
     @PostConstruct
     private void initPrivateKey() {
-        privateKey = readPrivateKey();
+        privateKey = generatePrivateKey();
     }
 
     public String generateClientSecret() {
@@ -53,7 +53,7 @@ public class AppleOAuthClientSecretProvider {
                 .compact();
     }
 
-    private PrivateKey readPrivateKey() {
+    private PrivateKey generatePrivateKey() {
         try {
             String secretKey = appleOAuthClientProperties.secretKey();
             byte[] encoded = Base64.decodeBase64(secretKey);
