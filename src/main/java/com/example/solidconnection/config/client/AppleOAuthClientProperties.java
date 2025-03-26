@@ -10,6 +10,7 @@ public record AppleOAuthClientProperties(
         String publicKeyUrl,
         String clientId,
         String teamId,
-        String keyId
+        String keyId,
+        String secretKey
 ) {
 }

@@ -9,15 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.FAILED_TO_READ_APPLE_PRIVATE_KEY;
 
@@ -32,7 +29,6 @@ public class AppleOAuthClientSecretProvider {
 
     private static final String KEY_ID_HEADER = "kid";
     private static final long TOKEN_DURATION = 1000 * 60 * 10; // 10min
-    private static final String SECRET_KEY_PATH = "secret/AppleOAuthKey.p8";
 
     private final AppleOAuthClientProperties appleOAuthClientProperties;
     private PrivateKey privateKey;
@@ -58,15 +54,13 @@ public class AppleOAuthClientSecretProvider {
     }
 
     private PrivateKey readPrivateKey() {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(SECRET_KEY_PATH);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-
-            String secretKey = reader.lines().collect(Collectors.joining("\n"));
+        try {
+            String secretKey = appleOAuthClientProperties.secretKey();
             byte[] encoded = Base64.decodeBase64(secretKey);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             return keyFactory.generatePrivate(keySpec);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CustomException(FAILED_TO_READ_APPLE_PRIVATE_KEY);
         }
     }
