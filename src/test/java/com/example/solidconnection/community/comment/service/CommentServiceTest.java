@@ -71,8 +71,10 @@ class CommentServiceTest extends BaseIntegrationTest {
                                     () -> assertThat(response.parentId()).isNull(),
                                     () -> assertThat(response.content()).isEqualTo(parentComment.getContent()),
                                     () -> assertThat(response.isOwner()).isTrue(),
-                                    () -> assertThat(response.createdAt()).isEqualTo(parentComment.getCreatedAt()),
-                                    () -> assertThat(response.updatedAt()).isEqualTo(parentComment.getUpdatedAt()),
+                                    () -> assertThat(response.createdAt().toInstant())
+                                            .isEqualTo(parentComment.getCreatedAt().toInstant()),
+                                    () -> assertThat(response.updatedAt().toInstant())
+                                            .isEqualTo(parentComment.getUpdatedAt().toInstant()),
 
                                     () -> assertThat(response.postFindSiteUserResponse().id())
                                             .isEqualTo(parentComment.getSiteUser().getId()),
@@ -89,8 +91,10 @@ class CommentServiceTest extends BaseIntegrationTest {
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.content()).isEqualTo(childComment.getContent()),
                                     () -> assertThat(response.isOwner()).isFalse(),
-                                    () -> assertThat(response.createdAt()).isEqualTo(childComment.getCreatedAt()),
-                                    () -> assertThat(response.updatedAt()).isEqualTo(childComment.getUpdatedAt()),
+                                    () -> assertThat(response.createdAt().toInstant())
+                                            .isEqualTo(childComment.getCreatedAt().toInstant()),
+                                    () -> assertThat(response.updatedAt().toInstant())
+                                            .isEqualTo(childComment.getUpdatedAt().toInstant()),
 
                                     () -> assertThat(response.postFindSiteUserResponse().id())
                                             .isEqualTo(childComment.getSiteUser().getId()),
