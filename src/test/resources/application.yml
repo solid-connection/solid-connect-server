@@ -7,7 +7,7 @@ spring:
       port: 6379
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     generate-ddl: true
     show-sql: true
     database: mysql
