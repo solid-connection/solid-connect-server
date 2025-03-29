@@ -11,8 +11,8 @@ import com.example.solidconnection.score.dto.GpaScoreRequest;
 import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
-import com.example.solidconnection.score.dto.LanguageTestScoreStatus;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
+import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -88,15 +88,15 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public LanguageTestScoreStatusResponse getLanguageTestScoreStatus(SiteUser siteUser) {
+    public LanguageTestScoreStatusesResponse getLanguageTestScoreStatus(SiteUser siteUser) {
         // todo: ditto
         SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        List<LanguageTestScoreStatus> languageTestScoreStatusList =
+        List<LanguageTestScoreStatusResponse> languageTestScoreStatusResponseList =
                 Optional.ofNullable(siteUser1.getLanguageTestScoreList())
                         .map(scores -> scores.stream()
-                                .map(LanguageTestScoreStatus::from)
+                                .map(LanguageTestScoreStatusResponse::from)
                                 .collect(Collectors.toList()))
                         .orElse(Collections.emptyList());
-        return new LanguageTestScoreStatusResponse(languageTestScoreStatusList);
+        return LanguageTestScoreStatusesResponse.from(languageTestScoreStatusResponseList);
     }
 }

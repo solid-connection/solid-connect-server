@@ -4,7 +4,7 @@ import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
-import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
+import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.service.ScoreService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
@@ -58,10 +58,10 @@ public class ScoreController {
 
     // 어학 성적 상태를 확인하는 api
     @GetMapping("/language-tests")
-    public ResponseEntity<LanguageTestScoreStatusResponse> getLanguageTestScoreStatus(
+    public ResponseEntity<LanguageTestScoreStatusesResponse> getLanguageTestScoreStatus(
             @AuthorizedUser SiteUser siteUser
     ) {
-        LanguageTestScoreStatusResponse languageTestScoreStatus = scoreService.getLanguageTestScoreStatus(siteUser);
+        LanguageTestScoreStatusesResponse languageTestScoreStatus = scoreService.getLanguageTestScoreStatus(siteUser);
         return ResponseEntity.ok(languageTestScoreStatus);
     }
 }
