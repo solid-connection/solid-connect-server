@@ -2,7 +2,7 @@ package com.example.solidconnection.score.controller;
 
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
-import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
+import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.service.ScoreService;
@@ -49,10 +49,10 @@ public class ScoreController {
 
     // 학점 상태를 확인하는 api
     @GetMapping("/gpas")
-    public ResponseEntity<GpaScoreStatusResponse> getGpaScoreStatus(
+    public ResponseEntity<GpaScoreStatusesResponse> getGpaScoreStatus(
             @AuthorizedUser SiteUser siteUser
     ) {
-        GpaScoreStatusResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUser);
+        GpaScoreStatusesResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUser);
         return ResponseEntity.ok(gpaScoreStatus);
     }
 

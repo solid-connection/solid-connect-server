@@ -7,8 +7,8 @@ import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
-import com.example.solidconnection.score.dto.GpaScoreStatus;
 import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
+import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatus;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
@@ -63,15 +63,15 @@ class ScoreServiceTest extends BaseIntegrationTest {
         );
 
         // when
-        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
 
         // then
-        assertThat(response.gpaScoreStatusList())
+        assertThat(response.gpaScoreStatusResponseList())
                 .hasSize(scores.size())
                 .containsExactlyInAnyOrder(
                         scores.stream()
-                                .map(GpaScoreStatus::from)
-                                .toArray(GpaScoreStatus[]::new)
+                                .map(GpaScoreStatusResponse::from)
+                                .toArray(GpaScoreStatusResponse[]::new)
                 );
     }
 
@@ -81,10 +81,10 @@ class ScoreServiceTest extends BaseIntegrationTest {
         SiteUser testUser = createSiteUser();
 
         // when
-        GpaScoreStatusResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
 
         // then
-        assertThat(response.gpaScoreStatusList()).isEmpty();
+        assertThat(response.gpaScoreStatusResponseList()).isEmpty();
     }
 
     @Test

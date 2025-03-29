@@ -8,8 +8,8 @@ import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
-import com.example.solidconnection.score.dto.GpaScoreStatus;
 import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
+import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatus;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
@@ -75,16 +75,16 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public GpaScoreStatusResponse getGpaScoreStatus(SiteUser siteUser) {
+    public GpaScoreStatusesResponse getGpaScoreStatus(SiteUser siteUser) {
         // todo: ditto
         SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        List<GpaScoreStatus> gpaScoreStatusList =
+        List<GpaScoreStatusResponse> gpaScoreStatusResponseList =
                 Optional.ofNullable(siteUser1.getGpaScoreList())
                         .map(scores -> scores.stream()
-                                .map(GpaScoreStatus::from)
+                                .map(GpaScoreStatusResponse::from)
                                 .collect(Collectors.toList()))
                         .orElse(Collections.emptyList());
-        return new GpaScoreStatusResponse(gpaScoreStatusList);
+        return GpaScoreStatusesResponse.from(gpaScoreStatusResponseList);
     }
 
     @Transactional(readOnly = true)
