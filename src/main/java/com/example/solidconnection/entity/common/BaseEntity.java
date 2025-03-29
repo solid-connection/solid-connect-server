@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import static java.time.temporal.ChronoUnit.MICROS;
+
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -24,12 +26,12 @@ public abstract class BaseEntity {
 
     @PrePersist
     public void onPrePersist() {
-        this.createdAt = ZonedDateTime.now(ZoneId.of("UTC"));
+        this.createdAt = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(MICROS); // 나노초 6자리 까지만 저장
         this.updatedAt = this.createdAt;
     }
 
     @PreUpdate
     public void onPreUpdate() {
-        this.updatedAt = ZonedDateTime.now(ZoneId.of("UTC"));
+        this.updatedAt = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(MICROS);
     }
 }
