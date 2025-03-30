@@ -51,7 +51,7 @@ oauth:
     team-id: team-id
     key-id: key-id
     redirect-url: "https://localhost:8080/auth/apple"
-    secret-key: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAfGIQ3TtNYAZG7i3m72odmdhfymkM9wAFg2rEL2RKUEA==
+    secret-key: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAfGIQ3TtNYAZG7i3m72odmdhfymkM9wAFg2rEL2RKUEA== # base64 encoded 된 임의의 값
 kakao:
     redirect-url: "http://localhost:8080/auth/kakao"
     client-id: client-id
