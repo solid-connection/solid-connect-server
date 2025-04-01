@@ -1,6 +1,5 @@
 package com.example.solidconnection.custom.resolver;
 
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,10 +13,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import java.lang.reflect.Method;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_PAGE;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_SIZE;
+import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MAX_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @TestContainerSpringBootTest
 @DisplayName("커스텀 페이지 요청 argument resolver 테스트")
@@ -87,63 +84,73 @@ class CustomPageableHandlerMethodArgumentResolverTest {
     }
 
     @Test
-    void 페이지_파라미터가_최소값보다_작으면_예외_응답을_반환한다() {
+    void 페이지_파라미터가_최소값보다_작으면_기본값을_사용한다() {
         // given
         request.setParameter(PAGE_PARAMETER, "0");
 
-        // when & then
-        assertThatCode(() -> customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_PAGE.getMessage());
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     @Test
-    void 페이지_파라미터가_음수이면_예외_응답을_반환한다() {
+    void 페이지_파라미터가_음수이면_기본값을_사용한다() {
         // given
         request.setParameter(PAGE_PARAMETER, "-1");
 
-        // when & then
-        assertThatCode(() -> customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_PAGE.getMessage());
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     @Test
-    void 사이즈_파라미터가_최소값보다_작으면_예외_응답을_반환한다() {
+    void 사이즈_파라미터가_최소값보다_작으면_기본값을_사용한다() {
         // given
         request.setParameter(SIZE_PARAMETER, "0");
 
-        // when & then
-        assertThatCode(() -> customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_SIZE.getMessage());
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     @Test
-    void 사이즈_파라미터가_최대값보다_크면_예외가_발생한다() {
+    void 사이즈_파라미터가_최대값보다_크면_기본값을_사용한다() {
         // given
-        request.setParameter(SIZE_PARAMETER, String.valueOf(CustomPageableHandlerMethodArgumentResolver.MAX_SIZE + 1));
+        request.setParameter(SIZE_PARAMETER, String.valueOf(MAX_SIZE + 1));
 
-        // when & then
-        assertThatCode(() -> customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_SIZE.getMessage());
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     @Test
-    void 사이즈_파라미터가_음수이면_예외_응답을_반환한다() {
+    void 사이즈_파라미터가_음수이면_기본값을_사용한다() {
         // given
         request.setParameter(SIZE_PARAMETER, "-1");
 
-        // when & then
-        assertThatCode(() -> customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(INVALID_SIZE.getMessage());
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     private static class TestController {

@@ -5,10 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
-import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MAX_SIZE;
-import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MIN_PAGE;
-import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MIN_SIZE;
-import static com.example.solidconnection.siteuser.service.SiteUserService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
+import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 
 @Getter
 @AllArgsConstructor
@@ -98,10 +95,6 @@ public enum ErrorCode {
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
     REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 사유가 필요합니다."),
-
-    // page
-    INVALID_PAGE(HttpStatus.BAD_REQUEST.value(), "페이지 번호는 " + MIN_PAGE + " 이상만 가능합니다."),
-    INVALID_SIZE(HttpStatus.BAD_REQUEST.value(), "페이지 크기는 " + MIN_SIZE + " 이상 " + MAX_SIZE + " 이하만 가능합니다."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
