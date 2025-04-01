@@ -5,10 +5,11 @@
     <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
 
     <springProperty scope="context" name="activeProfile" source="spring.profiles.active"/>
+    <springProperty scope="context" name="lokiUrl" source="logging.loki.url"/>
 
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
-            <url>http://monitor.solid-connection.com:3100/loki/api/v1/push</url>
+            <url>${lokiUrl}</url>
         </http>
         <format>
             <label>
