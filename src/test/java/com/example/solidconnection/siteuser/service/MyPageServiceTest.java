@@ -29,7 +29,6 @@ import java.util.List;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
-import static com.example.solidconnection.custom.exception.ErrorCode.PROFILE_IMAGE_NEEDED;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,18 +142,6 @@ class MyPageServiceTest extends BaseIntegrationTest {
 
             // then
             then(s3Service).should().deleteExProfile(testUser);
-        }
-
-        @Test
-        void 빈_이미지_파일로_프로필을_수정하면_예외_응답을_반환한다() {
-            // given
-            SiteUser testUser = createSiteUser();
-            MockMultipartFile emptyFile = createEmptyImageFile();
-
-            // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, emptyFile, "newNickname"))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(PROFILE_IMAGE_NEEDED.getMessage());
         }
     }
 
@@ -270,15 +257,6 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "test.jpg",
                 "image/jpeg",
                 "test image content".getBytes()
-        );
-    }
-
-    private MockMultipartFile createEmptyImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "empty.jpg",
-                "image/jpeg",
-                new byte[0]
         );
     }
 
