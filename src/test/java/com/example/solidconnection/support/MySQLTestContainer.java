@@ -1,34 +1,24 @@
 package com.example.solidconnection.support;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
-import javax.sql.DataSource;
+public class MySQLTestContainer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-@TestConfiguration
-public class MySQLTestContainer {
-
-    @Container
     private static final MySQLContainer<?> CONTAINER = new MySQLContainer<>("mysql:8.0");
 
-    @Bean
-    public DataSource dataSource() {
-        return DataSourceBuilder.create()
-                .url(CONTAINER.getJdbcUrl())
-                .username(CONTAINER.getUsername())
-                .password(CONTAINER.getPassword())
-                .driverClassName(CONTAINER.getDriverClassName())
-                .build();
+    static {
+        CONTAINER.start();
     }
 
-    @PostConstruct
-    void startContainer() {
-        if (!CONTAINER.isRunning()) {
-            CONTAINER.start();
-        }
+    @Override
+    public void initialize(ConfigurableApplicationContext applicationContext) {
+        TestPropertyValues.of(
+                "spring.datasource.url=" + CONTAINER.getJdbcUrl(),
+                "spring.datasource.username=" + CONTAINER.getUsername(),
+                "spring.datasource.password=" + CONTAINER.getPassword()
+        ).applyTo(applicationContext.getEnvironment());
     }
 }

@@ -46,7 +46,7 @@ public class Application {
     @Column(length = 100)
     private String nicknameForApply;
 
-    @Column(columnDefinition = "int not null default 0")
+    @Column(columnDefinition = "int not null default 1")
     private Integer updateCount;
 
     @Column(length = 50, nullable = false)
@@ -76,7 +76,7 @@ public class Application {
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
-        this.updateCount = 0;
+        this.updateCount = 1;
         this.verifyStatus = PENDING;
     }
 
@@ -115,7 +115,7 @@ public class Application {
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
-        this.updateCount = 0;
+        this.updateCount = 1;
         this.firstChoiceUniversity = firstChoiceUniversity;
         this.secondChoiceUniversity = secondChoiceUniversity;
         this.thirdChoiceUniversity = thirdChoiceUniversity;

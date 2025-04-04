@@ -1,8 +1,20 @@
 package com.example.solidconnection.score.dto;
 
-import java.util.List;
+import com.example.solidconnection.score.domain.LanguageTestScore;
+import com.example.solidconnection.type.VerifyStatus;
 
 public record LanguageTestScoreStatusResponse(
-        List<LanguageTestScoreStatus> languageTestScoreStatusList
+        long id,
+        LanguageTestResponse languageTestResponse,
+        VerifyStatus verifyStatus,
+        String rejectedReason
 ) {
+    public static LanguageTestScoreStatusResponse from(LanguageTestScore languageTestScore) {
+        return new LanguageTestScoreStatusResponse(
+                languageTestScore.getId(),
+                LanguageTestResponse.from(languageTestScore.getLanguageTest()),
+                languageTestScore.getVerifyStatus(),
+                languageTestScore.getRejectedReason()
+        );
+    }
 }
