@@ -21,7 +21,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
 
     private static final String PAGE_PARAMETER = "page";
     private static final String SIZE_PARAMETER = "size";
-    private static final int DEFAULT_PAGE = 1;
+    private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 10;
     private static final int MAX_SIZE = 50;
 
@@ -47,7 +47,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
@@ -79,7 +79,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
@@ -93,7 +93,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
@@ -107,7 +107,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
@@ -121,7 +121,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
@@ -135,7 +135,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(MAX_SIZE);
     }
 
@@ -149,7 +149,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
