@@ -12,12 +12,14 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class CustomPageableHandlerMethodArgumentResolver extends PageableHandlerMethodArgumentResolver {
 
-    public static final int MAX_SIZE = 50;
+    private static final int DEFAULT_PAGE = 0;
+    private static final int MAX_SIZE = 50;
     private static final int DEFAULT_SIZE = 10;
 
     public CustomPageableHandlerMethodArgumentResolver() {
+        setMaxPageSize(MAX_SIZE);
         setOneIndexedParameters(true);
-        setFallbackPageable(PageRequest.of(0, 10));
+        setFallbackPageable(PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE));
     }
 
     @Override
@@ -25,10 +27,6 @@ public class CustomPageableHandlerMethodArgumentResolver extends PageableHandler
                                     ModelAndViewContainer mavContainer,
                                     NativeWebRequest webRequest,
                                     WebDataBinderFactory binderFactory) {
-        Pageable pageable = super.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
-        if (pageable.getPageSize() > MAX_SIZE) {
-            return PageRequest.of(pageable.getPageNumber(), DEFAULT_SIZE, pageable.getSort());
-        }
-        return pageable;
+        return super.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
     }
 }

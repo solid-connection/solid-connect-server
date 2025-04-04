@@ -13,7 +13,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import java.lang.reflect.Method;
 
-import static com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver.MAX_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
@@ -24,6 +23,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
     private static final String SIZE_PARAMETER = "size";
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_SIZE = 10;
+    private static final int MAX_SIZE = 50;
 
     @Autowired
     private CustomPageableHandlerMethodArgumentResolver customPageableHandlerMethodArgumentResolver;
@@ -136,7 +136,7 @@ class CustomPageableHandlerMethodArgumentResolverTest {
 
         // then
         assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE - 1);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
+        assertThat(pageable.getPageSize()).isEqualTo(MAX_SIZE);
     }
 
     @Test
