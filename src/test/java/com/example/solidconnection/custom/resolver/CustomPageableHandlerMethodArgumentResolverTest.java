@@ -4,6 +4,9 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import java.lang.reflect.Method;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,17 +45,6 @@ class CustomPageableHandlerMethodArgumentResolverTest {
     }
 
     @Test
-    void 파라미터가_없으면_기본값을_사용한다() {
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
-
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
-    }
-
-    @Test
     void 유효한_파라미터가_있으면_해당_값을_사용한다() {
         // given
         int expectedPage = 2;
@@ -68,89 +61,43 @@ class CustomPageableHandlerMethodArgumentResolverTest {
         assertThat(pageable.getPageSize()).isEqualTo(expectedSize);
     }
 
-    @Test
-    void 파라미터가_숫자가_아니면_기본값을_사용한다() {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideInvalidParameters")
+    void 파라미터가_유효하지_않으면_기본_값을_사용한다(String testName, String pageParam, String sizeParam, int expectedPage, int expectedSize) {
         // given
-        request.setParameter(PAGE_PARAMETER, "invalid");
-        request.setParameter(SIZE_PARAMETER, "invalid");
+        request.setParameter(PAGE_PARAMETER, pageParam);
+        request.setParameter(SIZE_PARAMETER, sizeParam);
 
         // when
         Pageable pageable = customPageableHandlerMethodArgumentResolver
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
+        assertThat(pageable.getPageNumber()).isEqualTo(expectedPage);
+        assertThat(pageable.getPageSize()).isEqualTo(expectedSize);
     }
 
-    @Test
-    void 페이지_파라미터가_최소값보다_작으면_기본값을_사용한다() {
-        // given
-        request.setParameter(PAGE_PARAMETER, "0");
+    static Stream<Arguments> provideInvalidParameters() {
+        return Stream.of(
+                Arguments.of("Page null", null, "20", DEFAULT_PAGE, 20),
+                Arguments.of("Page 빈 문자열", "", "20", DEFAULT_PAGE, 20),
+                Arguments.of("Page 0", "0", "20", DEFAULT_PAGE, 20),
+                Arguments.of("Page 음수", "-1", "20", DEFAULT_PAGE, 20),
+                Arguments.of("Page 문자열", "invalid", "20", DEFAULT_PAGE, 20),
 
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
+                Arguments.of("Size null", "2", null, 1, DEFAULT_SIZE),
+                Arguments.of("Size 빈 문자열", "2", "", 1, DEFAULT_SIZE),
+                Arguments.of("Size 0", "2", "0", 1, DEFAULT_SIZE),
+                Arguments.of("Size 음수", "2", "-1", 1, DEFAULT_SIZE),
+                Arguments.of("Size 문자열", "2", "invalid", 1, DEFAULT_SIZE),
+                Arguments.of("Size 최대값 초과", "2", String.valueOf(MAX_SIZE + 1), 1, MAX_SIZE),
 
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
-    }
-
-    @Test
-    void 페이지_파라미터가_음수이면_기본값을_사용한다() {
-        // given
-        request.setParameter(PAGE_PARAMETER, "-1");
-
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
-
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
-    }
-
-    @Test
-    void 사이즈_파라미터가_최소값보다_작으면_기본값을_사용한다() {
-        // given
-        request.setParameter(SIZE_PARAMETER, "0");
-
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
-
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
-    }
-
-    @Test
-    void 사이즈_파라미터가_최대값보다_크면_기본값을_사용한다() {
-        // given
-        request.setParameter(SIZE_PARAMETER, String.valueOf(MAX_SIZE + 1));
-
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
-
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(MAX_SIZE);
-    }
-
-    @Test
-    void 사이즈_파라미터가_음수이면_기본값을_사용한다() {
-        // given
-        request.setParameter(SIZE_PARAMETER, "-1");
-
-        // when
-        Pageable pageable = customPageableHandlerMethodArgumentResolver
-                .resolveArgument(parameter, null, webRequest, null);
-
-        // then
-        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
-        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
+                Arguments.of("모두 null", null, null, DEFAULT_PAGE, DEFAULT_SIZE),
+                Arguments.of("모두 빈 문자열", "", "", DEFAULT_PAGE, DEFAULT_SIZE),
+                Arguments.of("모두 0", "0", "0", DEFAULT_PAGE, DEFAULT_SIZE),
+                Arguments.of("모두 음수", "-1", "-1", DEFAULT_PAGE, DEFAULT_SIZE),
+                Arguments.of("모두 문자열", "invalid", "invalid", DEFAULT_PAGE, DEFAULT_SIZE)
+        );
     }
 
     private static class TestController {
