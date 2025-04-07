@@ -45,12 +45,10 @@ class CustomPageableHandlerMethodArgumentResolverTest {
     }
 
     @Test
-    void 유효한_파라미터가_있으면_해당_값을_사용한다() {
+    void 유효한_페이지_파라미터가_있으면_해당_값을_사용한다() {
         // given
         int expectedPage = 2;
-        int expectedSize = 20;
         request.setParameter(PAGE_PARAMETER, String.valueOf(expectedPage));
-        request.setParameter(SIZE_PARAMETER, String.valueOf(expectedSize));
 
         // when
         Pageable pageable = customPageableHandlerMethodArgumentResolver
@@ -58,14 +56,55 @@ class CustomPageableHandlerMethodArgumentResolverTest {
 
         // then
         assertThat(pageable.getPageNumber()).isEqualTo(expectedPage - 1);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
+    }
+
+    @Test
+    void 유효한_사이즈_파라미터가_있으면_해당_값을_사용한다() {
+        // given
+        int expectedSize = 20;
+        request.setParameter(SIZE_PARAMETER, String.valueOf(expectedSize));
+
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
         assertThat(pageable.getPageSize()).isEqualTo(expectedSize);
+    }
+
+    @Test
+    void 사이즈_파라미터가_최대값을_초과하면_최대값을_사용한다() {
+        // given
+        request.setParameter(SIZE_PARAMETER, String.valueOf(MAX_SIZE + 1));
+
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageSize()).isEqualTo(MAX_SIZE);
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideInvalidParameters")
-    void 파라미터가_유효하지_않으면_기본_값을_사용한다(String testName, String pageParam, String sizeParam, int expectedPage, int expectedSize) {
+    void 페이지_파라미터가_유효하지_않으면_기본_값을_사용한다(String testName, String pageParam) {
         // given
         request.setParameter(PAGE_PARAMETER, pageParam);
+
+        // when
+        Pageable pageable = customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null);
+
+        // then
+        assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideInvalidParameters")
+    void 사이즈_파라미터가_유효하지_않으면_기본_값을_사용한다(String testName, String sizeParam) {
+        // given
         request.setParameter(SIZE_PARAMETER, sizeParam);
 
         // when
@@ -73,30 +112,16 @@ class CustomPageableHandlerMethodArgumentResolverTest {
                 .resolveArgument(parameter, null, webRequest, null);
 
         // then
-        assertThat(pageable.getPageNumber()).isEqualTo(expectedPage);
-        assertThat(pageable.getPageSize()).isEqualTo(expectedSize);
+        assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
     }
 
     static Stream<Arguments> provideInvalidParameters() {
         return Stream.of(
-                Arguments.of("Page null", null, "20", DEFAULT_PAGE, 20),
-                Arguments.of("Page 빈 문자열", "", "20", DEFAULT_PAGE, 20),
-                Arguments.of("Page 0", "0", "20", DEFAULT_PAGE, 20),
-                Arguments.of("Page 음수", "-1", "20", DEFAULT_PAGE, 20),
-                Arguments.of("Page 문자열", "invalid", "20", DEFAULT_PAGE, 20),
-
-                Arguments.of("Size null", "2", null, 1, DEFAULT_SIZE),
-                Arguments.of("Size 빈 문자열", "2", "", 1, DEFAULT_SIZE),
-                Arguments.of("Size 0", "2", "0", 1, DEFAULT_SIZE),
-                Arguments.of("Size 음수", "2", "-1", 1, DEFAULT_SIZE),
-                Arguments.of("Size 문자열", "2", "invalid", 1, DEFAULT_SIZE),
-                Arguments.of("Size 최대값 초과", "2", String.valueOf(MAX_SIZE + 1), 1, MAX_SIZE),
-
-                Arguments.of("모두 null", null, null, DEFAULT_PAGE, DEFAULT_SIZE),
-                Arguments.of("모두 빈 문자열", "", "", DEFAULT_PAGE, DEFAULT_SIZE),
-                Arguments.of("모두 0", "0", "0", DEFAULT_PAGE, DEFAULT_SIZE),
-                Arguments.of("모두 음수", "-1", "-1", DEFAULT_PAGE, DEFAULT_SIZE),
-                Arguments.of("모두 문자열", "invalid", "invalid", DEFAULT_PAGE, DEFAULT_SIZE)
+                Arguments.of("null", null),
+                Arguments.of("빈 문자열", ""),
+                Arguments.of("0", "0"),
+                Arguments.of("음수", "-1"),
+                Arguments.of("문자열", "invalid")
         );
     }
 
