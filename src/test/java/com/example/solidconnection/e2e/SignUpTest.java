@@ -80,7 +80,7 @@ class SignUpTest extends BaseEndToEndTest {
         List<String> interestedRegionNames = List.of("유럽");
         List<String> interestedCountryNames = List.of("프랑스", "독일");
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, interestedRegionNames, interestedCountryNames,
-                PreparationStatus.CONSIDERING, "profile", Gender.FEMALE, "nickname", "2000-01-01");
+                PreparationStatus.CONSIDERING, "profile", "nickname");
         SignInResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -94,10 +94,8 @@ class SignUpTest extends BaseEndToEndTest {
                 "회원 정보를 저장한다.",
                 () -> assertThat(savedSiteUser.getId()).isNotNull(),
                 () -> assertThat(savedSiteUser.getEmail()).isEqualTo(email),
-                () -> assertThat(savedSiteUser.getBirth()).isEqualTo(signUpRequest.birth()),
                 () -> assertThat(savedSiteUser.getNickname()).isEqualTo(signUpRequest.nickname()),
                 () -> assertThat(savedSiteUser.getProfileImageUrl()).isEqualTo(signUpRequest.profileImageUrl()),
-                () -> assertThat(savedSiteUser.getGender()).isEqualTo(signUpRequest.gender()),
                 () -> assertThat(savedSiteUser.getPreparationStage()).isEqualTo(signUpRequest.preparationStatus()));
 
         List<Region> interestedRegions = interestedRegionRepository.findAllBySiteUser(savedSiteUser).stream()
@@ -130,7 +128,7 @@ class SignUpTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
-                PreparationStatus.CONSIDERING, "profile", Gender.FEMALE, alreadyExistNickname, "2000-01-01");
+                PreparationStatus.CONSIDERING, "profile", alreadyExistNickname);
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -155,7 +153,7 @@ class SignUpTest extends BaseEndToEndTest {
 
         // request - body 생성 및 요청
         SignUpRequest signUpRequest = new SignUpRequest(generatedKakaoToken, null, null,
-                PreparationStatus.CONSIDERING, "profile", Gender.FEMALE, "nickname0", "2000-01-01");
+                PreparationStatus.CONSIDERING, "profile", "nickname0");
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)
@@ -171,7 +169,7 @@ class SignUpTest extends BaseEndToEndTest {
     @Test
     void 유효하지_않은_카카오_토큰으로_회원가입을_하면_예외를_응답한다() {
         SignUpRequest signUpRequest = new SignUpRequest("invalid", null, null,
-                PreparationStatus.CONSIDERING, "profile", Gender.FEMALE, "nickname", "2000-01-01");
+                PreparationStatus.CONSIDERING, "profile", "nickname");
         ErrorResponse errorResponse = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(signUpRequest)

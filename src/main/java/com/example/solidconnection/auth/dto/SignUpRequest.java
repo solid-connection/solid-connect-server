@@ -16,23 +16,19 @@ public record SignUpRequest(
         List<String> interestedCountries,
         PreparationStatus preparationStatus,
         String profileImageUrl,
-        Gender gender,
 
         @NotBlank(message = "닉네임을 입력해주세요.")
-        String nickname,
-
-        @JsonFormat(pattern = "yyyy-MM-dd")
-        String birth) {
+        String nickname) {
 
     public SiteUser toOAuthSiteUser(String email, AuthType authType) {
         return new SiteUser(
                 email,
                 this.nickname,
                 this.profileImageUrl,
-                this.birth,
+                "2000-01-01",
                 this.preparationStatus,
                 Role.MENTEE,
-                this.gender,
+                Gender.PREFER_NOT_TO_SAY,
                 authType
         );
     }
@@ -42,10 +38,10 @@ public record SignUpRequest(
                 email,
                 this.nickname,
                 this.profileImageUrl,
-                this.birth,
+                "2000-01-01",
                 this.preparationStatus,
                 Role.MENTEE,
-                this.gender,
+                Gender.PREFER_NOT_TO_SAY,
                 AuthType.EMAIL,
                 encodedPassword
         );
