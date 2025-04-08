@@ -9,7 +9,6 @@ import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -206,10 +205,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
@@ -219,10 +216,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "test@example.com",
                 "nickname",
                 "profile/profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
@@ -232,10 +227,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "duplicated@example.com",
                 "duplicatedNickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         siteUserRepository.save(siteUser);
     }

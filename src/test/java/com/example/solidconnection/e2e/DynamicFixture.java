@@ -4,7 +4,6 @@ import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -24,10 +23,8 @@ public class DynamicFixture {
                 email,
                 "nickname",
                 "profileImage",
-                "2000-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE
+                Role.MENTEE
         );
     }
 
@@ -36,10 +33,8 @@ public class DynamicFixture {
                 "email@email.com",
                 nickname,
                 "profileImage",
-                "2000-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE
+                Role.MENTEE
         );
     }
 

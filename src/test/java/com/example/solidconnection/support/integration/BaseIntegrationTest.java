@@ -22,7 +22,6 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
@@ -171,73 +170,57 @@ public abstract class BaseIntegrationTest {
                 "test1@example.com",
                 "nickname1",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE));
+                Role.MENTEE));
 
         테스트유저_2 = siteUserRepository.save(new SiteUser(
                 "test2@example.com",
                 "nickname2",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE));
+                Role.MENTEE));
 
         테스트유저_3 = siteUserRepository.save(new SiteUser(
                 "test3@example.com",
                 "nickname3",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE));
+                Role.MENTEE));
 
         테스트유저_4 = siteUserRepository.save(new SiteUser(
                 "test4@example.com",
                 "nickname4",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE));
+                Role.MENTEE));
 
         테스트유저_5 = siteUserRepository.save(new SiteUser(
                 "test5@example.com",
                 "nickname5",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE));
+                Role.MENTEE));
 
         테스트유저_6 = siteUserRepository.save(new SiteUser(
                 "test6@example.com",
                 "nickname6",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE));
+                Role.MENTEE));
 
         테스트유저_7 = siteUserRepository.save(new SiteUser(
                 "test7@example.com",
                 "nickname7",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.FEMALE));
+                Role.MENTEE));
 
         이전학기_지원자 = siteUserRepository.save(new SiteUser(
                 "old@example.com",
                 "oldNickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE));
+                Role.MENTEE));
     }
 
     private void setUpRegions() {
@@ -525,7 +508,7 @@ public abstract class BaseIntegrationTest {
         return languageTestScoreRepository.save(languageTestScore);
     }
 
-    private Post createPost (Board board, SiteUser siteUser, String title, String content, PostCategory category){
+    private Post createPost(Board board, SiteUser siteUser, String title, String content, PostCategory category) {
         Post post = new Post(
                 title,
                 content,

@@ -16,7 +16,6 @@ import com.example.solidconnection.repositories.RegionRepository;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
