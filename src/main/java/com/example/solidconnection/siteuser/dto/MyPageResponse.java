@@ -9,7 +9,6 @@ public record MyPageResponse(
         String profileImageUrl,
         Role role,
         AuthType authType,
-        String birth,
         String email,
         int likedPostCount,
         int likedMentorCount,
@@ -21,7 +20,6 @@ public record MyPageResponse(
                 siteUser.getProfileImageUrl(),
                 siteUser.getRole(),
                 siteUser.getAuthType(),
-                siteUser.getBirth(),
                 siteUser.getEmail(),
                 0, // TODO: 커뮤니티 기능 생기면 업데이트 필요
                 0, // TODO: 멘토 기능 생기면 업데이트 필요
