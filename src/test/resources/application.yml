@@ -1,0 +1,73 @@
+spring:
+
+# db
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+    show-sql: true
+    database: mysql
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: false
+
+# cloud
+cloud:
+  aws:
+    credentials:
+      access-key: access-key
+      secret-key: access-key
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      bucket: solid-connection-uploaded
+      url:
+        default: default-url
+        uploaded: uploaded-url
+    cloudFront:
+      url:
+        default: default-url
+        uploaded: uploaded-url
+
+# variable
+view:
+  count:
+    scheduling:
+      delay: 3000
+oauth:
+  apple:
+    token-url: "https://appleid.apple.com/auth/token"
+    client-secret-audience-url: "https://appleid.apple.com"
+    public-key-url: "https://appleid.apple.com/auth/keys"
+    client-id: client-id
+    team-id: team-id
+    key-id: key-id
+    redirect-url: "https://localhost:8080/auth/apple"
+    secret-key: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAfGIQ3TtNYAZG7i3m72odmdhfymkM9wAFg2rEL2RKUEA== # base64 encoded 된 임의의 값
+kakao:
+    redirect-url: "http://localhost:8080/auth/kakao"
+    client-id: client-id
+    token-url: "https://kauth.kakao.com/oauth/token"
+    user-info_url: "https://kapi.kakao.com/v2/user/me"
+sentry:
+  environment: test
+  dsn: "https://test-public-key@sentry.test-domain.io/123456"
+  send-default-pii: true
+  traces-sample-rate: 1.0
+  exception-resolver-order: -2147483647
+university:
+  term: 2024-1
+jwt:
+  secret:
+    1234567-1234-1234-1234-12345678901
+cors:
+  allowed-origins:
+    - "http://localhost:8080"

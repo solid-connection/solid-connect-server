@@ -6,6 +6,7 @@ import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.custom.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +33,13 @@ public class ApplicationController {
             @AuthorizedUser SiteUser siteUser,
             @Valid @RequestBody ApplyRequest applyRequest
     ) {
-        boolean result = applicationSubmissionService.apply(siteUser, applyRequest);
+        ApplicationSubmissionResponse applicationSubmissionResponse = applicationSubmissionService.apply(siteUser, applyRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApplicationSubmissionResponse(result));
+                .body(applicationSubmissionResponse);
     }
 
+    @RequireAdminAccess
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
             @AuthorizedUser SiteUser siteUser,

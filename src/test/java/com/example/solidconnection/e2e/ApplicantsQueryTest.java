@@ -105,7 +105,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/applications")
+                .get("/applications/competitors")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -119,30 +119,24 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                         List.of(ApplicantResponse.of(사용자1_지원정보, false))),
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
                         List.of(ApplicantResponse.of(나의_지원정보, true))),
-                UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자2_지원정보, false))),
-                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                        List.of())
         ));
         assertThat(secondChoiceApplicants).containsAnyElementsOf(List.of(
                 UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                        List.of(ApplicantResponse.of(나의_지원정보, true))),
+                        List.of(ApplicantResponse.of(나의_지원정보, false))),
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                        List.of(ApplicantResponse.of(사용자1_지원정보, false))),
-                UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false))),
-                UniversityApplicantsResponse.of(그라츠대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자2_지원정보, false)))
+                        List.of(ApplicantResponse.of(사용자1_지원정보, true))),
+                UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
+                        List.of())
         ));
         assertThat(thirdChoiceApplicants).containsAnyElementsOf(List.of(
+                UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                        List.of()),
+                UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                        List.of()),
                 UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
-                        List.of(ApplicantResponse.of(나의_지원정보, true))),
-                UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                        List.of(ApplicantResponse.of(사용자2_지원정보, false))),
-                UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자1_지원정보, false))),
-                UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))
+                        List.of(ApplicantResponse.of(나의_지원정보, true)))
         ));
     }
 
@@ -151,7 +145,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/applications?region=" + 영미권.getCode())
+                .get("/applications/competitors?region=" + 영미권.getCode())
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);
@@ -163,60 +157,14 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
                 UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                         List.of(ApplicantResponse.of(사용자1_지원정보, false))),
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                        List.of(ApplicantResponse.of(나의_지원정보, true))),
-                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false)))));
+                        List.of(ApplicantResponse.of(나의_지원정보, true)))
+        ));
         assertThat(secondChoiceApplicants).containsAnyElementsOf(List.of(
                 UniversityApplicantsResponse.of(괌대학_A_지원_정보,
                         List.of(ApplicantResponse.of(나의_지원정보, true))),
                 UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                        List.of(ApplicantResponse.of(사용자1_지원정보, false)))));
-    }
-
-    @Test
-    void 대학_국문_이름으로_필터링해서_지원자를_조회한다() {
-        ApplicationsResponse response = RestAssured.given().log().all()
-                .header("Authorization", "Bearer " + accessToken)
-                .when().log().all()
-                .get("/applications?keyword=라")
-                .then().log().all()
-                .statusCode(200)
-                .extract().as(ApplicationsResponse.class);
-
-        List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
-        List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
-
-        assertThat(firstChoiceApplicants).containsExactlyInAnyOrder(
-                UniversityApplicantsResponse.of(그라츠대학_지원_정보, List.of()),
-                UniversityApplicantsResponse.of(그라츠공과대학_지원_정보, List.of()),
-                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false))));
-        assertThat(secondChoiceApplicants).containsAnyElementsOf(List.of(
-                UniversityApplicantsResponse.of(그라츠대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자2_지원정보, false))),
-                UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자3_지원정보, false))),
-                UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보, List.of())));
-    }
-
-    @Test
-    void 국가_국문_이름으로_필터링해서_지원자를_조회한다() {
-        ApplicationsResponse response = RestAssured.given().log().all()
-                .header("Authorization", "Bearer " + accessToken)
-                .when().log().all()
-                .get("/applications?keyword=일본")
-                .then().log().all()
-                .statusCode(200)
-                .extract().as(ApplicationsResponse.class);
-
-        List<UniversityApplicantsResponse> firstChoiceApplicants = response.firstChoice();
-        List<UniversityApplicantsResponse> secondChoiceApplicants = response.secondChoice();
-
-        assertThat(firstChoiceApplicants).containsExactlyInAnyOrder(
-                UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                        List.of(ApplicantResponse.of(사용자2_지원정보, false))));
-        assertThat(secondChoiceApplicants).containsExactlyInAnyOrder(
-                UniversityApplicantsResponse.of(메이지대학_지원_정보, List.of()));
+                        List.of(ApplicantResponse.of(사용자1_지원정보, false)))
+        ));
     }
 
     @Test
@@ -224,7 +172,7 @@ class ApplicantsQueryTest extends UniversityDataSetUpEndToEndTest {
         ApplicationsResponse response = RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when().log().all()
-                .get("/applications")
+                .get("/applications/competitors")
                 .then().log().all()
                 .statusCode(200)
                 .extract().as(ApplicationsResponse.class);

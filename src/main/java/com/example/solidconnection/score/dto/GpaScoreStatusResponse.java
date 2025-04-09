@@ -1,8 +1,20 @@
 package com.example.solidconnection.score.dto;
 
-import java.util.List;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.type.VerifyStatus;
 
 public record GpaScoreStatusResponse(
-        List<GpaScoreStatus> gpaScoreStatusList
+        long id,
+        GpaResponse gpaResponse,
+        VerifyStatus verifyStatus,
+        String rejectedReason
 ) {
+    public static GpaScoreStatusResponse from(GpaScore gpaScore) {
+        return new GpaScoreStatusResponse(
+                gpaScore.getId(),
+                GpaResponse.from(gpaScore.getGpa()),
+                gpaScore.getVerifyStatus(),
+                gpaScore.getRejectedReason()
+        );
+    }
 }

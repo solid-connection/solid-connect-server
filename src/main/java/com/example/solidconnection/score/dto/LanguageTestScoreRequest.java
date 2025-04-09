@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record LanguageTestScoreRequest(
+
         @NotNull(message = "어학 종류를 입력해주세요.")
         LanguageTestType languageTestType,
 
