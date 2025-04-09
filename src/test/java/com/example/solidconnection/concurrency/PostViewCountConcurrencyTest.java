@@ -8,7 +8,6 @@ import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -67,10 +66,8 @@ public class PostViewCountConcurrencyTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
     }
 
@@ -118,7 +115,7 @@ public class PostViewCountConcurrencyTest {
             System.err.println("ExecutorService did not terminate in the expected time.");
         }
 
-        Thread.sleep(SCHEDULING_DELAY_MS+1000);
+        Thread.sleep(SCHEDULING_DELAY_MS + 1000);
 
         assertEquals(THREAD_NUMS, postRepository.getById(post.getId()).getViewCount());
     }
@@ -164,7 +161,7 @@ public class PostViewCountConcurrencyTest {
             System.err.println("ExecutorService did not terminate in the expected time.");
         }
 
-        Thread.sleep(SCHEDULING_DELAY_MS+1000);
+        Thread.sleep(SCHEDULING_DELAY_MS + 1000);
 
         assertEquals(2L, postRepository.getById(post.getId()).getViewCount());
     }

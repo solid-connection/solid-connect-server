@@ -9,7 +9,6 @@ import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -68,7 +67,6 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(testUser.getRole()),
-                () -> assertThat(response.birth()).isEqualTo(testUser.getBirth()),
                 () -> assertThat(response.email()).isEqualTo(testUser.getEmail()),
                 () -> assertThat(response.likedPostCount()).isEqualTo(testUser.getPostLikeList().size()),
                 () -> assertThat(response.likedUniversityCount()).isEqualTo(likedUniversityCount)
@@ -206,10 +204,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
@@ -219,10 +215,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "test@example.com",
                 "nickname",
                 "profile/profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
@@ -232,10 +226,8 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 "duplicated@example.com",
                 "duplicatedNickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         siteUserRepository.save(siteUser);
     }

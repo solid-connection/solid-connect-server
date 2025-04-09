@@ -3,7 +3,6 @@ package com.example.solidconnection.siteuser.repository;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.TestContainerDataJpaTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.Nested;
@@ -52,10 +51,8 @@ class SiteUserRepositoryTest {
                 email,
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
-                Gender.MALE,
                 authType
         );
     }
