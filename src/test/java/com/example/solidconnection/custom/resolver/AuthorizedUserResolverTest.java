@@ -7,7 +7,6 @@ import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,10 +95,8 @@ class AuthorizedUserResolverTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }

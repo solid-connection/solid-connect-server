@@ -7,7 +7,6 @@ import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
@@ -144,10 +143,8 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
