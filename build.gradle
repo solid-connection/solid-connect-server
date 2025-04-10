@@ -21,58 +21,54 @@ repositories {
     mavenCentral()
 }
 
-dependencies {//todo: 안쓰는 의존성이나 deprecated된 의존성 제거
+dependencies {
+    // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // DataBase
+    implementation 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.mysql:mysql-connector-j:8.2.0'
-    implementation 'org.hibernate:hibernate-core:6.3.0.CR1'
-    implementation 'org.springframework.data:spring-data-redis:3.1.2'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+
+    // QueryDSL
+    implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.11'
+    annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:6.11:jpa'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
+    // Security
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    implementation 'org.springframework.security:spring-security-core:6.1.2'
-    implementation 'org.springframework.security:spring-security-config:6.1.2'
-    implementation 'org.springframework.security:spring-security-web:6.1.2'
-    implementation 'io.lettuce:lettuce-core:6.2.5.RELEASE'
-    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.470'
-    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
-    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    runtimeOnly 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359' // for jjwt
+
+    // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.5.0'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.26'
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-core:3.3.3'
-
-    // Testcontainers
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mysql'
 
-    annotationProcessor(
-            'com.querydsl:querydsl-apt:5.0.0:jakarta',
-            'jakarta.persistence:jakarta.persistence-api:3.1.0',
-            'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    )
-
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-mysql'
+    // Etc
+    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
+// To include QueryDLS classes in compile classpath
 sourceSets {
     main.java.srcDirs += ['build/generated/sources/annotationProcessor/java/main']
-}
-
-compileJava {
-    options.annotationProcessorGeneratedSourcesDirectory = file('build/generated/sources/annotationProcessor/java/main')
 }
