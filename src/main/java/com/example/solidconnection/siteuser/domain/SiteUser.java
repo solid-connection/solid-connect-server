@@ -5,7 +5,6 @@ import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import jakarta.persistence.CascadeType;
@@ -61,9 +60,6 @@ public class SiteUser {
     @Column(length = 500)
     private String profileImageUrl;
 
-    @Column(nullable = false, length = 20)
-    private String birth;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PreparationStatus preparationStage;
@@ -71,10 +67,6 @@ public class SiteUser {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
 
     @Setter
     private LocalDateTime nicknameModifiedAt;
@@ -104,17 +96,13 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            String birth,
             PreparationStatus preparationStage,
-            Role role,
-            Gender gender) {
+            Role role) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.birth = birth;
         this.preparationStage = preparationStage;
         this.role = role;
-        this.gender = gender;
         this.authType = AuthType.KAKAO;
     }
 
@@ -122,18 +110,14 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            String birth,
             PreparationStatus preparationStage,
             Role role,
-            Gender gender,
             AuthType authType) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.birth = birth;
         this.preparationStage = preparationStage;
         this.role = role;
-        this.gender = gender;
         this.authType = authType;
     }
 
@@ -142,19 +126,15 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            String birth,
             PreparationStatus preparationStage,
             Role role,
-            Gender gender,
             AuthType authType,
             String password) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.birth = birth;
         this.preparationStage = preparationStage;
         this.role = role;
-        this.gender = gender;
         this.authType = authType;
         this.password = password;
     }

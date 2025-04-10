@@ -8,7 +8,6 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import org.assertj.core.api.Assertions;
@@ -88,10 +87,8 @@ class EmailSignInServiceTest {
                 email,
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,
-                Gender.MALE,
                 AuthType.EMAIL,
                 encodedPassword
         );

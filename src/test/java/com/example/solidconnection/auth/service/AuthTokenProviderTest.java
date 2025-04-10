@@ -5,7 +5,6 @@ import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.util.JwtUtils;
@@ -28,7 +27,7 @@ class AuthTokenProviderTest {
 
     @Autowired
     private AuthTokenProvider authTokenProvider;
-    
+
     @Autowired
     private SiteUserRepository siteUserRepository;
 
@@ -37,10 +36,10 @@ class AuthTokenProviderTest {
 
     @Autowired
     private JwtProperties jwtProperties;
-    
+
     private SiteUser siteUser;
     private String subject;
-    
+
     @BeforeEach
     void setUp() {
         siteUser = createSiteUser();
@@ -50,7 +49,7 @@ class AuthTokenProviderTest {
 
     @Nested
     class 액세스_토큰을_제공한다 {
-        
+
         @Test
         void SiteUser_로_액세스_토큰을_생성한다() {
             // when
@@ -74,10 +73,10 @@ class AuthTokenProviderTest {
             assertThat(actualSubject).isEqualTo(subject);
         }
     }
-    
+
     @Nested
     class 리프레시_토큰을_제공한다 {
-        
+
         @Test
         void SiteUser_로_리프레시_토큰을_생성하고_저장한다() {
             // when
@@ -177,10 +176,8 @@ class AuthTokenProviderTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
         return siteUserRepository.save(siteUser);
     }
