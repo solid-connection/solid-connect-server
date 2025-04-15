@@ -28,5 +28,15 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+    volumes:
+      - ./logs:/var/log/spring
     depends_on:
       - redis
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./logs:/var/log/spring
