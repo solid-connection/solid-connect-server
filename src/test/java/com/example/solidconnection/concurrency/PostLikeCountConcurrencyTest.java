@@ -8,7 +8,6 @@ import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.Gender;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -64,10 +63,8 @@ class PostLikeCountConcurrencyTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                "1999-01-01",
                 PreparationStatus.CONSIDERING,
-                Role.MENTEE,
-                Gender.MALE
+                Role.MENTEE
         );
     }
 
