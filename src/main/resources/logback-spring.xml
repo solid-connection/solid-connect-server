@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <springProperty scope="context" name="activeProfile" source="spring.profiles.active"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/spring/solid-connection-server.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 매일 로그를 롤링 -->
+            <fileNamePattern>/var/log/spring/solid-connection-server.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 최근 30일 로그 보관 -->
+        </rollingPolicy>
+
+        <encoder>
+            <!-- Loki에서 읽기 좋은 logfmt 형식 (간단한 key=value 스타일) -->
+            <pattern>timestamp=%d{yyyy-MM-dd'T'HH:mm:ss.SSS} level=%-5level thread=%thread logger=%logger{36}
+                message=%msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <springProfile name="prod,stage">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+</configuration>
