@@ -21,8 +21,8 @@ loki.process "spring_labels" {
 
   stage.static_labels {
     values = {
-      "job" = "spring",
-      "service" = "backend",
+      service = "backend",
+      env = sys.env("ALLOY_ENV"),
     }
   }
 }
