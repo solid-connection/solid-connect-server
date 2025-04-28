@@ -1,4 +1,4 @@
-name: "[STAGE] Build Gradle and Deploy"
+name: "[DEV] Build Gradle and Deploy"
 
 on:
   push:
