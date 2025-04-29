@@ -18,7 +18,7 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public String generateAccessToken(SiteUser siteUser) {
-        String subject = siteUser.getId().toString();
+        String subject = getSubject(siteUser);
         return generateToken(subject, TokenType.ACCESS);
     }
 
@@ -27,7 +27,7 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public String generateAndSaveRefreshToken(SiteUser siteUser) {
-        String subject = siteUser.getId().toString();
+        String subject = getSubject(siteUser);
         String refreshToken = generateToken(subject, TokenType.REFRESH);
         return saveToken(refreshToken, TokenType.REFRESH);
     }
@@ -49,5 +49,9 @@ public class AuthTokenProvider extends TokenProvider {
 
     public String getEmail(String token) {
         return parseSubjectIgnoringExpiration(token, jwtProperties.secret());
+    }
+
+    private String getSubject(SiteUser siteUser) {
+        return siteUser.getId().toString();
     }
 }
