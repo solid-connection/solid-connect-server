@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
-
 @Component
 public class AuthTokenProvider extends TokenProvider {
 
@@ -45,10 +43,6 @@ public class AuthTokenProvider extends TokenProvider {
     public Optional<String> findBlackListToken(String subject) {
         String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject);
         return Optional.ofNullable(redisTemplate.opsForValue().get(blackListTokenKey));
-    }
-
-    public String getEmail(String token) {
-        return parseSubjectIgnoringExpiration(token, jwtProperties.secret());
     }
 
     private String getSubject(SiteUser siteUser) {
