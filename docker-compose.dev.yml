@@ -19,15 +19,15 @@ services:
       - redis
     network_mode: host
 
-  solid-connection-stage:
+  solid-connection-dev:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: solid-connection-stage
+    container_name: solid-connection-dev
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=stage
+      - SPRING_PROFILES_ACTIVE=dev
     volumes:
       - ./logs:/var/log/spring
     depends_on:
@@ -43,4 +43,4 @@ services:
       - ./logs:/var/log/spring
       - ./docs/config.alloy:/etc/alloy/config.alloy:ro
     environment:
-      - ALLOY_ENV=stage
+      - ALLOY_ENV=dev

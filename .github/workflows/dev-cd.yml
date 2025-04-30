@@ -1,8 +1,8 @@
-name: "[STAGE] Build Gradle and Deploy"
+name: "[DEV] Build Gradle and Deploy"
 
 on:
   push:
-    branches: [ "release" ]
+    branches: [ "develop" ]
   workflow_dispatch:
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
           host: ${{ secrets.STAGE_HOST }}
           username: ${{ secrets.STAGE_USERNAME }}
           key: ${{ secrets.STAGE_PRIVATE_KEY }}
-          source: "./docker-compose.stage.yml"
+          source: "./docker-compose.dev.yml"
           target: "/home/${{ secrets.STAGE_USERNAME }}/solid-connect-stage/"
 
       - name: Run docker compose
