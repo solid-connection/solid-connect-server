@@ -116,11 +116,11 @@ public class AuthController {
     public ResponseEntity<ReissueResponse> reissueToken(
             Authentication authentication
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
+        String accessToken = authentication.getCredentials().toString();
+        if (accessToken == null) {
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
         }
-        ReissueResponse reissueResponse = authService.reissue(token);
+        ReissueResponse reissueResponse = authService.reissue(accessToken);
         return ResponseEntity.ok(reissueResponse);
     }
 }
