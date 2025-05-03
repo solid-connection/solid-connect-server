@@ -9,6 +9,7 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.service.AccessToken;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
@@ -97,11 +98,10 @@ public class AuthController {
     public ResponseEntity<Void> signOut(
             Authentication authentication
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
+        if (!(authentication.getCredentials() instanceof AccessToken accessToken)) { // null or AccessToken 로 형변환 실패
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
         }
-        authService.signOut(token);
+        authService.signOut(accessToken);
         return ResponseEntity.ok().build();
     }
 
