@@ -1,22 +1,13 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
-import com.example.solidconnection.util.JwtUtils;
-import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,156 +20,104 @@ class AuthTokenProviderTest {
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    private JwtProperties jwtProperties;
-
-    private SiteUser siteUser;
-    private String subject;
+    private Subject subject;
 
     @BeforeEach
     void setUp() {
-        siteUser = createSiteUser();
-        siteUserRepository.save(siteUser);
-        subject = siteUser.getId().toString();
+        subject = new Subject("subject123");
     }
 
-    @Nested
-    class 액세스_토큰을_제공한다 {
+    @Test
+    void 액세스_토큰을_생성한다() {
+        // when
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
-        @Test
-        void SiteUser_로_액세스_토큰을_생성한다() {
-            // when
-            String token = authTokenProvider.generateAccessToken(siteUser);
-
-            // then
-            String actualSubject = JwtUtils.parseSubject(token, jwtProperties.secret());
-            assertThat(actualSubject).isEqualTo(subject);
-        }
-
-        @Test
-        void subject_로_액세스_토큰을_생성한다() {
-            // given
-            String subject = "subject123";
-
-            // when
-            String token = authTokenProvider.generateAccessToken(subject);
-
-            // then
-            String actualSubject = JwtUtils.parseSubject(token, jwtProperties.secret());
-            assertThat(actualSubject).isEqualTo(subject);
-        }
+        // then
+        String actualSubject = authTokenProvider.parseSubject(accessToken.token()).value();
+        assertThat(actualSubject).isEqualTo(subject.value());
     }
 
     @Nested
     class 리프레시_토큰을_제공한다 {
 
         @Test
-        void SiteUser_로_리프레시_토큰을_생성하고_저장한다() {
+        void 리프레시_토큰을_생성하고_저장한다() {
             // when
-            String refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
+            RefreshToken actualRefreshToken = authTokenProvider.generateAndSaveRefreshToken(subject);
 
             // then
-            String actualSubject = JwtUtils.parseSubject(refreshToken, jwtProperties.secret());
-            String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
+            String actualSubject = authTokenProvider.parseSubject(actualRefreshToken.token()).value();
+            String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+            String expectedRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
             assertAll(
-                    () -> assertThat(actualSubject).isEqualTo(subject),
-                    () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isEqualTo(refreshToken)
+                    () -> assertThat(actualSubject).isEqualTo(subject.value()),
+                    () -> assertThat(actualRefreshToken.token()).isEqualTo(expectedRefreshToken)
             );
         }
 
         @Test
-        void 저장된_리프레시_토큰을_조회한다() {
+        void 유효한_리프레시_토큰인지_확인한다() {
             // given
-            String refreshToken = "refreshToken";
-            redisTemplate.opsForValue().set(TokenType.REFRESH.addPrefix(subject), refreshToken);
+            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(subject);
+            AccessToken fakeRefreshToken = authTokenProvider.generateAccessToken(subject); // todo: issue#296
 
-            // when
-            Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
-
-            // then
-            assertThat(optionalRefreshToken.get()).isEqualTo(refreshToken);
-        }
-
-        @Test
-        void 저장되지_않은_리프레시_토큰을_조회한다() {
-            // when
-            Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
-
-            // then
-            assertThat(optionalRefreshToken).isEmpty();
+            // when, then
+            assertAll(
+                    () -> assertThat(authTokenProvider.isValidRefreshToken(refreshToken.token())).isTrue(),
+                    () -> assertThat(authTokenProvider.isValidRefreshToken(fakeRefreshToken.token())).isFalse()
+            );
         }
     }
 
     @Nested
-    class 블랙리스트_토큰을_제공한다 {
+    class 블랙리스트를_관리한다 {
 
         @Test
-        void 엑세스_토큰으로_블랙리스트_토큰을_생성하고_저장한다() {
-            // when
-            String accessToken = "accessToken";
-            String blackListToken = authTokenProvider.generateAndSaveBlackListToken(accessToken);
-
-            // then
-            String actualSubject = JwtUtils.parseSubject(blackListToken, jwtProperties.secret());
-            String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken);
-            assertAll(
-                    () -> assertThat(actualSubject).isEqualTo(accessToken),
-                    () -> assertThat(redisTemplate.opsForValue().get(blackListTokenKey)).isEqualTo(blackListToken)
-            );
-        }
-
-        @Test
-        void 저장된_블랙리스트_토큰을_조회한다() {
+        void 액세스_토큰을_블랙리스트에_추가한다() {
             // given
-            String accessToken = "accessToken";
-            String blackListToken = "token";
-            redisTemplate.opsForValue().set(TokenType.BLACKLIST.addPrefix(accessToken), blackListToken);
+            AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: issue#296
 
             // when
-            Optional<String> optionalBlackListToken = authTokenProvider.findBlackListToken(accessToken);
+            authTokenProvider.addToBlacklist(accessToken);
 
             // then
-            assertThat(optionalBlackListToken).hasValue(blackListToken);
+            String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject.value());
+            String foundBlackListToken = redisTemplate.opsForValue().get(blackListTokenKey);
+            assertThat(foundBlackListToken).isEqualTo(accessToken.token());
         }
 
+        /*
+        * todo: JwtUtils 나 TokenProvider 를 스프링 빈으로 주입받도록 변경한다. (issue#296)
+        *  - 아래 테스트 코드에서는, 내부적으로 JwtUtils.parseSubject() 메서드가 호출될 때 발생하는 예외를 피하기 위해 jwt토큰을 생성한다.
+        *  - 테스트 작성자는 예외 발생을 피하기 위해 "제대로된 jwt 토큰 생성이 필요하다"는 것을 몰라야한다.
+        *  - 따라서, JwtUtils 나 TokenProvider 를 스프링 빈으로 주입받도록 변경하고, 테스트에서 mock 을 사용하여 의존성을 끊을 필요가 있다.
+         */
         @Test
-        void 저장되지_않은_블랙리스트_토큰을_조회한다() {
-            // when
-            Optional<String> optionalBlackListToken = authTokenProvider.findBlackListToken("accessToken");
+        void 블랙리스트에_있는_토큰인지_확인한다() {
+            // given
+            AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
+            authTokenProvider.addToBlacklist(accessToken);
+            AccessToken notRegisteredAccessToken = authTokenProvider.generateAccessToken(new Subject("!"));
 
-            // then
-            assertThat(optionalBlackListToken).isEmpty();
+            // when, then
+            assertAll(
+                    () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue(),
+                    () -> assertThat(authTokenProvider.isTokenBlacklisted(notRegisteredAccessToken.token())).isFalse()
+            );
         }
     }
 
     @Test
-    void 토큰을_생성한다() {
+    void 토큰으로부터_Subject_를_추출한다() {
+        // given
+        String accessToken = authTokenProvider.generateAccessToken(subject).token();
+
         // when
-        String subject = "subject123";
-        String token = authTokenProvider.generateToken(subject, TokenType.ACCESS);
+        Subject actualSubject = authTokenProvider.parseSubject(accessToken);
 
         // then
-        String extractedSubject = Jwts.parser()
-                .setSigningKey(jwtProperties.secret())
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-        assertThat(subject).isEqualTo(extractedSubject);
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
+        assertThat(actualSubject.value()).isEqualTo(subject.value());
     }
 }
