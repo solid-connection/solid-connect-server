@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.controller;
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenResponse;
+import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
@@ -114,13 +115,9 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            Authentication authentication
+            ReissueRequest reissueRequest
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
-        }
-        ReissueResponse reissueResponse = authService.reissue(token);
+        ReissueResponse reissueResponse = authService.reissue(reissueRequest);
         return ResponseEntity.ok(reissueResponse);
     }
 }

@@ -28,19 +28,19 @@ public class JwtUtils {
         return token.substring(TOKEN_PREFIX.length());
     }
 
-    public static String parseSubjectIgnoringExpiration(String token, String secretKey) {
+    public static String parseSubject(String token, String secretKey) {
         try {
             return parseClaims(token, secretKey).getSubject();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims().getSubject();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }
     }
 
-    public static String parseSubject(String token, String secretKey) {
+    public static String parseSubjectIgnoringExpiration(String token, String secretKey) {
         try {
             return parseClaims(token, secretKey).getSubject();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getSubject();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }
