@@ -2,11 +2,11 @@ package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.Region;
-import com.example.solidconnection.support.fixture.CountryFixture;
+import com.example.solidconnection.support.fixture.CountryFixtureBuilder;
 import com.example.solidconnection.support.fixture.LanguageRequirementFixture;
-import com.example.solidconnection.support.fixture.RegionFixture;
-import com.example.solidconnection.support.fixture.UniversityFixture;
-import com.example.solidconnection.support.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.support.fixture.RegionFixtureBuilder;
+import com.example.solidconnection.support.fixture.UniversityFixtureBuilder;
+import com.example.solidconnection.support.fixture.UniversityInfoForApplyFixtureBuilder;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.University;
@@ -23,10 +23,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UniversityFixtureHelper {
 
-    private final CountryFixture countryFixture;
-    private final RegionFixture regionFixture;
-    private final UniversityFixture universityFixture;
-    private final UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private final CountryFixtureBuilder countryFixture;
+    private final RegionFixtureBuilder regionFixture;
+    private final UniversityFixtureBuilder universityFixture;
+    private final UniversityInfoForApplyFixtureBuilder universityInfoForApplyFixture;
     private final LanguageRequirementFixture languageRequirementFixture;
 
     @Value("${university.term}")
@@ -59,18 +59,17 @@ public class UniversityFixtureHelper {
         Region region = regionFixture.region()
                 .code(regionCode)
                 .koreanName(regionKoreanName)
-                .create();
+                .findOrCreate();
 
         Country country = countryFixture.country()
                 .code(countryCode)
                 .koreanName(countryKoreanName)
                 .region(region)
-                .create();
+                .findOrCreate();
 
         University university = universityFixture.university()
                 .koreanName(universityKoreanName)
                 .englishName(universityEnglishName)
-                .formatName(universityFormatName)
                 .country(country)
                 .region(region)
                 .create();

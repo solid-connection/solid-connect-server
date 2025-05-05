@@ -2,11 +2,12 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.support.fixture.UniversityInfoForApplyFixture;
 import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
-import com.example.solidconnection.university.fixture.UniversityData;
 import com.example.solidconnection.university.fixture.UniversityFixtureHelper;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
@@ -40,29 +41,32 @@ class UniversityQueryServiceTest {
     @SpyBean
     private UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
-    private UniversityData 괌대학_A;
+    private UniversityInfoForApply 괌대학_A_지원_정보;
+
+    @Autowired
+    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
     @BeforeEach
     void setUp() {
-        괌대학_A = universityFixtureHelper.괌대학_A_생성();
+        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
     }
 
     @Test
     void 대학_상세정보를_정상_조회한다() {
         // given
-        Long universityId = 괌대학_A.대학().getId();
+        Long universityId = 괌대학_A_지원_정보.getId();
 
         // when
         UniversityDetailResponse response = universityQueryService.getUniversityDetail(universityId);
 
         // then
-        assertThat(response.id()).isEqualTo(괌대학_A.대학_지원_정보().getId());
+        assertThat(response.id()).isEqualTo(괌대학_A_지원_정보.getId());
     }
 
     @Test
     void 대학_상세정보_조회시_캐시가_적용된다() {
         // given
-        Long universityId = 괌대학_A.대학().getId();
+        Long universityId = 괌대학_A_지원_정보.getId();
 
         // when
         UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(universityId);
@@ -95,7 +99,7 @@ class UniversityQueryServiceTest {
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A.대학_지원_정보())
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보)
 //                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
 //                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
 //                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
@@ -139,7 +143,7 @@ class UniversityQueryServiceTest {
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
                 .containsExactlyInAnyOrder(
-                          UniversityInfoForApplyPreviewResponse.from(괌대학_A.대학_지원_정보())
+                          UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보)
 //                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
 //                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
 //                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보)
