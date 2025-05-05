@@ -35,7 +35,7 @@ class AuthServiceTest {
     @Test
     void 로그아웃한다() {
         // given
-        AccessToken accessToken = new AccessToken("subject", "accessToken");
+        AccessToken accessToken = authTokenProvider.generateAccessToken(new Subject("subject")); // todo: #296
 
         // when
         authService.signOut(accessToken);
