@@ -59,8 +59,8 @@ class SignOutCheckFilterTest {
         // given
         String token = createToken(subject);
         request = createRequest(token);
-        String refreshTokenKey = BLACKLIST.addPrefix(token);
-        redisTemplate.opsForValue().set(refreshTokenKey, "signOut");
+        String refreshTokenKey = BLACKLIST.addPrefix(subject);
+        redisTemplate.opsForValue().set(refreshTokenKey, token);
 
         // when & then
         assertThatCode(() -> signOutCheckFilter.doFilterInternal(request, response, filterChain))
