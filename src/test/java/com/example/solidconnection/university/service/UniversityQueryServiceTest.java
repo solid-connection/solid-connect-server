@@ -8,7 +8,6 @@ import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
-import com.example.solidconnection.university.fixture.UniversityFixtureHelper;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +30,6 @@ class UniversityQueryServiceTest {
 
     @Autowired
     private UniversityQueryService universityQueryService;
-
-    @Autowired
-    private UniversityFixtureHelper universityFixtureHelper;
 
     @SpyBean
     private UniversityFilterRepository universityFilterRepository;

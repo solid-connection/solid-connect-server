@@ -2,9 +2,9 @@ package com.example.solidconnection.support.fixture;
 
 import com.example.solidconnection.entity.Region;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.test.context.TestComponent;
 
-@Component
+@TestComponent
 @RequiredArgsConstructor
 public class RegionFixture {
 

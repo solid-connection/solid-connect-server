@@ -5,9 +5,9 @@ import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.LanguageRequirementRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.test.context.TestComponent;
 
-@Component
+@TestComponent
 @RequiredArgsConstructor
 public class LanguageRequirementFixture {
 
