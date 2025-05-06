@@ -83,9 +83,9 @@ class AuthTokenProviderTest {
             authTokenProvider.addToBlacklist(accessToken);
 
             // then
-            String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject.value());
+            String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken.token());
             String foundBlackListToken = redisTemplate.opsForValue().get(blackListTokenKey);
-            assertThat(foundBlackListToken).isEqualTo(accessToken.token());
+            assertThat(foundBlackListToken).isNotNull();
         }
 
         /*

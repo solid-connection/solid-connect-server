@@ -29,11 +29,12 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
 
     /*
     * 액세스 토큰을 블랙리스트에 저장한다.
-    * - key = BLACKLIST:{subject}
-    * - value = {accessToken}
+    * - key = BLACKLIST:{accessToken}
+    * - value = "signOut" -> key 의 존재만 확인하므로, value 에는 무슨 값이 들어가도 상관없다.
     * */
     public void addToBlacklist(AccessToken accessToken) {
-        saveToken(accessToken.token(), TokenType.BLACKLIST);
+        String blackListKey = TokenType.BLACKLIST.addPrefix(accessToken.token());
+        redisTemplate.opsForValue().set(blackListKey, "signOut");
     }
 
     /*
@@ -48,17 +49,10 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
         return Objects.equals(requestedRefreshToken, foundRefreshToken);
     }
 
-    /*
-    * 블랙리스트에 등록된 토큰인지 확인한다.
-    * - 액세스 토큰의 subject 에 해당하는 블랙리스트 토큰을 조회한다.
-    * - 조회된 블랙리스트 토큰과 요청된 액세스 토큰이 같은지 비교한다.
-    */
     @Override
     public boolean isTokenBlacklisted(String accessToken) {
-        String subject = JwtUtils.parseSubject(accessToken, jwtProperties.secret());
-        String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject);
-        String foundBlackListToken = redisTemplate.opsForValue().get(blackListTokenKey);
-        return Objects.equals(accessToken, foundBlackListToken);
+        String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken);
+        return redisTemplate.hasKey(blackListTokenKey);
     }
 
     public Subject parseSubject(String token) {
