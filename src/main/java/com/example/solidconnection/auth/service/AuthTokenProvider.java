@@ -63,4 +63,8 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
     public Subject toSubject(SiteUser siteUser) {
         return new Subject(siteUser.getId().toString());
     }
+
+    public AccessToken toAccessToken(String token) {
+        return new AccessToken(parseSubject(token), token);
+    }
 }

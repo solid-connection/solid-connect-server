@@ -38,7 +38,7 @@ class AuthServiceTest {
         AccessToken accessToken = authTokenProvider.generateAccessToken(new Subject("subject")); // todo: #296
 
         // when
-        authService.signOut(accessToken);
+        authService.signOut(accessToken.token());
 
         // then
         assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue();

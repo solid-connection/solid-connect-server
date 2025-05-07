@@ -22,7 +22,8 @@ public class AuthService {
      * 로그아웃 한다.
      * - 엑세스 토큰을 블랙리스트에 추가한다.
      * */
-    public void signOut(AccessToken accessToken) {
+    public void signOut(String token) {
+        AccessToken accessToken = authTokenProvider.toAccessToken(token);
         authTokenProvider.addToBlacklist(accessToken);
     }
 
