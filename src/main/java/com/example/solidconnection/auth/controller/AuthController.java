@@ -97,11 +97,11 @@ public class AuthController {
     public ResponseEntity<Void> signOut(
             Authentication authentication
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
+        String accessToken = (String) authentication.getCredentials();
+        if (accessToken == null || accessToken.isBlank()) {
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
         }
-        authService.signOut(token);
+        authService.signOut(accessToken);
         return ResponseEntity.ok().build();
     }
 

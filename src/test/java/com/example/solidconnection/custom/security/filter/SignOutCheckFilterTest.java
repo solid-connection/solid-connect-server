@@ -55,12 +55,12 @@ class SignOutCheckFilterTest {
     }
 
     @Test
-    void 로그아웃한_토큰이면_예외를_응답한다() throws Exception {
+    void 로그아웃한_토큰이면_예외를_응답한다() {
         // given
         String token = createToken(subject);
         request = createRequest(token);
         String refreshTokenKey = BLACKLIST.addPrefix(token);
-        redisTemplate.opsForValue().set(refreshTokenKey, "signOut");
+        redisTemplate.opsForValue().set(refreshTokenKey, token);
 
         // when & then
         assertThatCode(() -> signOutCheckFilter.doFilterInternal(request, response, filterChain))
