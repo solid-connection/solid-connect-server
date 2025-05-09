@@ -97,10 +97,7 @@ public class AuthController {
     public ResponseEntity<Void> signOut(
             Authentication authentication
     ) {
-        String accessToken = (String) authentication.getCredentials();
-        if (accessToken == null || accessToken.isBlank()) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
-        }
+        String accessToken = getAccessToken(authentication);
         authService.signOut(accessToken);
         return ResponseEntity.ok().build();
     }
@@ -108,12 +105,9 @@ public class AuthController {
     @PatchMapping("/quit")
     public ResponseEntity<Void> quit(
             @AuthorizedUser SiteUser siteUser,
-            Authentication authentication
+            Authentication authentication // todo: #299를 작업하며 인자를 (Authentication authentication)만 받도록 수정해야 함
     ) {
-        String accessToken = (String) authentication.getCredentials();
-        if (accessToken == null || accessToken.isBlank()) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
-        }
+        String accessToken = getAccessToken(authentication);
         authService.quit(siteUser, accessToken);
         return ResponseEntity.ok().build();
     }
@@ -124,5 +118,12 @@ public class AuthController {
     ) {
         ReissueResponse reissueResponse = authService.reissue(reissueRequest);
         return ResponseEntity.ok(reissueResponse);
+    }
+
+    private String getAccessToken(Authentication authentication) {
+        if (authentication == null || !(authentication.getCredentials() instanceof String accessToken)) {
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "엑세스 토큰이 없습니다.");
+        }
+        return accessToken;
     }
 }
