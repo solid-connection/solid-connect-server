@@ -1,4 +1,4 @@
-package com.example.solidconnection.common.validation.validator;
+package com.example.solidconnection.admin.dto.validation;
 
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;

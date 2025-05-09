@@ -1,4 +1,4 @@
-package com.example.solidconnection.common.validation.validator;
+package com.example.solidconnection.university.dto.validation;
 
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import jakarta.validation.ConstraintViolation;
