@@ -69,6 +69,20 @@ class AuthTokenProviderTest {
                     () -> assertThat(authTokenProvider.isValidRefreshToken(fakeRefreshToken.token())).isFalse()
             );
         }
+
+        @Test
+        void 액세서_토큰에_해당하는_리프레시_토큰을_삭제한다() {
+            // given
+            authTokenProvider.generateAndSaveRefreshToken(subject);
+            AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
+
+            // when
+            authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
+
+            // then
+            String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+            assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull();
+        }
     }
 
     @Nested
