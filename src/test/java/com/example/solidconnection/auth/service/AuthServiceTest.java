@@ -1,5 +1,6 @@
 package com.example.solidconnection.auth.service;
 
+import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.custom.exception.CustomException;
@@ -12,12 +13,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDate;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("인증 서비스 테스트")
 @TestContainerSpringBootTest
@@ -32,16 +35,24 @@ class AuthServiceTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     @Test
     void 로그아웃한다() {
         // given
-        AccessToken accessToken = authTokenProvider.generateAccessToken(new Subject("subject")); // todo: #296
+        Subject subject = new Subject("subject");
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
 
         // when
         authService.signOut(accessToken.token());
 
         // then
-        assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue();
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+        assertAll(
+                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+        );
     }
 
     @Test

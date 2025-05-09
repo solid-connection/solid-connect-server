@@ -24,6 +24,7 @@ public class AuthService {
      * */
     public void signOut(String token) {
         AccessToken accessToken = authTokenProvider.toAccessToken(token);
+        authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
         authTokenProvider.addToBlacklist(accessToken);
     }
 
