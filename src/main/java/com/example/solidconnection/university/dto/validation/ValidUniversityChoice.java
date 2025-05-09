@@ -1,6 +1,5 @@
-package com.example.solidconnection.common.validation.annotation;
+package com.example.solidconnection.university.dto.validation;
 
-import com.example.solidconnection.common.validation.validator.ValidUniversityChoiceValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
