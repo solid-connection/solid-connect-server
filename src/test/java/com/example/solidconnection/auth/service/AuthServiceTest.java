@@ -59,13 +59,20 @@ class AuthServiceTest {
     void 탈퇴한다() {
         // given
         SiteUser siteUser = createSiteUser();
+        Subject subject = authTokenProvider.toSubject(siteUser);
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
 
         // when
-        authService.quit(siteUser);
+        authService.quit(siteUser, accessToken.token());
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        assertThat(siteUser.getQuitedAt()).isEqualTo(tomorrow);
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+        assertAll(
+                () -> assertThat(siteUser.getQuitedAt()).isEqualTo(tomorrow),
+                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+        );
     }
 
     @Nested

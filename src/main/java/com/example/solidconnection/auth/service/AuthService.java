@@ -19,8 +19,9 @@ public class AuthService {
     private final AuthTokenProvider authTokenProvider;
 
     /*
-     * 로그아웃 한다.
+     * 로그아웃한다.
      * - 엑세스 토큰을 블랙리스트에 추가한다.
+     * - 리프레시 토큰을 삭제한다.
      * */
     public void signOut(String token) {
         AccessToken accessToken = authTokenProvider.toAccessToken(token);
@@ -32,11 +33,13 @@ public class AuthService {
      * 탈퇴한다.
      * - 탈퇴한 시점의 다음날을 탈퇴일로 잡는다.
      * - e.g. 2024-01-01 18:00 탈퇴 시, 2024-01-02 00:00 가 탈퇴일이 된다.
+     * - 로그아웃한다.
      * */
     @Transactional
-    public void quit(SiteUser siteUser) {
+    public void quit(SiteUser siteUser, String token) { // todo: #299를 작업하며 인자를 (String token)만 받도록 수정해야 함
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         siteUser.setQuitedAt(tomorrow);
+        signOut(token);
     }
 
     /*

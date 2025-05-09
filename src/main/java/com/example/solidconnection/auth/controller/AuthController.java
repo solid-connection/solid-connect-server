@@ -107,9 +107,14 @@ public class AuthController {
 
     @PatchMapping("/quit")
     public ResponseEntity<Void> quit(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser SiteUser siteUser,
+            Authentication authentication
     ) {
-        authService.quit(siteUser);
+        String accessToken = (String) authentication.getCredentials();
+        if (accessToken == null || accessToken.isBlank()) {
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
+        }
+        authService.quit(siteUser, accessToken);
         return ResponseEntity.ok().build();
     }
 
