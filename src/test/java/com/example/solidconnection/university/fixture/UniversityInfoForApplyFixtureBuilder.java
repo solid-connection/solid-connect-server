@@ -1,4 +1,4 @@
-package com.example.solidconnection.support.fixture;
+package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;

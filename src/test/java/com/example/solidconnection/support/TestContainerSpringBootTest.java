@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@ComponentScan(basePackages = "com.example.solidconnection.support.fixture")
+@ComponentScan(basePackages = "com.example.solidconnection")
 @ExtendWith({DatabaseClearExtension.class})
 @ContextConfiguration(initializers = {RedisTestContainer.class, MySQLTestContainer.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

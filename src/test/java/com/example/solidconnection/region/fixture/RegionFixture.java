@@ -1,4 +1,4 @@
-package com.example.solidconnection.support.fixture;
+package com.example.solidconnection.region.fixture;
 
 import com.example.solidconnection.entity.Region;
 import lombok.RequiredArgsConstructor;

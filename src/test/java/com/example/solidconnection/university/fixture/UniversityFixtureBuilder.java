@@ -1,4 +1,4 @@
-package com.example.solidconnection.support.fixture;
+package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.entity.Country;
 import com.example.solidconnection.entity.Region;

@@ -2,7 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.support.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;

@@ -1,5 +1,7 @@
-package com.example.solidconnection.support.fixture;
+package com.example.solidconnection.university.fixture;
 
+import com.example.solidconnection.country.fixture.CountryFixture;
+import com.example.solidconnection.region.fixture.RegionFixture;
 import com.example.solidconnection.university.domain.University;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
