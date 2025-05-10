@@ -41,6 +41,6 @@ services:
       - "12345:12345"
     volumes:
       - ./logs:/var/log/spring
-      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - ./docs/config.alloy:/etc/alloy/config.alloy:ro
     environment:
       - ALLOY_ENV=dev
