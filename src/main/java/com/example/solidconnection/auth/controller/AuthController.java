@@ -114,7 +114,7 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            ReissueRequest reissueRequest
+            @Valid @RequestBody ReissueRequest reissueRequest
     ) {
         ReissueResponse reissueResponse = authService.reissue(reissueRequest);
         return ResponseEntity.ok(reissueResponse);
