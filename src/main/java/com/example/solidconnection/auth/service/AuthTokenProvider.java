@@ -49,6 +49,12 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
         return Objects.equals(requestedRefreshToken, foundRefreshToken);
     }
 
+    public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
+        String subject = accessToken.subject().value();
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
+        redisTemplate.delete(refreshTokenKey);
+    }
+
     @Override
     public boolean isTokenBlacklisted(String accessToken) {
         String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken);
