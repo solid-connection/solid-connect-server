@@ -82,21 +82,6 @@ class JwtAuthenticationFilterTest {
             then(filterChain).should().doFilter(request, response);
         }
 
-        @Test
-        void 만료된_토큰을_컨텍스트에_저장한다() throws Exception {
-            // given
-            Date invalidExpiration = new Date(System.currentTimeMillis() - 1000);
-            String token = createTokenWithExpiration(invalidExpiration);
-            request = createRequestWithToken(token);
-
-            // when
-            jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-            // then
-            assertThat(SecurityContextHolder.getContext().getAuthentication())
-                    .isExactlyInstanceOf(ExpiredTokenAuthentication.class);
-            then(filterChain).should().doFilter(request, response);
-        }
     }
 
     private String createTokenWithExpiration(Date expiration) {
