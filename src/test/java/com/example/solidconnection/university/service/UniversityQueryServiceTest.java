@@ -2,6 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -10,7 +11,6 @@ import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewR
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,23 +37,19 @@ class UniversityQueryServiceTest {
     @SpyBean
     private UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
-    private UniversityInfoForApply 괌대학_A_지원_정보;
-
     @Autowired
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
-    @BeforeEach
-    void setUp() {
-        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-    }
+    @Autowired
+    private LanguageRequirementFixture languageRequirementFixture;
 
     @Test
     void 대학_상세정보를_정상_조회한다() {
         // given
-        Long universityId = 괌대학_A_지원_정보.getId();
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse response = universityQueryService.getUniversityDetail(universityId);
+        UniversityDetailResponse response = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.id()).isEqualTo(괌대학_A_지원_정보.getId());
@@ -62,15 +58,15 @@ class UniversityQueryServiceTest {
     @Test
     void 대학_상세정보_조회시_캐시가_적용된다() {
         // given
-        Long universityId = 괌대학_A_지원_정보.getId();
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(universityId);
-        UniversityDetailResponse secondResponse = universityQueryService.getUniversityDetail(universityId);
+        UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
+        UniversityDetailResponse secondResponse = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        then(universityInfoForApplyRepository).should(times(1)).getUniversityInfoForApplyById(universityId);
+        then(universityInfoForApplyRepository).should(times(1)).getUniversityInfoForApplyById(괌대학_A_지원_정보.getId());
     }
 
     @Test
@@ -88,6 +84,14 @@ class UniversityQueryServiceTest {
 
     @Test
     void 전체_대학을_조회한다() {
+        // given
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UniversityInfoForApply 괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
+        UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyFixture.네바다주립대학_라스베이거스_지원_정보();
+        UniversityInfoForApply 서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+        UniversityInfoForApply 그라츠대학_지원_정보 = universityInfoForApplyFixture.그라츠대학_지원_정보();
+        UniversityInfoForApply 메이지대학_지원_정보 = universityInfoForApplyFixture.메이지대학_지원_정보();
+
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of(), null, null);
@@ -95,22 +99,19 @@ class UniversityQueryServiceTest {
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보)
-//                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(그라츠공과대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(린츠_카톨릭대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
                 );
     }
 
     @Test
     void 대학_조회시_캐시가_적용된다() {
         // given
+        universityInfoForApplyFixture.괌대학_A_지원_정보();
         String regionCode = "AMERICAS";
         List<String> keywords = List.of("괌");
         LanguageTestType testType = LanguageTestType.TOEFL_IBT;
@@ -132,22 +133,28 @@ class UniversityQueryServiceTest {
 
     @Test
     void 지역으로_대학을_필터링한다() {
+        // given
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        universityInfoForApplyFixture.코펜하겐IT대학_지원_정보();
+        universityInfoForApplyFixture.그라츠공과대학_지원_정보();
+        universityInfoForApplyFixture.메이지대학_지원_정보();
+
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 "AMERICAS", List.of(), null, null);
 
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactlyInAnyOrder(
-                          UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보)
-//                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보)
-                );
+                .containsExactlyInAnyOrder(UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보));
     }
 
     @Test
     void 키워드로_대학을_필터링한다() {
+        // given
+        universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UniversityInfoForApply 그라츠대학_지원_정보 = universityInfoForApplyFixture.그라츠대학_지원_정보();
+        UniversityInfoForApply 메이지대학_지원_정보 = universityInfoForApplyFixture.메이지대학_지원_정보();
+
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of("라", "일본"), null, null);
@@ -155,34 +162,38 @@ class UniversityQueryServiceTest {
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
                 .containsExactlyInAnyOrder(
-//                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(그라츠공과대학_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
+                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
+                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
                 );
     }
 
     @Test
     void 어학시험_조건으로_대학을_필터링한다() {
+        // given
+        UniversityInfoForApply 괌대학_B_지원_정보 = languageRequirementFixture.괌대학_B_언어요구사항(universityInfoForApplyFixture.괌대학_B_지원_정보());
+        languageRequirementFixture.괌대학_A_언어요구사항(universityInfoForApplyFixture.괌대학_A_지원_정보());
+
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 null, List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
         assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactlyInAnyOrder(
-//                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-//                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보)
-                );
+                .containsExactlyInAnyOrder(UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보));
     }
 
     @Test
     void 모든_조건으로_대학을_필터링한다() {
+        // given
+        UniversityInfoForApply 서던덴마크대학교_지원_정보 = languageRequirementFixture.서던덴마크_대학_언어요구사항(universityInfoForApplyFixture.서던덴마크대학교_지원_정보());
+        languageRequirementFixture.괌대학_A_언어요구사항(universityInfoForApplyFixture.괌대학_A_지원_정보());
+
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
                 "EUROPE", List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
-        //assertThat(response.universityInfoForApplyPreviewResponses()).containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
+        assertThat(response.universityInfoForApplyPreviewResponses())
+                .containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
     }
 }
