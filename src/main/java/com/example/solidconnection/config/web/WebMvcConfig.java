@@ -2,7 +2,6 @@ package com.example.solidconnection.config.web;
 
 import com.example.solidconnection.custom.resolver.AuthorizedUserResolver;
 import com.example.solidconnection.custom.resolver.CustomPageableHandlerMethodArgumentResolver;
-import com.example.solidconnection.custom.resolver.ExpiredTokenResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -15,14 +14,12 @@ import java.util.List;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthorizedUserResolver authorizedUserResolver;
-    private final ExpiredTokenResolver expiredTokenResolver;
     private final CustomPageableHandlerMethodArgumentResolver customPageableHandlerMethodArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.addAll(List.of(
                 authorizedUserResolver,
-                expiredTokenResolver,
                 customPageableHandlerMethodArgumentResolver
         ));
     }
