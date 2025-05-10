@@ -12,7 +12,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import java.util.Date;
 
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
-import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -59,7 +58,7 @@ class JwtUtilsTest {
     }
 
     @Nested
-    class 유효한_토큰으로부터_subject_를_추출한다 {
+    class 토큰으로부터_subject_를_추출한다 {
 
         @Test
         void 유효한_토큰의_subject_를_추출한다() {
