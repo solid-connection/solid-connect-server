@@ -1,7 +1,6 @@
 package com.example.solidconnection.custom.security.filter;
 
 import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
 import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetailsService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,7 +34,7 @@ class JwtAuthenticationFilterTest {
     @Autowired
     private JwtProperties jwtProperties;
 
-    @MockBean
+    @MockBean // 이 테스트코드에서 사용자를 조회할 필요는 없으므로 MockBean 으로 대체
     private SiteUserDetailsService siteUserDetailsService;
 
     private HttpServletRequest request;
@@ -63,40 +61,20 @@ class JwtAuthenticationFilterTest {
         then(filterChain).should().doFilter(request, response);
     }
 
-    @Nested
-    class 토큰이_있으면_컨텍스트에_저장한다 {
+    @Test
+    void 토큰이_있으면_컨텍스트에_저장한다() throws Exception {
+        // given
+        Date validExpiration = new Date(System.currentTimeMillis() + 1000);
+        String token = createTokenWithExpiration(validExpiration);
+        request = createRequestWithToken(token);
 
-        @Test
-        void 유효한_토큰을_컨텍스트에_저장한다() throws Exception {
-            // given
-            Date validExpiration = new Date(System.currentTimeMillis() + 1000);
-            String token = createTokenWithExpiration(validExpiration);
-            request = createRequestWithToken(token);
+        // when
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
-            // when
-            jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-            // then
-            assertThat(SecurityContextHolder.getContext().getAuthentication())
-                    .isExactlyInstanceOf(SiteUserAuthentication.class);
-            then(filterChain).should().doFilter(request, response);
-        }
-
-        @Test
-        void 만료된_토큰을_컨텍스트에_저장한다() throws Exception {
-            // given
-            Date invalidExpiration = new Date(System.currentTimeMillis() - 1000);
-            String token = createTokenWithExpiration(invalidExpiration);
-            request = createRequestWithToken(token);
-
-            // when
-            jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-            // then
-            assertThat(SecurityContextHolder.getContext().getAuthentication())
-                    .isExactlyInstanceOf(ExpiredTokenAuthentication.class);
-            then(filterChain).should().doFilter(request, response);
-        }
+        // then
+        assertThat(SecurityContextHolder.getContext().getAuthentication())
+                .isExactlyInstanceOf(SiteUserAuthentication.class);
+        then(filterChain).should().doFilter(request, response);
     }
 
     private String createTokenWithExpiration(Date expiration) {

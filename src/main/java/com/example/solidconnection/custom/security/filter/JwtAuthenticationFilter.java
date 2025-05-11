@@ -1,7 +1,5 @@
 package com.example.solidconnection.custom.security.filter;
 
-import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.custom.security.authentication.ExpiredTokenAuthentication;
 import com.example.solidconnection.custom.security.authentication.JwtAuthentication;
 import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import jakarta.servlet.FilterChain;
@@ -18,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.util.JwtUtils.isExpired;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 
 
@@ -26,7 +23,6 @@ import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtProperties jwtProperties;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -47,9 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private JwtAuthentication createAuthentication(String token) {
-        if (isExpired(token, jwtProperties.secret())) {
-            return new ExpiredTokenAuthentication(token);
-        }
         return new SiteUserAuthentication(token);
     }
 }
