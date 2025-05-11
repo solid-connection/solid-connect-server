@@ -170,8 +170,12 @@ class UniversityQueryServiceTest {
     @Test
     void 어학시험_조건으로_대학을_필터링한다() {
         // given
-        UniversityInfoForApply 괌대학_B_지원_정보 = languageRequirementFixture.괌대학_B_언어요구사항(universityInfoForApplyFixture.괌대학_B_지원_정보());
-        languageRequirementFixture.괌대학_A_언어요구사항(universityInfoForApplyFixture.괌대학_A_지원_정보());
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        languageRequirementFixture.토플_80(괌대학_A_지원_정보);
+        languageRequirementFixture.토익_800(괌대학_A_지원_정보);
+        UniversityInfoForApply 괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
+        languageRequirementFixture.토플_70(괌대학_B_지원_정보);
+        languageRequirementFixture.토익_900(괌대학_B_지원_정보);
 
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
@@ -185,8 +189,11 @@ class UniversityQueryServiceTest {
     @Test
     void 모든_조건으로_대학을_필터링한다() {
         // given
-        UniversityInfoForApply 서던덴마크대학교_지원_정보 = languageRequirementFixture.서던덴마크_대학_언어요구사항(universityInfoForApplyFixture.서던덴마크대학교_지원_정보());
-        languageRequirementFixture.괌대학_A_언어요구사항(universityInfoForApplyFixture.괌대학_A_지원_정보());
+        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        languageRequirementFixture.토플_80(괌대학_A_지원_정보);
+        languageRequirementFixture.토익_800(괌대학_A_지원_정보);
+        UniversityInfoForApply 서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+        languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
 
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
