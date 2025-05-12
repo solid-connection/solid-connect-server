@@ -15,13 +15,13 @@ import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,17 +52,26 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @MockBean
     private S3Service s3Service;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    private SiteUser 테스트_유저;
+
+    @BeforeEach
+    void setUp() {
+        테스트_유저 = siteUserFixture.테스트_유저();
+    }
+
     @Test
     void GPA_점수_상태를_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
         List<GpaScore> scores = List.of(
-                createGpaScore(testUser, 3.5, 4.5),
-                createGpaScore(testUser, 3.8, 4.5)
+                createGpaScore(테스트_유저, 3.5, 4.5),
+                createGpaScore(테스트_유저, 3.8, 4.5)
         );
 
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(테스트_유저);
 
         // then
         assertThat(response.gpaScoreStatusResponseList())
@@ -76,11 +85,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     @Test
     void GPA_점수가_없는_경우_빈_리스트를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(테스트_유저);
 
         // then
         assertThat(response.gpaScoreStatusResponseList()).isEmpty();
@@ -89,15 +95,14 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Test
     void 어학_시험_점수_상태를_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
         List<LanguageTestScore> scores = List.of(
-                createLanguageTestScore(testUser, LanguageTestType.TOEIC, "100"),
-                createLanguageTestScore(testUser, LanguageTestType.TOEFL_IBT, "7.5")
+                createLanguageTestScore(테스트_유저, LanguageTestType.TOEIC, "100"),
+                createLanguageTestScore(테스트_유저, LanguageTestType.TOEFL_IBT, "7.5")
         );
-        siteUserRepository.save(testUser);
+        siteUserRepository.save(테스트_유저);
 
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(testUser);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(테스트_유저);
 
         // then
         assertThat(response.languageTestScoreStatusResponseList())
@@ -111,11 +116,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
 
     @Test
     void 어학_시험_점수가_없는_경우_빈_리스트를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(testUser);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(테스트_유저);
 
         // then
         assertThat(response.languageTestScoreStatusResponseList()).isEmpty();
@@ -124,14 +126,13 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Test
     void GPA_점수를_등록한다() {
         // given
-        SiteUser testUser = createSiteUser();
         GpaScoreRequest request = createGpaScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
         given(s3Service.uploadFile(file, ImgType.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitGpaScore(testUser, request, file);
+        long scoreId = scoreService.submitGpaScore(테스트_유저, request, file);
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -147,14 +148,13 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Test
     void 어학_시험_점수를_등록한다() {
         // given
-        SiteUser testUser = createSiteUser();
         LanguageTestScoreRequest request = createLanguageTestScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
         given(s3Service.uploadFile(file, ImgType.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitLanguageTestScore(testUser, request, file);
+        long scoreId = scoreService.submitLanguageTestScore(테스트_유저, request, file);
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -165,17 +165,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestReportUrl()).isEqualTo(fileUrl)
         );
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 
     private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
