@@ -2,10 +2,8 @@ package com.example.solidconnection.concurrency;
 
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,32 +20,25 @@ import java.util.concurrent.TimeUnit;
 
 @TestContainerSpringBootTest
 @DisplayName("ThunderingHerd 테스트")
-public class ThunderingHerdTest {
+class ThunderingHerdTest {
+
     @Autowired
     private ApplicationQueryService applicationQueryService;
+
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private SiteUserFixture siteUserFixture;
+
     private int THREAD_NUMS = 1000;
     private int THREAD_POOL_SIZE = 200;
     private int TIMEOUT_SECONDS = 10;
-    private SiteUser siteUser;
+    private SiteUser 테스트_유저;
 
     @BeforeEach
     public void setUp() {
-        siteUser = createSiteUser();
-        siteUserRepository.save(siteUser);
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
+        테스트_유저 = siteUserFixture.테스트_유저();
     }
 
     @Test
@@ -63,9 +54,9 @@ public class ThunderingHerdTest {
             executorService.submit(() -> {
                 try {
                     List<Runnable> tasks = Arrays.asList(
-                            () -> applicationQueryService.getApplicants(siteUser, "", ""),
-                            () -> applicationQueryService.getApplicants(siteUser, "ASIA", ""),
-                            () -> applicationQueryService.getApplicants(siteUser, "", "추오")
+                            () -> applicationQueryService.getApplicants(테스트_유저, "", ""),
+                            () -> applicationQueryService.getApplicants(테스트_유저, "ASIA", ""),
+                            () -> applicationQueryService.getApplicants(테스트_유저, "", "추오")
                     );
                     Collections.shuffle(tasks);
                     tasks.forEach(Runnable::run);
