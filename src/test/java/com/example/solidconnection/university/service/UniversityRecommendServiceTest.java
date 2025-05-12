@@ -7,10 +7,8 @@ import com.example.solidconnection.region.fixture.RegionFixture;
 import com.example.solidconnection.repositories.InterestedCountyRepository;
 import com.example.solidconnection.repositories.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
@@ -33,9 +31,6 @@ class UniversityRecommendServiceTest {
     private UniversityRecommendService universityRecommendService;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private InterestedRegionRepository interestedRegionRepository;
 
     @Autowired
@@ -43,6 +38,9 @@ class UniversityRecommendServiceTest {
 
     @Autowired
     private GeneralUniversityRecommendService generalUniversityRecommendService;
+
+    @Autowired
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
     private RegionFixture regionFixture;
@@ -53,41 +51,37 @@ class UniversityRecommendServiceTest {
     @Autowired
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
-    private SiteUser testUser;
+    private SiteUser 테스트_유저;
     private UniversityInfoForApply 괌대학_A_지원_정보;
     private UniversityInfoForApply 괌대학_B_지원_정보;
     private UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보;
     private UniversityInfoForApply 메모리얼대학_세인트존스_A_지원_정보;
     private UniversityInfoForApply 서던덴마크대학교_지원_정보;
     private UniversityInfoForApply 코펜하겐IT대학_지원_정보;
-    private UniversityInfoForApply 그라츠대학_지원_정보;
-    private UniversityInfoForApply 그라츠공과대학_지원_정보;
-    private UniversityInfoForApply 린츠_카톨릭대학_지원_정보;
-    private UniversityInfoForApply 메이지대학_지원_정보;
 
     @BeforeEach
     void setUp() {
-        testUser = createSiteUser();
+        테스트_유저 = siteUserFixture.테스트_유저();
         괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
         괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
         네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyFixture.네바다주립대학_라스베이거스_지원_정보();
         메모리얼대학_세인트존스_A_지원_정보 = universityInfoForApplyFixture.메모리얼대학_세인트존스_A_지원_정보();
         서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
         코펜하겐IT대학_지원_정보 = universityInfoForApplyFixture.코펜하겐IT대학_지원_정보();
-        그라츠대학_지원_정보 = universityInfoForApplyFixture.그라츠대학_지원_정보();
-        그라츠공과대학_지원_정보 = universityInfoForApplyFixture.그라츠공과대학_지원_정보();
-        린츠_카톨릭대학_지원_정보 = universityInfoForApplyFixture.린츠_카톨릭대학_지원_정보();
-        메이지대학_지원_정보 = universityInfoForApplyFixture.메이지대학_지원_정보();
+        universityInfoForApplyFixture.그라츠대학_지원_정보();
+        universityInfoForApplyFixture.그라츠공과대학_지원_정보();
+        universityInfoForApplyFixture.린츠_카톨릭대학_지원_정보();
+        universityInfoForApplyFixture.메이지대학_지원_정보();
         generalUniversityRecommendService.init();
     }
 
     @Test
     void 관심_지역_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedRegionRepository.save(new InterestedRegion(testUser, regionFixture.영미권()));
+        interestedRegionRepository.save(new InterestedRegion(테스트_유저, regionFixture.영미권()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -103,10 +97,10 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedCountyRepository.save(new InterestedCountry(testUser, countryFixture.덴마크()));
+        interestedCountyRepository.save(new InterestedCountry(테스트_유저, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -120,11 +114,11 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedRegionRepository.save(new InterestedRegion(testUser, regionFixture.영미권()));
-        interestedCountyRepository.save(new InterestedCountry(testUser, countryFixture.덴마크()));
+        interestedRegionRepository.save(new InterestedRegion(테스트_유저, regionFixture.영미권()));
+        interestedCountyRepository.save(new InterestedCountry(테스트_유저, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -142,7 +136,7 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -167,17 +161,5 @@ class UniversityRecommendServiceTest {
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );
-    }
-
-    // todo : 추후 Fixture로 대체 필요
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 }
