@@ -1,7 +1,7 @@
-package com.example.solidconnection.region.fixture;
+package com.example.solidconnection.location.region.fixture;
 
 import com.example.solidconnection.location.region.domain.Region;
-import com.example.solidconnection.region.repository.RegionRepositoryForTest;
+import com.example.solidconnection.location.region.repository.RegionRepositoryForTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
