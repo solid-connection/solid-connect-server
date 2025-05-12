@@ -1,6 +1,6 @@
-package com.example.solidconnection.repositories;
+package com.example.solidconnection.region.repository;
 
-import com.example.solidconnection.entity.InterestedRegion;
+import com.example.solidconnection.region.domain.InterestedRegion;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
