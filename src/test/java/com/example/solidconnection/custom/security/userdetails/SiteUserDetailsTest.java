@@ -1,10 +1,8 @@
 package com.example.solidconnection.custom.security.userdetails;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SiteUserDetailsTest {
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Test
     void 사용자_권한을_정상적으로_반환한다() {
         // given
-        SiteUser siteUser = siteUserRepository.save(createSiteUser());
-        SiteUserDetails siteUserDetails = new SiteUserDetails(siteUser);
+        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
+        SiteUserDetails siteUserDetails = new SiteUserDetails(테스트_유저);
 
         // when
         Collection<? extends GrantedAuthority> authorities = siteUserDetails.getAuthorities();
@@ -33,16 +31,6 @@ class SiteUserDetailsTest {
         // then
         assertThat(authorities)
                 .extracting("authority")
-                .containsExactly("ROLE_" + siteUser.getRole().name());
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
+                .containsExactly("ROLE_" + 테스트_유저.getRole().name());
     }
 }
