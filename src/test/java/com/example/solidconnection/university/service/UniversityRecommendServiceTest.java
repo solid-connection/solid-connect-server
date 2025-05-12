@@ -1,9 +1,9 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.entity.InterestedCountry;
-import com.example.solidconnection.entity.InterestedRegion;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
+import com.example.solidconnection.country.domain.InterestedCountry;
+import com.example.solidconnection.region.domain.InterestedRegion;
+import com.example.solidconnection.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
@@ -34,7 +34,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
     private InterestedRegionRepository interestedRegionRepository;
 
     @Autowired
-    private InterestedCountyRepository interestedCountyRepository;
+    private InterestedCountryRepository interestedCountryRepository;
 
     @Autowired
     private GeneralUniversityRecommendService generalUniversityRecommendService;
@@ -68,7 +68,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
     void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
         SiteUser testUser = createSiteUser();
-        interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
+        interestedCountryRepository.save(new InterestedCountry(testUser, 덴마크));
 
         // when
         UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);
@@ -87,7 +87,7 @@ class UniversityRecommendServiceTest extends BaseIntegrationTest {
         // given
         SiteUser testUser = createSiteUser();
         interestedRegionRepository.save(new InterestedRegion(testUser, 영미권));
-        interestedCountyRepository.save(new InterestedCountry(testUser, 덴마크));
+        interestedCountryRepository.save(new InterestedCountry(testUser, 덴마크));
 
         // when
         UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(testUser);

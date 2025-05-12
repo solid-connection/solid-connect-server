@@ -4,10 +4,10 @@ import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.auth.service.SignUpService;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.repositories.CountryRepository;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
-import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.country.repository.CountryRepository;
+import com.example.solidconnection.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -22,9 +22,9 @@ public class OAuthSignUpService extends SignUpService {
 
     OAuthSignUpService(SignInService signInService, SiteUserRepository siteUserRepository,
                        RegionRepository regionRepository, InterestedRegionRepository interestedRegionRepository,
-                       CountryRepository countryRepository, InterestedCountyRepository interestedCountyRepository,
+                       CountryRepository countryRepository, InterestedCountryRepository interestedCountryRepository,
                        OAuthSignUpTokenProvider oAuthSignUpTokenProvider) {
-        super(signInService, siteUserRepository, regionRepository, interestedRegionRepository, countryRepository, interestedCountyRepository);
+        super(signInService, siteUserRepository, regionRepository, interestedRegionRepository, countryRepository, interestedCountryRepository);
         this.oAuthSignUpTokenProvider = oAuthSignUpTokenProvider;
     }
 

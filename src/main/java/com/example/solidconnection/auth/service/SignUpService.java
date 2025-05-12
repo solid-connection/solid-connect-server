@@ -3,12 +3,12 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.entity.InterestedCountry;
-import com.example.solidconnection.entity.InterestedRegion;
-import com.example.solidconnection.repositories.CountryRepository;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
-import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.country.domain.InterestedCountry;
+import com.example.solidconnection.region.domain.InterestedRegion;
+import com.example.solidconnection.country.repository.CountryRepository;
+import com.example.solidconnection.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +31,17 @@ public abstract class SignUpService {
     protected final RegionRepository regionRepository;
     protected final InterestedRegionRepository interestedRegionRepository;
     protected final CountryRepository countryRepository;
-    protected final InterestedCountyRepository interestedCountyRepository;
+    protected final InterestedCountryRepository interestedCountryRepository;
 
     protected SignUpService(SignInService signInService, SiteUserRepository siteUserRepository,
                             RegionRepository regionRepository, InterestedRegionRepository interestedRegionRepository,
-                            CountryRepository countryRepository, InterestedCountyRepository interestedCountyRepository) {
+                            CountryRepository countryRepository, InterestedCountryRepository interestedCountryRepository) {
         this.signInService = signInService;
         this.siteUserRepository = siteUserRepository;
         this.regionRepository = regionRepository;
         this.interestedRegionRepository = interestedRegionRepository;
         this.countryRepository = countryRepository;
-        this.interestedCountyRepository = interestedCountyRepository;
+        this.interestedCountryRepository = interestedCountryRepository;
     }
 
     @Transactional
@@ -81,7 +81,7 @@ public abstract class SignUpService {
         List<InterestedCountry> interestedCountries = countryRepository.findByKoreanNames(interestedCountryNames).stream()
                 .map(country -> new InterestedCountry(savedSiteUser, country))
                 .toList();
-        interestedCountyRepository.saveAll(interestedCountries);
+        interestedCountryRepository.saveAll(interestedCountries);
     }
 
     protected abstract void validateSignUpToken(SignUpRequest signUpRequest);
