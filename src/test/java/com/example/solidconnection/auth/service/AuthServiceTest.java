@@ -5,10 +5,8 @@ import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,10 +31,10 @@ class AuthServiceTest {
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private SiteUserFixture siteUserFixture;
 
     @Test
     void 로그아웃한다() {
@@ -58,18 +56,18 @@ class AuthServiceTest {
     @Test
     void 탈퇴한다() {
         // given
-        SiteUser siteUser = createSiteUser();
-        Subject subject = authTokenProvider.toSubject(siteUser);
+        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
+        Subject subject = authTokenProvider.toSubject(테스트_유저);
         AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
 
         // when
-        authService.quit(siteUser, accessToken.token());
+        authService.quit(테스트_유저, accessToken.token());
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
         assertAll(
-                () -> assertThat(siteUser.getQuitedAt()).isEqualTo(tomorrow),
+                () -> assertThat(테스트_유저.getQuitedAt()).isEqualTo(tomorrow),
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
                 () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
         );
@@ -104,16 +102,5 @@ class AuthServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(REFRESH_TOKEN_EXPIRED.getMessage());
         }
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 }
