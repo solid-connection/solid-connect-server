@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.repository.custom;
 
-import com.example.solidconnection.country.domain.QCountry;
-import com.example.solidconnection.region.domain.QRegion;
+import com.example.solidconnection.location.country.domain.QCountry;
+import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.QUniversity;
 import com.example.solidconnection.university.domain.QUniversityInfoForApply;
