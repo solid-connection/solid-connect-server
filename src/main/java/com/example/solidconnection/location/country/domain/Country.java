@@ -1,6 +1,6 @@
-package com.example.solidconnection.country.domain;
+package com.example.solidconnection.location.country.domain;
 
-import com.example.solidconnection.region.domain.Region;
+import com.example.solidconnection.location.region.domain.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

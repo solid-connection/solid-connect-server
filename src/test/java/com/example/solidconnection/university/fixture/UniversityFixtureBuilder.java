@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.fixture;
 
-import com.example.solidconnection.country.domain.Country;
-import com.example.solidconnection.region.domain.Region;
+import com.example.solidconnection.location.country.domain.Country;
+import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;

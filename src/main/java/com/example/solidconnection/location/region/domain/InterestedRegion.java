@@ -1,4 +1,4 @@
-package com.example.solidconnection.country.domain;
+package com.example.solidconnection.location.region.domain;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class InterestedCountry {
+public class InterestedRegion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class InterestedCountry {
     private SiteUser siteUser;
 
     @ManyToOne
-    private Country country;
+    private Region region;
 
-    public InterestedCountry(SiteUser siteUser, Country country) {
+    public InterestedRegion(SiteUser siteUser, Region region) {
         this.siteUser = siteUser;
-        this.country = country;
+        this.region = region;
     }
 }

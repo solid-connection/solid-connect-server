@@ -1,9 +1,9 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.country.domain.InterestedCountry;
-import com.example.solidconnection.region.domain.InterestedRegion;
-import com.example.solidconnection.country.repository.InterestedCountryRepository;
-import com.example.solidconnection.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.location.country.domain.InterestedCountry;
+import com.example.solidconnection.location.region.domain.InterestedRegion;
+import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
