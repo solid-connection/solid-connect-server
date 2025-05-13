@@ -2,11 +2,9 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.IsLikeResponse;
@@ -38,17 +36,17 @@ class UniversityLikeServiceTest {
     private LikedUniversityRepository likedUniversityRepository;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
-    private SiteUser testUser;
+    private SiteUser 테스트_유저;
     private UniversityInfoForApply 괌대학_A_지원_정보;
 
     @BeforeEach
     void setUp() {
-        testUser = createSiteUser();
+        테스트_유저 = siteUserFixture.테스트_유저();
         괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
     }
 
@@ -58,13 +56,13 @@ class UniversityLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_등록한다() {
             // when
-            LikeResultResponse response = universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId());
+            LikeResultResponse response = universityLikeService.likeUniversity(테스트_유저, 괌대학_A_지원_정보.getId());
 
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
                     () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                            testUser, 괌대학_A_지원_정보
+                            테스트_유저, 괌대학_A_지원_정보
                     )).isPresent()
             );
         }
@@ -72,10 +70,10 @@ class UniversityLikeServiceTest {
         @Test
         void 이미_좋아요한_대학이면_예외_응답을_반환한다() {
             // given
-            saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+            saveLikedUniversity(테스트_유저, 괌대학_A_지원_정보);
 
             // when & then
-            assertThatCode(() -> universityLikeService.likeUniversity(testUser, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> universityLikeService.likeUniversity(테스트_유저, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_LIKED_UNIVERSITY.getMessage());
         }
@@ -87,16 +85,16 @@ class UniversityLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_취소한다() {
             // given
-            saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+            saveLikedUniversity(테스트_유저, 괌대학_A_지원_정보);
 
             // when
-            LikeResultResponse response = universityLikeService.cancelLikeUniversity(testUser, 괌대학_A_지원_정보.getId());
+            LikeResultResponse response = universityLikeService.cancelLikeUniversity(테스트_유저, 괌대학_A_지원_정보.getId());
 
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
                     () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
-                            testUser, 괌대학_A_지원_정보
+                            테스트_유저, 괌대학_A_지원_정보
                     )).isEmpty()
             );
         }
@@ -104,7 +102,7 @@ class UniversityLikeServiceTest {
         @Test
         void 좋아요하지_않은_대학이면_예외_응답을_반환한다() {
             // when & then
-            assertThatCode(() -> universityLikeService.cancelLikeUniversity(testUser, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> universityLikeService.cancelLikeUniversity(테스트_유저, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NOT_LIKED_UNIVERSITY.getMessage());
         }
@@ -116,7 +114,7 @@ class UniversityLikeServiceTest {
         Long invalidUniversityId = 9999L;
 
         // when & then
-        assertThatCode(() -> universityLikeService.likeUniversity(testUser, invalidUniversityId))
+        assertThatCode(() -> universityLikeService.likeUniversity(테스트_유저, invalidUniversityId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
@@ -124,10 +122,10 @@ class UniversityLikeServiceTest {
     @Test
     void 좋아요한_대학인지_확인한다() {
         // given
-        saveLikedUniversity(testUser, 괌대학_A_지원_정보);
+        saveLikedUniversity(테스트_유저, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(테스트_유저, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -136,7 +134,7 @@ class UniversityLikeServiceTest {
     @Test
     void 좋아요하지_않은_대학인지_확인한다() {
         // when
-        IsLikeResponse response = universityLikeService.getIsLiked(testUser, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = universityLikeService.getIsLiked(테스트_유저, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -148,21 +146,9 @@ class UniversityLikeServiceTest {
         Long invalidUniversityId = 9999L;
 
         // when & then
-        assertThatCode(() -> universityLikeService.getIsLiked(testUser, invalidUniversityId))
+        assertThatCode(() -> universityLikeService.getIsLiked(테스트_유저, invalidUniversityId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
-    }
-
-    // todo : 추후 Fixture로 대체 필요
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 
     private void saveLikedUniversity(SiteUser siteUser, UniversityInfoForApply universityInfoForApply) {
