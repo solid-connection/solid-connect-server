@@ -7,12 +7,14 @@ import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @TestComponent
 @RequiredArgsConstructor
 public class SiteUserFixtureBuilder {
 
     private final SiteUserRepository siteUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private String email;
     private AuthType authType;
@@ -22,7 +24,7 @@ public class SiteUserFixtureBuilder {
     private String password;
 
     public SiteUserFixtureBuilder siteUser() {
-        return new SiteUserFixtureBuilder(siteUserRepository);
+        return new SiteUserFixtureBuilder(siteUserRepository, passwordEncoder);
     }
 
     public SiteUserFixtureBuilder email(String email) {
@@ -63,7 +65,7 @@ public class SiteUserFixtureBuilder {
                 PreparationStatus.CONSIDERING,
                 role,
                 authType,
-                password
+                passwordEncoder.encode(password)
         );
         return siteUserRepository.save(siteUser);
     }

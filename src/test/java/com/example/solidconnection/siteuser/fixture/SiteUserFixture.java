@@ -5,14 +5,12 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @TestComponent
 @RequiredArgsConstructor
 public class SiteUserFixture {
 
     private final SiteUserFixtureBuilder siteUserFixtureBuilder;
-    private final PasswordEncoder passwordEncoder;
 
     public SiteUser 테스트_유저() {
         return siteUserFixtureBuilder.siteUser()
@@ -27,7 +25,7 @@ public class SiteUserFixture {
 
     public SiteUser 테스트_유저(int index, String nickname) {
         return siteUserFixtureBuilder.siteUser()
-                .email("test" + index + " @example.com")
+                .email("test" + index + "@example.com")
                 .authType(AuthType.EMAIL)
                 .nickname(nickname)
                 .profileImageUrl("profileImageUrl")
@@ -54,7 +52,7 @@ public class SiteUserFixture {
                 .nickname("테스트유저")
                 .profileImageUrl("profileImageUrl")
                 .role(Role.MENTEE)
-                .password(passwordEncoder.encode(password))
+                .password(password)
                 .create();
     }
 
