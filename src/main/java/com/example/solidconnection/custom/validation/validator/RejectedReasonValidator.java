@@ -2,7 +2,7 @@ package com.example.solidconnection.custom.validation.validator;
 
 import com.example.solidconnection.admin.dto.ScoreUpdateRequest;
 import com.example.solidconnection.custom.validation.annotation.RejectedReasonRequired;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

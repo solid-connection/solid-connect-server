@@ -13,7 +13,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.siteuser.domain.PreparationStatus;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

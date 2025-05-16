@@ -22,7 +22,7 @@ import com.example.solidconnection.s3.ImgType;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.siteuser.domain.PreparationStatus;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

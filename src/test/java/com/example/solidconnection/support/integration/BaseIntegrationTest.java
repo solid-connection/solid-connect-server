@@ -26,7 +26,7 @@ import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.siteuser.domain.PreparationStatus;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;

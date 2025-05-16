@@ -8,7 +8,7 @@ import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
