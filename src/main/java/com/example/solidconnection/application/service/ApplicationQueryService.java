@@ -6,7 +6,7 @@ import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.university.domain.University;
@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
 @RequiredArgsConstructor
 @Service

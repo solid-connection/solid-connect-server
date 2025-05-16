@@ -1,8 +1,8 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.exception.ErrorCode;
-import com.example.solidconnection.custom.response.ErrorResponse;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 
 @Component
 @RequiredArgsConstructor

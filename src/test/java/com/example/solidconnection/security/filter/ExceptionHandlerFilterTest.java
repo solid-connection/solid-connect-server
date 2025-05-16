@@ -1,8 +1,7 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.exception.ErrorCode;
-import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;

@@ -4,7 +4,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.FILE_NOT_EXIST;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
-import static com.example.solidconnection.custom.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
-import static com.example.solidconnection.custom.exception.ErrorCode.S3_CLIENT_EXCEPTION;
-import static com.example.solidconnection.custom.exception.ErrorCode.S3_SERVICE_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor

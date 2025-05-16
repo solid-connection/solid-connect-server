@@ -9,7 +9,7 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.service.AdminGpaScoreService;
 import com.example.solidconnection.admin.service.AdminLanguageTestScoreService;
-import com.example.solidconnection.custom.response.PageResponse;
+import com.example.solidconnection.common.response.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.siteuser.service;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
-import static com.example.solidconnection.custom.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 
 @RequiredArgsConstructor
 @Service

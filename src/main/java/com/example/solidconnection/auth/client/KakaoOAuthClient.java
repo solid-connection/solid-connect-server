@@ -3,7 +3,7 @@ package com.example.solidconnection.auth.client;
 import com.example.solidconnection.auth.dto.oauth.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
 import com.example.solidconnection.config.client.KakaoOAuthClientProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,9 +16,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
-import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
-import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
+import static com.example.solidconnection.common.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
+import static com.example.solidconnection.common.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
 
 /*
  * 카카오 인증을 위한 OAuth2 클라이언트

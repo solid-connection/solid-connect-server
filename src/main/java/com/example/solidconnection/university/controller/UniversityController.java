@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.controller;
 
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.university.domain.LanguageTestType;

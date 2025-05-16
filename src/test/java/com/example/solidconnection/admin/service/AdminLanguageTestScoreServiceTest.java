@@ -5,7 +5,7 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.LANGUAGE_TEST_SCORE_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.LANGUAGE_TEST_SCORE_NOT_FOUND;
 import static com.example.solidconnection.university.domain.LanguageTestType.TOEIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;

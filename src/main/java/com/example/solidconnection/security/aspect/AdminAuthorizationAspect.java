@@ -1,6 +1,6 @@
 package com.example.solidconnection.security.aspect;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_DENIED;
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 
 @Aspect

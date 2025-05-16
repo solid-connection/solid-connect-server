@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.then;

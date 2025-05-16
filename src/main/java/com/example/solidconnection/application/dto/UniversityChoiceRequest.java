@@ -1,6 +1,6 @@
 package com.example.solidconnection.application.dto;
 
-import com.example.solidconnection.custom.validation.annotation.ValidUniversityChoice;
+import com.example.solidconnection.common.validation.annotation.ValidUniversityChoice;
 
 @ValidUniversityChoice
 public record UniversityChoiceRequest(

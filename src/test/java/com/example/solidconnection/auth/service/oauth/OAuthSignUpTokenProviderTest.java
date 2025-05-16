@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.service.oauth;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.JwtUtils;
@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.solidconnection.auth.service.oauth.OAuthSignUpTokenProvider.AUTH_TYPE_CLAIM_KEY;
-import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
