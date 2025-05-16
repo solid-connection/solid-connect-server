@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.dto;
 
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 
 public record LanguageRequirementResponse(

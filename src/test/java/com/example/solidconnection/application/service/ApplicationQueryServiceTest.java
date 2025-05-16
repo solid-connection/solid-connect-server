@@ -13,7 +13,7 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.type.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import org.junit.jupiter.api.DisplayName;

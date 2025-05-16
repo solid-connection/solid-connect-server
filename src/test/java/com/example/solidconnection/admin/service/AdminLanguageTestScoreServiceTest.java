@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.LANGUAGE_TEST_SCORE_NOT_FOUND;
-import static com.example.solidconnection.type.LanguageTestType.TOEIC;
+import static com.example.solidconnection.university.domain.LanguageTestType.TOEIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;

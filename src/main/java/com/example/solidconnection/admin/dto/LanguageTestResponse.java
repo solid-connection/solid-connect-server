@@ -1,6 +1,6 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 
 public record LanguageTestResponse(
         LanguageTestType languageTestType,

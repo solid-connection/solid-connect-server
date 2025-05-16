@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.university.domain;
 
 import java.util.Comparator;
 

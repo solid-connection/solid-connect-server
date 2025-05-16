@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.university.domain;
 
 public enum SemesterAvailableForDispatch {
     ONE_SEMESTER("1개학기"),

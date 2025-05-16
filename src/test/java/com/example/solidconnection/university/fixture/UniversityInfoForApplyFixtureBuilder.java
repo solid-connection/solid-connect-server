@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.TestComponent;
 
 import java.util.HashSet;
 
-import static com.example.solidconnection.type.SemesterAvailableForDispatch.ONE_SEMESTER;
-import static com.example.solidconnection.type.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
+import static com.example.solidconnection.university.domain.SemesterAvailableForDispatch.ONE_SEMESTER;
+import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 
 @TestComponent
 @RequiredArgsConstructor
