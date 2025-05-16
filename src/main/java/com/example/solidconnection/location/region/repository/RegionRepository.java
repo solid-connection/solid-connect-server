@@ -1,6 +1,6 @@
-package com.example.solidconnection.repositories;
+package com.example.solidconnection.location.region.repository;
 
-import com.example.solidconnection.entity.Region;
+import com.example.solidconnection.location.region.domain.Region;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

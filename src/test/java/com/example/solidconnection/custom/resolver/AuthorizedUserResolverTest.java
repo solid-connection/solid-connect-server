@@ -1,6 +1,5 @@
 package com.example.solidconnection.custom.resolver;
 
-
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
