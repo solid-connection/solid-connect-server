@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
-import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;

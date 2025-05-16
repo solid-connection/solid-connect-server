@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.security.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
