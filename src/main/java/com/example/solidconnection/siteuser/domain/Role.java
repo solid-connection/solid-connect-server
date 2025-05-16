@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.siteuser.domain;
 
 public enum Role {
 

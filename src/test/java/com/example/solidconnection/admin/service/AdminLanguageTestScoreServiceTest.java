@@ -11,6 +11,8 @@ import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.type.VerifyStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.custom.security.userdetails;
 
-import com.example.solidconnection.type.Role;
+import com.example.solidconnection.siteuser.domain.Role;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;

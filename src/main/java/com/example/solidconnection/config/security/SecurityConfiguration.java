@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.example.solidconnection.type.Role.ADMIN;
+import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 
 @Configuration
 @EnableWebSecurity

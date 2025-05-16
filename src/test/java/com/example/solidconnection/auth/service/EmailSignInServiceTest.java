@@ -7,6 +7,8 @@ import com.example.solidconnection.custom.exception.ErrorCode;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
