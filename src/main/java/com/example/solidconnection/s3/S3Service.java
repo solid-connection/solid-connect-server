@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.ImgType;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,7 +17,7 @@ import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.ImgType;
+import com.example.solidconnection.s3.ImgType;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import jakarta.transaction.Transactional;

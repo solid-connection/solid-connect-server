@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.s3;
 
 import lombok.Getter;
 
