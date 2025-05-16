@@ -2,9 +2,9 @@ package com.example.solidconnection.config.security;
 
 import com.example.solidconnection.custom.exception.CustomAccessDeniedHandler;
 import com.example.solidconnection.custom.exception.CustomAuthenticationEntryPoint;
-import com.example.solidconnection.custom.security.filter.ExceptionHandlerFilter;
-import com.example.solidconnection.custom.security.filter.JwtAuthenticationFilter;
-import com.example.solidconnection.custom.security.filter.SignOutCheckFilter;
+import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
+import com.example.solidconnection.security.filter.JwtAuthenticationFilter;
+import com.example.solidconnection.security.filter.SignOutCheckFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
