@@ -3,7 +3,7 @@ package com.example.solidconnection.application.repository;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
