@@ -1,8 +1,8 @@
 package com.example.solidconnection.custom.resolver;
 
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
-import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
+import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.custom.security.provider.SiteUserAuthenticationProvider;
+import com.example.solidconnection.security.provider.SiteUserAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
