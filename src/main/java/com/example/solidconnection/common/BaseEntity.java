@@ -1,4 +1,4 @@
-package com.example.solidconnection.entity.common;
+package com.example.solidconnection.common;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
