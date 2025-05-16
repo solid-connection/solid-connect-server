@@ -1,4 +1,4 @@
-package com.example.solidconnection.service;
+package com.example.solidconnection.community.post.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +13,7 @@ import static com.example.solidconnection.community.post.service.RedisConstants.
 import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_TTL;
 
 @Service
-public class RedisService {
+public class RedisService { // todo: 정말 필요한지 고민 필요
 
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisScript<Long> incrViewCountLuaScript;

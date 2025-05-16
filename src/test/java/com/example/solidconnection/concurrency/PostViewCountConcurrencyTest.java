@@ -3,14 +3,14 @@ package com.example.solidconnection.concurrency;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.repository.BoardRepository;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.service.RedisService;
+import com.example.solidconnection.community.post.service.RedisService;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.community.post.domain.PostCategory;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
-import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.util.RedisUtils;
 import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.*;
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestContainerSpringBootTest

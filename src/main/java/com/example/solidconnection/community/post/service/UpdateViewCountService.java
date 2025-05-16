@@ -1,4 +1,4 @@
-package com.example.solidconnection.service;
+package com.example.solidconnection.community.post.service;
 
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;

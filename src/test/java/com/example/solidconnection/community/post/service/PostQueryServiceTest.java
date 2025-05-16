@@ -1,22 +1,21 @@
 package com.example.solidconnection.community.post.service;
 
 import com.example.solidconnection.community.board.domain.Board;
+import com.example.solidconnection.community.board.domain.BoardCode;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
-import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
-import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
+import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.dto.PostFindPostImageResponse;
 import com.example.solidconnection.community.post.dto.PostFindResponse;
-import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.repository.PostImageRepository;
-import com.example.solidconnection.service.RedisService;
+import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.community.board.domain.BoardCode;
-import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
