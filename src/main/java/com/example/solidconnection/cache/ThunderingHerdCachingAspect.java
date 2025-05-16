@@ -22,10 +22,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.example.solidconnection.type.RedisConstants.CREATE_CHANNEL;
-import static com.example.solidconnection.type.RedisConstants.LOCK_TIMEOUT_MS;
-import static com.example.solidconnection.type.RedisConstants.MAX_WAIT_TIME_MS;
-import static com.example.solidconnection.type.RedisConstants.REFRESH_LIMIT_PERCENT;
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.community.post.service.RedisConstants.LOCK_TIMEOUT_MS;
+import static com.example.solidconnection.community.post.service.RedisConstants.MAX_WAIT_TIME_MS;
+import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LIMIT_PERCENT;
 
 @Aspect
 @Component

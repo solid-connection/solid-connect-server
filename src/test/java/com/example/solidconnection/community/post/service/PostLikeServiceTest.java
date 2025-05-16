@@ -9,7 +9,7 @@ import com.example.solidconnection.community.post.repository.PostLikeRepository;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

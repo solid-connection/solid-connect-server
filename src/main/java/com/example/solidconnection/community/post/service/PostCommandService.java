@@ -17,7 +17,7 @@ import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.type.ImgType;
-import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;

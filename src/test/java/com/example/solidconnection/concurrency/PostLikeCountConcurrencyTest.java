@@ -8,7 +8,7 @@ import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.BeforeEach;

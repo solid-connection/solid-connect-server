@@ -4,7 +4,7 @@ import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.service.PostQueryService;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.BoardCode;
+import com.example.solidconnection.community.board.domain.BoardCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
