@@ -1,8 +1,7 @@
 package com.example.solidconnection.s3;
 
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.ImgType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

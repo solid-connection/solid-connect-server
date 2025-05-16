@@ -16,7 +16,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import static com.example.solidconnection.type.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
 
 @Configuration
 @EnableRedisRepositories

@@ -1,6 +1,6 @@
 package com.example.solidconnection.siteuser.controller;
 
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;

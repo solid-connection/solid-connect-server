@@ -1,6 +1,6 @@
 package com.example.solidconnection.score.controller;
 
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;

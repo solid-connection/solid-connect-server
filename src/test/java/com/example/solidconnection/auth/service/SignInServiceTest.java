@@ -2,12 +2,12 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
-import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.util.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

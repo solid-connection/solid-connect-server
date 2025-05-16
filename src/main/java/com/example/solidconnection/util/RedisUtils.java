@@ -11,10 +11,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.type.RedisConstants.CREATE_LOCK_PREFIX;
-import static com.example.solidconnection.type.RedisConstants.REFRESH_LOCK_PREFIX;
-import static com.example.solidconnection.type.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
-import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_LOCK_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LOCK_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PREFIX;
 
 @Component
 public class RedisUtils {

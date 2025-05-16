@@ -1,7 +1,7 @@
 package com.example.solidconnection.score.dto;
 
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 
 public record LanguageTestResponse(
         LanguageTestType languageTestType,

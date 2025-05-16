@@ -1,16 +1,16 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.country.fixture.CountryFixture;
-import com.example.solidconnection.entity.InterestedCountry;
-import com.example.solidconnection.entity.InterestedRegion;
-import com.example.solidconnection.region.fixture.RegionFixture;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
+import com.example.solidconnection.location.country.domain.InterestedCountry;
+import com.example.solidconnection.location.country.fixture.CountryFixture;
+import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
+import com.example.solidconnection.location.region.domain.InterestedRegion;
+import com.example.solidconnection.location.region.fixture.RegionFixture;
+import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;

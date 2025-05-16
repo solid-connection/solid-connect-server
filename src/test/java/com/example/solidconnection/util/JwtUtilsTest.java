@@ -1,7 +1,7 @@
 package com.example.solidconnection.util;
 
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.exception.ErrorCode;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.DisplayName;

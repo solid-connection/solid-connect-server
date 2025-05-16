@@ -1,6 +1,6 @@
 package com.example.solidconnection.scheduler;
 
-import com.example.solidconnection.service.UpdateViewCountService;
+import com.example.solidconnection.community.post.service.UpdateViewCountService;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PATTERN;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PATTERN;
 
 @RequiredArgsConstructor
 @Component
