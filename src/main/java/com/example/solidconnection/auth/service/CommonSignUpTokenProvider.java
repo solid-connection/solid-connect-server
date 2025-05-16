@@ -1,6 +1,6 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.util.JwtUtils;

@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.client;
 
 import com.example.solidconnection.auth.dto.oauth.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
-import com.example.solidconnection.config.client.KakaoOAuthClientProperties;
+import com.example.solidconnection.auth.client.config.KakaoOAuthClientProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.auth.client;
 
-import com.example.solidconnection.config.client.AppleOAuthClientProperties;
+import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

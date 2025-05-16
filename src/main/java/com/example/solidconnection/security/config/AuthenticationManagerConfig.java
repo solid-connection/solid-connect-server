@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.security;
+package com.example.solidconnection.security.config;
 
 import com.example.solidconnection.security.provider.SiteUserAuthenticationProvider;
 import lombok.RequiredArgsConstructor;

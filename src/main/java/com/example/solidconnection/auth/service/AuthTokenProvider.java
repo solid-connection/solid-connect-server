@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.util.JwtUtils;
 import org.springframework.data.redis.core.RedisTemplate;

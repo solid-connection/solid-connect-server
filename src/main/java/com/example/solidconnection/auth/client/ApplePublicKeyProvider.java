@@ -1,6 +1,6 @@
 package com.example.solidconnection.auth.client;
 
-import com.example.solidconnection.config.client.AppleOAuthClientProperties;
+import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
