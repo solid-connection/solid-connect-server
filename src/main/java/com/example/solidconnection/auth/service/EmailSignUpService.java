@@ -2,10 +2,10 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.repositories.CountryRepository;
-import com.example.solidconnection.repositories.InterestedCountyRepository;
-import com.example.solidconnection.repositories.InterestedRegionRepository;
-import com.example.solidconnection.repositories.RegionRepository;
+import com.example.solidconnection.location.country.repository.CountryRepository;
+import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
+import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;

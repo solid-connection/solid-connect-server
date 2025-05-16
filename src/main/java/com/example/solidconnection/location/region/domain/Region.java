@@ -1,4 +1,4 @@
-package com.example.solidconnection.entity;
+package com.example.solidconnection.location.region.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
