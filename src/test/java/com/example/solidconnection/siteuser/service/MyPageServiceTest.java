@@ -10,8 +10,8 @@ import com.example.solidconnection.siteuser.repository.LikedUniversityRepository
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.s3.ImgType;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import org.junit.jupiter.api.Assertions;

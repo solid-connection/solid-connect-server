@@ -5,8 +5,6 @@ import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

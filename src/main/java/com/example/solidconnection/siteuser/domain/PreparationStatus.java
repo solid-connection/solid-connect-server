@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.siteuser.domain;
 
 public enum PreparationStatus {
     CONSIDERING,             // 교환학생 지원 고민 상태

@@ -2,7 +2,7 @@ package com.example.solidconnection.siteuser.dto;
 
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.Role;
+import com.example.solidconnection.siteuser.domain.Role;
 
 public record MyPageResponse(
         String nickname,

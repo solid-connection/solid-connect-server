@@ -10,7 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_DENIED;
-import static com.example.solidconnection.type.Role.ADMIN;
+import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 
 @Aspect
 @Component
