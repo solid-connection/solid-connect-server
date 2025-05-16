@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -15,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.S3_CLIENT_EXCEPTION;
-import static com.example.solidconnection.custom.exception.ErrorCode.S3_SERVICE_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 
 @Component
 @EnableAsync

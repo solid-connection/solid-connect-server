@@ -1,13 +1,13 @@
 package com.example.solidconnection.util;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
 @Component
 public class JwtUtils {

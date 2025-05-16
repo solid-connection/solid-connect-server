@@ -5,7 +5,7 @@ import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;

@@ -6,7 +6,7 @@ import com.example.solidconnection.community.comment.dto.CommentDeleteResponse;
 import com.example.solidconnection.community.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.community.comment.service.CommentService;
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

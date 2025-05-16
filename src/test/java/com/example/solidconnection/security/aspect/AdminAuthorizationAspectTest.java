@@ -1,6 +1,6 @@
 package com.example.solidconnection.security.aspect;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.ACCESS_DENIED;
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 

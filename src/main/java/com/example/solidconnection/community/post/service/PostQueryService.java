@@ -6,7 +6,7 @@ import com.example.solidconnection.community.comment.dto.PostFindCommentResponse
 import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.board.repository.BoardRepository;
 import com.example.solidconnection.community.comment.service.CommentService;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.dto.PostFindPostImageResponse;
 import com.example.solidconnection.community.post.dto.PostFindResponse;
@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 
 @Service
 @RequiredArgsConstructor

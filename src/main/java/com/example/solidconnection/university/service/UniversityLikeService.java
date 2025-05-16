@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
-import static com.example.solidconnection.custom.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
 
 @RequiredArgsConstructor
 @Service

@@ -1,8 +1,6 @@
 package com.example.solidconnection.security.userdetails;
 
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.security.userdetails.SiteUserDetails;
-import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -16,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICATION_FAILED;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;

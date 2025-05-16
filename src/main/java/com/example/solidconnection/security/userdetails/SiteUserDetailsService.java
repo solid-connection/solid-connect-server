@@ -1,6 +1,6 @@
 package com.example.solidconnection.security.userdetails;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.AUTHENTICATION_FAILED;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_TOKEN;
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
 @Service
 @RequiredArgsConstructor

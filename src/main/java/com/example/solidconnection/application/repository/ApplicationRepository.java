@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.repository;
 
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_FOUND;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {

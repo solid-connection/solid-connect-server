@@ -11,7 +11,7 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.service.PostCommandService;
 import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.community.post.service.PostQueryService;
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

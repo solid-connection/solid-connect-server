@@ -1,7 +1,7 @@
 package com.example.solidconnection.config.security;
 
-import com.example.solidconnection.custom.exception.CustomAccessDeniedHandler;
-import com.example.solidconnection.custom.exception.CustomAuthenticationEntryPoint;
+import com.example.solidconnection.common.exception.CustomAccessDeniedHandler;
+import com.example.solidconnection.common.exception.CustomAuthenticationEntryPoint;
 import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
 import com.example.solidconnection.security.filter.JwtAuthenticationFilter;
 import com.example.solidconnection.security.filter.SignOutCheckFilter;

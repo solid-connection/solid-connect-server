@@ -1,8 +1,7 @@
 package com.example.solidconnection.security.filter;
 
 import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.security.filter.SignOutCheckFilter;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,7 +20,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;

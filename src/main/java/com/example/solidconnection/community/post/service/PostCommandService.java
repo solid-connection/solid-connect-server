@@ -10,7 +10,7 @@ import com.example.solidconnection.community.post.dto.PostDeleteResponse;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -26,11 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
-import static com.example.solidconnection.custom.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_ACCESS;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_CATEGORY;
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

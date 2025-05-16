@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.client;
 
 import com.example.solidconnection.config.client.AppleOAuthClientProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,9 +20,9 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLE_ID_TOKEN_EXPIRED;
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLE_PUBLIC_KEY_NOT_FOUND;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLE_ID_TOKEN_EXPIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLE_PUBLIC_KEY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
 import static org.apache.tomcat.util.codec.binary.Base64.decodeBase64URLSafe;
 
 /*

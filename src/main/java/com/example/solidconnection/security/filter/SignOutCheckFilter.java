@@ -1,7 +1,7 @@
 package com.example.solidconnection.security.filter;
 
 import com.example.solidconnection.auth.service.BlacklistChecker;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 
 @Component
