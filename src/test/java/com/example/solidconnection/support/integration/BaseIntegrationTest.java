@@ -23,7 +23,7 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;
@@ -41,10 +41,10 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.example.solidconnection.type.BoardCode.AMERICAS;
-import static com.example.solidconnection.type.BoardCode.ASIA;
-import static com.example.solidconnection.type.BoardCode.EUROPE;
-import static com.example.solidconnection.type.BoardCode.FREE;
+import static com.example.solidconnection.community.board.domain.BoardCode.AMERICAS;
+import static com.example.solidconnection.community.board.domain.BoardCode.ASIA;
+import static com.example.solidconnection.community.board.domain.BoardCode.EUROPE;
+import static com.example.solidconnection.community.board.domain.BoardCode.FREE;
 import static com.example.solidconnection.type.SemesterAvailableForDispatch.ONE_SEMESTER;
 import static com.example.solidconnection.type.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.type.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
-import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_TTL;
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_TTL;
 
 @Service
 public class RedisService {

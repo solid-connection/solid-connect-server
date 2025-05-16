@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.community.post.service;
 
 import lombok.Getter;
 

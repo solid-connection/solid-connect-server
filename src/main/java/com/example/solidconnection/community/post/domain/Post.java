@@ -5,7 +5,6 @@ import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.entity.common.BaseEntity;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.PostCategory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
