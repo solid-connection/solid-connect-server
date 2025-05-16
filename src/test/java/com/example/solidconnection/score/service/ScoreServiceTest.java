@@ -18,7 +18,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.s3.ImgType;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;

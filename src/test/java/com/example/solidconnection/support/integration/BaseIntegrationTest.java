@@ -22,7 +22,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.DatabaseClearExtension;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
@@ -45,8 +45,8 @@ import static com.example.solidconnection.community.board.domain.BoardCode.AMERI
 import static com.example.solidconnection.community.board.domain.BoardCode.ASIA;
 import static com.example.solidconnection.community.board.domain.BoardCode.EUROPE;
 import static com.example.solidconnection.community.board.domain.BoardCode.FREE;
-import static com.example.solidconnection.type.SemesterAvailableForDispatch.ONE_SEMESTER;
-import static com.example.solidconnection.type.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
+import static com.example.solidconnection.university.domain.SemesterAvailableForDispatch.ONE_SEMESTER;
+import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 
 @TestContainerSpringBootTest
 @ExtendWith(DatabaseClearExtension.class)

@@ -1,4 +1,4 @@
-package com.example.solidconnection.type;
+package com.example.solidconnection.university.domain;
 
 public enum TuitionFeeType {
     HOME_UNIVERSITY_PAYMENT("본교등록금납부형"),

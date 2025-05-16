@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.fixture;
 
-import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.LanguageRequirement;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;

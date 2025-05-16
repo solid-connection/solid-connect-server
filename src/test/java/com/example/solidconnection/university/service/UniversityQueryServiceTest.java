@@ -2,13 +2,13 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
+import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
+import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
 import org.junit.jupiter.api.DisplayName;

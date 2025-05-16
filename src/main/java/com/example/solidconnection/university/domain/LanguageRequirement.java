@@ -1,6 +1,5 @@
 package com.example.solidconnection.university.domain;
 
-import com.example.solidconnection.type.LanguageTestType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -2,7 +2,7 @@ package com.example.solidconnection.custom.validation.validator;
 
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.type.VerifyStatus;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

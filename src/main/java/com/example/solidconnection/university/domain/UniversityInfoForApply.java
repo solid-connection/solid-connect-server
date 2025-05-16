@@ -1,7 +1,5 @@
 package com.example.solidconnection.university.domain;
 
-import com.example.solidconnection.type.SemesterAvailableForDispatch;
-import com.example.solidconnection.type.TuitionFeeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

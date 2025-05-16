@@ -3,7 +3,7 @@ package com.example.solidconnection.university.controller;
 import com.example.solidconnection.custom.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.service.MyPageService;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
