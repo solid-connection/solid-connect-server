@@ -1,7 +1,7 @@
 package com.example.solidconnection.score.domain;
 
 import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.entity.common.BaseEntity;
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import jakarta.persistence.Column;

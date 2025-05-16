@@ -1,6 +1,6 @@
 package com.example.solidconnection.community.comment.domain;
 
-import com.example.solidconnection.entity.common.BaseEntity;
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;
