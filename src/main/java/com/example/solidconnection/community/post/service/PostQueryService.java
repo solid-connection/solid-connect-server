@@ -12,7 +12,6 @@ import com.example.solidconnection.community.post.dto.PostFindPostImageResponse;
 import com.example.solidconnection.community.post.dto.PostFindResponse;
 import com.example.solidconnection.community.post.repository.PostLikeRepository;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.community.board.domain.BoardCode;

@@ -1,6 +1,6 @@
 package com.example.solidconnection.scheduler;
 
-import com.example.solidconnection.service.UpdateViewCountService;
+import com.example.solidconnection.community.post.service.UpdateViewCountService;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

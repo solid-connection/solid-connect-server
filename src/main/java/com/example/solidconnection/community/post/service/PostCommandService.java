@@ -13,7 +13,6 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
-import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.s3.ImgType;
