@@ -1,4 +1,4 @@
-package com.example.solidconnection.s3;
+package com.example.solidconnection.s3.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

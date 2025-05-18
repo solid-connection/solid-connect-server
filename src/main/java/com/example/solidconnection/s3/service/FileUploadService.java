@@ -1,4 +1,4 @@
-package com.example.solidconnection.s3;
+package com.example.solidconnection.s3.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;

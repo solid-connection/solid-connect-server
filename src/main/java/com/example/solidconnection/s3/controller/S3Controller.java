@@ -1,6 +1,10 @@
-package com.example.solidconnection.s3;
+package com.example.solidconnection.s3.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
+import com.example.solidconnection.s3.dto.urlPrefixResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,10 +1,12 @@
-package com.example.solidconnection.s3;
+package com.example.solidconnection.s3.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
