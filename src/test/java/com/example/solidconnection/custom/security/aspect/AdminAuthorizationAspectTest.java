@@ -29,10 +29,10 @@ class AdminAuthorizationAspectTest {
     @Test
     void 어드민_사용자는_어드민_전용_메소드에_접근할_수_있다() {
         // given
-        SiteUser 테스트_어드민 = siteUserFixture.테스트_어드민();
+        SiteUser admin = siteUserFixture.관리자();
 
         // when
-        boolean response = testService.adminOnlyMethod(테스트_어드민);
+        boolean response = testService.adminOnlyMethod(admin);
 
         // then
         assertThat(response).isTrue();
@@ -53,11 +53,11 @@ class AdminAuthorizationAspectTest {
     void 어드민_어노테이션이_없는_메소드는_모두_접근_가능하다() {
         // given
         SiteUser user = siteUserFixture.사용자();
-        SiteUser 테스트_어드민 = siteUserFixture.테스트_어드민();
+        SiteUser admin = siteUserFixture.관리자();
 
         // when
         boolean menteeResponse = testService.publicMethod(user);
-        boolean adminResponse = testService.publicMethod(테스트_어드민);
+        boolean adminResponse = testService.publicMethod(admin);
 
         // then
         assertThat(menteeResponse).isTrue();

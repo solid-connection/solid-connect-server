@@ -56,11 +56,11 @@ public class SiteUserFixture {
                 .create();
     }
 
-    public SiteUser 테스트_어드민() {
+    public SiteUser 관리자() {
         return siteUserFixtureBuilder.siteUser()
                 .email("admin@example.com")
                 .authType(AuthType.EMAIL)
-                .nickname("테스트어드민")
+                .nickname("관리자")
                 .profileImageUrl("profileImageUrl")
                 .role(Role.ADMIN)
                 .password("admin123")
