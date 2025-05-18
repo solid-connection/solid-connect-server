@@ -3,13 +3,16 @@ package com.example.solidconnection.siteuser.service;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.ImgType;
+import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
@@ -58,6 +61,9 @@ class MyPageServiceTest {
 
     @Autowired
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+
+    @Autowired
+    private SiteUserFixtureBuilder siteUserFixtureBuilder;
 
     private SiteUser 테스트_유저;
 
@@ -132,7 +138,7 @@ class MyPageServiceTest {
         @Test
         void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
             // given
-            SiteUser 커스텀_프로필_테스트_유저 = siteUserFixture.커스텀_프로필_테스트_유저();
+            SiteUser 커스텀_프로필_테스트_유저 = createSiteUserWithCustomProfile();
             MockMultipartFile imageFile = createValidImageFile();
             given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
@@ -172,11 +178,10 @@ class MyPageServiceTest {
         @Test
         void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
             // given
-            SiteUser 중복_닉네임_테스트_유저 = siteUserFixture.중복_닉네임_테스트_유저();
-            MockMultipartFile imageFile = createValidImageFile();
+            SiteUser existingUser = siteUserFixture.테스트_유저(1, "existing nickname");
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(테스트_유저, imageFile,  중복_닉네임_테스트_유저.getNickname()))
+            assertThatCode(() -> myPageService.updateMyPageInfo(테스트_유저, null, existingUser.getNickname()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -221,5 +226,16 @@ class MyPageServiceTest {
                 NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
         );
         return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
+    }
+
+    public SiteUser createSiteUserWithCustomProfile() {
+        return siteUserFixtureBuilder.siteUser()
+                .email("customProfile@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname("커스텀프로필")
+                .profileImageUrl("profile/profileImageUrl")
+                .role(Role.MENTEE)
+                .password("customPassword123")
+                .create();
     }
 }

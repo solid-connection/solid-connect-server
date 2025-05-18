@@ -56,28 +56,6 @@ public class SiteUserFixture {
                 .create();
     }
 
-    public SiteUser 중복_닉네임_테스트_유저() {
-        return siteUserFixtureBuilder.siteUser()
-                .email("duplicated@example.com")
-                .authType(AuthType.EMAIL)
-                .nickname("중복닉네임")
-                .profileImageUrl("profileImageUrl")
-                .role(Role.MENTEE)
-                .password("password123")
-                .create();
-    }
-
-    public SiteUser 커스텀_프로필_테스트_유저() {
-        return siteUserFixtureBuilder.siteUser()
-                .email("customProfile@example.com")
-                .authType(AuthType.EMAIL)
-                .nickname("커스텀프로필")
-                .profileImageUrl("profile/profileImageUrl")
-                .role(Role.MENTEE)
-                .password("customPassword123")
-                .create();
-    }
-
     public SiteUser 테스트_어드민() {
         return siteUserFixtureBuilder.siteUser()
                 .email("admin@example.com")
