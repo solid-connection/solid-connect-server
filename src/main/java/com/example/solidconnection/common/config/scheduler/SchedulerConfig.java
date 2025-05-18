@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.scheduler;
+package com.example.solidconnection.common.config.scheduler;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;

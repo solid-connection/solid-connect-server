@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.sync;
+package com.example.solidconnection.common.config.sync;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

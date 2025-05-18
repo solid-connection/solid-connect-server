@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.redis;
+package com.example.solidconnection.common.config.redis;
 
 import com.example.solidconnection.cache.CacheUpdateListener;
 import org.springframework.beans.factory.annotation.Value;

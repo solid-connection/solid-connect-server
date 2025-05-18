@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.client;
+package com.example.solidconnection.common.config.client;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.example.solidconnection.config.web;
+package com.example.solidconnection.common.config.web;
 
 import com.example.solidconnection.common.resolver.AuthorizedUserResolver;
 import com.example.solidconnection.common.resolver.CustomPageableHandlerMethodArgumentResolver;
