@@ -31,8 +31,8 @@ class EmailSignInServiceTest {
         // given
         String email = "testEmail";
         String rawPassword = "testPassword";
-        SiteUser siteUser = siteUserFixture.테스트_유저(email, rawPassword);
-        EmailSignInRequest signInRequest = new EmailSignInRequest(siteUser.getEmail(), rawPassword);
+        SiteUser user = siteUserFixture.사용자(email, rawPassword);
+        EmailSignInRequest signInRequest = new EmailSignInRequest(user.getEmail(), rawPassword);
 
         // when
         SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
@@ -62,7 +62,7 @@ class EmailSignInServiceTest {
         void 비밀번호가_일치하지_않으면_예외_응답을_반환한다() {
             // given
             String email = "testEmail";
-            siteUserFixture.테스트_유저(email, "testPassword");
+            siteUserFixture.사용자(email, "testPassword");
             EmailSignInRequest signInRequest = new EmailSignInRequest(email, "틀린비밀번호");
 
             // when & then

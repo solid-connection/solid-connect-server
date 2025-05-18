@@ -34,19 +34,19 @@ class SignInServiceTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    private SiteUser 테스트_유저;
+    private SiteUser user;
     private String subject;
 
     @BeforeEach
     void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
-        subject = 테스트_유저.getId().toString();
+        user = siteUserFixture.사용자();
+        subject = user.getId().toString();
     }
 
     @Test
     void 성공적으로_로그인한다() {
         // when
-        SignInResponse signInResponse = signInService.signIn(테스트_유저);
+        SignInResponse signInResponse = signInService.signIn(user);
 
         // then
         String accessTokenSubject = JwtUtils.parseSubject(signInResponse.accessToken(), jwtProperties.secret());
@@ -61,12 +61,12 @@ class SignInServiceTest {
     @Test
     void 탈퇴한_이력이_있으면_초기화한다() {
         // given
-        테스트_유저.setQuitedAt(LocalDate.now().minusDays(1));
+        user.setQuitedAt(LocalDate.now().minusDays(1));
 
         // when
-        signInService.signIn(테스트_유저);
+        signInService.signIn(user);
 
         // then
-        assertThat(테스트_유저.getQuitedAt()).isNull();
+        assertThat(user.getQuitedAt()).isNull();
     }
 }

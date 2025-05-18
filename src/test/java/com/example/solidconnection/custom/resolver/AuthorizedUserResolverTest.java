@@ -39,8 +39,8 @@ class AuthorizedUserResolverTest {
     @Test
     void security_context_에_저장된_인증된_사용자를_반환한다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
-        Authentication authentication = createAuthenticationWithUser(테스트_유저);
+        SiteUser user = siteUserFixture.사용자();
+        Authentication authentication = createAuthenticationWithUser(user);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         MethodParameter parameter = mock(MethodParameter.class);
@@ -52,7 +52,7 @@ class AuthorizedUserResolverTest {
         SiteUser resolveSiteUser = (SiteUser) authorizedUserResolver.resolveArgument(parameter, null, null, null);
 
         // then
-        assertThat(resolveSiteUser).isEqualTo(테스트_유저);
+        assertThat(resolveSiteUser).isEqualTo(user);
     }
 
     @Nested

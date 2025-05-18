@@ -51,7 +51,7 @@ class UniversityRecommendServiceTest {
     @Autowired
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
-    private SiteUser 테스트_유저;
+    private SiteUser user;
     private UniversityInfoForApply 괌대학_A_지원_정보;
     private UniversityInfoForApply 괌대학_B_지원_정보;
     private UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보;
@@ -61,7 +61,7 @@ class UniversityRecommendServiceTest {
 
     @BeforeEach
     void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
+        user = siteUserFixture.사용자();
         괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
         괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
         네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyFixture.네바다주립대학_라스베이거스_지원_정보();
@@ -78,10 +78,10 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_지역_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedRegionRepository.save(new InterestedRegion(테스트_유저, regionFixture.영미권()));
+        interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -97,10 +97,10 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedCountyRepository.save(new InterestedCountry(테스트_유저, countryFixture.덴마크()));
+        interestedCountyRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -114,11 +114,11 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedRegionRepository.save(new InterestedRegion(테스트_유저, regionFixture.영미권()));
-        interestedCountyRepository.save(new InterestedCountry(테스트_유저, countryFixture.덴마크()));
+        interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
+        interestedCountyRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
@@ -136,7 +136,7 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(테스트_유저);
+        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())

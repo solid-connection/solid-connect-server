@@ -47,12 +47,12 @@ class AdminGpaScoreServiceTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        SiteUser 테스트_유저_1 = siteUserFixture.테스트_유저(1, "test1");
-        SiteUser 테스트_유저_2 = siteUserFixture.테스트_유저(2, "test2");
-        SiteUser 테스트_유저_3 = siteUserFixture.테스트_유저(3, "test3");
-        gpaScore3 = createGpaScore(테스트_유저_3, VerifyStatus.REJECTED);
-        gpaScore2 = createGpaScore(테스트_유저_2, VerifyStatus.PENDING);
-        gpaScore1 = createGpaScore(테스트_유저_1, VerifyStatus.PENDING);
+        SiteUser user1 = siteUserFixture.사용자(1, "test1");
+        SiteUser user2 = siteUserFixture.사용자(2, "test2");
+        SiteUser user3 = siteUserFixture.사용자(3, "test3");
+        gpaScore3 = createGpaScore(user3, VerifyStatus.REJECTED);
+        gpaScore2 = createGpaScore(user2, VerifyStatus.PENDING);
+        gpaScore1 = createGpaScore(user1, VerifyStatus.PENDING);
     }
 
     @Nested

@@ -38,11 +38,11 @@ class SiteUserAuthenticationProviderTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
+        user = siteUserFixture.사용자();
     }
 
     @Test
@@ -61,7 +61,7 @@ class SiteUserAuthenticationProviderTest {
     @Test
     void 유효한_토큰이면_정상적으로_인증_정보를_반환한다() {
         // given
-        String token = createValidToken(테스트_유저.getId());
+        String token = createValidToken(user.getId());
         SiteUserAuthentication auth = new SiteUserAuthentication(token);
 
         // when
@@ -103,7 +103,7 @@ class SiteUserAuthenticationProviderTest {
         @Test
         void 유효한_토큰이지만_해당되는_사용자가_없으면_예외_응답을_반환한다() {
             // given
-            long notExistingUserId = 테스트_유저.getId() + 100;
+            long notExistingUserId = user.getId() + 100;
             String token = createValidToken(notExistingUserId);
             SiteUserAuthentication auth = new SiteUserAuthentication(token);
 
@@ -125,7 +125,7 @@ class SiteUserAuthenticationProviderTest {
 
     private String createExpiredToken() {
         return Jwts.builder()
-                .setSubject(String.valueOf(테스트_유저.getId()))
+                .setSubject(String.valueOf(user.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() - 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())

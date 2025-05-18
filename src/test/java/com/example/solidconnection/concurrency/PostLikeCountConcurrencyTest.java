@@ -52,14 +52,14 @@ class PostLikeCountConcurrencyTest {
 
     private Post post;
     private Board board;
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
         board = createBoard();
         boardRepository.save(board);
-        테스트_유저 = siteUserFixture.테스트_유저();
-        post = createPost(board, 테스트_유저);
+        user = siteUserFixture.사용자();
+        post = createPost(board, user);
         postRepository.save(post);
     }
 

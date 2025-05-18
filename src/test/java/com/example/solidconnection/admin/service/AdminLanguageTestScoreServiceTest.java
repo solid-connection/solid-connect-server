@@ -48,12 +48,12 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        SiteUser 테스트_유저_1 = siteUserFixture.테스트_유저(1, "test1");
-        SiteUser 테스트_유저_2 = siteUserFixture.테스트_유저(2, "test2");
-        SiteUser 테스트_유저_3 = siteUserFixture.테스트_유저(3, "test3");
-        languageTestScore3 = createLanguageTestScore(테스트_유저_3, VerifyStatus.REJECTED);
-        languageTestScore2 = createLanguageTestScore(테스트_유저_2, VerifyStatus.PENDING);
-        languageTestScore1 = createLanguageTestScore(테스트_유저_1, VerifyStatus.PENDING);
+        SiteUser user1 = siteUserFixture.사용자(1, "test1");
+        SiteUser user2 = siteUserFixture.사용자(2, "test2");
+        SiteUser user3 = siteUserFixture.사용자(3, "test3");
+        languageTestScore3 = createLanguageTestScore(user3, VerifyStatus.REJECTED);
+        languageTestScore2 = createLanguageTestScore(user2, VerifyStatus.PENDING);
+        languageTestScore1 = createLanguageTestScore(user1, VerifyStatus.PENDING);
     }
 
     @Nested

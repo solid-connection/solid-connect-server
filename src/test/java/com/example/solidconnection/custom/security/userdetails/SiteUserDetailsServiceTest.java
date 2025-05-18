@@ -34,8 +34,8 @@ class SiteUserDetailsServiceTest {
     @Test
     void 사용자_인증_정보를_반환한다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
-        String username = getUserName(테스트_유저);
+        SiteUser user = siteUserFixture.사용자();
+        String username = getUserName(user);
 
         // when
         SiteUserDetails userDetails = (SiteUserDetails) userDetailsService.loadUserByUsername(username);
@@ -43,7 +43,7 @@ class SiteUserDetailsServiceTest {
         // then
         assertAll(
                 () -> assertThat(userDetails.getUsername()).isEqualTo(username),
-                () -> assertThat(userDetails.getSiteUser()).extracting("id").isEqualTo(테스트_유저.getId())
+                () -> assertThat(userDetails.getSiteUser()).extracting("id").isEqualTo(user.getId())
         );
     }
 
@@ -75,10 +75,10 @@ class SiteUserDetailsServiceTest {
         @Test
         void 탈퇴한_사용자이면_예외_응답을_반환한다() {
             // given
-            SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
-            테스트_유저.setQuitedAt(LocalDate.now());
-            siteUserRepository.save(테스트_유저);
-            String username = getUserName(테스트_유저);
+            SiteUser user = siteUserFixture.사용자();
+            user.setQuitedAt(LocalDate.now());
+            siteUserRepository.save(user);
+            String username = getUserName(user);
 
             // when & then
             assertThatCode(() -> userDetailsService.loadUserByUsername(username))

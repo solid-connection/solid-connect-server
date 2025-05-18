@@ -22,11 +22,11 @@ class SiteUserServiceTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
+        user = siteUserFixture.사용자();
     }
 
     @Nested
@@ -35,7 +35,7 @@ class SiteUserServiceTest {
         @Test
         void 존재하는_닉네임이면_true를_반환한다() {
             // when
-            NicknameExistsResponse response = siteUserService.checkNicknameExists(테스트_유저.getNickname());
+            NicknameExistsResponse response = siteUserService.checkNicknameExists(user.getNickname());
 
             // then
             assertThat(response.exists()).isTrue();

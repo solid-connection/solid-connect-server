@@ -22,8 +22,8 @@ class SiteUserDetailsTest {
     @Test
     void 사용자_권한을_정상적으로_반환한다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
-        SiteUserDetails siteUserDetails = new SiteUserDetails(테스트_유저);
+        SiteUser user = siteUserFixture.사용자();
+        SiteUserDetails siteUserDetails = new SiteUserDetails(user);
 
         // when
         Collection<? extends GrantedAuthority> authorities = siteUserDetails.getAuthorities();
@@ -31,6 +31,6 @@ class SiteUserDetailsTest {
         // then
         assertThat(authorities)
                 .extracting("authority")
-                .containsExactly("ROLE_" + 테스트_유저.getRole().name());
+                .containsExactly("ROLE_" + user.getRole().name());
     }
 }

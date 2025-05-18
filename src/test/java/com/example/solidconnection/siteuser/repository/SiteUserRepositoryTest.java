@@ -26,20 +26,20 @@ class SiteUserRepositoryTest {
         @Test
         void 이메일과_인증_유형이_동일한_사용자를_저장하면_예외_응답을_반환한다() {
             // given
-            siteUserFixture.테스트_유저("email", AuthType.KAKAO);
+            siteUserFixture.사용자("email", AuthType.KAKAO);
 
             // when, then
-            assertThatCode(() -> siteUserFixture.테스트_유저("email", AuthType.KAKAO))
+            assertThatCode(() -> siteUserFixture.사용자("email", AuthType.KAKAO))
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
 
         @Test
         void 이메일이_같더라도_인증_유형이_다른_사용자는_정상_저장한다() {
             // given
-            siteUserFixture.테스트_유저("email", AuthType.KAKAO);
+            siteUserFixture.사용자("email", AuthType.KAKAO);
 
             // when, then
-            assertThatCode(() -> siteUserFixture.테스트_유저("email", AuthType.APPLE))
+            assertThatCode(() -> siteUserFixture.사용자("email", AuthType.APPLE))
                     .doesNotThrowAnyException();
         }
     }

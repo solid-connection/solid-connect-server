@@ -56,18 +56,18 @@ class AuthServiceTest {
     @Test
     void 탈퇴한다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
-        Subject subject = authTokenProvider.toSubject(테스트_유저);
+        SiteUser user = siteUserFixture.사용자();
+        Subject subject = authTokenProvider.toSubject(user);
         AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
 
         // when
-        authService.quit(테스트_유저, accessToken.token());
+        authService.quit(user, accessToken.token());
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
         assertAll(
-                () -> assertThat(테스트_유저.getQuitedAt()).isEqualTo(tomorrow),
+                () -> assertThat(user.getQuitedAt()).isEqualTo(tomorrow),
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
                 () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
         );

@@ -65,28 +65,28 @@ class MyPageServiceTest {
     @Autowired
     private SiteUserFixtureBuilder siteUserFixtureBuilder;
 
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
+        user = siteUserFixture.사용자();
     }
 
     @Test
     void 마이페이지_정보를_조회한다() {
         // given
-        int likedUniversityCount = createLikedUniversities(테스트_유저);
+        int likedUniversityCount = createLikedUniversities(user);
 
         // when
-        MyPageResponse response = myPageService.getMyPageInfo(테스트_유저);
+        MyPageResponse response = myPageService.getMyPageInfo(user);
 
         // then
         Assertions.assertAll(
-                () -> assertThat(response.nickname()).isEqualTo(테스트_유저.getNickname()),
-                () -> assertThat(response.profileImageUrl()).isEqualTo(테스트_유저.getProfileImageUrl()),
-                () -> assertThat(response.role()).isEqualTo(테스트_유저.getRole()),
-                () -> assertThat(response.email()).isEqualTo(테스트_유저.getEmail()),
-                () -> assertThat(response.likedPostCount()).isEqualTo(테스트_유저.getPostLikeList().size()),
+                () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
+                () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
+                () -> assertThat(response.role()).isEqualTo(user.getRole()),
+                () -> assertThat(response.email()).isEqualTo(user.getEmail()),
+                () -> assertThat(response.likedPostCount()).isEqualTo(user.getPostLikeList().size()),
                 () -> assertThat(response.likedUniversityCount()).isEqualTo(likedUniversityCount)
         );
     }
@@ -94,10 +94,10 @@ class MyPageServiceTest {
     @Test
     void 관심_대학교_목록을_조회한다() {
         // given
-        int likedUniversityCount = createLikedUniversities(테스트_유저);
+        int likedUniversityCount = createLikedUniversities(user);
 
         // when
-        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(테스트_유저);
+        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(user);
 
         // then
         assertThat(response).hasSize(likedUniversityCount);
@@ -115,10 +115,10 @@ class MyPageServiceTest {
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
-            myPageService.updateMyPageInfo(테스트_유저, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
-            assertThat(테스트_유저.getProfileImageUrl()).isEqualTo(expectedUrl);
+            assertThat(user.getProfileImageUrl()).isEqualTo(expectedUrl);
         }
 
         @Test
@@ -129,7 +129,7 @@ class MyPageServiceTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(테스트_유저, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
             then(s3Service).should(never()).deleteExProfile(any());
@@ -167,10 +167,10 @@ class MyPageServiceTest {
             String newNickname = "newNickname";
 
             // when
-            myPageService.updateMyPageInfo(테스트_유저, imageFile, newNickname);
+            myPageService.updateMyPageInfo(user, imageFile, newNickname);
 
             // then
-            SiteUser updatedUser = siteUserRepository.findById(테스트_유저.getId()).get();
+            SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
             assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
             assertThat(updatedUser.getNickname()).isEqualTo(newNickname);
         }
@@ -178,10 +178,10 @@ class MyPageServiceTest {
         @Test
         void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
             // given
-            SiteUser existingUser = siteUserFixture.테스트_유저(1, "existing nickname");
+            SiteUser existingUser = siteUserFixture.사용자(1, "existing nickname");
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(테스트_유저, null, existingUser.getNickname()))
+            assertThatCode(() -> myPageService.updateMyPageInfo(user, null, existingUser.getNickname()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -191,10 +191,10 @@ class MyPageServiceTest {
             // given
             MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
-            테스트_유저.setNicknameModifiedAt(modifiedAt);
+            user.setNicknameModifiedAt(modifiedAt);
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(테스트_유저, imageFile, "nickname12"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(user, imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }

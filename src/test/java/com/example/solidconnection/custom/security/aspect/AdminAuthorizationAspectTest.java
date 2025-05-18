@@ -41,10 +41,10 @@ class AdminAuthorizationAspectTest {
     @Test
     void 일반_사용자가_어드민_전용_메소드에_접근하면_예외_응답을_반환한다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
+        SiteUser user = siteUserFixture.사용자();
 
         // when & then
-        assertThatCode(() -> testService.adminOnlyMethod(테스트_유저))
+        assertThatCode(() -> testService.adminOnlyMethod(user))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ACCESS_DENIED.getMessage());
     }
@@ -52,11 +52,11 @@ class AdminAuthorizationAspectTest {
     @Test
     void 어드민_어노테이션이_없는_메소드는_모두_접근_가능하다() {
         // given
-        SiteUser 테스트_유저 = siteUserFixture.테스트_유저();
+        SiteUser user = siteUserFixture.사용자();
         SiteUser 테스트_어드민 = siteUserFixture.테스트_어드민();
 
         // when
-        boolean menteeResponse = testService.publicMethod(테스트_유저);
+        boolean menteeResponse = testService.publicMethod(user);
         boolean adminResponse = testService.publicMethod(테스트_어드민);
 
         // then

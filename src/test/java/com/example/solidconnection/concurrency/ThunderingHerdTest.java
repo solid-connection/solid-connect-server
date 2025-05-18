@@ -34,11 +34,11 @@ class ThunderingHerdTest {
     private int THREAD_NUMS = 1000;
     private int THREAD_POOL_SIZE = 200;
     private int TIMEOUT_SECONDS = 10;
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     public void setUp() {
-        테스트_유저 = siteUserFixture.테스트_유저();
+        user = siteUserFixture.사용자();
     }
 
     @Test
@@ -54,9 +54,9 @@ class ThunderingHerdTest {
             executorService.submit(() -> {
                 try {
                     List<Runnable> tasks = Arrays.asList(
-                            () -> applicationQueryService.getApplicants(테스트_유저, "", ""),
-                            () -> applicationQueryService.getApplicants(테스트_유저, "ASIA", ""),
-                            () -> applicationQueryService.getApplicants(테스트_유저, "", "추오")
+                            () -> applicationQueryService.getApplicants(user, "", ""),
+                            () -> applicationQueryService.getApplicants(user, "ASIA", ""),
+                            () -> applicationQueryService.getApplicants(user, "", "추오")
                     );
                     Collections.shuffle(tasks);
                     tasks.forEach(Runnable::run);

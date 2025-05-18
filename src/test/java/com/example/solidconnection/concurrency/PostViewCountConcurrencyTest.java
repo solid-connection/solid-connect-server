@@ -52,14 +52,14 @@ class PostViewCountConcurrencyTest {
 
     private Post post;
     private Board board;
-    private SiteUser 테스트_유저;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
         board = createBoard();
         boardRepository.save(board);
-        테스트_유저 = siteUserFixture.테스트_유저();
-        post = createPost(board, 테스트_유저);
+        user = siteUserFixture.사용자();
+        post = createPost(board, user);
         postRepository.save(post);
     }
 
@@ -85,7 +85,7 @@ class PostViewCountConcurrencyTest {
     @Test
     void 게시글을_조회할_때_조회수_동시성_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(테스트_유저.getId(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -115,7 +115,7 @@ class PostViewCountConcurrencyTest {
     @Test
     void 게시글을_조회할_때_조회수_조작_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(테스트_유저.getId(), post.getId()));
+        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -123,7 +123,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(테스트_유저.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }
@@ -136,7 +136,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(테스트_유저.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
                     if (isFirstTime) {
                         redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
                     }

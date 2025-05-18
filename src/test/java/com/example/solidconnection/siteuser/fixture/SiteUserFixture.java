@@ -12,18 +12,18 @@ public class SiteUserFixture {
 
     private final SiteUserFixtureBuilder siteUserFixtureBuilder;
 
-    public SiteUser 테스트_유저() {
+    public SiteUser 사용자() {
         return siteUserFixtureBuilder.siteUser()
                 .email("test@example.com")
                 .authType(AuthType.EMAIL)
-                .nickname("테스트유저")
+                .nickname("사용자")
                 .profileImageUrl("profileImageUrl")
                 .role(Role.MENTEE)
                 .password("password123")
                 .create();
     }
 
-    public SiteUser 테스트_유저(int index, String nickname) {
+    public SiteUser 사용자(int index, String nickname) {
         return siteUserFixtureBuilder.siteUser()
                 .email("test" + index + "@example.com")
                 .authType(AuthType.EMAIL)
@@ -34,22 +34,22 @@ public class SiteUserFixture {
                 .create();
     }
 
-    public SiteUser 테스트_유저(String email, AuthType authType) {
+    public SiteUser 사용자(String email, AuthType authType) {
         return siteUserFixtureBuilder.siteUser()
                 .email(email)
                 .authType(authType)
-                .nickname("테스트유저")
+                .nickname("사용자")
                 .profileImageUrl("profileImageUrl")
                 .role(Role.MENTEE)
                 .password("password123")
                 .create();
     }
 
-    public SiteUser 테스트_유저(String email, String password) {
+    public SiteUser 사용자(String email, String password) {
         return siteUserFixtureBuilder.siteUser()
                 .email(email)
                 .authType(AuthType.EMAIL)
-                .nickname("테스트유저")
+                .nickname("사용자")
                 .profileImageUrl("profileImageUrl")
                 .role(Role.MENTEE)
                 .password(password)
