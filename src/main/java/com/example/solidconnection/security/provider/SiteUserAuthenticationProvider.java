@@ -1,5 +1,6 @@
 package com.example.solidconnection.security.provider;
 
+import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.security.authentication.JwtAuthentication;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.config.JwtProperties;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import static com.example.solidconnection.util.JwtUtils.parseSubject;
 
 @Component
 @RequiredArgsConstructor
@@ -19,13 +19,14 @@ public class SiteUserAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtProperties jwtProperties;
     private final SiteUserDetailsService siteUserDetailsService;
+    private final TokenProvider tokenProvider;
 
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
         JwtAuthentication jwtAuth = (JwtAuthentication) auth;
         String token = jwtAuth.getToken();
 
-        String username = parseSubject(token, jwtProperties.secret());
+        String username = tokenProvider.parseSubject(token, jwtProperties.secret());
         SiteUserDetails userDetails = (SiteUserDetails) siteUserDetailsService.loadUserByUsername(username);
         return new SiteUserAuthentication(token, userDetails);
     }

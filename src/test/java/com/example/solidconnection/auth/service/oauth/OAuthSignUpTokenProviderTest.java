@@ -1,11 +1,11 @@
 package com.example.solidconnection.auth.service.oauth;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -35,6 +35,9 @@ class OAuthSignUpTokenProviderTest {
     private OAuthSignUpTokenProvider OAuthSignUpTokenProvider;
 
     @Autowired
+    private TokenProvider tokenProvider;
+
+    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
@@ -50,7 +53,7 @@ class OAuthSignUpTokenProviderTest {
         String signUpToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(email, authType);
 
         // then
-        Claims claims = JwtUtils.parseClaims(signUpToken, jwtProperties.secret());
+        Claims claims = tokenProvider.parseClaims(signUpToken, jwtProperties.secret());
         String actualSubject = claims.getSubject();
         AuthType actualAuthType = AuthType.valueOf(claims.get(AUTH_TYPE_CLAIM_KEY, String.class));
         String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
