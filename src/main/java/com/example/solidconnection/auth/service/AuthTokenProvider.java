@@ -3,27 +3,28 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.util.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
-public class AuthTokenProvider extends TokenProvider {
+@RequiredArgsConstructor
+public class AuthTokenProvider {
 
-    public AuthTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
-        super(jwtProperties, redisTemplate);
-    }
+    private final JwtProperties jwtProperties;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
 
     public AccessToken generateAccessToken(Subject subject) {
-        String token = generateToken(subject.value(), TokenType.ACCESS);
+        String token = tokenProvider.generateToken(subject.value(), TokenType.ACCESS);
         return new AccessToken(subject, token);
     }
 
     public RefreshToken generateAndSaveRefreshToken(Subject subject) {
-        String token = generateToken(subject.value(), TokenType.REFRESH);
-        saveToken(token, TokenType.REFRESH);
+        String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
+        tokenProvider.saveToken(token, TokenType.REFRESH);
         return new RefreshToken(subject, token);
     }
 
@@ -33,7 +34,7 @@ public class AuthTokenProvider extends TokenProvider {
     * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
     * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
-        String subject = JwtUtils.parseSubject(requestedRefreshToken, jwtProperties.secret());
+        String subject = tokenProvider.parseSubject(requestedRefreshToken, jwtProperties.secret());
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
         String foundRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
         return Objects.equals(requestedRefreshToken, foundRefreshToken);
@@ -46,7 +47,7 @@ public class AuthTokenProvider extends TokenProvider {
     }
 
     public Subject parseSubject(String token) {
-        String subject = JwtUtils.parseSubject(token, jwtProperties.secret());
+        String subject = tokenProvider.parseSubject(token, jwtProperties.secret());
         return new Subject(subject);
     }
 
