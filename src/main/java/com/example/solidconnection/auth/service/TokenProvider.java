@@ -1,8 +1,10 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.config.JwtProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,7 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.util.JwtUtils.parseSubject;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
 public abstract class TokenProvider {
 
@@ -43,5 +45,20 @@ public abstract class TokenProvider {
                 TimeUnit.MILLISECONDS
         );
         return token;
+    }
+
+    public String parseSubject(String token, String secretKey) {
+        try {
+            return parseClaims(token, secretKey).getSubject();
+        } catch (Exception e) {
+            throw new CustomException(INVALID_TOKEN);
+        }
+    }
+
+    public Claims parseClaims(String token, String secretKey) throws ExpiredJwtException {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
