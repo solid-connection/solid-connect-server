@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.security.filter;
 
 public interface BlacklistChecker {
 

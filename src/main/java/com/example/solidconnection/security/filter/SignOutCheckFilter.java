@@ -1,6 +1,5 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.auth.service.BlacklistChecker;
 import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

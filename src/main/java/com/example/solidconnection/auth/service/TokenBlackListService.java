@@ -1,5 +1,6 @@
 package com.example.solidconnection.auth.service;
 
+import com.example.solidconnection.security.filter.BlacklistChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
