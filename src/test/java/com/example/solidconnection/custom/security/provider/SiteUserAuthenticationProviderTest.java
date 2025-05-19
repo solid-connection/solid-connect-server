@@ -5,10 +5,8 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,14 +36,13 @@ class SiteUserAuthenticationProviderTest {
     private JwtProperties jwtProperties;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private SiteUserFixture siteUserFixture;
 
-    private SiteUser siteUser;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
-        siteUser = createSiteUser();
-        siteUserRepository.save(siteUser);
+        user = siteUserFixture.사용자();
     }
 
     @Test
@@ -64,7 +61,7 @@ class SiteUserAuthenticationProviderTest {
     @Test
     void 유효한_토큰이면_정상적으로_인증_정보를_반환한다() {
         // given
-        String token = createValidToken(siteUser.getId());
+        String token = createValidToken(user.getId());
         SiteUserAuthentication auth = new SiteUserAuthentication(token);
 
         // when
@@ -106,7 +103,7 @@ class SiteUserAuthenticationProviderTest {
         @Test
         void 유효한_토큰이지만_해당되는_사용자가_없으면_예외_응답을_반환한다() {
             // given
-            long notExistingUserId = siteUser.getId() + 100;
+            long notExistingUserId = user.getId() + 100;
             String token = createValidToken(notExistingUserId);
             SiteUserAuthentication auth = new SiteUserAuthentication(token);
 
@@ -128,7 +125,7 @@ class SiteUserAuthenticationProviderTest {
 
     private String createExpiredToken() {
         return Jwts.builder()
-                .setSubject(String.valueOf(siteUser.getId()))
+                .setSubject(String.valueOf(user.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() - 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
@@ -142,15 +139,5 @@ class SiteUserAuthenticationProviderTest {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
                 .compact();
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
     }
 }

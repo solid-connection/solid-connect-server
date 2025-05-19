@@ -13,10 +13,12 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.community.post.repository.PostImageRepository;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.BoardCode;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,16 @@ class PostQueryServiceTest extends BaseIntegrationTest {
 
     @Autowired
     private PostImageRepository postImageRepository;
+
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    private SiteUser user;
+
+    @BeforeEach
+    void setUp() {
+        user = siteUserFixture.사용자(1, "test1");
+    }
 
     @Test
     void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
@@ -103,15 +115,15 @@ class PostQueryServiceTest extends BaseIntegrationTest {
         // given
         String expectedImageUrl = "test-image-url";
         List<String> imageUrls = List.of(expectedImageUrl);
-        Post testPost = createPost(자유게시판, 테스트유저_1, expectedImageUrl);
-        List<Comment> comments = createComments(testPost, 테스트유저_1, List.of("첫번째 댓글", "두번째 댓글"));
+        Post testPost = createPost(자유게시판, user, expectedImageUrl);
+        List<Comment> comments = createComments(testPost, user, List.of("첫번째 댓글", "두번째 댓글"));
 
-        String validateKey = redisUtils.getValidatePostViewCountRedisKey(테스트유저_1.getId(), testPost.getId());
+        String validateKey = redisUtils.getValidatePostViewCountRedisKey(user.getId(), testPost.getId());
         String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
 
         // when
         PostFindResponse response = postQueryService.findPostById(
-                테스트유저_1,
+                user,
                 testPost.getId()
         );
 
@@ -128,9 +140,9 @@ class PostQueryServiceTest extends BaseIntegrationTest {
                 () -> assertThat(response.postFindBoardResponse().code()).isEqualTo(자유게시판.getCode()),
                 () -> assertThat(response.postFindBoardResponse().koreanName()).isEqualTo(자유게시판.getKoreanName()),
 
-                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(테스트유저_1.getId()),
-                () -> assertThat(response.postFindSiteUserResponse().nickname()).isEqualTo(테스트유저_1.getNickname()),
-                () -> assertThat(response.postFindSiteUserResponse().profileImageUrl()).isEqualTo(테스트유저_1.getProfileImageUrl()),
+                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(user.getId()),
+                () -> assertThat(response.postFindSiteUserResponse().nickname()).isEqualTo(user.getNickname()),
+                () -> assertThat(response.postFindSiteUserResponse().profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
 
                 () -> assertThat(response.postFindPostImageResponses())
                         .hasSize(imageUrls.size())

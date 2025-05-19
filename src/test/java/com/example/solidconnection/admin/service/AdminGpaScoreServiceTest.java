@@ -9,10 +9,8 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,26 +36,23 @@ class AdminGpaScoreServiceTest extends BaseIntegrationTest {
     private AdminGpaScoreService adminGpaScoreService;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private GpaScoreRepository gpaScoreRepository;
 
-    private SiteUser siteUser1;
-    private SiteUser siteUser2;
-    private SiteUser siteUser3;
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
     private GpaScore gpaScore1;
     private GpaScore gpaScore2;
     private GpaScore gpaScore3;
 
     @BeforeEach
     void setUp() {
-        siteUser1 = createSiteUser(1, "test1");
-        siteUser2 = createSiteUser(2, "test2");
-        siteUser3 = createSiteUser(3, "test3");
-        gpaScore3 = createGpaScore(siteUser3, VerifyStatus.REJECTED);
-        gpaScore2 = createGpaScore(siteUser2, VerifyStatus.PENDING);
-        gpaScore1 = createGpaScore(siteUser1, VerifyStatus.PENDING);
+        SiteUser user1 = siteUserFixture.사용자(1, "test1");
+        SiteUser user2 = siteUserFixture.사용자(2, "test2");
+        SiteUser user3 = siteUserFixture.사용자(3, "test3");
+        gpaScore3 = createGpaScore(user3, VerifyStatus.REJECTED);
+        gpaScore2 = createGpaScore(user2, VerifyStatus.PENDING);
+        gpaScore1 = createGpaScore(user1, VerifyStatus.PENDING);
     }
 
     @Nested
@@ -207,17 +202,6 @@ class AdminGpaScoreServiceTest extends BaseIntegrationTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(GPA_SCORE_NOT_FOUND.getMessage());
         }
-    }
-
-    private SiteUser createSiteUser(int index, String nickname) {
-        SiteUser siteUser = new SiteUser(
-                "test" + index + " @example.com",
-                nickname,
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 
     private GpaScore createGpaScore(SiteUser siteUser, VerifyStatus status) {

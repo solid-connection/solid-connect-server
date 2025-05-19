@@ -15,11 +15,13 @@ import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
 import com.example.solidconnection.service.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.type.ImgType;
 import com.example.solidconnection.type.PostCategory;
 import com.example.solidconnection.util.RedisUtils;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -63,6 +65,16 @@ class PostCommandServiceTest extends BaseIntegrationTest {
     @Autowired
     private PostImageRepository postImageRepository;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    private SiteUser user1;
+
+    @BeforeEach
+    void setUp() {
+        user1 = siteUserFixture.사용자(1, "test1");
+    }
+
     @Nested
     class 게시글_생성_테스트 {
 
@@ -78,7 +90,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when
             PostCreateResponse response = postCommandService.createPost(
-                    테스트유저_1,
+                    user1,
                     request,
                     imageFiles
             );
@@ -107,7 +119,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, request, imageFiles))
+                    postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -120,7 +132,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, request, imageFiles))
+                    postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -133,7 +145,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(테스트유저_1, request, imageFiles))
+                    postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -148,7 +160,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
             // given
             String originImageUrl = "origin-image-url";
             String expectedImageUrl = "update-image-url";
-            Post testPost = createPost(자유게시판, 테스트유저_1, originImageUrl);
+            Post testPost = createPost(자유게시판, user1, originImageUrl);
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = List.of(createImageFile());
 
@@ -157,7 +169,7 @@ class PostCommandServiceTest extends BaseIntegrationTest {
 
             // when
             PostUpdateResponse response = postCommandService.updatePost(
-                    테스트유저_1,
+                    user1,
                     testPost.getId(),
                     request,
                     imageFiles
@@ -180,14 +192,15 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         @Test
         void 다른_사용자의_게시글을_수정하면_예외_응답을_반환한다() {
             // given
-            Post testPost = createPost(자유게시판, 테스트유저_1, "origin-image-url");
+            SiteUser user2 = siteUserFixture.사용자(2, "test2");
+            Post testPost = createPost(자유게시판, user1, "origin-image-url");
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = List.of();
 
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_2,
+                            user2,
                             testPost.getId(),
                             request,
                             imageFiles
@@ -199,14 +212,14 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         @Test
         void 질문_게시글을_수정하면_예외_응답을_반환한다() {
             // given
-            Post testPost = createQuestionPost(자유게시판, 테스트유저_1, "origin-image-url");
+            Post testPost = createQuestionPost(자유게시판, user1, "origin-image-url");
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = List.of();
 
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_1,
+                            user1,
                             testPost.getId(),
                             request,
                             imageFiles
@@ -218,14 +231,14 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         @Test
         void 이미지를_5개_초과하여_수정하면_예외_응답을_반환한다() {
             // given
-            Post testPost = createPost(자유게시판, 테스트유저_1, "origin-image-url");
+            Post testPost = createPost(자유게시판, user1, "origin-image-url");
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = createSixImageFiles();
 
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.updatePost(
-                            테스트유저_1,
+                            user1,
                             testPost.getId(),
                             request,
                             imageFiles
@@ -242,13 +255,13 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         void 게시글을_성공적으로_삭제한다() {
             // given
             String originImageUrl = "origin-image-url";
-            Post testPost = createPost(자유게시판, 테스트유저_1, originImageUrl);
+            Post testPost = createPost(자유게시판, user1, originImageUrl);
             String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
             redisService.increaseViewCount(viewCountKey);
 
             // when
             PostDeleteResponse response = postCommandService.deletePostById(
-                    테스트유저_1,
+                    user1,
                     testPost.getId()
             );
 
@@ -264,12 +277,13 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         @Test
         void 다른_사용자의_게시글을_삭제하면_예외_응답을_반환한다() {
             // given
-            Post testPost = createPost(자유게시판, 테스트유저_1, "origin-image-url");
+            SiteUser user2 = siteUserFixture.사용자(2, "test2");
+            Post testPost = createPost(자유게시판, user1, "origin-image-url");
 
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
-                            테스트유저_2,
+                            user2,
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)
@@ -279,12 +293,12 @@ class PostCommandServiceTest extends BaseIntegrationTest {
         @Test
         void 질문_게시글을_삭제하면_예외_응답을_반환한다() {
             // given
-            Post testPost = createQuestionPost(자유게시판, 테스트유저_1, "origin-image-url");
+            Post testPost = createQuestionPost(자유게시판, user1, "origin-image-url");
 
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(
-                            테스트유저_1,
+                            user1,
                             testPost.getId()
                     ))
                     .isInstanceOf(CustomException.class)

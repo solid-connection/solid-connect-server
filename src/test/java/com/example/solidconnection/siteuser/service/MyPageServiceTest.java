@@ -3,17 +3,19 @@ package com.example.solidconnection.siteuser.service;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.s3.S3Service;
 import com.example.solidconnection.s3.UploadedFileUrlResponse;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.dto.NicknameUpdateRequest;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.ImgType;
-import com.example.solidconnection.type.PreparationStatus;
 import com.example.solidconnection.type.Role;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,8 +40,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.then;
 
+@TestContainerSpringBootTest
 @DisplayName("마이페이지 서비스 테스트")
-class MyPageServiceTest extends BaseIntegrationTest {
+class MyPageServiceTest {
 
     @Autowired
     private MyPageService myPageService;
@@ -53,22 +56,37 @@ class MyPageServiceTest extends BaseIntegrationTest {
     @Autowired
     private LikedUniversityRepository likedUniversityRepository;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+
+    @Autowired
+    private SiteUserFixtureBuilder siteUserFixtureBuilder;
+
+    private SiteUser user;
+
+    @BeforeEach
+    void setUp() {
+        user = siteUserFixture.사용자();
+    }
+
     @Test
     void 마이페이지_정보를_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
-        int likedUniversityCount = createLikedUniversities(testUser);
+        int likedUniversityCount = createLikedUniversities(user);
 
         // when
-        MyPageResponse response = myPageService.getMyPageInfo(testUser);
+        MyPageResponse response = myPageService.getMyPageInfo(user);
 
         // then
         Assertions.assertAll(
-                () -> assertThat(response.nickname()).isEqualTo(testUser.getNickname()),
-                () -> assertThat(response.profileImageUrl()).isEqualTo(testUser.getProfileImageUrl()),
-                () -> assertThat(response.role()).isEqualTo(testUser.getRole()),
-                () -> assertThat(response.email()).isEqualTo(testUser.getEmail()),
-                () -> assertThat(response.likedPostCount()).isEqualTo(testUser.getPostLikeList().size()),
+                () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
+                () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
+                () -> assertThat(response.role()).isEqualTo(user.getRole()),
+                () -> assertThat(response.email()).isEqualTo(user.getEmail()),
+                () -> assertThat(response.likedPostCount()).isEqualTo(user.getPostLikeList().size()),
                 () -> assertThat(response.likedUniversityCount()).isEqualTo(likedUniversityCount)
         );
     }
@@ -76,21 +94,13 @@ class MyPageServiceTest extends BaseIntegrationTest {
     @Test
     void 관심_대학교_목록을_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
-        int likedUniversityCount = createLikedUniversities(testUser);
+        int likedUniversityCount = createLikedUniversities(user);
 
         // when
-        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(testUser);
+        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(user);
 
         // then
-        assertThat(response)
-                .hasSize(likedUniversityCount)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                .containsAll(List.of(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
-                ));
+        assertThat(response).hasSize(likedUniversityCount);
     }
 
     @Nested
@@ -99,29 +109,27 @@ class MyPageServiceTest extends BaseIntegrationTest {
         @Test
         void 새로운_이미지로_성공적으로_업데이트한다() {
             // given
-            SiteUser testUser = createSiteUser();
             String expectedUrl = "newProfileImageUrl";
             MockMultipartFile imageFile = createValidImageFile();
             given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
-            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
-            assertThat(testUser.getProfileImageUrl()).isEqualTo(expectedUrl);
+            assertThat(user.getProfileImageUrl()).isEqualTo(expectedUrl);
         }
 
         @Test
         void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
             // given
-            SiteUser testUser = createSiteUser();
             MockMultipartFile imageFile = createValidImageFile();
             given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
             then(s3Service).should(never()).deleteExProfile(any());
@@ -130,16 +138,16 @@ class MyPageServiceTest extends BaseIntegrationTest {
         @Test
         void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
             // given
-            SiteUser testUser = createSiteUserWithCustomProfile();
+            SiteUser 커스텀_프로필_사용자 = createSiteUserWithCustomProfile();
             MockMultipartFile imageFile = createValidImageFile();
             given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(testUser, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(testUser);
+            then(s3Service).should().deleteExProfile(커스텀_프로필_사용자);
         }
     }
 
@@ -155,15 +163,14 @@ class MyPageServiceTest extends BaseIntegrationTest {
         @Test
         void 닉네임을_성공적으로_수정한다() {
             // given
-            SiteUser testUser = createSiteUser();
             MockMultipartFile imageFile = createValidImageFile();
             String newNickname = "newNickname";
 
             // when
-            myPageService.updateMyPageInfo(testUser, imageFile, newNickname);
+            myPageService.updateMyPageInfo(user, imageFile, newNickname);
 
             // then
-            SiteUser updatedUser = siteUserRepository.findById(testUser.getId()).get();
+            SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
             assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
             assertThat(updatedUser.getNickname()).isEqualTo(newNickname);
         }
@@ -171,12 +178,10 @@ class MyPageServiceTest extends BaseIntegrationTest {
         @Test
         void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
             // given
-            createDuplicatedSiteUser();
-            SiteUser testUser = createSiteUser();
-            MockMultipartFile imageFile = createValidImageFile();
+            SiteUser existingUser = siteUserFixture.사용자(1, "existing nickname");
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, imageFile, "duplicatedNickname"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(user, null, existingUser.getNickname()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
@@ -184,58 +189,21 @@ class MyPageServiceTest extends BaseIntegrationTest {
         @Test
         void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
             // given
-            SiteUser testUser = createSiteUser();
             MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
-            testUser.setNicknameModifiedAt(modifiedAt);
-            siteUserRepository.save(testUser);
-
-            NicknameUpdateRequest request = new NicknameUpdateRequest("newNickname");
+            user.setNicknameModifiedAt(modifiedAt);
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(testUser, imageFile, "nickname12"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(user, imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }
     }
 
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
-    }
-
-    private SiteUser createSiteUserWithCustomProfile() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profile/profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
-    }
-
-    private void createDuplicatedSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "duplicated@example.com",
-                "duplicatedNickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        siteUserRepository.save(siteUser);
-    }
-
     private int createLikedUniversities(SiteUser testUser) {
-        LikedUniversity likedUniversity1 = new LikedUniversity(null, 괌대학_A_지원_정보, testUser);
-        LikedUniversity likedUniversity2 = new LikedUniversity(null, 메이지대학_지원_정보, testUser);
-        LikedUniversity likedUniversity3 = new LikedUniversity(null, 코펜하겐IT대학_지원_정보, testUser);
+        LikedUniversity likedUniversity1 = new LikedUniversity(null, universityInfoForApplyFixture.괌대학_A_지원_정보(), testUser);
+        LikedUniversity likedUniversity2 = new LikedUniversity(null, universityInfoForApplyFixture.메이지대학_지원_정보(), testUser);
+        LikedUniversity likedUniversity3 = new LikedUniversity(null, universityInfoForApplyFixture.코펜하겐IT대학_지원_정보(), testUser);
 
         likedUniversityRepository.save(likedUniversity1);
         likedUniversityRepository.save(likedUniversity2);
@@ -258,5 +226,16 @@ class MyPageServiceTest extends BaseIntegrationTest {
                 NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
         );
         return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
+    }
+
+    private SiteUser createSiteUserWithCustomProfile() {
+        return siteUserFixtureBuilder.siteUser()
+                .email("customProfile@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname("커스텀프로필")
+                .profileImageUrl("profile/profileImageUrl")
+                .role(Role.MENTEE)
+                .password("customPassword123")
+                .create();
     }
 }

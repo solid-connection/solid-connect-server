@@ -6,11 +6,10 @@ import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.type.PostCategory;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,41 +30,37 @@ class PostLikeCountConcurrencyTest {
 
     @Autowired
     private PostLikeService postLikeService;
+
     @Autowired
     private PostRepository postRepository;
+
     @Autowired
     private BoardRepository boardRepository;
+
     @Autowired
     private SiteUserRepository siteUserRepository;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
     @Value("${view.count.scheduling.delay}")
     private int SCHEDULING_DELAY_MS;
+
     private int THREAD_NUMS = 1000;
     private int THREAD_POOL_SIZE = 200;
     private int TIMEOUT_SECONDS = 10;
 
     private Post post;
     private Board board;
-    private SiteUser siteUser;
+    private SiteUser user;
 
     @BeforeEach
     void setUp() {
         board = createBoard();
         boardRepository.save(board);
-        siteUser = createSiteUser();
-        siteUserRepository.save(siteUser);
-        post = createPost(board, siteUser);
+        user = siteUserFixture.사용자();
+        post = createPost(board, user);
         postRepository.save(post);
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
     }
 
     private Board createBoard() {

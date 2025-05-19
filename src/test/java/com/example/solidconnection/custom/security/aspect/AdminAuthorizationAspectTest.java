@@ -3,9 +3,8 @@ package com.example.solidconnection.custom.security.aspect;
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +23,16 @@ class AdminAuthorizationAspectTest {
     @Autowired
     private TestService testService;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
     @Test
     void 어드민_사용자는_어드민_전용_메소드에_접근할_수_있다() {
         // given
-        SiteUser adminUser = createSiteUser(Role.ADMIN);
+        SiteUser admin = siteUserFixture.관리자();
 
         // when
-        boolean response = testService.adminOnlyMethod(adminUser);
+        boolean response = testService.adminOnlyMethod(admin);
 
         // then
         assertThat(response).isTrue();
@@ -39,10 +41,10 @@ class AdminAuthorizationAspectTest {
     @Test
     void 일반_사용자가_어드민_전용_메소드에_접근하면_예외_응답을_반환한다() {
         // given
-        SiteUser mentorUser = createSiteUser(Role.MENTOR);
+        SiteUser user = siteUserFixture.사용자();
 
         // when & then
-        assertThatCode(() -> testService.adminOnlyMethod(mentorUser))
+        assertThatCode(() -> testService.adminOnlyMethod(user))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ACCESS_DENIED.getMessage());
     }
@@ -50,26 +52,16 @@ class AdminAuthorizationAspectTest {
     @Test
     void 어드민_어노테이션이_없는_메소드는_모두_접근_가능하다() {
         // given
-        SiteUser menteeUser = createSiteUser(Role.MENTEE);
-        SiteUser adminUser = createSiteUser(Role.ADMIN);
+        SiteUser user = siteUserFixture.사용자();
+        SiteUser admin = siteUserFixture.관리자();
 
         // when
-        boolean menteeResponse = testService.publicMethod(menteeUser);
-        boolean adminResponse = testService.publicMethod(adminUser);
+        boolean menteeResponse = testService.publicMethod(user);
+        boolean adminResponse = testService.publicMethod(admin);
 
         // then
         assertThat(menteeResponse).isTrue();
         assertThat(adminResponse).isTrue();
-    }
-
-    private SiteUser createSiteUser(Role role) {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                role
-        );
     }
 
     @TestConfiguration

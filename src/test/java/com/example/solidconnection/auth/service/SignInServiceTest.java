@@ -4,10 +4,8 @@ import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.config.security.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.util.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,28 +29,24 @@ class SignInServiceTest {
     private JwtProperties jwtProperties;
 
     @Autowired
-    private AuthTokenProvider authTokenProvider;
-
-    @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    private SiteUser siteUser;
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    private SiteUser user;
     private String subject;
 
     @BeforeEach
     void setUp() {
-        siteUser = createSiteUser();
-        siteUserRepository.save(siteUser);
-        subject = siteUser.getId().toString();
+        user = siteUserFixture.사용자();
+        subject = user.getId().toString();
     }
 
     @Test
     void 성공적으로_로그인한다() {
         // when
-        SignInResponse signInResponse = signInService.signIn(siteUser);
+        SignInResponse signInResponse = signInService.signIn(user);
 
         // then
         String accessTokenSubject = JwtUtils.parseSubject(signInResponse.accessToken(), jwtProperties.secret());
@@ -67,23 +61,12 @@ class SignInServiceTest {
     @Test
     void 탈퇴한_이력이_있으면_초기화한다() {
         // given
-        siteUser.setQuitedAt(LocalDate.now().minusDays(1));
-        siteUserRepository.save(siteUser);
+        user.setQuitedAt(LocalDate.now().minusDays(1));
 
         // when
-        signInService.signIn(siteUser);
+        signInService.signIn(user);
 
         // then
-        assertThat(siteUser.getQuitedAt()).isNull();
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
+        assertThat(user.getQuitedAt()).isNull();
     }
 }

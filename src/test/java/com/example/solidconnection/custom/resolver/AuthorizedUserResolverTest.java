@@ -1,14 +1,11 @@
 package com.example.solidconnection.custom.resolver;
 
-
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.custom.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.custom.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,7 +29,7 @@ class AuthorizedUserResolverTest {
     private AuthorizedUserResolver authorizedUserResolver;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
+    private SiteUserFixture siteUserFixture;
 
     @BeforeEach
     void setUp() {
@@ -42,8 +39,8 @@ class AuthorizedUserResolverTest {
     @Test
     void security_context_에_저장된_인증된_사용자를_반환한다() {
         // given
-        SiteUser siteUser = createAndSaveSiteUser();
-        Authentication authentication = createAuthenticationWithUser(siteUser);
+        SiteUser user = siteUserFixture.사용자();
+        Authentication authentication = createAuthenticationWithUser(user);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         MethodParameter parameter = mock(MethodParameter.class);
@@ -55,7 +52,7 @@ class AuthorizedUserResolverTest {
         SiteUser resolveSiteUser = (SiteUser) authorizedUserResolver.resolveArgument(parameter, null, null, null);
 
         // then
-        assertThat(resolveSiteUser).isEqualTo(siteUser);
+        assertThat(resolveSiteUser).isEqualTo(user);
     }
 
     @Nested
@@ -88,17 +85,6 @@ class AuthorizedUserResolverTest {
                     authorizedUserResolver.resolveArgument(parameter, null, null, null)
             ).isNull();
         }
-    }
-
-    private SiteUser createAndSaveSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 
     private SiteUserAuthentication createAuthenticationWithUser(SiteUser siteUser) {

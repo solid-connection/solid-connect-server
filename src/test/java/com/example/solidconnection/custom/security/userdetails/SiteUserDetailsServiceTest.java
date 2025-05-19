@@ -2,10 +2,9 @@ package com.example.solidconnection.custom.security.userdetails;
 
 import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,13 +26,16 @@ class SiteUserDetailsServiceTest {
     private SiteUserDetailsService userDetailsService;
 
     @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    @Autowired
     private SiteUserRepository siteUserRepository;
 
     @Test
     void 사용자_인증_정보를_반환한다() {
         // given
-        SiteUser siteUser = siteUserRepository.save(createSiteUser());
-        String username = getUserName(siteUser);
+        SiteUser user = siteUserFixture.사용자();
+        String username = getUserName(user);
 
         // when
         SiteUserDetails userDetails = (SiteUserDetails) userDetailsService.loadUserByUsername(username);
@@ -41,7 +43,7 @@ class SiteUserDetailsServiceTest {
         // then
         assertAll(
                 () -> assertThat(userDetails.getUsername()).isEqualTo(username),
-                () -> assertThat(userDetails.getSiteUser()).extracting("id").isEqualTo(siteUser.getId())
+                () -> assertThat(userDetails.getSiteUser()).extracting("id").isEqualTo(user.getId())
         );
     }
 
@@ -73,26 +75,16 @@ class SiteUserDetailsServiceTest {
         @Test
         void 탈퇴한_사용자이면_예외_응답을_반환한다() {
             // given
-            SiteUser siteUser = createSiteUser();
-            siteUser.setQuitedAt(LocalDate.now());
-            siteUserRepository.save(siteUser);
-            String username = getUserName(siteUser);
+            SiteUser user = siteUserFixture.사용자();
+            user.setQuitedAt(LocalDate.now());
+            siteUserRepository.save(user);
+            String username = getUserName(user);
 
             // when & then
             assertThatCode(() -> userDetailsService.loadUserByUsername(username))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(AUTHENTICATION_FAILED.getMessage());
         }
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
     }
 
     private String getUserName(SiteUser siteUser) {

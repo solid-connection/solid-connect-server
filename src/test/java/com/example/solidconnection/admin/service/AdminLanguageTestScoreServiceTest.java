@@ -9,10 +9,8 @@ import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import com.example.solidconnection.type.VerifyStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,26 +37,23 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
     private AdminLanguageTestScoreService adminLanguageTestScoreService;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private LanguageTestScoreRepository languageTestScoreRepository;
 
-    private SiteUser siteUser1;
-    private SiteUser siteUser2;
-    private SiteUser siteUser3;
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
     private LanguageTestScore languageTestScore1;
     private LanguageTestScore languageTestScore2;
     private LanguageTestScore languageTestScore3;
 
     @BeforeEach
     void setUp() {
-        siteUser1 = createSiteUser(1, "test1");
-        siteUser2 = createSiteUser(2, "test2");
-        siteUser3 = createSiteUser(3, "test3");
-        languageTestScore3 = createLanguageTestScore(siteUser3, VerifyStatus.REJECTED);
-        languageTestScore2 = createLanguageTestScore(siteUser2, VerifyStatus.PENDING);
-        languageTestScore1 = createLanguageTestScore(siteUser1, VerifyStatus.PENDING);
+        SiteUser user1 = siteUserFixture.사용자(1, "test1");
+        SiteUser user2 = siteUserFixture.사용자(2, "test2");
+        SiteUser user3 = siteUserFixture.사용자(3, "test3");
+        languageTestScore3 = createLanguageTestScore(user3, VerifyStatus.REJECTED);
+        languageTestScore2 = createLanguageTestScore(user2, VerifyStatus.PENDING);
+        languageTestScore1 = createLanguageTestScore(user1, VerifyStatus.PENDING);
     }
 
     @Nested
@@ -217,17 +212,6 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(LANGUAGE_TEST_SCORE_NOT_FOUND.getMessage());
         }
-    }
-
-    private SiteUser createSiteUser(int index, String nickname) {
-        SiteUser siteUser = new SiteUser(
-                "test" + index + " @example.com",
-                nickname,
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
     }
 
     private LanguageTestScore createLanguageTestScore(SiteUser siteUser, VerifyStatus status) {
