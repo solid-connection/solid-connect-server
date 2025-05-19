@@ -15,8 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
-import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
+import java.util.Optional;
 
 
 @Component
@@ -24,18 +23,19 @@ import static com.example.solidconnection.util.JwtUtils.parseTokenFromRequest;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final AuthorizationHeaderParser authorizationHeaderParser;
 
     @Override
     public void doFilterInternal(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String token = parseTokenFromRequest(request);
-        if (token == null) {
+        Optional<String> token = authorizationHeaderParser.parseToken(request);
+        if (token.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        JwtAuthentication authToken = createAuthentication(token);
+        JwtAuthentication authToken = createAuthentication(token.get());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
