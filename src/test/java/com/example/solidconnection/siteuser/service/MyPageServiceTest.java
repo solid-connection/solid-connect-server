@@ -228,7 +228,7 @@ class MyPageServiceTest {
         return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
     }
 
-    public SiteUser createSiteUserWithCustomProfile() {
+    private SiteUser createSiteUserWithCustomProfile() {
         return siteUserFixtureBuilder.siteUser()
                 .email("customProfile@example.com")
                 .authType(AuthType.EMAIL)
