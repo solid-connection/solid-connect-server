@@ -2,7 +2,6 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -26,9 +25,6 @@ class SignInServiceTest {
 
     @Autowired
     private TokenProvider tokenProvider;
-
-    @Autowired
-    private JwtProperties jwtProperties;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

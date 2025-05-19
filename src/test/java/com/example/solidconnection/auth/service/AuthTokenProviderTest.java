@@ -71,7 +71,7 @@ class AuthTokenProviderTest {
         }
 
         @Test
-        void 액세서_토큰에_해당하는_리프레시_토큰을_삭제한다() {
+        void 액세스_토큰에_해당하는_리프레시_토큰을_삭제한다() {
             // given
             authTokenProvider.generateAndSaveRefreshToken(subject);
             AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
