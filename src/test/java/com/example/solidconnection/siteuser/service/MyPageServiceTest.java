@@ -138,16 +138,16 @@ class MyPageServiceTest {
         @Test
         void 프로필을_처음_수정하는_것이_아니라면_이전_이미지를_삭제한다() {
             // given
-            SiteUser 커스텀_프로필_테스트_유저 = createSiteUserWithCustomProfile();
+            SiteUser 커스텀_프로필_사용자 = createSiteUserWithCustomProfile();
             MockMultipartFile imageFile = createValidImageFile();
             given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(커스텀_프로필_테스트_유저, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(커스텀_프로필_테스트_유저);
+            then(s3Service).should().deleteExProfile(커스텀_프로필_사용자);
         }
     }
 
