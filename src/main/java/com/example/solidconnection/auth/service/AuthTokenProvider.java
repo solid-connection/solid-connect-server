@@ -1,7 +1,6 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,7 +12,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthTokenProvider {
 
-    private final JwtProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
 
@@ -34,7 +32,7 @@ public class AuthTokenProvider {
     * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
     * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
-        String subject = tokenProvider.parseSubject(requestedRefreshToken, jwtProperties.secret());
+        String subject = tokenProvider.parseSubject(requestedRefreshToken);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
         String foundRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
         return Objects.equals(requestedRefreshToken, foundRefreshToken);
@@ -47,7 +45,7 @@ public class AuthTokenProvider {
     }
 
     public Subject parseSubject(String token) {
-        String subject = tokenProvider.parseSubject(token, jwtProperties.secret());
+        String subject = tokenProvider.parseSubject(token);
         return new Subject(subject);
     }
 

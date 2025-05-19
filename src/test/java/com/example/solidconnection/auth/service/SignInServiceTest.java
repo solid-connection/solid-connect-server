@@ -51,8 +51,8 @@ class SignInServiceTest {
         SignInResponse signInResponse = signInService.signIn(user);
 
         // then
-        String accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken(), jwtProperties.secret());
-        String refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken(), jwtProperties.secret());
+        String accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
+        String refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
         String savedRefreshToken = redisTemplate.opsForValue().get(TokenType.REFRESH.addPrefix(refreshTokenSubject));
         assertAll(
                 () -> assertThat(accessTokenSubject).isEqualTo(subject),

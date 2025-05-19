@@ -36,7 +36,7 @@ public class TokenProvider {
     }
 
     public final String saveToken(String token, TokenType tokenType) {
-        String subject = parseSubject(token, jwtProperties.secret());
+        String subject = parseSubject(token);
         redisTemplate.opsForValue().set(
                 tokenType.addPrefix(subject),
                 token,
@@ -46,17 +46,17 @@ public class TokenProvider {
         return token;
     }
 
-    public String parseSubject(String token, String secretKey) {
+    public String parseSubject(String token) {
         try {
-            return parseClaims(token, secretKey).getSubject();
+            return parseClaims(token).getSubject();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }
     }
 
-    public Claims parseClaims(String token, String secretKey) throws ExpiredJwtException {
+    public Claims parseClaims(String token) throws ExpiredJwtException {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(jwtProperties.secret())
                 .parseClaimsJws(token)
                 .getBody();
     }

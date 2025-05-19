@@ -62,7 +62,7 @@ public class EmailSignUpTokenProvider {
 
     private void validateFormatAndExpiration(String token) {
         try {
-            Claims claims = tokenProvider.parseClaims(token, jwtProperties.secret());
+            Claims claims = tokenProvider.parseClaims(token);
             Objects.requireNonNull(claims.getSubject());
             String encodedPassword = claims.get(PASSWORD_CLAIM_KEY, String.class);
             Objects.requireNonNull(encodedPassword);
@@ -79,11 +79,11 @@ public class EmailSignUpTokenProvider {
     }
 
     public String parseEmail(String token) {
-        return tokenProvider.parseSubject(token, jwtProperties.secret());
+        return tokenProvider.parseSubject(token);
     }
 
     public String parseEncodedPassword(String token) {
-        Claims claims = tokenProvider.parseClaims(token, jwtProperties.secret());
+        Claims claims = tokenProvider.parseClaims(token);
         return claims.get(PASSWORD_CLAIM_KEY, String.class);
     }
 }

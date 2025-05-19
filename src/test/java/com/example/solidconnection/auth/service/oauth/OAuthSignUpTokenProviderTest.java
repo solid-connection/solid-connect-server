@@ -53,7 +53,7 @@ class OAuthSignUpTokenProviderTest {
         String signUpToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(email, authType);
 
         // then
-        Claims claims = tokenProvider.parseClaims(signUpToken, jwtProperties.secret());
+        Claims claims = tokenProvider.parseClaims(signUpToken);
         String actualSubject = claims.getSubject();
         AuthType actualAuthType = AuthType.valueOf(claims.get(AUTH_TYPE_CLAIM_KEY, String.class));
         String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
