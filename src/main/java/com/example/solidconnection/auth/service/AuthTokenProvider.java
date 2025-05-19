@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class AuthTokenProvider extends TokenProvider implements BlacklistChecker {
+public class AuthTokenProvider extends TokenProvider {
 
     public AuthTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
         super(jwtProperties, redisTemplate);
@@ -25,16 +25,6 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
         String token = generateToken(subject.value(), TokenType.REFRESH);
         saveToken(token, TokenType.REFRESH);
         return new RefreshToken(subject, token);
-    }
-
-    /*
-    * 액세스 토큰을 블랙리스트에 저장한다.
-    * - key = BLACKLIST:{accessToken}
-    * - value = "signOut" -> key 의 존재만 확인하므로, value 에는 무슨 값이 들어가도 상관없다.
-    * */
-    public void addToBlacklist(AccessToken accessToken) {
-        String blackListKey = TokenType.BLACKLIST.addPrefix(accessToken.token());
-        redisTemplate.opsForValue().set(blackListKey, "signOut");
     }
 
     /*
@@ -53,12 +43,6 @@ public class AuthTokenProvider extends TokenProvider implements BlacklistChecker
         String subject = accessToken.subject().value();
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
         redisTemplate.delete(refreshTokenKey);
-    }
-
-    @Override
-    public boolean isTokenBlacklisted(String accessToken) {
-        String blackListTokenKey = TokenType.BLACKLIST.addPrefix(accessToken);
-        return redisTemplate.hasKey(blackListTokenKey);
     }
 
     public Subject parseSubject(String token) {

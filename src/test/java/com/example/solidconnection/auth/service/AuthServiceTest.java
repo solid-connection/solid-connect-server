@@ -31,6 +31,9 @@ class AuthServiceTest {
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
+    private TokenBlackListService tokenBlackListService;
+
+    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
@@ -49,7 +52,7 @@ class AuthServiceTest {
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
         assertAll(
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
-                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+                () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
 
@@ -69,7 +72,7 @@ class AuthServiceTest {
         assertAll(
                 () -> assertThat(user.getQuitedAt()).isEqualTo(tomorrow),
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
-                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+                () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
 

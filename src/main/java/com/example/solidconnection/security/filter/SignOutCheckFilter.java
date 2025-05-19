@@ -21,7 +21,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREAD
 public class SignOutCheckFilter extends OncePerRequestFilter {
 
     private final AuthorizationHeaderParser authorizationHeaderParser;
-    private final BlacklistChecker tokenBlacklistChecker;
+    private final BlacklistChecker blacklistChecker;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -35,6 +35,6 @@ public class SignOutCheckFilter extends OncePerRequestFilter {
     }
 
     private boolean hasSignedOut(String accessToken) {
-        return tokenBlacklistChecker.isTokenBlacklisted(accessToken);
+        return blacklistChecker.isTokenBlacklisted(accessToken);
     }
 }
