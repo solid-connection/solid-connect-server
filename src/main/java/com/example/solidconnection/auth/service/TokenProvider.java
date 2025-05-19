@@ -4,7 +4,6 @@ import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.config.JwtProperties;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -47,17 +46,17 @@ public class TokenProvider {
     }
 
     public String parseSubject(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    public Claims parseClaims(String token) {
         try {
-            return parseClaims(token).getSubject();
+            return Jwts.parser()
+                    .setSigningKey(jwtProperties.secret())
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }
-    }
-
-    public Claims parseClaims(String token) throws ExpiredJwtException {
-        return Jwts.parser()
-                .setSigningKey(jwtProperties.secret())
-                .parseClaimsJws(token)
-                .getBody();
     }
 }
