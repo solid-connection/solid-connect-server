@@ -7,24 +7,23 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
-public abstract class TokenProvider {
+@Component
+@RequiredArgsConstructor
+public class TokenProvider {
 
-    protected final JwtProperties jwtProperties;
-    protected final RedisTemplate<String, String> redisTemplate;
+    private final JwtProperties jwtProperties;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public TokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
-        this.jwtProperties = jwtProperties;
-        this.redisTemplate = redisTemplate;
-    }
-
-    protected final String generateToken(String string, TokenType tokenType) {
+    public final String generateToken(String string, TokenType tokenType) {
         Claims claims = Jwts.claims().setSubject(string);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + tokenType.getExpireTime());
@@ -36,7 +35,7 @@ public abstract class TokenProvider {
                 .compact();
     }
 
-    protected final String saveToken(String token, TokenType tokenType) {
+    public final String saveToken(String token, TokenType tokenType) {
         String subject = parseSubject(token, jwtProperties.secret());
         redisTemplate.opsForValue().set(
                 tokenType.addPrefix(subject),
