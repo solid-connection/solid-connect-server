@@ -1,6 +1,6 @@
 package com.example.solidconnection.community.post.repository;
 
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_LIKE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
 
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {

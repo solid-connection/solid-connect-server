@@ -1,6 +1,6 @@
 package com.example.solidconnection.news.domain;
 
-import com.example.solidconnection.entity.common.BaseEntity;
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

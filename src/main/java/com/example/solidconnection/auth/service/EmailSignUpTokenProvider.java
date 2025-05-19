@@ -2,8 +2,8 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
-import com.example.solidconnection.config.security.JwtProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.custom.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 import static com.example.solidconnection.util.JwtUtils.parseClaims;
 import static com.example.solidconnection.util.JwtUtils.parseSubject;
 

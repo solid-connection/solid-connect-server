@@ -1,14 +1,14 @@
 package com.example.solidconnection.community.comment.repository;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.comment.domain.Comment;
-import com.example.solidconnection.custom.exception.CustomException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_COMMENT_ID;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_ID;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 

@@ -1,8 +1,8 @@
 package com.example.solidconnection.community.board.repository;
 
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.board.domain.Board;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.exception.ErrorCode;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_BOARD_CODE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, String> {

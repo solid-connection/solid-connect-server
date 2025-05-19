@@ -1,8 +1,9 @@
 package com.example.solidconnection.community.post.service;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
-import com.example.solidconnection.custom.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.dto.PostDislikeResponse;
 import com.example.solidconnection.community.post.dto.PostLikeResponse;
 import com.example.solidconnection.community.post.repository.PostLikeRepository;
@@ -10,15 +11,14 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.PostCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.DUPLICATE_POST_LIKE;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_POST_LIKE;
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;

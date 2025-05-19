@@ -2,9 +2,10 @@ package com.example.solidconnection.score.service;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.s3.S3Service;
-import com.example.solidconnection.s3.UploadedFileUrlResponse;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
+import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
@@ -17,7 +18,6 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.type.ImgType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.solidconnection.custom.exception.ErrorCode.USER_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

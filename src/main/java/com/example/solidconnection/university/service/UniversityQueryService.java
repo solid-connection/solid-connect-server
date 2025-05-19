@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
-import com.example.solidconnection.type.LanguageTestType;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;

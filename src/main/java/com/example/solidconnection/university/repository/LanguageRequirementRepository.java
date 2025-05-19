@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.repository;
 
-import com.example.solidconnection.type.LanguageTestType;
 import com.example.solidconnection.university.domain.LanguageRequirement;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

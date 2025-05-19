@@ -1,9 +1,9 @@
 package com.example.solidconnection.auth.dto;
 
 import com.example.solidconnection.siteuser.domain.AuthType;
+import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;

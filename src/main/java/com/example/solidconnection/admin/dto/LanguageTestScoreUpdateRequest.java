@@ -1,8 +1,8 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.custom.validation.annotation.RejectedReasonRequired;
-import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.application.dto.validation.RejectedReasonRequired;
+import com.example.solidconnection.university.domain.LanguageTestType;
 import jakarta.validation.constraints.NotNull;
 
 @RejectedReasonRequired
