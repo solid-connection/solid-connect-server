@@ -15,9 +15,6 @@ public class JwtUtils {
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
 
-    private JwtUtils() {
-    }
-
     public static String parseTokenFromRequest(HttpServletRequest request) {
         String token = request.getHeader(TOKEN_HEADER);
         if (token == null || token.isBlank() || !token.startsWith(TOKEN_PREFIX)) {
@@ -33,6 +30,7 @@ public class JwtUtils {
             throw new CustomException(INVALID_TOKEN);
         }
     }
+
     public static Claims parseClaims(String token, String secretKey) throws ExpiredJwtException {
         return Jwts.parser()
                 .setSigningKey(secretKey)
