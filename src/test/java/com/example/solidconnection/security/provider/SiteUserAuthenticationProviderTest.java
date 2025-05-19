@@ -1,14 +1,12 @@
 package com.example.solidconnection.security.provider;
 
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
-import com.example.solidconnection.siteuser.domain.Role;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;

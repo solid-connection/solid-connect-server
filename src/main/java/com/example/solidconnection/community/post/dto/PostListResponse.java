@@ -1,7 +1,7 @@
 package com.example.solidconnection.community.post.dto;
 
-import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostImage;
 
 import java.time.ZonedDateTime;
 import java.util.List;

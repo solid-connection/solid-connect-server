@@ -1,7 +1,7 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.score.domain.GpaScore;
 
 public record GpaScoreResponse(
         long id,

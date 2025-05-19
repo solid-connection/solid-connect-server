@@ -1,7 +1,7 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -95,12 +95,12 @@ class SignOutCheckFilterTest {
     }
 
     private String createToken(String subject) {
-            return Jwts.builder()
-                    .setSubject(subject)
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                    .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
-                    .compact();
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000))
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .compact();
     }
 
     private HttpServletRequest createRequest(String token) {

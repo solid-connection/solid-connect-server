@@ -1,7 +1,7 @@
 package com.example.solidconnection.community.comment.repository;
 
-import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.community.comment.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

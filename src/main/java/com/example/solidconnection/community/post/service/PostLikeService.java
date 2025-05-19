@@ -1,12 +1,12 @@
 package com.example.solidconnection.community.post.service;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
 import com.example.solidconnection.community.post.dto.PostDislikeResponse;
 import com.example.solidconnection.community.post.dto.PostLikeResponse;
 import com.example.solidconnection.community.post.repository.PostLikeRepository;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;

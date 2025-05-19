@@ -1,10 +1,9 @@
 package com.example.solidconnection.security.authentication;
 
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.domain.PreparationStatus;
 import com.example.solidconnection.siteuser.domain.Role;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

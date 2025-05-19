@@ -1,7 +1,7 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;

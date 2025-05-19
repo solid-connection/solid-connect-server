@@ -4,9 +4,9 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.domain.InterestedCountry;
-import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
+import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -85,6 +85,8 @@ public abstract class SignUpService {
     }
 
     protected abstract void validateSignUpToken(SignUpRequest signUpRequest);
+
     protected abstract void validateUserNotDuplicated(SignUpRequest signUpRequest);
+
     protected abstract SiteUser createSiteUser(SignUpRequest signUpRequest);
 }

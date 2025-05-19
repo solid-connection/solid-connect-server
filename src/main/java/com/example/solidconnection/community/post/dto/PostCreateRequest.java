@@ -2,8 +2,8 @@ package com.example.solidconnection.community.post.dto;
 
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.post.domain.Post;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.community.post.domain.PostCategory;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

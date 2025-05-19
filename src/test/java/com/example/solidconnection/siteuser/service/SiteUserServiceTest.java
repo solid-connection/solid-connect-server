@@ -2,10 +2,6 @@ package com.example.solidconnection.siteuser.service;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.NicknameExistsResponse;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
-import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;

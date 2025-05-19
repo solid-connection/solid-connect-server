@@ -6,8 +6,6 @@ import com.example.solidconnection.location.country.repository.InterestedCountyR
 import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
-import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;

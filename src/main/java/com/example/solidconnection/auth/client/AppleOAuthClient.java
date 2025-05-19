@@ -1,8 +1,8 @@
 package com.example.solidconnection.auth.client;
 
+import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.AppleTokenDto;
 import com.example.solidconnection.auth.dto.oauth.AppleUserInfoDto;
-import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;

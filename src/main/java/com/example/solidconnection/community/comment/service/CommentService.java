@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.comment.service;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.comment.dto.CommentCreateRequest;
 import com.example.solidconnection.community.comment.dto.CommentCreateResponse;
@@ -10,7 +11,6 @@ import com.example.solidconnection.community.comment.dto.PostFindCommentResponse
 import com.example.solidconnection.community.comment.repository.CommentRepository;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;

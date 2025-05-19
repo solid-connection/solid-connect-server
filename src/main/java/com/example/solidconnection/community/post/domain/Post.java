@@ -1,8 +1,8 @@
 package com.example.solidconnection.community.post.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.comment.domain.Comment;
-import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;

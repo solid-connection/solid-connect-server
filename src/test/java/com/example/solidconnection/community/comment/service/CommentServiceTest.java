@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.comment.service;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.comment.dto.CommentCreateRequest;
@@ -10,11 +11,10 @@ import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.community.post.domain.PostCategory;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

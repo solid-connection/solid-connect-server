@@ -1,8 +1,9 @@
 package com.example.solidconnection.community.post.service;
 
-import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.dto.PostDislikeResponse;
 import com.example.solidconnection.community.post.dto.PostLikeResponse;
 import com.example.solidconnection.community.post.repository.PostLikeRepository;
@@ -10,7 +11,7 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.community.post.domain.PostCategory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

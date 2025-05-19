@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.post.controller;
 
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.community.post.dto.PostCreateRequest;
 import com.example.solidconnection.community.post.dto.PostCreateResponse;
 import com.example.solidconnection.community.post.dto.PostDeleteResponse;
@@ -11,7 +12,6 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.service.PostCommandService;
 import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.community.post.service.PostQueryService;
-import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

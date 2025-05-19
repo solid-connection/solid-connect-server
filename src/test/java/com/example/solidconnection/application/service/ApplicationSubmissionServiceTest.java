@@ -3,6 +3,7 @@ package com.example.solidconnection.application.service;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
@@ -15,7 +16,6 @@ import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.integration.BaseIntegrationTest;
 import com.example.solidconnection.university.domain.LanguageTestType;
-import com.example.solidconnection.application.domain.VerifyStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +141,7 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
 
     private GpaScore createUnapprovedGpaScore(SiteUser siteUser) {
         GpaScore gpaScore = new GpaScore(
-                new Gpa(4.0,  4.5, "/gpa-report.pdf"),
+                new Gpa(4.0, 4.5, "/gpa-report.pdf"),
                 siteUser
         );
         return gpaScoreRepository.save(gpaScore);

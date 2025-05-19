@@ -1,10 +1,10 @@
 package com.example.solidconnection.security.provider;
 
+import com.example.solidconnection.security.authentication.JwtAuthentication;
+import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
-import com.example.solidconnection.security.authentication.JwtAuthentication;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
