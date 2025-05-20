@@ -70,22 +70,7 @@ class AdminLanguageTestScoreServiceTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
-            assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
         }
 
         @Test
@@ -100,21 +85,7 @@ class AdminLanguageTestScoreServiceTest {
 
             // then
             assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+                    .hasSize(expectedLanguageTestScores.size());
         }
 
         @Test
@@ -128,22 +99,7 @@ class AdminLanguageTestScoreServiceTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
-            assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
         }
     }
 

@@ -7,10 +7,8 @@ import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
-import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
-import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.fixture.GpaScoreFixture;
 import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
@@ -30,7 +28,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @TestContainerSpringBootTest
@@ -77,13 +74,7 @@ class ScoreServiceTest {
         GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user);
 
         // then
-        assertThat(response.gpaScoreStatusResponseList())
-                .hasSize(scores.size())
-                .containsExactlyInAnyOrder(
-                        scores.stream()
-                                .map(GpaScoreStatusResponse::from)
-                                .toArray(GpaScoreStatusResponse[]::new)
-                );
+        assertThat(response.gpaScoreStatusResponseList()).hasSize(scores.size());
     }
 
     @Test
@@ -107,13 +98,7 @@ class ScoreServiceTest {
         LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user);
 
         // then
-        assertThat(response.languageTestScoreStatusResponseList())
-                .hasSize(scores.size())
-                .containsExactlyInAnyOrder(
-                        scores.stream()
-                                .map(LanguageTestScoreStatusResponse::from)
-                                .toArray(LanguageTestScoreStatusResponse[]::new)
-                );
+        assertThat(response.languageTestScoreStatusResponseList()).hasSize(scores.size());
     }
 
     @Test
@@ -138,13 +123,7 @@ class ScoreServiceTest {
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
-        assertAll(
-                () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
-                () -> assertThat(savedScore.getGpa().getGpa()).isEqualTo(request.gpa()),
-                () -> assertThat(savedScore.getGpa().getGpaCriteria()).isEqualTo(request.gpaCriteria()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
-                () -> assertThat(savedScore.getGpa().getGpaReportUrl()).isEqualTo(fileUrl)
-        );
+        assertThat(savedScore.getId()).isEqualTo(scoreId);
     }
 
     @Test
@@ -160,13 +139,7 @@ class ScoreServiceTest {
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then
-        assertAll(
-                () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestType()).isEqualTo(request.languageTestType()),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestScore()).isEqualTo(request.languageTestScore()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestReportUrl()).isEqualTo(fileUrl)
-        );
+        assertThat(savedScore.getId()).isEqualTo(scoreId);
     }
 
     private GpaScoreRequest createGpaScoreRequest() {

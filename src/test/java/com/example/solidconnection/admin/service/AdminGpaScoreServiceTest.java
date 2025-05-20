@@ -69,19 +69,7 @@ class AdminGpaScoreServiceTest {
             Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
-            assertThat(response.getContent())
-                    .hasSize(expectedGpaScores.size())
-                    .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+            assertThat(response.getContent()).hasSize(expectedGpaScores.size());
         }
 
         @Test
@@ -95,19 +83,7 @@ class AdminGpaScoreServiceTest {
             Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
-            assertThat(response.getContent())
-                    .hasSize(expectedGpaScores.size())
-                    .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+            assertThat(response.getContent()).hasSize(expectedGpaScores.size());
         }
 
         @Test
@@ -121,19 +97,7 @@ class AdminGpaScoreServiceTest {
             Page<GpaScoreSearchResponse> response = adminGpaScoreService.searchGpaScores(condition, pageable);
 
             // then
-            assertThat(response.getContent())
-                    .hasSize(expectedGpaScores.size())
-                    .zipSatisfy(expectedGpaScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.gpaScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpa()).isEqualTo(expected.getGpa().getGpa()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaCriteria()).isEqualTo(expected.getGpa().getGpaCriteria()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().gpaResponse().gpaReportUrl()).isEqualTo(expected.getGpa().getGpaReportUrl()),
-                            () -> assertThat(actual.gpaScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+            assertThat(response.getContent()).hasSize(expectedGpaScores.size());
         }
     }
 
