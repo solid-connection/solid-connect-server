@@ -43,7 +43,7 @@ class AuthServiceTest {
     void 로그아웃한다() {
         // given
         Subject subject = new Subject("subject");
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
         // when
         authService.signOut(accessToken.token());
@@ -61,7 +61,7 @@ class AuthServiceTest {
         // given
         SiteUser user = siteUserFixture.사용자();
         Subject subject = authTokenProvider.toSubject(user);
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
         // when
         authService.quit(user, accessToken.token());

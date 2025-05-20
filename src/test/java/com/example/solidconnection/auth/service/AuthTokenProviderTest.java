@@ -61,7 +61,7 @@ class AuthTokenProviderTest {
         void 유효한_리프레시_토큰인지_확인한다() {
             // given
             RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(subject);
-            AccessToken fakeRefreshToken = authTokenProvider.generateAccessToken(subject); // todo: issue#296
+            AccessToken fakeRefreshToken = authTokenProvider.generateAccessToken(subject);
 
             // when, then
             assertAll(
