@@ -1,6 +1,5 @@
 package com.example.solidconnection.score.service;
 
-import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.s3.domain.ImgType;
@@ -14,6 +13,7 @@ import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
+import com.example.solidconnection.score.fixture.GpaScoreFixture;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -55,6 +55,9 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
+    @Autowired
+    private GpaScoreFixture gpaScoreFixture;
+
     private SiteUser user;
 
     @BeforeEach
@@ -66,8 +69,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
     void GPA_점수_상태를_조회한다() {
         // given
         List<GpaScore> scores = List.of(
-                createGpaScore(user, 3.5, 4.5),
-                createGpaScore(user, 3.8, 4.5)
+                gpaScoreFixture.GPA점수(3.5, 4.5, VerifyStatus.PENDING, user),
+                gpaScoreFixture.GPA점수(3.8, 4.5, VerifyStatus.APPROVED, user)
         );
 
         // when
@@ -165,15 +168,6 @@ class ScoreServiceTest extends BaseIntegrationTest {
                 () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
                 () -> assertThat(savedScore.getLanguageTest().getLanguageTestReportUrl()).isEqualTo(fileUrl)
         );
-    }
-
-    private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
-        GpaScore gpaScore = new GpaScore(
-                new Gpa(gpa, gpaCriteria, "/gpa-report.pdf"),
-                siteUser
-        );
-        gpaScore.setSiteUser(siteUser);
-        return gpaScoreRepository.save(gpaScore);
     }
 
     private LanguageTestScore createLanguageTestScore(SiteUser siteUser, LanguageTestType languageTestType, String score) {
