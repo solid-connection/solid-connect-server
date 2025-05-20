@@ -69,8 +69,8 @@ class ScoreServiceTest extends BaseIntegrationTest {
     void GPA_점수_상태를_조회한다() {
         // given
         List<GpaScore> scores = List.of(
-                gpaScoreFixture.GPA점수(3.5, 4.5, VerifyStatus.PENDING, user),
-                gpaScoreFixture.GPA점수(3.8, 4.5, VerifyStatus.APPROVED, user)
+                gpaScoreFixture.GPA_점수(3.5, 4.5, VerifyStatus.PENDING, user),
+                gpaScoreFixture.GPA_점수(3.8, 4.5, VerifyStatus.APPROVED, user)
         );
 
         // when

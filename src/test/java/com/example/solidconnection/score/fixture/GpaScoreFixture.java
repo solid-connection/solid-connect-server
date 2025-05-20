@@ -13,7 +13,7 @@ public class GpaScoreFixture {
 
     private final GpaScoreFixtureBuilder gpaScoreFixtureBuilder;
 
-    public GpaScore GPA점수(
+    public GpaScore GPA_점수 (
             Double gpa,
             Double gpaCriteria,
             VerifyStatus verifyStatus,
