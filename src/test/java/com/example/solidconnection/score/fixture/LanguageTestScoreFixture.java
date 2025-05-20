@@ -8,19 +8,17 @@ import com.example.solidconnection.university.domain.LanguageTestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
+import static com.example.solidconnection.university.domain.LanguageTestType.TOEIC;
+
 @TestComponent
 @RequiredArgsConstructor
 public class LanguageTestScoreFixture {
 
     private final LanguageTestScoreFixtureBuilder languageTestScoreFixtureBuilder;
 
-    public LanguageTestScore 어학_점수 (
-            LanguageTestType languageTestType,
-            String languageTestScore,
-            VerifyStatus verifyStatus,
-            SiteUser siteUser) {
+    public LanguageTestScore 어학_점수 (VerifyStatus verifyStatus, SiteUser siteUser) {
         return languageTestScoreFixtureBuilder.languageTestScore()
-                .languageTest(new LanguageTest(languageTestType, languageTestScore, "/language-report.pdf"))
+                .languageTest(new LanguageTest(TOEIC, "500", "/language-report.pdf"))
                 .verifyStatus(verifyStatus)
                 .siteUser(siteUser)
                 .create();

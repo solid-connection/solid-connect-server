@@ -90,8 +90,8 @@ class ScoreServiceTest {
     void 어학_시험_점수_상태를_조회한다() {
         // given
         List<LanguageTestScore> scores = List.of(
-                languageTestScoreFixture.어학_점수(LanguageTestType.TOEIC, "100", VerifyStatus.PENDING, user),
-                languageTestScoreFixture.어학_점수(LanguageTestType.TOEFL_IBT, "7.5", VerifyStatus.PENDING, user)
+                languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user),
+                languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user)
         );
 
         // when
