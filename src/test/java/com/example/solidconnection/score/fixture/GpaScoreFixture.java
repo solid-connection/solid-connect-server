@@ -13,13 +13,9 @@ public class GpaScoreFixture {
 
     private final GpaScoreFixtureBuilder gpaScoreFixtureBuilder;
 
-    public GpaScore GPA_점수 (
-            Double gpa,
-            Double gpaCriteria,
-            VerifyStatus verifyStatus,
-            SiteUser siteUser) {
+    public GpaScore GPA_점수 (VerifyStatus verifyStatus, SiteUser siteUser) {
         return gpaScoreFixtureBuilder.gpaScore()
-                .gpa(new Gpa(gpa, gpaCriteria, "/gpa-report.pdf"))
+                .gpa(new Gpa(4.0, 4.5, "/gpa-report.pdf"))
                 .verifyStatus(verifyStatus)
                 .siteUser(siteUser)
                 .create();

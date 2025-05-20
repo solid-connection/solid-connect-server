@@ -50,9 +50,9 @@ class AdminGpaScoreServiceTest {
         SiteUser user1 = siteUserFixture.사용자(1, "test1");
         SiteUser user2 = siteUserFixture.사용자(2, "test2");
         SiteUser user3 = siteUserFixture.사용자(3, "test3");
-        gpaScore3 = gpaScoreFixture.GPA_점수(3.5, 4.5, VerifyStatus.REJECTED, user3);
-        gpaScore2 = gpaScoreFixture.GPA_점수(3.5, 4.5, VerifyStatus.PENDING, user2);
-        gpaScore1 = gpaScoreFixture.GPA_점수(3.5, 4.5, VerifyStatus.PENDING, user1);
+        gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.REJECTED, user3);
+        gpaScore2 = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user2);
+        gpaScore1 = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user1);
     }
 
     @Nested
