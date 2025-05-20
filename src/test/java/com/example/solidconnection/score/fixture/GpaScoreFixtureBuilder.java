@@ -39,6 +39,7 @@ public class GpaScoreFixtureBuilder {
 
     public GpaScore create() {
         GpaScore gpaScore = new GpaScore(gpa, siteUser);
+        gpaScore.setSiteUser(siteUser);
         gpaScore.setVerifyStatus(verifyStatus);
         return gpaScoreRepository.save(gpaScore);
     }
