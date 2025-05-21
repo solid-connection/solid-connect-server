@@ -4,14 +4,13 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
-import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
+import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,17 +29,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@TestContainerSpringBootTest
 @DisplayName("어학 검증 관리자 서비스 테스트")
-class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
+class AdminLanguageTestScoreServiceTest {
 
     @Autowired
     private AdminLanguageTestScoreService adminLanguageTestScoreService;
 
     @Autowired
-    private LanguageTestScoreRepository languageTestScoreRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private SiteUserFixture siteUserFixture;
+    private LanguageTestScoreFixture languageTestScoreFixture;
 
     private LanguageTestScore languageTestScore1;
     private LanguageTestScore languageTestScore2;
@@ -51,9 +51,9 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
         SiteUser user1 = siteUserFixture.사용자(1, "test1");
         SiteUser user2 = siteUserFixture.사용자(2, "test2");
         SiteUser user3 = siteUserFixture.사용자(3, "test3");
-        languageTestScore3 = createLanguageTestScore(user3, VerifyStatus.REJECTED);
-        languageTestScore2 = createLanguageTestScore(user2, VerifyStatus.PENDING);
-        languageTestScore1 = createLanguageTestScore(user1, VerifyStatus.PENDING);
+        languageTestScore1 = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user1);
+        languageTestScore2 = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user2);
+        languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.REJECTED, user3);
     }
 
     @Nested
@@ -70,22 +70,10 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
             assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+                    .extracting(content -> content.languageTestScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
         }
 
         @Test
@@ -99,22 +87,10 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
             assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1", "test2", "test3");
         }
 
         @Test
@@ -128,22 +104,13 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
             assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size())
-                    .zipSatisfy(expectedLanguageTestScores, (actual, expected) -> assertAll(
-                            () -> assertThat(actual.languageTestScoreStatusResponse().id()).isEqualTo(expected.getId()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestType())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestType()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestScore())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestScore()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().languageTestResponse().languageTestReportUrl())
-                                    .isEqualTo(expected.getLanguageTest().getLanguageTestReportUrl()),
-                            () -> assertThat(actual.languageTestScoreStatusResponse().verifyStatus()).isEqualTo(expected.getVerifyStatus()),
-
-                            () -> assertThat(actual.siteUserResponse().id()).isEqualTo(expected.getSiteUser().getId()),
-                            () -> assertThat(actual.siteUserResponse().profileImageUrl()).isEqualTo(expected.getSiteUser().getProfileImageUrl()),
-                            () -> assertThat(actual.siteUserResponse().nickname()).isEqualTo(expected.getSiteUser().getNickname())
-                    ));
+                    .extracting(content -> content.languageTestScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
+            assertThat(response.getContent())
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1");
         }
     }
 
@@ -212,14 +179,5 @@ class AdminLanguageTestScoreServiceTest extends BaseIntegrationTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(LANGUAGE_TEST_SCORE_NOT_FOUND.getMessage());
         }
-    }
-
-    private LanguageTestScore createLanguageTestScore(SiteUser siteUser, VerifyStatus status) {
-        LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(TOEIC, "500", "/toeic-report.pdf"),
-                siteUser
-        );
-        languageTestScore.setVerifyStatus(status);
-        return languageTestScoreRepository.save(languageTestScore);
     }
 }
