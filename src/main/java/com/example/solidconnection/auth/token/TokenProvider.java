@@ -17,11 +17,12 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOK
 
 @Component
 @RequiredArgsConstructor
-public class TokenProvider {
+public class TokenProvider implements com.example.solidconnection.auth.service.TokenProvider {
 
     private final JwtProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
 
+    @Override
     public final String generateToken(String string, TokenType tokenType) {
         Claims claims = Jwts.claims().setSubject(string);
         Date now = new Date();
@@ -34,6 +35,7 @@ public class TokenProvider {
                 .compact();
     }
 
+    @Override
     public final String saveToken(String token, TokenType tokenType) {
         String subject = parseSubject(token);
         redisTemplate.opsForValue().set(
@@ -45,10 +47,12 @@ public class TokenProvider {
         return token;
     }
 
+    @Override
     public String parseSubject(String token) {
         return parseClaims(token).getSubject();
     }
 
+    @Override
     public Claims parseClaims(String token) {
         try {
             return Jwts.parser()
