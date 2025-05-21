@@ -51,9 +51,9 @@ class AdminLanguageTestScoreServiceTest {
         SiteUser user1 = siteUserFixture.사용자(1, "test1");
         SiteUser user2 = siteUserFixture.사용자(2, "test2");
         SiteUser user3 = siteUserFixture.사용자(3, "test3");
-        languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.REJECTED, user3);
-        languageTestScore2 = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user2);
         languageTestScore1 = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user1);
+        languageTestScore2 = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user2);
+        languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.REJECTED, user3);
     }
 
     @Nested
