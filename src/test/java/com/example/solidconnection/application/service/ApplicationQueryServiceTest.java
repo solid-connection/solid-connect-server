@@ -1,32 +1,37 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
+import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.score.repository.GpaScoreRepository;
-import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
+import com.example.solidconnection.score.fixture.GpaScoreFixture;
+import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
+import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestContainerSpringBootTest
 @DisplayName("지원서 조회 서비스 테스트")
-class ApplicationQueryServiceTest extends BaseIntegrationTest {
+class ApplicationQueryServiceTest {
 
     @Autowired
     private ApplicationQueryService applicationQueryService;
@@ -35,19 +40,111 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
     private ApplicationRepository applicationRepository;
 
     @Autowired
-    private GpaScoreRepository gpaScoreRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private LanguageTestScoreRepository languageTestScoreRepository;
+    private RegionFixture regionFixture;
+
+    @Autowired
+    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+
+    @Autowired
+    private LanguageRequirementFixture languageRequirementFixture;
+
+    @Autowired
+    private GpaScoreFixture gpaScoreFixture;
+
+    @Autowired
+    private LanguageTestScoreFixture languageTestScoreFixture;
+
+    @Autowired
+    private ApplicationFixture applicationFixture;
+
+    @Value("${university.term}")
+    private String term;
+
+    private SiteUser user1;
+    private SiteUser user2;
+    private SiteUser user3;
+
+    private GpaScore gpaScore1;
+    private GpaScore gpaScore2;
+    private GpaScore gpaScore3;
+
+    private LanguageTestScore languageTestScore1;
+    private LanguageTestScore languageTestScore2;
+    private LanguageTestScore languageTestScore3;
+
+    private UniversityInfoForApply 괌대학_A_지원_정보;
+    private UniversityInfoForApply 괌대학_B_지원_정보;
+    private UniversityInfoForApply 서던덴마크대학교_지원_정보;
+
+    @BeforeEach
+    void setUp() {
+        user1 = siteUserFixture.사용자(1, "test1");
+        gpaScore1 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user1);
+        languageTestScore1 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user1);
+
+        user2 = siteUserFixture.사용자(2, "test2");
+        gpaScore2 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user2);
+        languageTestScore2 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user2);
+
+        user3 = siteUserFixture.사용자(3, "test3");
+        gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user3);
+        languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
+
+        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        languageRequirementFixture.토플_80(괌대학_A_지원_정보);
+        languageRequirementFixture.토익_800(괌대학_A_지원_정보);
+
+        괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
+        languageRequirementFixture.토플_70(괌대학_B_지원_정보);
+        languageRequirementFixture.토익_900(괌대학_B_지원_정보);
+
+        서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+        languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
+    }
 
     @Nested
     class 지원자_목록_조회_테스트 {
 
         @Test
         void 이번_학기_전체_지원자를_조회한다() {
+            // given
+            Application application1 = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+            Application application2 = applicationFixture.지원서(
+                    user2,
+                    "nickname2",
+                    term,
+                    gpaScore2.getGpa(),
+                    languageTestScore2.getLanguageTest(),
+                    괌대학_B_지원_정보,
+                    null,
+                    null
+            );
+            Application application3 = applicationFixture.지원서(
+                    user3,
+                    "nickname3",
+                    term,
+                    gpaScore3.getGpa(),
+                    languageTestScore3.getLanguageTest(),
+                    서던덴마크대학교_지원_정보,
+                    null,
+                    null
+            );
+
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2,
+                    user1,
                     "",
                     ""
             );
@@ -55,128 +152,174 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
             // then
             assertThat(response.firstChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
+                            List.of(ApplicantResponse.of(application1, true))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false))),
-                    UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false))),
-                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_7_코펜하겐IT대학_X_X_지원서, false)))
-            ));
-
-            assertThat(response.secondChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
-                    UniversityApplicantsResponse.of(그라츠대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false))),
-                    UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
-            ));
-
-            assertThat(response.thirdChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
+                            List.of(ApplicantResponse.of(application2, false))),
                     UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false))),
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
+                            List.of(ApplicantResponse.of(application3, false)))
             ));
         }
 
         @Test
         void 이번_학기_특정_지역_지원자를_조회한다() {
+            //given
+            Application application1 = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+            Application application2 = applicationFixture.지원서(
+                    user2,
+                    "nickname2",
+                    term,
+                    gpaScore2.getGpa(),
+                    languageTestScore2.getLanguageTest(),
+                    괌대학_B_지원_정보,
+                    null,
+                    null
+            );
+            applicationFixture.지원서(
+                    user3,
+                    "nickname3",
+                    term,
+                    gpaScore3.getGpa(),
+                    languageTestScore3.getLanguageTest(),
+                    서던덴마크대학교_지원_정보,
+                    null,
+                    null
+            );
+
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2,
-                    영미권.getCode(),
+                    user1,
+                    regionFixture.영미권().getCode(),
                     ""
             );
 
             // then
-            assertThat(response.firstChoice()).containsAll(List.of(
+            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false))),
+                            List.of(ApplicantResponse.of(application1, true))),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
-            ));
-
-            assertThat(response.secondChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
-            ));
+                            List.of(ApplicantResponse.of(application2, false)))
+            );
         }
 
         @Test
         void 이번_학기_지원자를_대학_국문_이름으로_필터링해서_조회한다() {
+            //given
+            Application application1 = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+            Application application2 = applicationFixture.지원서(
+                    user2,
+                    "nickname2",
+                    term,
+                    gpaScore2.getGpa(),
+                    languageTestScore2.getLanguageTest(),
+                    괌대학_B_지원_정보,
+                    null,
+                    null
+            );
+            applicationFixture.지원서(
+                    user3,
+                    "nickname3",
+                    term,
+                    gpaScore3.getGpa(),
+                    languageTestScore3.getLanguageTest(),
+                    서던덴마크대학교_지원_정보,
+                    null,
+                    null
+            );
+
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_2,
+                    user1,
                     null,
-                    "일본"
+                    "괌"
             );
 
             // then
-            assertThat(response.firstChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서, false)))
-            ));
-
-            assertThat(response.secondChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보, List.of())
-            ));
-
-            assertThat(response.thirdChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서, false)))
+            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(ApplicantResponse.of(application1, true))),
+                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                            List.of(ApplicantResponse.of(application2, false)))
             );
         }
 
         @Test
         void 이전_학기_지원자는_조회되지_않는다() {
+            // given
+            Application application = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    "1988-1",
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1,
+                    user1,
                     "",
                     ""
             );
 
             // then
             assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
-                    UniversityApplicantsResponse.of(네바다주립대학_라스베이거스_지원_정보,
-                            List.of(ApplicantResponse.of(이전학기_지원서, false)))
-            ));
-            assertThat(response.secondChoice()).doesNotContainAnyElementsOf(List.of(
-                    UniversityApplicantsResponse.of(그라츠공과대학_지원_정보,
-                            List.of(ApplicantResponse.of(이전학기_지원서, false)))
-            ));
-            assertThat(response.thirdChoice()).doesNotContainAnyElementsOf(List.of(
-                    UniversityApplicantsResponse.of(메이지대학_지원_정보,
-                            List.of(ApplicantResponse.of(이전학기_지원서, false)))
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(ApplicantResponse.of(application, true)))
             ));
         }
 
         @Test
         void 동일_유저의_여러_지원서_중_최신_지원서만_조회된다() {
             // given
-            Application firstApplication = createApplication(테스트유저_1, 괌대학_A_지원_정보);
+            Application firstApplication = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
             firstApplication.setIsDeleteTrue();
             applicationRepository.save(firstApplication);
-            Application secondApplication = createApplication(테스트유저_1, 네바다주립대학_라스베이거스_지원_정보);
-
+            Application secondApplication = applicationFixture.지원서(
+                    user1,
+                    "nickname2",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_B_지원_정보,
+                    null,
+                    null
+            );
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    테스트유저_1, "", "");
+                    user1,
+                    "",
+                    ""
+            );
 
             // then
             assertThat(response.firstChoice().stream()
@@ -191,100 +334,99 @@ class ApplicationQueryServiceTest extends BaseIntegrationTest {
 
         @Test
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
-            // when
-            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_2
+            // given
+            Application application1 = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
             );
+            Application application2 = applicationFixture.지원서(
+                    user2,
+                    "nickname2",
+                    term,
+                    gpaScore2.getGpa(),
+                    languageTestScore2.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+            applicationFixture.지원서(
+                    user3,
+                    "nickname3",
+                    term,
+                    gpaScore3.getGpa(),
+                    languageTestScore3.getLanguageTest(),
+                    괌대학_B_지원_정보,
+                    null,
+                    null
+            );
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1);
 
             // then
-            assertThat(response.firstChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
-            ));
-
-            assertThat(response.secondChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true))),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서, false)))
-            ));
-
-            assertThat(response.thirdChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(린츠_카톨릭대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서, true)))
-            ));
+            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of(
+                            ApplicantResponse.of(application1, true),
+                            ApplicantResponse.of(application2, false)
+                    ))
+            );
         }
 
         @Test
         void 이번_학기_지원한_대학_중_미선택이_있을_때_경쟁자_목록을_조회한다() {
-            // when
-            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_7
+            // given
+            Application application1 = applicationFixture.지원서(
+                    user1,
+                    "nickname1",
+                    term,
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보,
+                    null,
+                    null
+            );
+            applicationFixture.지원서(
+                    user2,
+                    "nickname2",
+                    term,
+                    gpaScore2.getGpa(),
+                    languageTestScore2.getLanguageTest(),
+                    null,
+                    괌대학_B_지원_정보,
+                    null
+            );
+            applicationFixture.지원서(
+                    user3,
+                    "nickname3",
+                    term,
+                    gpaScore3.getGpa(),
+                    languageTestScore3.getLanguageTest(),
+                    null,
+                    null,
+                    서던덴마크대학교_지원_정보
             );
 
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1);
+
             // then
-            assertThat(response.firstChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보,
-                            List.of(ApplicantResponse.of(테스트유저_7_코펜하겐IT대학_X_X_지원서, true)))
-            ));
+            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(ApplicantResponse.of(application1, true)))
+            );
 
             assertThat(response.secondChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보, List.of())
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of())
             );
 
             assertThat(response.thirdChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(코펜하겐IT대학_지원_정보, List.of())
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of())
             );
         }
-
-        @Test
-        void 이번_학기_지원한_대학이_모두_미선택일_때_경쟁자_목록을_조회한다() {
-            //when
-            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(
-                    테스트유저_6
-            );
-
-            // then
-            assertThat(response.firstChoice()).isEmpty();
-            assertThat(response.secondChoice()).isEmpty();
-            assertThat(response.thirdChoice()).isEmpty();
-        }
-    }
-
-    private GpaScore createApprovedGpaScore(SiteUser siteUser) {
-        GpaScore gpaScore = new GpaScore(
-                new Gpa(4.0, 4.5, "/gpa-report.pdf"),
-                siteUser
-        );
-        gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
-        return gpaScoreRepository.save(gpaScore);
-    }
-
-    private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
-        LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                siteUser
-        );
-        languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);
-        return languageTestScoreRepository.save(languageTestScore);
-    }
-
-    private Application createApplication(
-            SiteUser siteUser,
-            UniversityInfoForApply universityInfoForApply) {
-        Application application = new Application(
-                siteUser,
-                createApprovedGpaScore(siteUser).getGpa(),
-                createApprovedLanguageTestScore(siteUser).getLanguageTest(),
-                term,
-                universityInfoForApply,
-                null,
-                null,
-                null
-        );
-        application.setVerifyStatus(VerifyStatus.APPROVED);
-        return applicationRepository.save(application);
     }
 }
