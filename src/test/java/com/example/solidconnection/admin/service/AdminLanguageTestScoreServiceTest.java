@@ -71,6 +71,9 @@ class AdminLanguageTestScoreServiceTest {
 
             // then
             assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.languageTestScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
         }
 
         @Test
@@ -84,8 +87,10 @@ class AdminLanguageTestScoreServiceTest {
             Page<LanguageTestScoreSearchResponse> response = adminLanguageTestScoreService.searchLanguageTestScores(condition, pageable);
 
             // then
+            assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
             assertThat(response.getContent())
-                    .hasSize(expectedLanguageTestScores.size());
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1", "test2", "test3");
         }
 
         @Test
@@ -100,6 +105,12 @@ class AdminLanguageTestScoreServiceTest {
 
             // then
             assertThat(response.getContent()).hasSize(expectedLanguageTestScores.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.languageTestScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
+            assertThat(response.getContent())
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1");
         }
     }
 

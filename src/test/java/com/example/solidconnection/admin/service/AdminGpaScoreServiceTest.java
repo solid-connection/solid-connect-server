@@ -70,6 +70,9 @@ class AdminGpaScoreServiceTest {
 
             // then
             assertThat(response.getContent()).hasSize(expectedGpaScores.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.gpaScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
         }
 
         @Test
@@ -84,6 +87,9 @@ class AdminGpaScoreServiceTest {
 
             // then
             assertThat(response.getContent()).hasSize(expectedGpaScores.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1", "test2", "test3");
         }
 
         @Test
@@ -98,6 +104,12 @@ class AdminGpaScoreServiceTest {
 
             // then
             assertThat(response.getContent()).hasSize(expectedGpaScores.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.gpaScoreStatusResponse().verifyStatus())
+                    .containsOnly(VerifyStatus.PENDING);
+            assertThat(response.getContent())
+                    .extracting(content -> content.siteUserResponse().nickname())
+                    .containsOnly("test1");
         }
     }
 
