@@ -1,4 +1,4 @@
-package com.example.solidconnection.security.config;
+package com.example.solidconnection.auth.token.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

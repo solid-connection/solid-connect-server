@@ -1,6 +1,7 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.TokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

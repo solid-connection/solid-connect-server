@@ -1,5 +1,6 @@
 package com.example.solidconnection.auth.service;
 
+import com.example.solidconnection.auth.token.TokenProvider;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import lombok.RequiredArgsConstructor;

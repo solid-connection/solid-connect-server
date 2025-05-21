@@ -1,6 +1,6 @@
 package com.example.solidconnection.security.provider;
 
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.token.TokenProvider;
 import com.example.solidconnection.security.authentication.JwtAuthentication;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;

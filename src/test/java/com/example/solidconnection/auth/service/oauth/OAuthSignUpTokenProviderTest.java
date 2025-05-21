@@ -1,9 +1,9 @@
 package com.example.solidconnection.auth.service.oauth;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.token.TokenProvider;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.config.JwtProperties;
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Claims;

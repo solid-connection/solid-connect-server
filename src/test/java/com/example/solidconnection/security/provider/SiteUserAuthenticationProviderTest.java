@@ -2,7 +2,7 @@ package com.example.solidconnection.security.provider;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
-import com.example.solidconnection.security.config.JwtProperties;
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;

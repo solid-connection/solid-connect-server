@@ -1,8 +1,8 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.token;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.config.JwtProperties;
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

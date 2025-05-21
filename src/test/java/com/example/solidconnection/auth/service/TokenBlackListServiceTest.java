@@ -1,5 +1,6 @@
 package com.example.solidconnection.auth.service;
 
+import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
