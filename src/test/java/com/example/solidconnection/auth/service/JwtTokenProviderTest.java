@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.token.TokenProvider;
+import com.example.solidconnection.auth.token.JwtTokenProvider;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.auth.token.config.JwtProperties;
@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("토큰 제공자 테스트")
 @TestContainerSpringBootTest
-class TokenProviderTest {
+class JwtTokenProviderTest {
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
     private JwtProperties jwtProperties;

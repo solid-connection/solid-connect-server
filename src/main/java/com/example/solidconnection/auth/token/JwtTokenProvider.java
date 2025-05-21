@@ -1,8 +1,9 @@
 package com.example.solidconnection.auth.token;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
+import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,7 +18,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOK
 
 @Component
 @RequiredArgsConstructor
-public class TokenProvider implements com.example.solidconnection.auth.service.TokenProvider {
+public class JwtTokenProvider implements TokenProvider {
 
     private final JwtProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;

@@ -2,9 +2,8 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
-import com.example.solidconnection.auth.token.TokenProvider;
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.auth.token.config.JwtProperties;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

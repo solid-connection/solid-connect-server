@@ -1,7 +1,6 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.token.TokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,10 +27,10 @@ public class AuthTokenProvider {
     }
 
     /*
-    * 유효한 리프레시 토큰인지 확인한다.
-    * - 요청된 토큰과 같은 subject 의 리프레시 토큰을 조회한다.
-    * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
-    * */
+     * 유효한 리프레시 토큰인지 확인한다.
+     * - 요청된 토큰과 같은 subject 의 리프레시 토큰을 조회한다.
+     * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
+     * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
         String subject = tokenProvider.parseSubject(requestedRefreshToken);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
