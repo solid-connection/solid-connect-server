@@ -15,7 +15,6 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +47,6 @@ class ApplicationSubmissionServiceTest {
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
     @Autowired
-    private LanguageRequirementFixture languageRequirementFixture;
-
-    @Autowired
     private GpaScoreFixture gpaScoreFixture;
 
     @Autowired
@@ -67,17 +63,9 @@ class ApplicationSubmissionServiceTest {
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
-
         괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-        languageRequirementFixture.토플_80(괌대학_A_지원_정보);
-        languageRequirementFixture.토익_800(괌대학_A_지원_정보);
-
         괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
-        languageRequirementFixture.토플_70(괌대학_B_지원_정보);
-        languageRequirementFixture.토익_900(괌대학_B_지원_정보);
-
         서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
-        languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
     }
 
     @Test
