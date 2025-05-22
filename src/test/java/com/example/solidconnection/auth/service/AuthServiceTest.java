@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
+import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -31,6 +32,9 @@ class AuthServiceTest {
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
+    private TokenBlackListService tokenBlackListService;
+
+    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
@@ -40,7 +44,7 @@ class AuthServiceTest {
     void 로그아웃한다() {
         // given
         Subject subject = new Subject("subject");
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
         // when
         authService.signOut(accessToken.token());
@@ -49,7 +53,7 @@ class AuthServiceTest {
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
         assertAll(
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
-                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+                () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
 
@@ -58,7 +62,7 @@ class AuthServiceTest {
         // given
         SiteUser user = siteUserFixture.사용자();
         Subject subject = authTokenProvider.toSubject(user);
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject); // todo: #296
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
         // when
         authService.quit(user, accessToken.token());
@@ -69,7 +73,7 @@ class AuthServiceTest {
         assertAll(
                 () -> assertThat(user.getQuitedAt()).isEqualTo(tomorrow),
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
-                () -> assertThat(authTokenProvider.isTokenBlacklisted(accessToken.token())).isTrue()
+                () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
 

@@ -2,11 +2,9 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.util.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +24,7 @@ class SignInServiceTest {
     private SignInService signInService;
 
     @Autowired
-    private JwtProperties jwtProperties;
+    private TokenProvider tokenProvider;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -49,8 +47,8 @@ class SignInServiceTest {
         SignInResponse signInResponse = signInService.signIn(user);
 
         // then
-        String accessTokenSubject = JwtUtils.parseSubject(signInResponse.accessToken(), jwtProperties.secret());
-        String refreshTokenSubject = JwtUtils.parseSubject(signInResponse.refreshToken(), jwtProperties.secret());
+        String accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
+        String refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
         String savedRefreshToken = redisTemplate.opsForValue().get(TokenType.REFRESH.addPrefix(refreshTokenSubject));
         assertAll(
                 () -> assertThat(accessTokenSubject).isEqualTo(subject),

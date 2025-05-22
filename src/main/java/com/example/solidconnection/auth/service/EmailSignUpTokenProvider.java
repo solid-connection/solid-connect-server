@@ -2,12 +2,13 @@ package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,22 +20,18 @@ import java.util.Objects;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
-import static com.example.solidconnection.util.JwtUtils.parseClaims;
-import static com.example.solidconnection.util.JwtUtils.parseSubject;
 
 @Component
-public class EmailSignUpTokenProvider extends TokenProvider {
+@RequiredArgsConstructor
+public class EmailSignUpTokenProvider {
 
     static final String PASSWORD_CLAIM_KEY = "password";
     static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
     private final PasswordEncoder passwordEncoder;
-
-    public EmailSignUpTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate,
-                                    PasswordEncoder passwordEncoder) {
-        super(jwtProperties, redisTemplate);
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final JwtProperties jwtProperties;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
 
     public String generateAndSaveSignUpToken(EmailSignUpTokenRequest request) {
         String email = request.email();
@@ -54,7 +51,7 @@ public class EmailSignUpTokenProvider extends TokenProvider {
                 .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.secret())
                 .compact();
-        return saveToken(signUpToken, TokenType.SIGN_UP);
+        return tokenProvider.saveToken(signUpToken, TokenType.SIGN_UP);
     }
 
     public void validateSignUpToken(String token) {
@@ -65,7 +62,7 @@ public class EmailSignUpTokenProvider extends TokenProvider {
 
     private void validateFormatAndExpiration(String token) {
         try {
-            Claims claims = parseClaims(token, jwtProperties.secret());
+            Claims claims = tokenProvider.parseClaims(token);
             Objects.requireNonNull(claims.getSubject());
             String encodedPassword = claims.get(PASSWORD_CLAIM_KEY, String.class);
             Objects.requireNonNull(encodedPassword);
@@ -82,11 +79,11 @@ public class EmailSignUpTokenProvider extends TokenProvider {
     }
 
     public String parseEmail(String token) {
-        return parseSubject(token, jwtProperties.secret());
+        return tokenProvider.parseSubject(token);
     }
 
     public String parseEncodedPassword(String token) {
-        Claims claims = parseClaims(token, jwtProperties.secret());
+        Claims claims = tokenProvider.parseClaims(token);
         return claims.get(PASSWORD_CLAIM_KEY, String.class);
     }
 }

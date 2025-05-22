@@ -2,12 +2,13 @@ package com.example.solidconnection.auth.service.oauth;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.config.JwtProperties;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,17 +19,16 @@ import java.util.Objects;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
-import static com.example.solidconnection.util.JwtUtils.parseClaims;
-import static com.example.solidconnection.util.JwtUtils.parseSubject;
 
 @Component
-public class OAuthSignUpTokenProvider extends TokenProvider {
+@RequiredArgsConstructor
+public class OAuthSignUpTokenProvider {
 
     static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
-    public OAuthSignUpTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
-        super(jwtProperties, redisTemplate);
-    }
+    private final JwtProperties jwtProperties;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
 
     public String generateAndSaveSignUpToken(String email, AuthType authType) {
         Map<String, Object> authTypeClaim = new HashMap<>(Map.of(AUTH_TYPE_CLAIM_KEY, authType));
@@ -42,7 +42,7 @@ public class OAuthSignUpTokenProvider extends TokenProvider {
                 .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.secret())
                 .compact();
-        return saveToken(signUpToken, TokenType.SIGN_UP);
+        return tokenProvider.saveToken(signUpToken, TokenType.SIGN_UP);
     }
 
     public void validateSignUpToken(String token) {
@@ -53,7 +53,7 @@ public class OAuthSignUpTokenProvider extends TokenProvider {
 
     private void validateFormatAndExpiration(String token) {
         try {
-            Claims claims = parseClaims(token, jwtProperties.secret());
+            Claims claims = tokenProvider.parseClaims(token);
             Objects.requireNonNull(claims.getSubject());
             String serializedAuthType = claims.get(AUTH_TYPE_CLAIM_KEY, String.class);
             AuthType.valueOf(serializedAuthType);
@@ -70,11 +70,11 @@ public class OAuthSignUpTokenProvider extends TokenProvider {
     }
 
     public String parseEmail(String token) {
-        return parseSubject(token, jwtProperties.secret());
+        return tokenProvider.parseSubject(token);
     }
 
     public AuthType parseAuthType(String token) {
-        Claims claims = parseClaims(token, jwtProperties.secret());
+        Claims claims = tokenProvider.parseClaims(token);
         String authTypeStr = claims.get(AUTH_TYPE_CLAIM_KEY, String.class);
         return AuthType.valueOf(authTypeStr);
     }
