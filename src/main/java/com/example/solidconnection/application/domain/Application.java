@@ -1,7 +1,6 @@
 package com.example.solidconnection.application.domain;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -54,14 +53,14 @@ public class Application {
     @Column
     private boolean isDelete = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply firstChoiceUniversity;
+    @Column
+    private Long firstChoiceUniversityApplyInfoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply secondChoiceUniversity;
+    @Column
+    private Long secondChoiceUniversityApplyInfoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply thirdChoiceUniversity;
+    @Column
+    private Long thirdChoiceUniversityApplyInfoId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser siteUser;
@@ -85,18 +84,18 @@ public class Application {
             LanguageTest languageTest,
             String term,
             Integer updateCount,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
+            Long firstChoiceUniversityApplyInfoId,
+            Long secondChoiceUniversityApplyInfoId,
+            Long thirdChoiceUniversityApplyInfoId,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
         this.updateCount = updateCount;
-        this.firstChoiceUniversity = firstChoiceUniversity;
-        this.secondChoiceUniversity = secondChoiceUniversity;
-        this.thirdChoiceUniversity = thirdChoiceUniversity;
+        this.firstChoiceUniversityApplyInfoId = firstChoiceUniversityApplyInfoId;
+        this.secondChoiceUniversityApplyInfoId = secondChoiceUniversityApplyInfoId;
+        this.thirdChoiceUniversityApplyInfoId = thirdChoiceUniversityApplyInfoId;
         this.nicknameForApply = nicknameForApply;
         this.verifyStatus = PENDING;
     }
@@ -106,37 +105,23 @@ public class Application {
             Gpa gpa,
             LanguageTest languageTest,
             String term,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
+            Long firstChoiceUniversityApplyInfoId,
+            Long secondChoiceUniversityApplyInfoId,
+            Long thirdChoiceUniversityApplyInfoId,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
         this.updateCount = 1;
-        this.firstChoiceUniversity = firstChoiceUniversity;
-        this.secondChoiceUniversity = secondChoiceUniversity;
-        this.thirdChoiceUniversity = thirdChoiceUniversity;
+        this.firstChoiceUniversityApplyInfoId = firstChoiceUniversityApplyInfoId;
+        this.secondChoiceUniversityApplyInfoId = secondChoiceUniversityApplyInfoId;
+        this.thirdChoiceUniversityApplyInfoId = thirdChoiceUniversityApplyInfoId;
         this.nicknameForApply = nicknameForApply;
         this.verifyStatus = PENDING;
     }
 
     public void setIsDeleteTrue() {
         this.isDelete = true;
-    }
-
-    public void updateUniversityChoice(
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
-            String nicknameForApply) {
-        if (this.firstChoiceUniversity != null) {
-            this.updateCount++;
-        }
-        this.firstChoiceUniversity = firstChoiceUniversity;
-        this.secondChoiceUniversity = secondChoiceUniversity;
-        this.thirdChoiceUniversity = thirdChoiceUniversity;
-        this.nicknameForApply = nicknameForApply;
     }
 }
