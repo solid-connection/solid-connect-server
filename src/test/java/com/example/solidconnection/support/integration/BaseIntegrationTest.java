@@ -423,26 +423,82 @@ public abstract class BaseIntegrationTest {
     }
 
     private void setUpApplications() {
-        테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서 = new Application(테스트유저_2, createApprovedGpaScore(테스트유저_2).getGpa(), createApprovedLanguageTestScore(테스트유저_2).getLanguageTest(),
-                term, 2L, 1L, 15L, "user2_nickname");
+        테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서 = new Application(
+                테스트유저_2,
+                createApprovedGpaScore(테스트유저_2).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_2).getLanguageTest(),
+                term,
+                괌대학_B_지원_정보.getId(),
+                괌대학_A_지원_정보.getId(),
+                린츠_카톨릭대학_지원_정보.getId(),
+                "user2_nickname"
+        );
 
-        테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서 = new Application(테스트유저_3, createApprovedGpaScore(테스트유저_3).getGpa(), createApprovedLanguageTestScore(테스트유저_3).getLanguageTest(),
-                term, 1L, 2L, 14L, "user3_nickname");
+        테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서 = new Application(
+                테스트유저_3,
+                createApprovedGpaScore(테스트유저_3).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_3).getLanguageTest(),
+                term,
+                괌대학_A_지원_정보.getId(),
+                괌대학_B_지원_정보.getId(),
+                그라츠공과대학_지원_정보.getId(),
+                "user3_nickname"
+        );
 
-        테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서 = new Application(테스트유저_4, createApprovedGpaScore(테스트유저_4).getGpa(), createApprovedLanguageTestScore(테스트유저_4).getLanguageTest(),
-                term, 18L, 13L, 9L, "user4_nickname");
+        테스트유저_4_메이지대학_그라츠대학_서던덴마크대학_지원서 = new Application(
+                테스트유저_4,
+                createApprovedGpaScore(테스트유저_4).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_4).getLanguageTest(),
+                term,
+                메이지대학_지원_정보.getId(),
+                그라츠대학_지원_정보.getId(),
+                서던덴마크대학교_지원_정보.getId(),
+                "user4_nickname"
+        );
 
-        테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서 = new Application(테스트유저_5, createApprovedGpaScore(테스트유저_5).getGpa(), createApprovedLanguageTestScore(테스트유저_5).getLanguageTest(),
-                term, 3L, 14L, 18L, "user5_nickname");
+        테스트유저_5_네바다주립대학_그라츠공과대학_메이지대학_지원서 = new Application(
+                테스트유저_5,
+                createApprovedGpaScore(테스트유저_5).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_5).getLanguageTest(),
+                term,
+                네바다주립대학_라스베이거스_지원_정보.getId(),
+                그라츠공과대학_지원_정보.getId(),
+                메이지대학_지원_정보.getId(),
+                "user5_nickname"
+        );
 
-        테스트유저_6_X_X_X_지원서 = new Application(테스트유저_6, createApprovedGpaScore(테스트유저_6).getGpa(), createApprovedLanguageTestScore(테스트유저_6).getLanguageTest(),
-                term, null, null, null, "user6_nickname");
+        테스트유저_6_X_X_X_지원서 = new Application(
+                테스트유저_6,
+                createApprovedGpaScore(테스트유저_6).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_6).getLanguageTest(),
+                term,
+                null,
+                null,
+                null,
+                "user6_nickname"
+        );
 
-        테스트유저_7_코펜하겐IT대학_X_X_지원서 = new Application(테스트유저_7, createApprovedGpaScore(테스트유저_7).getGpa(), createApprovedLanguageTestScore(테스트유저_7).getLanguageTest(),
-                term, 10L, null, null, "user7_nickname");
+        테스트유저_7_코펜하겐IT대학_X_X_지원서 = new Application(
+                테스트유저_7,
+                createApprovedGpaScore(테스트유저_7).getGpa(),
+                createApprovedLanguageTestScore(테스트유저_7).getLanguageTest(),
+                term,
+                코펜하겐IT대학_지원_정보.getId(),
+                null,
+                null,
+                "user7_nickname"
+        );
 
-        이전학기_지원서 = new Application(이전학기_지원자, createApprovedGpaScore(이전학기_지원자).getGpa(), createApprovedLanguageTestScore(이전학기_지원자).getLanguageTest(),
-                "1988-1", 3L, 14L, 18L, "old_nickname");
+        이전학기_지원서 = new Application(
+                이전학기_지원자,
+                createApprovedGpaScore(이전학기_지원자).getGpa(),
+                createApprovedLanguageTestScore(이전학기_지원자).getLanguageTest(),
+                "1988-1",
+                네바다주립대학_라스베이거스_지원_정보.getId(),
+                그라츠공과대학_지원_정보.getId(),
+                메이지대학_지원_정보.getId(),
+                "old_nickname"
+        );
 
         테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);
         테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서.setVerifyStatus(VerifyStatus.APPROVED);

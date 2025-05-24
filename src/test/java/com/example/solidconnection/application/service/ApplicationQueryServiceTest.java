@@ -70,11 +70,11 @@ class ApplicationQueryServiceTest {
     private LanguageTestScore languageTestScore1;
     private LanguageTestScore languageTestScore2;
     private LanguageTestScore languageTestScore3;
-    
-    private Long firstChoiceUniversityApplyInfoId = 1L;
-    private Long secondChoiceUniversityApplyInfoId = 2L;
-    
-    private Long thirdChoiceUniversityApplyInfoId = 3L;
+
+    private Long firstChoiceUniversityApplyInfoId;
+    private Long secondChoiceUniversityApplyInfoId;
+    private Long thirdChoiceUniversityApplyInfoId;
+
 
     private UniversityInfoForApply 괌대학_A_지원_정보;
     private UniversityInfoForApply 괌대학_B_지원_정보;
@@ -94,9 +94,13 @@ class ApplicationQueryServiceTest {
         gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user3);
         languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
 
-        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-        괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
+        괌대학_A_지원_정보       = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        괌대학_B_지원_정보       = universityInfoForApplyFixture.괌대학_B_지원_정보();
         서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+
+        firstChoiceUniversityApplyInfoId  = 괌대학_A_지원_정보.getId();
+        secondChoiceUniversityApplyInfoId = 괌대학_B_지원_정보.getId();
+        thirdChoiceUniversityApplyInfoId  = 서던덴마크대학교_지원_정보.getId();
     }
 
     @Nested
