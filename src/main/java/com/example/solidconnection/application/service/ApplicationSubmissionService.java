@@ -45,24 +45,14 @@ public class ApplicationSubmissionService {
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
-    // todo: 임시로 새로운 신청 생성 시 기존 캐싱 데이터를 삭제한다. 추후 수정 필요
-    @DefaultCacheOut(
-            key = {"applications:all"},
-            cacheManager = "customCacheManager"
-    )
     public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
         UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
-        UniversityInfoForApply firstChoiceUniversity = universityInfoForApplyRepository
-                .getUniversityInfoForApplyByIdAndTerm(universityChoiceRequest.firstChoiceUniversityId(), term);
-        UniversityInfoForApply secondChoiceUniversity = Optional.ofNullable(universityChoiceRequest.secondChoiceUniversityId())
-                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                .orElse(null);
-        UniversityInfoForApply thirdChoiceUniversity = Optional.ofNullable(universityChoiceRequest.thirdChoiceUniversityId())
-                .map(id -> universityInfoForApplyRepository.getUniversityInfoForApplyByIdAndTerm(id, term))
-                .orElse(null);
+        Long firstChoiceUniversityId = universityChoiceRequest.firstChoiceUniversityId();
+        Long secondChoiceUniversityId = universityChoiceRequest.secondChoiceUniversityId();
+        Long thirdChoiceUniversityId = universityChoiceRequest.thirdChoiceUniversityId();
 
         Optional<Application> existingApplication = applicationRepository.findBySiteUserAndTerm(siteUser, term);
         int updateCount = existingApplication
@@ -72,10 +62,22 @@ public class ApplicationSubmissionService {
                     return application.getUpdateCount() + 1;
                 })
                 .orElse(1);
-        Application newApplication = new Application(siteUser, gpaScore.getGpa(), languageTestScore.getLanguageTest(),
-                term, updateCount, firstChoiceUniversity, secondChoiceUniversity, thirdChoiceUniversity, getRandomNickname());
+
+        Application newApplication = new Application(
+                siteUser,
+                gpaScore.getGpa(),
+                languageTestScore.getLanguageTest(),
+                term,
+                updateCount,
+                firstChoiceUniversityId,
+                secondChoiceUniversityId,
+                thirdChoiceUniversityId,
+                getRandomNickname()
+        );
+
         newApplication.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(newApplication);
+
         return ApplicationSubmissionResponse.from(newApplication);
     }
 
