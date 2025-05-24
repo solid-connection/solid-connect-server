@@ -20,14 +20,21 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByNicknameForApply(String nicknameForApply);
 
-    List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
-
-    List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
-
-    List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
+    @Query("""
+    select a
+    from Application a
+    join fetch a.siteUser
+    where (a.firstChoiceUniversityApplyInfoId in :universityIds
+        or a.secondChoiceUniversityApplyInfoId in :universityIds
+        or a.thirdChoiceUniversityApplyInfoId in :universityIds)
+      and a.verifyStatus = :status
+      and a.term = :term
+      and a.isDelete = false
+""")
+    List<Application> findApplicationsForChoices(
+            @Param("universityIds") List<Long> universityIds,
+            @Param("status") VerifyStatus status,
+            @Param("term") String term);
 
     @Query("""
         SELECT a FROM Application a
