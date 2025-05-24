@@ -58,8 +58,13 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
     }
 
-    default UniversityInfoForApply getUniversityInfoForApplyByIdAndTerm(Long id, String term) {
-        return findByIdAndTerm(id, term)
-                .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND_FOR_TERM));
-    }
+    @Query("""
+    select distinct uia from UniversityInfoForApply uia
+    join fetch uia.university u
+    join fetch u.country c
+    join fetch u.region r
+    where uia.id in :ids
+""")
+    List<UniversityInfoForApply> findByIdsWithUniversityAndLocation(@Param("ids") List<Long> ids);
+
 }

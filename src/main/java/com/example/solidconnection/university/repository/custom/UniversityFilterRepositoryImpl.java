@@ -28,18 +28,21 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
     @Override
-    public List<University> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+    public List<Long> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
 
         return queryFactory
-                .selectFrom(university)
+                .select(university.id)
+                .from(university)
                 .join(university.country, country)
                 .join(country.region, region)
-                .where(regionCodeEq(region, regionCode)
-                        .and(countryOrUniversityContainsKeyword(country, university, keywords))
+                .where(
+                        regionCodeEq(region, regionCode)
+                                .and(countryOrUniversityContainsKeyword(country, university, keywords))
                 )
+                .distinct()
                 .fetch();
     }
 
