@@ -472,7 +472,7 @@ public abstract class BaseIntegrationTest {
                 createApprovedGpaScore(테스트유저_6).getGpa(),
                 createApprovedLanguageTestScore(테스트유저_6).getLanguageTest(),
                 term,
-                null,
+                그라츠대학_지원_정보.getId(),
                 null,
                 null,
                 "user6_nickname"
