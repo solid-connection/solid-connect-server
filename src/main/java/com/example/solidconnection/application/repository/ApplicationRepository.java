@@ -34,7 +34,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findApplicationsByUniversityChoices(@Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
 
     @Query("""
-            SELECT a 
+            SELECT a
             FROM Application a
             WHERE a.siteUser = :siteUser
                 AND a.term = :term
