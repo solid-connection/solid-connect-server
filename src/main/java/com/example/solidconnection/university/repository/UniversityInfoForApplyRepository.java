@@ -22,7 +22,12 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
 
     Optional<UniversityInfoForApply> findFirstByKoreanNameAndTerm(String koreanName, String term);
 
-    @Query("SELECT c FROM UniversityInfoForApply c WHERE c.university IN :universities AND c.term = :term")
+    @Query("""
+            SELECT uifa 
+            FROM UniversityInfoForApply uifa 
+            WHERE uifa.university IN :universities 
+                AND uifa.term = :term
+            """)
     List<UniversityInfoForApply> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
@@ -49,7 +54,8 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
                 SELECT *
                 FROM university_info_for_apply
                 WHERE term = :term
-                ORDER BY RAND() LIMIT :limitNum
+                ORDER BY RAND() 
+                LIMIT :limitNum
             """, nativeQuery = true)
     List<UniversityInfoForApply> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
 
@@ -59,12 +65,23 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
     }
 
     @Query("""
-    select distinct uia from UniversityInfoForApply uia
-    join fetch uia.university u
-    join fetch u.country c
-    join fetch u.region r
-    where uia.id in :ids
-""")
+            SELECT DISTINCT uifa
+            FROM UniversityInfoForApply uifa
+            JOIN FETCH uifa.university u
+            JOIN FETCH u.country c
+            JOIN FETCH u.region r
+            WHERE uifa.id IN :ids
+            """)
     List<UniversityInfoForApply> findByIdsWithUniversityAndLocation(@Param("ids") List<Long> ids);
+
+    @Query("""
+            SELECT DISTINCT uifa
+            FROM UniversityInfoForApply uifa
+            JOIN FETCH uifa.university u
+            JOIN FETCH u.country c
+            JOIN FETCH u.region r
+            WHERE u.id IN :universityIds
+            """)
+    List<UniversityInfoForApply> findByUniversityIdsWithUniversityAndLocation(@Param("universityIds") List<Long> universityIds);
 
 }

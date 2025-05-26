@@ -21,27 +21,25 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     boolean existsByNicknameForApply(String nicknameForApply);
 
     @Query("""
-    select a
-    from Application a
-    join fetch a.siteUser
-    where (a.firstChoiceUniversityApplyInfoId in :universityIds
-        or a.secondChoiceUniversityApplyInfoId in :universityIds
-        or a.thirdChoiceUniversityApplyInfoId in :universityIds)
-      and a.verifyStatus = :status
-      and a.term = :term
-      and a.isDelete = false
-""")
-    List<Application> findApplicationsForChoices(
-            @Param("universityIds") List<Long> universityIds,
-            @Param("status") VerifyStatus status,
-            @Param("term") String term);
+            SELECT a
+            FROM Application a
+            JOIN FETCH a.siteUser
+            WHERE (a.firstChoiceUniversityApplyInfoId IN :universityIds
+                OR a.secondChoiceUniversityApplyInfoId IN :universityIds
+                OR a.thirdChoiceUniversityApplyInfoId IN :universityIds)
+                AND a.verifyStatus = :status
+                AND a.term = :term
+                AND a.isDelete = false
+            """)
+    List<Application> findApplicationsByUniversityChoices(@Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
 
     @Query("""
-        SELECT a FROM Application a
-        WHERE a.siteUser = :siteUser
-        AND a.term = :term
-        AND a.isDelete = false
-    """)
+            SELECT a 
+            FROM Application a
+            WHERE a.siteUser = :siteUser
+                AND a.term = :term
+                AND a.isDelete = false
+            """)
     Optional<Application> findBySiteUserAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
 
     default Application getApplicationBySiteUserAndTerm(SiteUser siteUser, String term) {

@@ -72,7 +72,6 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     @Override
     public List<UniversityInfoForApply> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term) {
-
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;

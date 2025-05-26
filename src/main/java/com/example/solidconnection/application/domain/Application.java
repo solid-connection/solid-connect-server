@@ -53,7 +53,7 @@ public class Application {
     @Column
     private boolean isDelete = false;
 
-    @Column
+    @Column(nullable = false)
     private Long firstChoiceUniversityApplyInfoId;
 
     @Column

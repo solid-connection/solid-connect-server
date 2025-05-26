@@ -16,9 +16,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.List;
+import java.util.Objects;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
@@ -33,27 +38,30 @@ public class ApplicationQueryService {
     @Value("${university.term}")
     public String term;
 
+    // todo: 캐싱 정책 변경 시 수정 필요
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 1. 대학 ID 필터링 (regionCode, keyword)
         List<Long> universityIds = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
-        if (universityIds.isEmpty()) return new ApplicationsResponse(List.of(), List.of(), List.of());
+        if (universityIds.isEmpty()) {
+            return new ApplicationsResponse(List.of(), List.of(), List.of());
+        }
 
         // 2. 조건에 맞는 모든 Application 한 번에 조회
-        List<Application> applications = applicationRepository.findApplicationsForChoices(universityIds, VerifyStatus.APPROVED, term);
+        List<Application> applications = applicationRepository.findApplicationsByUniversityChoices(universityIds, VerifyStatus.APPROVED, term);
 
         // 3. 대학정보 조회
-        List<UniversityInfoForApply> universityInfos = universityInfoForApplyRepository.findByIdsWithUniversityAndLocation(universityIds);
+        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findByUniversityIdsWithUniversityAndLocation(universityIds);
 
         // 4. 지원서 분류 및 DTO 변환
-        return classifyApplicationsByChoice(universityInfos, applications, siteUser);
+        return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
 
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
 
-        List<Long> universityIds = Stream.of(
+        List<Long> universityInfoForApplyIds = Stream.of(
                         userLatestApplication.getFirstChoiceUniversityApplyInfoId(),
                         userLatestApplication.getSecondChoiceUniversityApplyInfoId(),
                         userLatestApplication.getThirdChoiceUniversityApplyInfoId()
@@ -61,62 +69,60 @@ public class ApplicationQueryService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (universityIds.isEmpty()) {
+        if (universityInfoForApplyIds.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
 
-        List<Application> applications = applicationRepository.findApplicationsForChoices(universityIds, VerifyStatus.APPROVED, term);
-        List<UniversityInfoForApply> universityInfos = universityInfoForApplyRepository.findByIdsWithUniversityAndLocation(universityIds);
+        List<Application> applications = applicationRepository.findApplicationsByUniversityChoices(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
+        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findByIdsWithUniversityAndLocation(universityInfoForApplyIds);
 
-        return classifyApplicationsByChoice(universityInfos, applications, siteUser);
+        return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
-            List<UniversityInfoForApply> universityInfos,
+            List<UniversityInfoForApply> universityInfosForApply,
             List<Application> applications,
             SiteUser siteUser) {
+        Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUniversityApplyInfoId);
+        Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUniversityApplyInfoId);
+        Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUniversityApplyInfoId);
 
-        Map<Long, List<Application>> firstChoiceMap = new HashMap<>();
-        Map<Long, List<Application>> secondChoiceMap = new HashMap<>();
-        Map<Long, List<Application>> thirdChoiceMap = new HashMap<>();
+        List<UniversityApplicantsResponse> firstChoiceApplicants =
+                createUniversityApplicantsResponses(universityInfosForApply, firstChoiceMap, siteUser);
+        List<UniversityApplicantsResponse> secondChoiceApplicants =
+                createUniversityApplicantsResponses(universityInfosForApply, secondChoiceMap, siteUser);
+        List<UniversityApplicantsResponse> thirdChoiceApplicants =
+                createUniversityApplicantsResponses(universityInfosForApply, thirdChoiceMap, siteUser);
 
-        for (Application a : applications) {
-            if (a.getFirstChoiceUniversityApplyInfoId() != null) {
-                firstChoiceMap.computeIfAbsent(a.getFirstChoiceUniversityApplyInfoId(), k -> new ArrayList<>()).add(a);
-            }
-            if (a.getSecondChoiceUniversityApplyInfoId() != null) {
-                secondChoiceMap.computeIfAbsent(a.getSecondChoiceUniversityApplyInfoId(), k -> new ArrayList<>()).add(a);
-            }
-            if (a.getThirdChoiceUniversityApplyInfoId() != null) {
-                thirdChoiceMap.computeIfAbsent(a.getThirdChoiceUniversityApplyInfoId(), k -> new ArrayList<>()).add(a);
+        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
+    }
+
+    private Map<Long, List<Application>> createChoiceMap(
+            List<Application> applications,
+            Function<Application, Long> choiceIdExtractor) {
+        Map<Long, List<Application>> choiceMap = new HashMap<>();
+
+        for (Application application : applications) {
+            Long choiceId = choiceIdExtractor.apply(application);
+            if (choiceId != null) {
+                choiceMap.computeIfAbsent(choiceId, k -> new ArrayList<>()).add(application);
             }
         }
 
-        List<UniversityApplicantsResponse> firstChoiceApplicants = universityInfos.stream()
+        return choiceMap;
+    }
+
+    private List<UniversityApplicantsResponse> createUniversityApplicantsResponses(
+            List<UniversityInfoForApply> universityInfosForApply,
+            Map<Long, List<Application>> choiceMap,
+            SiteUser siteUser) {
+        return universityInfosForApply.stream()
                 .map(uia -> UniversityApplicantsResponse.of(
                         uia,
-                        firstChoiceMap.getOrDefault(uia.getId(), List.of()).stream()
+                        choiceMap.getOrDefault(uia.getId(), List.of()).stream()
                                 .map(ap -> ApplicantResponse.of(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
                                 .toList()))
                 .toList();
-
-        List<UniversityApplicantsResponse> secondChoiceApplicants = universityInfos.stream()
-                .map(uia -> UniversityApplicantsResponse.of(
-                        uia,
-                        secondChoiceMap.getOrDefault(uia.getId(), List.of()).stream()
-                                .map(ap -> ApplicantResponse.of(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                                .toList()))
-                .toList();
-
-        List<UniversityApplicantsResponse> thirdChoiceApplicants = universityInfos.stream()
-                .map(uia -> UniversityApplicantsResponse.of(
-                        uia,
-                        thirdChoiceMap.getOrDefault(uia.getId(), List.of()).stream()
-                                .map(ap -> ApplicantResponse.of(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                                .toList()))
-                .toList();
-
-        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 
     @Transactional(readOnly = true)
