@@ -20,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
-import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 
 @RequiredArgsConstructor
 @Service
@@ -48,7 +47,6 @@ public class MyPageService {
     @Transactional
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
         if (nickname != null) {
-            validateNicknameUnique(nickname);
             validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
             siteUser.setNickname(nickname);
             siteUser.setNicknameModifiedAt(LocalDateTime.now());
@@ -63,12 +61,6 @@ public class MyPageService {
             siteUser.setProfileImageUrl(profileImageUrl);
         }
         siteUserRepository.save(siteUser);
-    }
-
-    private void validateNicknameUnique(String nickname) {
-        if (siteUserRepository.existsByNickname(nickname)) {
-            throw new CustomException(NICKNAME_ALREADY_EXISTED);
-        }
     }
 
     private void validateNicknameNotChangedRecently(LocalDateTime lastModifiedAt) {

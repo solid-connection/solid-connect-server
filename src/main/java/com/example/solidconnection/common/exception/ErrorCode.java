@@ -96,6 +96,9 @@ public enum ErrorCode {
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
     REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 사유가 필요합니다."),
 
+    // database
+    DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
+
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "JWT 토큰을 처리할 수 없습니다."),
