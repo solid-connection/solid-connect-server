@@ -48,8 +48,7 @@ public class MyPageService {
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
         if (nickname != null) {
             validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-            siteUser.setNickname(nickname);
-            siteUser.setNicknameModifiedAt(LocalDateTime.now());
+            siteUserRepository.updateNickname(siteUser.getId(), nickname, LocalDateTime.now());
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -58,9 +57,8 @@ public class MyPageService {
                 s3Service.deleteExProfile(siteUser);
             }
             String profileImageUrl = uploadedFile.fileUrl();
-            siteUser.setProfileImageUrl(profileImageUrl);
+            siteUserRepository.updateProfileImage(siteUser.getId(), profileImageUrl);
         }
-        siteUserRepository.save(siteUser);
     }
 
     private void validateNicknameNotChangedRecently(LocalDateTime lastModifiedAt) {
