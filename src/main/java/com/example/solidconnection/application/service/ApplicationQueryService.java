@@ -41,20 +41,18 @@ public class ApplicationQueryService {
     // todo: 캐싱 정책 변경 시 수정 필요
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
-        // 1. 대학 ID 필터링 (regionCode, keyword)
-        List<Long> universityIds = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
-        if (universityIds.isEmpty()) {
+        // 1. 대학 지원 정보 필터링 (regionCode, keyword)
+        List<UniversityInfoForApply> univApplyInfos = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
+        if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
-
         // 2. 조건에 맞는 모든 Application 한 번에 조회
-        List<Application> applications = applicationRepository.findApplicationsByUniversityChoices(universityIds, VerifyStatus.APPROVED, term);
-
-        // 3. 대학정보 조회
-        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findByUniversityIdsWithUniversityAndLocation(universityIds);
-
-        // 4. 지원서 분류 및 DTO 변환
-        return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
+        List<Long> univApplyInfoIds = univApplyInfos.stream()
+                .map(UniversityInfoForApply::getId)
+                .toList();
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
+        // 3. 지원서 분류 및 DTO 변환
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
     }
 
     @Transactional(readOnly = true)
@@ -62,9 +60,9 @@ public class ApplicationQueryService {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
 
         List<Long> universityInfoForApplyIds = Stream.of(
-                        userLatestApplication.getFirstChoiceUniversityApplyInfoId(),
-                        userLatestApplication.getSecondChoiceUniversityApplyInfoId(),
-                        userLatestApplication.getThirdChoiceUniversityApplyInfoId()
+                        userLatestApplication.getFirstChoiceUnivApplyInfoId(),
+                        userLatestApplication.getSecondChoiceUnivApplyInfoId(),
+                        userLatestApplication.getThirdChoiceUnivApplyInfoId()
                 )
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -73,8 +71,8 @@ public class ApplicationQueryService {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
 
-        List<Application> applications = applicationRepository.findApplicationsByUniversityChoices(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
-        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findByIdsWithUniversityAndLocation(universityInfoForApplyIds);
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
+        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findAllByUniversityIds(universityInfoForApplyIds);
 
         return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
@@ -83,9 +81,9 @@ public class ApplicationQueryService {
             List<UniversityInfoForApply> universityInfosForApply,
             List<Application> applications,
             SiteUser siteUser) {
-        Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUniversityApplyInfoId);
-        Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUniversityApplyInfoId);
-        Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUniversityApplyInfoId);
+        Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
+        Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUnivApplyInfoId);
+        Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
 
         List<UniversityApplicantsResponse> firstChoiceApplicants =
                 createUniversityApplicantsResponses(universityInfosForApply, firstChoiceMap, siteUser);
@@ -117,11 +115,7 @@ public class ApplicationQueryService {
             Map<Long, List<Application>> choiceMap,
             SiteUser siteUser) {
         return universityInfosForApply.stream()
-                .map(uia -> UniversityApplicantsResponse.of(
-                        uia,
-                        choiceMap.getOrDefault(uia.getId(), List.of()).stream()
-                                .map(ap -> ApplicantResponse.of(ap, Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                                .toList()))
+                .map(uia -> UniversityApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
                 .toList();
     }
 

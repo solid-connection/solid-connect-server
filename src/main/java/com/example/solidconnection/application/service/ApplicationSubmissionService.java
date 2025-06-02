@@ -6,14 +6,12 @@ import com.example.solidconnection.application.dto.ApplicationSubmissionResponse
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UniversityChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.cache.annotation.DefaultCacheOut;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +48,7 @@ public class ApplicationSubmissionService {
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
-        Long firstChoiceUniversityId = universityChoiceRequest.firstChoiceUniversityId();
+        long firstChoiceUniversityId = universityChoiceRequest.firstChoiceUniversityId();
         Long secondChoiceUniversityId = universityChoiceRequest.secondChoiceUniversityId();
         Long thirdChoiceUniversityId = universityChoiceRequest.thirdChoiceUniversityId();
 

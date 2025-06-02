@@ -5,8 +5,8 @@ import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.QUniversity;
 import com.example.solidconnection.university.domain.QUniversityInfoForApply;
-import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
@@ -28,16 +28,19 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
     @Override
-    public List<Long> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+    public List<UniversityInfoForApply> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+        QUniversityInfoForApply universityInfoForApply = QUniversityInfoForApply.universityInfoForApply;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
+        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
         return queryFactory
-                .select(university.id)
-                .from(university)
-                .join(university.country, country)
-                .join(country.region, region)
+                .selectFrom(universityInfoForApply)
+                .join(universityInfoForApply.university, university).fetchJoin()
+                .join(university.country, country).fetchJoin()
+                .join(country.region, region).fetchJoin()
+                .leftJoin(universityInfoForApply.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         regionCodeEq(region, regionCode)
                                 .and(countryOrUniversityContainsKeyword(country, university, keywords))
@@ -45,6 +48,7 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
                 .distinct()
                 .fetch();
     }
+
 
     private BooleanExpression regionCodeEq(QRegion region, String regionCode) {
         if (regionCode == null || regionCode.isEmpty()) {

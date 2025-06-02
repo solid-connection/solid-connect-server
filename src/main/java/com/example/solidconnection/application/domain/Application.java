@@ -30,11 +30,11 @@ import static com.example.solidconnection.application.domain.VerifyStatus.PENDIN
         @Index(name = "idx_app_user_term_delete",
                 columnList = "site_user_id, term, is_delete"),
         @Index(name = "idx_app_first_choice_search",
-                columnList = "verify_status, term, is_delete, first_choice_university_apply_info_id"),
+                columnList = "verify_status, term, is_delete, first_choice_university_info_for_apply_id"),
         @Index(name = "idx_app_second_choice_search",
-                columnList = "verify_status, term, is_delete, second_choice_university_apply_info_id"),
+                columnList = "verify_status, term, is_delete, second_choice_university_info_for_apply_id"),
         @Index(name = "idx_app_third_choice_search",
-                columnList = "verify_status, term, is_delete, third_choice_university_apply_info_id")
+                columnList = "verify_status, term, is_delete, third_choice_university_info_for_apply_id")
 })
 public class Application {
 
@@ -65,14 +65,14 @@ public class Application {
     @Column(name="is_delete")
     private boolean isDelete = false;
 
-    @Column(nullable = false, name="first_choice_university_apply_info_id")
-    private Long firstChoiceUniversityApplyInfoId;
+    @Column(nullable = false , name = "first_choice_university_info_for_apply_id")
+    private long firstChoiceUnivApplyInfoId;
 
-    @Column(name="second_choice_university_apply_info_id")
-    private Long secondChoiceUniversityApplyInfoId;
+    @Column(name = "second_choice_university_info_for_apply_id")
+    private Long secondChoiceUnivApplyInfoId;
 
-    @Column(name="third_choice_university_apply_info_id")
-    private Long thirdChoiceUniversityApplyInfoId;
+    @Column(name = "third_choice_university_info_for_apply_id")
+    private Long thirdChoiceUnivApplyInfoId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser siteUser;
@@ -96,18 +96,18 @@ public class Application {
             LanguageTest languageTest,
             String term,
             Integer updateCount,
-            Long firstChoiceUniversityApplyInfoId,
-            Long secondChoiceUniversityApplyInfoId,
-            Long thirdChoiceUniversityApplyInfoId,
+            long firstChoiceUnivApplyInfoId,
+            Long secondChoiceUnivApplyInfoId,
+            Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
         this.updateCount = updateCount;
-        this.firstChoiceUniversityApplyInfoId = firstChoiceUniversityApplyInfoId;
-        this.secondChoiceUniversityApplyInfoId = secondChoiceUniversityApplyInfoId;
-        this.thirdChoiceUniversityApplyInfoId = thirdChoiceUniversityApplyInfoId;
+        this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
+        this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
+        this.thirdChoiceUnivApplyInfoId = thirdChoiceUnivApplyInfoId;
         this.nicknameForApply = nicknameForApply;
         this.verifyStatus = PENDING;
     }
@@ -117,18 +117,18 @@ public class Application {
             Gpa gpa,
             LanguageTest languageTest,
             String term,
-            Long firstChoiceUniversityApplyInfoId,
-            Long secondChoiceUniversityApplyInfoId,
-            Long thirdChoiceUniversityApplyInfoId,
+            long firstChoiceUnivApplyInfoId,
+            Long secondChoiceUnivApplyInfoId,
+            Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
         this.updateCount = 1;
-        this.firstChoiceUniversityApplyInfoId = firstChoiceUniversityApplyInfoId;
-        this.secondChoiceUniversityApplyInfoId = secondChoiceUniversityApplyInfoId;
-        this.thirdChoiceUniversityApplyInfoId = thirdChoiceUniversityApplyInfoId;
+        this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
+        this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
+        this.thirdChoiceUnivApplyInfoId = thirdChoiceUnivApplyInfoId;
         this.nicknameForApply = nicknameForApply;
         this.verifyStatus = PENDING;
     }

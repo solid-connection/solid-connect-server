@@ -24,14 +24,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             SELECT a
             FROM Application a
             JOIN FETCH a.siteUser
-            WHERE (a.firstChoiceUniversityApplyInfoId IN :universityIds
-                OR a.secondChoiceUniversityApplyInfoId IN :universityIds
-                OR a.thirdChoiceUniversityApplyInfoId IN :universityIds)
+            WHERE (a.firstChoiceUnivApplyInfoId IN :universityIds
+                OR a.secondChoiceUnivApplyInfoId IN :universityIds
+                OR a.thirdChoiceUnivApplyInfoId IN :universityIds)
                 AND a.verifyStatus = :status
                 AND a.term = :term
                 AND a.isDelete = false
             """)
-    List<Application> findApplicationsByUniversityChoices(@Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
+    List<Application> findAllByUnivApplyInfoIds(@Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
 
     @Query("""
             SELECT a

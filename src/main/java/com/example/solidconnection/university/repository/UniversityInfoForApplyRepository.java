@@ -72,7 +72,7 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
             JOIN FETCH u.region r
             WHERE uifa.id IN :ids
             """)
-    List<UniversityInfoForApply> findByIdsWithUniversityAndLocation(@Param("ids") List<Long> ids);
+    List<UniversityInfoForApply> findAllByUniversityIds(@Param("ids") List<Long> ids);
 
     @Query("""
             SELECT DISTINCT uifa
@@ -83,5 +83,4 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
             WHERE u.id IN :universityIds
             """)
     List<UniversityInfoForApply> findByUniversityIdsWithUniversityAndLocation(@Param("universityIds") List<Long> universityIds);
-
 }
