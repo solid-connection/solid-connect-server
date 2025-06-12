@@ -3,6 +3,7 @@ package com.example.solidconnection.news.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
+import com.example.solidconnection.news.dto.NewsFindResponse;
 import com.example.solidconnection.news.dto.NewsResponse;
 import com.example.solidconnection.news.service.NewsCommandService;
 import com.example.solidconnection.news.service.NewsQueryService;
@@ -35,6 +36,15 @@ public class NewsController {
     public ResponseEntity<NewsResponse> searchNews() {
         NewsResponse newsResponse = newsQueryService.searchNews();
         return ResponseEntity.ok(newsResponse);
+    }
+
+    @GetMapping(value = "/{news_id}")
+    public ResponseEntity<NewsFindResponse> findNewsById(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news_id") Long newsId
+    ) {
+        NewsFindResponse newsFindResponse = newsQueryService.findNewsById(newsId);
+        return ResponseEntity.ok(newsFindResponse);
     }
 
     @RequireAdminAccess
