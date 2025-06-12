@@ -40,4 +40,20 @@ public class News extends BaseEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.url = url;
     }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    public void updateUrl(String url) {
+        this.url = url;
+    }
+
+    public void updateThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
 }

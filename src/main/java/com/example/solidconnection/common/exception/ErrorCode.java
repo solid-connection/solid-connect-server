@@ -5,6 +5,9 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
+import static com.example.solidconnection.news.service.NewsService.MAX_DESCRIPTION_LENGTH;
+import static com.example.solidconnection.news.service.NewsService.MAX_TITLE_LENGTH;
+import static com.example.solidconnection.news.service.NewsService.MAX_URL_LENGTH;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 
 @Getter
@@ -42,6 +45,7 @@ public enum ErrorCode {
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
+    NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -95,6 +99,13 @@ public enum ErrorCode {
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
     REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 사유가 필요합니다."),
+
+    // news
+    NEWS_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 제목은 " + MAX_TITLE_LENGTH + "자 이하여야 합니다."),
+    NEWS_TITLE_EMPTY(HttpStatus.BAD_REQUEST.value(), "소식지 제목은 빈 값일 수 없습니다."),
+    NEWS_DESCRIPTION_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 설명은 " + MAX_DESCRIPTION_LENGTH + "500자 이하여야 합니다."),
+    NEWS_URL_INVALID(HttpStatus.BAD_REQUEST.value(), "올바른 URL 형식이 아닙니다."),
+    NEWS_URL_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 URL은 " + MAX_URL_LENGTH + "자 이하여야 합니다."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),

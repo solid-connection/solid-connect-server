@@ -9,6 +9,8 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +33,26 @@ public class NewsController {
             @RequestParam(value = "file") MultipartFile imageFile
     ) {
         NewsResponse newsResponse = newsService.createNews(newsCreateRequest, imageFile);
+        return ResponseEntity.ok(newsResponse);
+    }
+
+    @RequireAdminAccess
+    @PatchMapping(value = "/{news_id}")
+    public ResponseEntity<NewsResponse> updateNews(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news_id") Long newsId,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "url", required = false) String url,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile
+    ) {
+        NewsResponse newsResponse = newsService.updateNews(
+                newsId,
+                title,
+                description,
+                url,
+                imageFile
+        );
         return ResponseEntity.ok(newsResponse);
     }
 }
