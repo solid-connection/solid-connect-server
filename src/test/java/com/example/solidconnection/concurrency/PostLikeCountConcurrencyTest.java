@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmail;
+import static com.example.solidconnection.e2e.DynamicFixture.createSiteUserByEmailAndNickname;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestContainerSpringBootTest
@@ -92,7 +92,8 @@ class PostLikeCountConcurrencyTest {
 
         for (int i = 0; i < THREAD_NUMS; i++) {
             String email = "email" + i;
-            SiteUser tmpSiteUser = siteUserRepository.save(createSiteUserByEmail(email));
+            String nickname = "nickname" + i;
+            SiteUser tmpSiteUser = siteUserRepository.save(createSiteUserByEmailAndNickname(email, nickname));
             executorService.submit(() -> {
                 try {
                     postLikeService.likePost(tmpSiteUser, post.getId());
