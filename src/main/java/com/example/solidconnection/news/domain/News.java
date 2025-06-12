@@ -29,4 +29,15 @@ public class News extends BaseEntity {
 
     @Column(length = 500)
     private String url;
+
+    public News(
+            String title,
+            String description,
+            String thumbnailUrl,
+            String url) {
+        this.title = title;
+        this.description = description;
+        this.thumbnailUrl = thumbnailUrl;
+        this.url = url;
+    }
 }
