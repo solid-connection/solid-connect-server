@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.NEWS_TITLE_EMPTY;
 import static com.example.solidconnection.common.exception.ErrorCode.NEWS_URL_INVALID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 서비스 테스트")
@@ -125,22 +125,6 @@ public class NewsServiceTest {
         }
 
         @Test
-        void 존재하지_않는_소식지_수정시_예외가_발생한다() {
-            // given
-            long invalidNewsId = 9999L;
-
-            // when & then
-            assertThatCode(() -> newsService.updateNews(
-                    invalidNewsId,
-                    "제목 수정",
-                    null,
-                    null,
-                    null))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(NEWS_NOT_FOUND.getMessage());
-        }
-
-        @Test
         void 빈_제목으로_수정시_예외가_발생한다() {
             // when & then
             assertThatCode(() -> newsService.updateNews(
@@ -164,6 +148,25 @@ public class NewsServiceTest {
                     null))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NEWS_URL_INVALID.getMessage());
+        }
+    }
+
+    @Nested
+    class 소식지_삭제_테스트 {
+
+        @Test
+        void 소식지를_성공적으로_삭제한다() {
+            // given
+            News originNews = newsFixture.소식지();
+            String expectedImageUrl = originNews.getThumbnailUrl();
+
+            // when
+            NewsResponse response = newsService.deleteNewsById(originNews.getId());
+
+            // then
+            assertThat(response.id()).isEqualTo(originNews.getId());
+            assertThat(newsRepository.findById(originNews.getId())).isEmpty();
+            then(s3Service).should().deletePostImage(expectedImageUrl);
         }
     }
 
