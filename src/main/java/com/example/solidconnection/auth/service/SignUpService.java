@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
@@ -11,6 +12,7 @@ import com.example.solidconnection.location.region.repository.InterestedRegionRe
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -49,17 +51,20 @@ public abstract class SignUpService {
         // 검증
         validateSignUpToken(signUpRequest);
         validateUserNotDuplicated(signUpRequest);
-        validateNicknameDuplicated(signUpRequest.nickname());
 
-        // 사용자 저장
-        SiteUser siteUser = siteUserRepository.save(createSiteUser(signUpRequest));
+        try {
+            // 사용자 저장
+            SiteUser siteUser = siteUserRepository.save(createSiteUser(signUpRequest));
 
-        // 관심 지역, 국가 저장
-        saveInterestedRegion(signUpRequest, siteUser);
-        saveInterestedCountry(signUpRequest, siteUser);
+            // 관심 지역, 국가 저장
+            saveInterestedRegion(signUpRequest, siteUser);
+            saveInterestedCountry(signUpRequest, siteUser);
 
-        // 로그인
-        return signInService.signIn(siteUser);
+            // 로그인
+            return signInService.signIn(siteUser);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(determineErrorCode(e));
+        }
     }
 
     private void validateNicknameDuplicated(String nickname) {
@@ -82,6 +87,14 @@ public abstract class SignUpService {
                 .map(country -> new InterestedCountry(savedSiteUser, country))
                 .toList();
         interestedCountyRepository.saveAll(interestedCountries);
+    }
+
+    private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
+        if (e.getMessage().contains("uk_site_user_nickname")) {
+            return ErrorCode.NICKNAME_ALREADY_EXISTED;
+        }
+
+        return ErrorCode.DATA_INTEGRITY_VIOLATION;
     }
 
     protected abstract void validateSignUpToken(SignUpRequest signUpRequest);

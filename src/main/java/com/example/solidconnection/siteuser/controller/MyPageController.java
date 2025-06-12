@@ -48,9 +48,7 @@ class MyPageController {
     }
 
     private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
-        String message = e.getMostSpecificCause().getMessage().toLowerCase();
-
-        if (message.contains("unique") && message.contains("nickname")) {
+        if (e.getMessage().contains("uk_site_user_nickname")) {
             return ErrorCode.NICKNAME_ALREADY_EXISTED;
         }
 
