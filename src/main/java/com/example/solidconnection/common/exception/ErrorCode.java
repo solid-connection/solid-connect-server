@@ -103,7 +103,7 @@ public enum ErrorCode {
     // news
     NEWS_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 제목은 " + MAX_TITLE_LENGTH + "자 이하여야 합니다."),
     NEWS_TITLE_EMPTY(HttpStatus.BAD_REQUEST.value(), "소식지 제목은 빈 값일 수 없습니다."),
-    NEWS_DESCRIPTION_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 설명은 " + MAX_DESCRIPTION_LENGTH + "500자 이하여야 합니다."),
+    NEWS_DESCRIPTION_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 설명은 " + MAX_DESCRIPTION_LENGTH + "자 이하여야 합니다."),
     NEWS_URL_INVALID(HttpStatus.BAD_REQUEST.value(), "올바른 URL 형식이 아닙니다."),
     NEWS_URL_TOO_LONG(HttpStatus.BAD_REQUEST.value(), "소식지 URL은 " + MAX_URL_LENGTH + "자 이하여야 합니다."),
 
