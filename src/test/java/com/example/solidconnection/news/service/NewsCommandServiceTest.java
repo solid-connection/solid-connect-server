@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 생성/수정/삭제 서비스 테스트")
-public class NewsCommandServiceTest {
+class NewsCommandServiceTest {
 
     @Autowired
     private NewsCommandService newsCommandService;
