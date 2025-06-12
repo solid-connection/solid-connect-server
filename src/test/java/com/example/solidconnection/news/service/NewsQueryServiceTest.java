@@ -1,6 +1,7 @@
 package com.example.solidconnection.news.service;
 
 import com.example.solidconnection.news.domain.News;
+import com.example.solidconnection.news.dto.NewsFindResponse;
 import com.example.solidconnection.news.dto.NewsItemResponse;
 import com.example.solidconnection.news.dto.NewsResponse;
 import com.example.solidconnection.news.fixture.NewsFixture;
@@ -40,5 +41,18 @@ class NewsQueryServiceTest {
         assertThat(response.newsItemsResponseList())
                 .extracting(NewsItemResponse::updatedAt)
                 .isSortedAccordingTo(Comparator.reverseOrder());
+    }
+
+    @Test
+    void 소식지를_성공적으로_조회한다() {
+        // given
+        News news = newsFixture.소식지();
+
+        // when
+        NewsFindResponse response = newsQueryService.findNewsById(news.getId());
+
+        // then
+        assertThat(response.id()).isEqualTo(news.getId());
+        assertThat(response.description()).isEqualTo(news.getDescription());
     }
 }
