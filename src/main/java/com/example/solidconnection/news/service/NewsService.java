@@ -65,6 +65,15 @@ public class NewsService {
         return NewsResponse.from(savedNews);
     }
 
+    @Transactional
+    public NewsResponse deleteNewsById(Long newsId) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
+        s3Service.deletePostImage(news.getThumbnailUrl());
+        newsRepository.deleteById(newsId);
+        return NewsResponse.from(news);
+    }
+
     private void validateTitle(String title) {
         if (title.trim().isEmpty()) {
             throw new CustomException(NEWS_TITLE_EMPTY);

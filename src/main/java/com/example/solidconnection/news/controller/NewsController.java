@@ -9,6 +9,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +54,16 @@ public class NewsController {
                 url,
                 imageFile
         );
+        return ResponseEntity.ok(newsResponse);
+    }
+
+    @RequireAdminAccess
+    @DeleteMapping(value = "/{news_id}")
+    public ResponseEntity<NewsResponse> deleteNewsById(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news_id") Long newsId
+    ) {
+        NewsResponse newsResponse = newsService.deleteNewsById(newsId);
         return ResponseEntity.ok(newsResponse);
     }
 }
