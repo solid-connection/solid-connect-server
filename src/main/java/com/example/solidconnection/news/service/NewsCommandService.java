@@ -57,9 +57,9 @@ public class NewsCommandService {
         }
         if (imageFile != null) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
+            s3Service.deletePostImage(news.getThumbnailUrl());
             String thumbnailImageUrl = uploadedFile.fileUrl();
             news.updateThumbnailUrl(thumbnailImageUrl);
-            s3Service.deletePostImage(news.getThumbnailUrl());
         }
         News savedNews = newsRepository.save(news);
         return NewsCommandResponse.from(savedNews);
