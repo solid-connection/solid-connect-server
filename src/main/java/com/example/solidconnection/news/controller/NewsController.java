@@ -3,13 +3,16 @@ package com.example.solidconnection.news.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
+import com.example.solidconnection.news.dto.NewsResponse;
 import com.example.solidconnection.news.service.NewsCommandService;
+import com.example.solidconnection.news.service.NewsQueryService;
 import com.example.solidconnection.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +27,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/news")
 public class NewsController {
 
+    private final NewsQueryService newsQueryService;
     private final NewsCommandService newsCommandService;
+
+    // todo: 추후 검색 조건 및 Slice 적용
+    @GetMapping
+    public ResponseEntity<NewsResponse> searchNews() {
+        NewsResponse newsResponse = newsQueryService.searchNews();
+        return ResponseEntity.ok(newsResponse);
+    }
 
     @RequireAdminAccess
     @PostMapping
