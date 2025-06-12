@@ -24,8 +24,8 @@ class SiteUserRepositoryTest {
         @Test
         void 이메일과_인증_유형이_동일한_사용자를_저장하면_예외_응답을_반환한다() {
             // given
-            SiteUser user1 = createSiteUser("email", AuthType.KAKAO);
-            SiteUser user2 = createSiteUser("email", AuthType.KAKAO);
+            SiteUser user1 = createSiteUser("email", "nickname1", AuthType.KAKAO);
+            SiteUser user2 = createSiteUser("email", "nickname2", AuthType.KAKAO);
             siteUserRepository.save(user1);
 
             // when, then
@@ -36,8 +36,8 @@ class SiteUserRepositoryTest {
         @Test
         void 이메일이_같더라도_인증_유형이_다른_사용자는_정상_저장한다() {
             // given
-            SiteUser user1 = createSiteUser("email", AuthType.KAKAO);
-            SiteUser user2 = createSiteUser("email", AuthType.APPLE);
+            SiteUser user1 = createSiteUser("email", "nickname1", AuthType.KAKAO);
+            SiteUser user2 = createSiteUser("email", "nickname2", AuthType.APPLE);
             siteUserRepository.save(user1);
 
             // when, then
@@ -46,10 +46,42 @@ class SiteUserRepositoryTest {
         }
     }
 
-    private SiteUser createSiteUser(String email, AuthType authType) {
+    @Nested
+    class 닉네임은_중복될_수_없다{
+
+        @Test
+        void 중복된_닉네임으로_사용자를_저장하면_예외_응답을_반환한다() {
+            // given
+            SiteUser user1 = createSiteUser("email1", "nickname", AuthType.KAKAO);
+            SiteUser user2 = createSiteUser("email2", "nickname", AuthType.KAKAO);
+            siteUserRepository.save(user1);
+
+            // when, then
+            assertThatCode(() -> siteUserRepository.save(user2))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
+            // given
+            SiteUser user1 = createSiteUser("email1", "nickname1", AuthType.KAKAO);
+            SiteUser user2 = createSiteUser("email2", "nickname2", AuthType.KAKAO);
+            siteUserRepository.save(user1);
+            siteUserRepository.save(user2);
+
+            // when
+            user2.setNickname("nickname1");
+
+            // then
+            assertThatCode(() -> siteUserRepository.saveAndFlush(user2))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
+
+    private SiteUser createSiteUser(String email, String nickname, AuthType authType) {
         return new SiteUser(
                 email,
-                "nickname",
+                nickname,
                 "profileImageUrl",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE,

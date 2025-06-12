@@ -118,7 +118,8 @@ class MyPageServiceTest {
             myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
-            assertThat(user.getProfileImageUrl()).isEqualTo(expectedUrl);
+            SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
+            assertThat(updatedUser.getProfileImageUrl()).isEqualTo(expectedUrl);
         }
 
         @Test
@@ -173,17 +174,6 @@ class MyPageServiceTest {
             SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
             assertThat(updatedUser.getNicknameModifiedAt()).isNotNull();
             assertThat(updatedUser.getNickname()).isEqualTo(newNickname);
-        }
-
-        @Test
-        void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
-            // given
-            SiteUser existingUser = siteUserFixture.사용자(1, "existing nickname");
-
-            // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(user, null, existingUser.getNickname()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
         }
 
         @Test

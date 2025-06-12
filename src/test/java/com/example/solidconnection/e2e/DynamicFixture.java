@@ -6,10 +6,10 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 
 public class DynamicFixture { // todo: test fixture 개선 작업 이후, 이 클래스의 사용이 대체되면 삭제 필요
 
-    public static SiteUser createSiteUserByEmail(String email) {
+    public static SiteUser createSiteUserByEmailAndNickname(String email, String nickname) {
         return new SiteUser(
                 email,
-                "nickname",
+                nickname,
                 "profileImage",
                 PreparationStatus.CONSIDERING,
                 Role.MENTEE
