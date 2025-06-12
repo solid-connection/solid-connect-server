@@ -56,10 +56,10 @@ public class NewsCommandService {
             news.updateUrl(url);
         }
         if (imageFile != null) {
-            s3Service.deletePostImage(news.getThumbnailUrl());
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
             String thumbnailImageUrl = uploadedFile.fileUrl();
             news.updateThumbnailUrl(thumbnailImageUrl);
+            s3Service.deletePostImage(news.getThumbnailUrl());
         }
         News savedNews = newsRepository.save(news);
         return NewsCommandResponse.from(savedNews);
@@ -69,8 +69,8 @@ public class NewsCommandService {
     public NewsCommandResponse deleteNewsById(Long newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
-        s3Service.deletePostImage(news.getThumbnailUrl());
         newsRepository.deleteById(newsId);
+        s3Service.deletePostImage(news.getThumbnailUrl());
         return NewsCommandResponse.from(news);
     }
 
