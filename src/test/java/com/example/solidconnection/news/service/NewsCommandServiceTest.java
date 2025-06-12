@@ -3,7 +3,7 @@ package com.example.solidconnection.news.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
-import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.news.repository.NewsRepository;
 import com.example.solidconnection.s3.domain.ImgType;
@@ -29,11 +29,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
-@DisplayName("소식지 서비스 테스트")
-public class NewsServiceTest {
+@DisplayName("소식지 생성/수정/삭제 서비스 테스트")
+public class NewsCommandServiceTest {
 
     @Autowired
-    private NewsService newsService;
+    private NewsCommandService newsCommandService;
 
     @MockBean
     private S3Service s3Service;
@@ -57,7 +57,7 @@ public class NewsServiceTest {
                     .willReturn(new UploadedFileUrlResponse(expectedImageUrl));
 
             // when
-            NewsResponse response = newsService.createNews(request, imageFile);
+            NewsCommandResponse response = newsCommandService.createNews(request, imageFile);
 
             // then
             News savedNews = newsRepository.findById(response.id()).orElseThrow();
@@ -87,7 +87,7 @@ public class NewsServiceTest {
                     .willReturn(new UploadedFileUrlResponse(expectedNewImageUrl));
 
             // when
-            NewsResponse response = newsService.updateNews(
+            NewsCommandResponse response = newsCommandService.updateNews(
                     originNews.getId(),
                     expectedTitle,
                     expectedDescription,
@@ -112,7 +112,7 @@ public class NewsServiceTest {
             String originalThumbnailUrl = originNews.getThumbnailUrl();
 
             // when
-            NewsResponse response = newsService.updateNews(
+            NewsCommandResponse response = newsCommandService.updateNews(
                     originNews.getId(), expectedTitle, null, null, null
             );
 
@@ -127,7 +127,7 @@ public class NewsServiceTest {
         @Test
         void 빈_제목으로_수정시_예외가_발생한다() {
             // when & then
-            assertThatCode(() -> newsService.updateNews(
+            assertThatCode(() -> newsCommandService.updateNews(
                     originNews.getId(),
                     "   ",
                     null,
@@ -140,7 +140,7 @@ public class NewsServiceTest {
         @Test
         void 잘못된_URL_형식으로_수정시_예외가_발생한다() {
             // when & then
-            assertThatCode(() -> newsService.updateNews(
+            assertThatCode(() -> newsCommandService.updateNews(
                     originNews.getId(),
                     null,
                     null,
@@ -161,7 +161,7 @@ public class NewsServiceTest {
             String expectedImageUrl = originNews.getThumbnailUrl();
 
             // when
-            NewsResponse response = newsService.deleteNewsById(originNews.getId());
+            NewsCommandResponse response = newsCommandService.deleteNewsById(originNews.getId());
 
             // then
             assertThat(response.id()).isEqualTo(originNews.getId());

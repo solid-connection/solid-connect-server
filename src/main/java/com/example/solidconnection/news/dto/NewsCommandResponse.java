@@ -2,11 +2,11 @@ package com.example.solidconnection.news.dto;
 
 import com.example.solidconnection.news.domain.News;
 
-public record NewsResponse(
+public record NewsCommandResponse(
         long id
 ) {
-    public static NewsResponse from(News news) {
-        return new NewsResponse(
+    public static NewsCommandResponse from(News news) {
+        return new NewsCommandResponse(
                 news.getId()
         );
     }

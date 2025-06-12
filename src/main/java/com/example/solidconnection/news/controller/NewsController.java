@@ -2,8 +2,8 @@ package com.example.solidconnection.news.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
-import com.example.solidconnection.news.dto.NewsResponse;
-import com.example.solidconnection.news.service.NewsService;
+import com.example.solidconnection.news.dto.NewsCommandResponse;
+import com.example.solidconnection.news.service.NewsCommandService;
 import com.example.solidconnection.security.annotation.RequireAdminAccess;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
@@ -24,22 +24,22 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/news")
 public class NewsController {
 
-    private final NewsService newsService;
+    private final NewsCommandService newsCommandService;
 
     @RequireAdminAccess
     @PostMapping
-    public ResponseEntity<NewsResponse> createNews(
+    public ResponseEntity<NewsCommandResponse> createNews(
             @AuthorizedUser SiteUser siteUser,
             @Valid @RequestPart("newsCreateRequest") NewsCreateRequest newsCreateRequest,
             @RequestParam(value = "file") MultipartFile imageFile
     ) {
-        NewsResponse newsResponse = newsService.createNews(newsCreateRequest, imageFile);
-        return ResponseEntity.ok(newsResponse);
+        NewsCommandResponse newsCommandResponse = newsCommandService.createNews(newsCreateRequest, imageFile);
+        return ResponseEntity.ok(newsCommandResponse);
     }
 
     @RequireAdminAccess
     @PatchMapping(value = "/{news_id}")
-    public ResponseEntity<NewsResponse> updateNews(
+    public ResponseEntity<NewsCommandResponse> updateNews(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news_id") Long newsId,
             @RequestParam(value = "title", required = false) String title,
@@ -47,23 +47,23 @@ public class NewsController {
             @RequestParam(value = "url", required = false) String url,
             @RequestParam(value = "file", required = false) MultipartFile imageFile
     ) {
-        NewsResponse newsResponse = newsService.updateNews(
+        NewsCommandResponse newsCommandResponse = newsCommandService.updateNews(
                 newsId,
                 title,
                 description,
                 url,
                 imageFile
         );
-        return ResponseEntity.ok(newsResponse);
+        return ResponseEntity.ok(newsCommandResponse);
     }
 
     @RequireAdminAccess
     @DeleteMapping(value = "/{news_id}")
-    public ResponseEntity<NewsResponse> deleteNewsById(
+    public ResponseEntity<NewsCommandResponse> deleteNewsById(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news_id") Long newsId
     ) {
-        NewsResponse newsResponse = newsService.deleteNewsById(newsId);
-        return ResponseEntity.ok(newsResponse);
+        NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(newsId);
+        return ResponseEntity.ok(newsCommandResponse);
     }
 }

@@ -3,7 +3,7 @@ package com.example.solidconnection.news.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
-import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.repository.NewsRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -22,7 +22,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NEWS_URL_TO
 
 @Service
 @RequiredArgsConstructor
-public class NewsService {
+public class NewsCommandService {
 
     public static final int MAX_TITLE_LENGTH = 255;
     public static final int MAX_DESCRIPTION_LENGTH = 255;
@@ -32,15 +32,15 @@ public class NewsService {
     private final NewsRepository newsRepository;
 
     @Transactional
-    public NewsResponse createNews(NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
+    public NewsCommandResponse createNews(NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
         UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
         News news = newsCreateRequest.toEntity(uploadedFile.fileUrl());
         News savedNews = newsRepository.save(news);
-        return NewsResponse.from(savedNews);
+        return NewsCommandResponse.from(savedNews);
     }
 
     @Transactional
-    public NewsResponse updateNews(Long newsId, String title, String description, String url, MultipartFile imageFile) {
+    public NewsCommandResponse updateNews(Long newsId, String title, String description, String url, MultipartFile imageFile) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
         if (title != null) {
@@ -62,16 +62,16 @@ public class NewsService {
             news.updateThumbnailUrl(thumbnailImageUrl);
         }
         News savedNews = newsRepository.save(news);
-        return NewsResponse.from(savedNews);
+        return NewsCommandResponse.from(savedNews);
     }
 
     @Transactional
-    public NewsResponse deleteNewsById(Long newsId) {
+    public NewsCommandResponse deleteNewsById(Long newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
         s3Service.deletePostImage(news.getThumbnailUrl());
         newsRepository.deleteById(newsId);
-        return NewsResponse.from(news);
+        return NewsCommandResponse.from(news);
     }
 
     private void validateTitle(String title) {
