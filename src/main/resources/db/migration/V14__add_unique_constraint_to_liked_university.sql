@@ -1,0 +1,3 @@
+ALTER TABLE liked_university
+ADD CONSTRAINT uk_liked_university_site_user_university
+UNIQUE (site_user_id, university_info_for_apply_id);

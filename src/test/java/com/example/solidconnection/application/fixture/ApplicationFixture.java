@@ -4,7 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -20,9 +20,9 @@ public class ApplicationFixture {
             String term,
             Gpa gpa,
             LanguageTest languageTest,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity
+            UnivApplyInfo firstChoiceUniversity,
+            UnivApplyInfo secondChoiceUniversity,
+            UnivApplyInfo thirdChoiceUniversity
     ) {
         return applicationFixtureBuilder.application()
                 .siteUser(siteUser)

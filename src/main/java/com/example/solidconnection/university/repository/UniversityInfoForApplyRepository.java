@@ -3,7 +3,7 @@ package com.example.solidconnection.university.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,18 +16,18 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND_FOR_TERM;
 
 @Repository
-public interface UniversityInfoForApplyRepository extends JpaRepository<UniversityInfoForApply, Long> {
+public interface UniversityInfoForApplyRepository extends JpaRepository<UnivApplyInfo, Long> {
 
-    Optional<UniversityInfoForApply> findByIdAndTerm(Long id, String term);
+    Optional<UnivApplyInfo> findByIdAndTerm(Long id, String term);
 
-    Optional<UniversityInfoForApply> findFirstByKoreanNameAndTerm(String koreanName, String term);
+    Optional<UnivApplyInfo> findFirstByKoreanNameAndTerm(String koreanName, String term);
 
-    @Query("SELECT c FROM UniversityInfoForApply c WHERE c.university IN :universities AND c.term = :term")
-    List<UniversityInfoForApply> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
+    @Query("SELECT c FROM UnivApplyInfo c WHERE c.university IN :universities AND c.term = :term")
+    List<UnivApplyInfo> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
             SELECT uifa
-            FROM UniversityInfoForApply uifa
+            FROM UnivApplyInfo uifa
             JOIN University u ON uifa.university = u
             WHERE (u.country.code IN (
                       SELECT c.code
@@ -43,7 +43,7 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
                   ))
                   AND uifa.term = :term
             """)
-    List<UniversityInfoForApply> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
+    List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
 
     @Query(value = """
                 SELECT *
@@ -51,14 +51,14 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<Universi
                 WHERE term = :term
                 ORDER BY RAND() LIMIT :limitNum
             """, nativeQuery = true)
-    List<UniversityInfoForApply> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
+    List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
 
-    default UniversityInfoForApply getUniversityInfoForApplyById(Long id) {
+    default UnivApplyInfo getUniversityInfoForApplyById(Long id) {
         return findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
     }
 
-    default UniversityInfoForApply getUniversityInfoForApplyByIdAndTerm(Long id, String term) {
+    default UnivApplyInfo getUniversityInfoForApplyByIdAndTerm(Long id, String term) {
         return findByIdAndTerm(id, term)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND_FOR_TERM));
     }

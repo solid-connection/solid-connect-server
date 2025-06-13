@@ -4,7 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,13 +21,13 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     boolean existsByNicknameForApply(String nicknameForApply);
 
     List<Application> findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply firstChoiceUniversity, VerifyStatus verifyStatus, String term);
+            UnivApplyInfo firstChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     List<Application> findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply secondChoiceUniversity, VerifyStatus verifyStatus, String term);
+            UnivApplyInfo secondChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     List<Application> findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(
-            UniversityInfoForApply thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
+            UnivApplyInfo thirdChoiceUniversity, VerifyStatus verifyStatus, String term);
 
     @Query("""
         SELECT a FROM Application a

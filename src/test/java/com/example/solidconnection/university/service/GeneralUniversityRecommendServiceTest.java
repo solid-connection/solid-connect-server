@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +46,7 @@ class GeneralUniversityRecommendServiceTest {
     @Test
     void 모집_시기의_대학들_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
         // given
-        List<UniversityInfoForApply> universities = generalUniversityRecommendService.getRecommendUniversities();
+        List<UnivApplyInfo> universities = generalUniversityRecommendService.getRecommendUniversities();
 
         // when & then
         assertAll(

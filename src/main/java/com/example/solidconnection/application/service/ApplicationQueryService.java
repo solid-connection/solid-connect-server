@@ -10,7 +10,7 @@ import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -65,13 +65,13 @@ public class ApplicationQueryService {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
         List<University> userAppliedUniversities = Arrays.asList(
                         Optional.ofNullable(userLatestApplication.getFirstChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
+                                .map(UnivApplyInfo::getUniversity)
                                 .orElse(null),
                         Optional.ofNullable(userLatestApplication.getSecondChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
+                                .map(UnivApplyInfo::getUniversity)
                                 .orElse(null),
                         Optional.ofNullable(userLatestApplication.getThirdChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
+                                .map(UnivApplyInfo::getUniversity)
                                 .orElse(null)
                 ).stream()
                 .filter(Objects::nonNull)
@@ -120,7 +120,7 @@ public class ApplicationQueryService {
     private List<UniversityApplicantsResponse> getApplicantsByChoice(
             List<University> searchedUniversities,
             SiteUser siteUser,
-            Function<UniversityInfoForApply, List<Application>> findApplicationsByChoice) {
+            Function<UnivApplyInfo, List<Application>> findApplicationsByChoice) {
         return universityInfoForApplyRepository.findByUniversitiesAndTerm(searchedUniversities, term).stream()
                 .map(universityInfoForApply -> UniversityApplicantsResponse.of(
                         universityInfoForApply,

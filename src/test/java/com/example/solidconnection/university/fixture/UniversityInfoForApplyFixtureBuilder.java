@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -40,14 +40,14 @@ public class UniversityInfoForApplyFixtureBuilder {
         return this;
     }
 
-    public UniversityInfoForApply create() {
-        UniversityInfoForApply universityInfoForApply = new UniversityInfoForApply(
+    public UnivApplyInfo create() {
+        UnivApplyInfo univApplyInfo = new UnivApplyInfo(
                 null, term, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
                 new HashSet<>(), university
         );
-        return universityInfoForApplyRepository.save(universityInfoForApply);
+        return universityInfoForApplyRepository.save(univApplyInfo);
     }
 }
