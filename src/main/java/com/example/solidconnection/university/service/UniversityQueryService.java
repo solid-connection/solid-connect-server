@@ -3,7 +3,7 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
@@ -33,11 +33,11 @@ public class UniversityQueryService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityDetailResponse getUniversityDetail(Long universityInfoForApplyId) {
-        UniversityInfoForApply universityInfoForApply
+        UnivApplyInfo univApplyInfo
                 = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
-        University university = universityInfoForApply.getUniversity();
+        University university = univApplyInfo.getUniversity();
 
-        return UniversityDetailResponse.of(university, universityInfoForApply);
+        return UniversityDetailResponse.of(university, univApplyInfo);
     }
 
     /*

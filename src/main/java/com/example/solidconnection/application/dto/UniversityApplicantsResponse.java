@@ -2,7 +2,7 @@ package com.example.solidconnection.application.dto;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
 
@@ -12,12 +12,12 @@ public record UniversityApplicantsResponse(
         String region,
         String country,
         List<ApplicantResponse> applicants) {
-    public static UniversityApplicantsResponse of(UniversityInfoForApply universityInfoForApply, List<Application> applications, SiteUser siteUser) {
+    public static UniversityApplicantsResponse of(UnivApplyInfo univApplyInfo, List<Application> applications, SiteUser siteUser) {
         return new UniversityApplicantsResponse(
-                universityInfoForApply.getKoreanName(),
-                universityInfoForApply.getStudentCapacity(),
-                universityInfoForApply.getUniversity().getRegion().getKoreanName(),
-                universityInfoForApply.getUniversity().getCountry().getKoreanName(),
+                univApplyInfo.getKoreanName(),
+                univApplyInfo.getStudentCapacity(),
+                univApplyInfo.getUniversity().getRegion().getKoreanName(),
+                univApplyInfo.getUniversity().getCountry().getKoreanName(),
                 applications.stream()
                             .map(application -> ApplicantResponse.of(application, isUsers(application, siteUser)))
                             .toList());

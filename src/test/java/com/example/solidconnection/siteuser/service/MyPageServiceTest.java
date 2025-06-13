@@ -15,7 +15,7 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +60,7 @@ class MyPageServiceTest {
     private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Autowired
     private SiteUserFixtureBuilder siteUserFixtureBuilder;
@@ -193,9 +193,9 @@ class MyPageServiceTest {
     }
 
     private int createLikedUniversities(SiteUser testUser) {
-        LikedUniversity likedUniversity1 = new LikedUniversity(null, universityInfoForApplyFixture.괌대학_A_지원_정보(), testUser);
-        LikedUniversity likedUniversity2 = new LikedUniversity(null, universityInfoForApplyFixture.메이지대학_지원_정보(), testUser);
-        LikedUniversity likedUniversity3 = new LikedUniversity(null, universityInfoForApplyFixture.코펜하겐IT대학_지원_정보(), testUser);
+        LikedUniversity likedUniversity1 = new LikedUniversity(null, univApplyInfoFixture.괌대학_A_지원_정보(), testUser);
+        LikedUniversity likedUniversity2 = new LikedUniversity(null, univApplyInfoFixture.메이지대학_지원_정보(), testUser);
+        LikedUniversity likedUniversity3 = new LikedUniversity(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(), testUser);
 
         likedUniversityRepository.save(likedUniversity1);
         likedUniversityRepository.save(likedUniversity2);

@@ -2,13 +2,12 @@ package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
-import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.List;
-import java.util.Objects;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
@@ -42,13 +41,13 @@ public class ApplicationQueryService {
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 1. 대학 지원 정보 필터링 (regionCode, keyword)
-        List<UniversityInfoForApply> univApplyInfos = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
         // 2. 조건에 맞는 모든 Application 한 번에 조회
         List<Long> univApplyInfoIds = univApplyInfos.stream()
-                .map(UniversityInfoForApply::getId)
+                .map(UnivApplyInfo::getId)
                 .toList();
         List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
         // 3. 지원서 분류 및 DTO 변환
@@ -72,13 +71,13 @@ public class ApplicationQueryService {
         }
 
         List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
-        List<UniversityInfoForApply> universityInfosForApply = universityInfoForApplyRepository.findAllByUniversityIds(universityInfoForApplyIds);
+        List<UnivApplyInfo> universityInfosForApply = universityInfoForApplyRepository.findAllByUniversityIds(universityInfoForApplyIds);
 
         return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
-            List<UniversityInfoForApply> universityInfosForApply,
+            List<UnivApplyInfo> universityInfosForApply,
             List<Application> applications,
             SiteUser siteUser) {
         Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
@@ -111,7 +110,7 @@ public class ApplicationQueryService {
     }
 
     private List<UniversityApplicantsResponse> createUniversityApplicantsResponses(
-            List<UniversityInfoForApply> universityInfosForApply,
+            List<UnivApplyInfo> universityInfosForApply,
             Map<Long, List<Application>> choiceMap,
             SiteUser siteUser) {
         return universityInfosForApply.stream()

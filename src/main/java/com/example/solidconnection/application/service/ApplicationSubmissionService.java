@@ -12,7 +12,6 @@ import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class ApplicationSubmissionService {
     public static final int APPLICATION_UPDATE_COUNT_LIMIT = 3;
 
     private final ApplicationRepository applicationRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
 

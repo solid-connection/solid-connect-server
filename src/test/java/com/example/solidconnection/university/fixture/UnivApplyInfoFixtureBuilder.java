@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -13,7 +13,7 @@ import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_
 
 @TestComponent
 @RequiredArgsConstructor
-public class UniversityInfoForApplyFixtureBuilder {
+public class UnivApplyInfoFixtureBuilder {
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
@@ -21,33 +21,33 @@ public class UniversityInfoForApplyFixtureBuilder {
     private String koreanName;
     private University university;
 
-    public UniversityInfoForApplyFixtureBuilder universityInfoForApply() {
-        return new UniversityInfoForApplyFixtureBuilder(universityInfoForApplyRepository);
+    public UnivApplyInfoFixtureBuilder universityInfoForApply() {
+        return new UnivApplyInfoFixtureBuilder(universityInfoForApplyRepository);
     }
 
-    public UniversityInfoForApplyFixtureBuilder term(String term) {
+    public UnivApplyInfoFixtureBuilder term(String term) {
         this.term = term;
         return this;
     }
 
-    public UniversityInfoForApplyFixtureBuilder koreanName(String koreanName) {
+    public UnivApplyInfoFixtureBuilder koreanName(String koreanName) {
         this.koreanName = koreanName;
         return this;
     }
 
-    public UniversityInfoForApplyFixtureBuilder university(University university) {
+    public UnivApplyInfoFixtureBuilder university(University university) {
         this.university = university;
         return this;
     }
 
-    public UniversityInfoForApply create() {
-        UniversityInfoForApply universityInfoForApply = new UniversityInfoForApply(
+    public UnivApplyInfo create() {
+        UnivApplyInfo univApplyInfo = new UnivApplyInfo(
                 null, term, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
                 new HashSet<>(), university
         );
-        return universityInfoForApplyRepository.save(universityInfoForApply);
+        return universityInfoForApplyRepository.save(univApplyInfo);
     }
 }

@@ -15,8 +15,8 @@ import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,7 +45,7 @@ class ApplicationQueryServiceTest {
     private RegionFixture regionFixture;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Autowired
     private GpaScoreFixture gpaScoreFixture;
@@ -71,9 +71,9 @@ class ApplicationQueryServiceTest {
     private LanguageTestScore languageTestScore2;
     private LanguageTestScore languageTestScore3;
 
-    private UniversityInfoForApply 괌대학_A_지원_정보;
-    private UniversityInfoForApply 괌대학_B_지원_정보;
-    private UniversityInfoForApply 서던덴마크대학교_지원_정보;
+    private UnivApplyInfo 괌대학_A_지원_정보;
+    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
     @BeforeEach
     void setUp() {
@@ -89,9 +89,9 @@ class ApplicationQueryServiceTest {
         gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user3);
         languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
 
-        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-        괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
-        서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
+        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
     }
 
     @Nested
