@@ -2,7 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.fixture.CountryFixture;
-import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
+import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
 import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
@@ -34,7 +34,7 @@ class UniversityRecommendServiceTest {
     private InterestedRegionRepository interestedRegionRepository;
 
     @Autowired
-    private InterestedCountyRepository interestedCountyRepository;
+    private InterestedCountryRepository interestedCountryRepository;
 
     @Autowired
     private GeneralUniversityRecommendService generalUniversityRecommendService;
@@ -97,7 +97,7 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
-        interestedCountyRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
+        interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
         UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
@@ -115,7 +115,7 @@ class UniversityRecommendServiceTest {
     void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
         // given
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
-        interestedCountyRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
+        interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
         UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
