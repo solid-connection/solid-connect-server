@@ -1,0 +1,96 @@
+package com.example.solidconnection.university.repository;
+
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+
+@TestContainerSpringBootTest
+@DisplayName("대학교 좋아요 레파지토리 테스트")
+public class UniversityLikeRepositoryTest {
+
+    @Autowired
+    private LikedUniversityRepository likedUniversityRepository;
+
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+
+    @Nested
+    class 사용자와_좋아요한_대학은_복합_유니크_제약조건을_갖는다 {
+
+        @Test
+        void 같은_사용자가_같은_대학에_중복으로_좋아요하면_예외_응답을_반환한다() {
+            // given
+            SiteUser user = siteUserFixture.사용자();
+            UnivApplyInfo university = universityInfoForApplyFixture.괌대학_A_지원_정보();
+
+            LikedUniversity firstLike = createLikedUniversity(user, university);
+            likedUniversityRepository.save(firstLike);
+
+            LikedUniversity secondLike = createLikedUniversity(user, university);
+
+            // when & then
+            assertThatCode(() -> likedUniversityRepository.save(secondLike))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        void 다른_사용자가_같은_대학에_좋아요하면_정상_저장된다() {
+            // given
+            SiteUser user1 = siteUserFixture.사용자(1, "user1");
+            SiteUser user2 = siteUserFixture.사용자(2, "user2");
+            UnivApplyInfo university = universityInfoForApplyFixture.괌대학_A_지원_정보();
+
+            LikedUniversity firstLike = createLikedUniversity(user1, university);
+            likedUniversityRepository.save(firstLike);
+
+            LikedUniversity secondLike = createLikedUniversity(user2, university);
+
+            // when & then
+            assertThatCode(() -> {
+                LikedUniversity saved = likedUniversityRepository.save(secondLike);
+                assertThat(saved.getId()).isNotNull();
+            }).doesNotThrowAnyException();
+        }
+
+        @Test
+        void 같은_사용자가_다른_대학에_좋아요하면_정상_저장된다() {
+            // given
+            SiteUser user = siteUserFixture.사용자();
+            UnivApplyInfo university1 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+            UnivApplyInfo university2 = universityInfoForApplyFixture.메이지대학_지원_정보();
+
+            LikedUniversity firstLike = createLikedUniversity(user, university1);
+            likedUniversityRepository.save(firstLike);
+
+            LikedUniversity secondLike = createLikedUniversity(user, university2);
+
+            // when & then
+            assertThatCode(() -> {
+                LikedUniversity saved = likedUniversityRepository.save(secondLike);
+                assertThat(saved.getId()).isNotNull();
+            }).doesNotThrowAnyException();
+        }
+    }
+
+    private LikedUniversity createLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+        return LikedUniversity.builder()
+                .siteUser(siteUser)
+                .univApplyInfo(univApplyInfo)
+                .build();
+    }
+}
