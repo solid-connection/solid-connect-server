@@ -29,7 +29,7 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.LanguageRequirementRepository;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.UniversityRepository;
@@ -80,16 +80,16 @@ public abstract class BaseIntegrationTest {
     public static University 유럽_오스트리아_린츠_카톨릭대학;
     public static University 아시아_일본_메이지대학;
 
-    public static UniversityInfoForApply 괌대학_A_지원_정보;
-    public static UniversityInfoForApply 괌대학_B_지원_정보;
-    public static UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보;
-    public static UniversityInfoForApply 메모리얼대학_세인트존스_A_지원_정보;
-    public static UniversityInfoForApply 서던덴마크대학교_지원_정보;
-    public static UniversityInfoForApply 코펜하겐IT대학_지원_정보;
-    public static UniversityInfoForApply 그라츠대학_지원_정보;
-    public static UniversityInfoForApply 그라츠공과대학_지원_정보;
-    public static UniversityInfoForApply 린츠_카톨릭대학_지원_정보;
-    public static UniversityInfoForApply 메이지대학_지원_정보;
+    public static UnivApplyInfo 괌대학_A_지원_정보;
+    public static UnivApplyInfo 괌대학_B_지원_정보;
+    public static UnivApplyInfo 네바다주립대학_라스베이거스_지원_정보;
+    public static UnivApplyInfo 메모리얼대학_세인트존스_A_지원_정보;
+    public static UnivApplyInfo 서던덴마크대학교_지원_정보;
+    public static UnivApplyInfo 코펜하겐IT대학_지원_정보;
+    public static UnivApplyInfo 그라츠대학_지원_정보;
+    public static UnivApplyInfo 그라츠공과대학_지원_정보;
+    public static UnivApplyInfo 린츠_카톨릭대학_지원_정보;
+    public static UnivApplyInfo 메이지대학_지원_정보;
 
     public static Application 테스트유저_2_괌대학_B_괌대학_A_린츠_카톨릭대학_지원서;
     public static Application 테스트유저_3_괌대학_A_괌대학_B_그라츠공과대학_지원서;
@@ -326,7 +326,7 @@ public abstract class BaseIntegrationTest {
     }
 
     private void setUpUniversityInfos() {
-        괌대학_A_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        괌대학_A_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "괌대학(A형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -334,7 +334,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 영미권_미국_괌대학
         ));
 
-        괌대학_B_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        괌대학_B_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "괌대학(B형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -342,7 +342,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 영미권_미국_괌대학
         ));
 
-        네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "네바다주립대학 라스베이거스(B형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -350,7 +350,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 영미권_미국_네바다주립대학_라스베이거스
         ));
 
-        메모리얼대학_세인트존스_A_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        메모리얼대학_세인트존스_A_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "메모리얼 대학 세인트존스(A형)", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -358,7 +358,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 영미권_캐나다_메모리얼대학_세인트존스
         ));
 
-        서던덴마크대학교_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        서던덴마크대학교_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "서던덴마크대학교", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -366,7 +366,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 유럽_덴마크_서던덴마크대학교
         ));
 
-        코펜하겐IT대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        코펜하겐IT대학_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "코펜하겐 IT대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -374,7 +374,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 유럽_덴마크_코펜하겐IT대학
         ));
 
-        그라츠대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        그라츠대학_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "그라츠 대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -382,7 +382,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 유럽_오스트리아_그라츠대학
         ));
 
-        그라츠공과대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        그라츠공과대학_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "그라츠공과대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -390,7 +390,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 유럽_오스트리아_그라츠공과대학
         ));
 
-        린츠_카톨릭대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        린츠_카톨릭대학_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "린츠 카톨릭 대학교", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -398,7 +398,7 @@ public abstract class BaseIntegrationTest {
                 new HashSet<>(), 유럽_오스트리아_린츠_카톨릭대학
         ));
 
-        메이지대학_지원_정보 = universityInfoForApplyRepository.save(new UniversityInfoForApply(
+        메이지대학_지원_정보 = universityInfoForApplyRepository.save(new UnivApplyInfo(
                 null, term, "메이지대학", 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
@@ -476,7 +476,7 @@ public abstract class BaseIntegrationTest {
     }
 
     private void saveLanguageTestRequirement(
-            UniversityInfoForApply universityInfoForApply,
+            UnivApplyInfo univApplyInfo,
             LanguageTestType testType,
             String minScore
     ) {
@@ -484,9 +484,9 @@ public abstract class BaseIntegrationTest {
                 null,
                 testType,
                 minScore,
-                universityInfoForApply);
-        universityInfoForApply.addLanguageRequirements(languageRequirement);
-        universityInfoForApplyRepository.save(universityInfoForApply);
+                univApplyInfo);
+        univApplyInfo.addLanguageRequirements(languageRequirement);
+        universityInfoForApplyRepository.save(univApplyInfo);
         languageRequirementRepository.save(languageRequirement);
     }
 

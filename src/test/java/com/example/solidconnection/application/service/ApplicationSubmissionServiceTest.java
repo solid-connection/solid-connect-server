@@ -14,7 +14,7 @@ import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,9 +56,9 @@ class ApplicationSubmissionServiceTest {
     private String term;
 
     private SiteUser user;
-    private UniversityInfoForApply 괌대학_A_지원_정보;
-    private UniversityInfoForApply 괌대학_B_지원_정보;
-    private UniversityInfoForApply 서던덴마크대학교_지원_정보;
+    private UnivApplyInfo 괌대학_A_지원_정보;
+    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
     @BeforeEach
     void setUp() {

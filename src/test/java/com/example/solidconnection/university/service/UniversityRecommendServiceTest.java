@@ -9,7 +9,7 @@ import com.example.solidconnection.location.region.repository.InterestedRegionRe
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
@@ -52,12 +52,12 @@ class UniversityRecommendServiceTest {
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
     private SiteUser user;
-    private UniversityInfoForApply 괌대학_A_지원_정보;
-    private UniversityInfoForApply 괌대학_B_지원_정보;
-    private UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보;
-    private UniversityInfoForApply 메모리얼대학_세인트존스_A_지원_정보;
-    private UniversityInfoForApply 서던덴마크대학교_지원_정보;
-    private UniversityInfoForApply 코펜하겐IT대학_지원_정보;
+    private UnivApplyInfo 괌대학_A_지원_정보;
+    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 네바다주립대학_라스베이거스_지원_정보;
+    private UnivApplyInfo 메모리얼대학_세인트존스_A_지원_정보;
+    private UnivApplyInfo 서던덴마크대학교_지원_정보;
+    private UnivApplyInfo 코펜하겐IT대학_지원_정보;
 
     @BeforeEach
     void setUp() {

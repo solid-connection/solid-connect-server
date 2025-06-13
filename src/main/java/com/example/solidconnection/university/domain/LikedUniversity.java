@@ -23,7 +23,7 @@ public class LikedUniversity {
     private Long id;
 
     @ManyToOne
-    private UniversityInfoForApply universityInfoForApply;
+    private UnivApplyInfo univApplyInfo;
 
     @ManyToOne
     private SiteUser siteUser;

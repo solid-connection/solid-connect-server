@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.dto;
 
 import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
 
@@ -35,11 +35,11 @@ public record UniversityDetailResponse(
 
     public static UniversityDetailResponse of(
             University university,
-            UniversityInfoForApply universityInfoForApply) {
+            UnivApplyInfo univApplyInfo) {
         return new UniversityDetailResponse(
-                universityInfoForApply.getId(),
-                universityInfoForApply.getTerm(),
-                universityInfoForApply.getKoreanName(),
+                univApplyInfo.getId(),
+                univApplyInfo.getTerm(),
+                univApplyInfo.getKoreanName(),
                 university.getEnglishName(),
                 university.getFormatName(),
                 university.getRegion().getKoreanName(),
@@ -48,21 +48,21 @@ public record UniversityDetailResponse(
                 university.getLogoImageUrl(),
                 university.getBackgroundImageUrl(),
                 university.getDetailsForLocal(),
-                universityInfoForApply.getStudentCapacity(),
-                universityInfoForApply.getTuitionFeeType().getKoreanName(),
-                universityInfoForApply.getSemesterAvailableForDispatch().getKoreanName(),
-                universityInfoForApply.getLanguageRequirements().stream()
+                univApplyInfo.getStudentCapacity(),
+                univApplyInfo.getTuitionFeeType().getKoreanName(),
+                univApplyInfo.getSemesterAvailableForDispatch().getKoreanName(),
+                univApplyInfo.getLanguageRequirements().stream()
                         .map(LanguageRequirementResponse::from)
                         .toList(),
-                universityInfoForApply.getDetailsForLanguage(),
-                universityInfoForApply.getGpaRequirement(),
-                universityInfoForApply.getGpaRequirementCriteria(),
-                universityInfoForApply.getSemesterRequirement(),
-                universityInfoForApply.getDetailsForApply(),
-                universityInfoForApply.getDetailsForMajor(),
-                universityInfoForApply.getDetailsForAccommodation(),
-                universityInfoForApply.getDetailsForEnglishCourse(),
-                universityInfoForApply.getDetails(),
+                univApplyInfo.getDetailsForLanguage(),
+                univApplyInfo.getGpaRequirement(),
+                univApplyInfo.getGpaRequirementCriteria(),
+                univApplyInfo.getSemesterRequirement(),
+                univApplyInfo.getDetailsForApply(),
+                univApplyInfo.getDetailsForMajor(),
+                univApplyInfo.getDetailsForAccommodation(),
+                univApplyInfo.getDetailsForEnglishCourse(),
+                univApplyInfo.getDetails(),
                 university.getAccommodationUrl(),
                 university.getEnglishCourseUrl()
         );

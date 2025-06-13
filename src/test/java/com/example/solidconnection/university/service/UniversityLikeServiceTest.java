@@ -6,7 +6,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUniversity;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
@@ -42,7 +42,7 @@ class UniversityLikeServiceTest {
     private UniversityInfoForApplyFixture universityInfoForApplyFixture;
 
     private SiteUser user;
-    private UniversityInfoForApply 괌대학_A_지원_정보;
+    private UnivApplyInfo 괌대학_A_지원_정보;
 
     @BeforeEach
     void setUp() {
@@ -61,7 +61,7 @@ class UniversityLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
+                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
                             user, 괌대학_A_지원_정보
                     )).isPresent()
             );
@@ -93,7 +93,7 @@ class UniversityLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(
+                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
                             user, 괌대학_A_지원_정보
                     )).isEmpty()
             );
@@ -151,10 +151,10 @@ class UniversityLikeServiceTest {
                 .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
     }
 
-    private void saveLikedUniversity(SiteUser siteUser, UniversityInfoForApply universityInfoForApply) {
+    private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         LikedUniversity likedUniversity = LikedUniversity.builder()
                 .siteUser(siteUser)
-                .universityInfoForApply(universityInfoForApply)
+                .univApplyInfo(univApplyInfo)
                 .build();
         likedUniversityRepository.save(likedUniversity);
     }
