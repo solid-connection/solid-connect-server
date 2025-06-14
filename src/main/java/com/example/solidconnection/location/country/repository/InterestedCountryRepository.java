@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface InterestedCountyRepository extends JpaRepository<InterestedCountry, Long> {
+public interface InterestedCountryRepository extends JpaRepository<InterestedCountry, Long> {
     List<InterestedCountry> findAllBySiteUser(SiteUser siteUser);
 }
