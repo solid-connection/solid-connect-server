@@ -34,6 +34,7 @@ import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAY
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
@@ -148,7 +149,8 @@ class MyPageServiceTest {
             myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(커스텀_프로필_사용자);
+            then(s3Service).should().deleteExProfile(argThat(user ->
+                    user.getId().equals(커스텀_프로필_사용자.getId())));
         }
     }
 
@@ -182,6 +184,7 @@ class MyPageServiceTest {
             MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
             user.setNicknameModifiedAt(modifiedAt);
+            siteUserRepository.save(user);
 
             // when & then
             assertThatCode(() -> myPageService.updateMyPageInfo(user, imageFile, "nickname12"))

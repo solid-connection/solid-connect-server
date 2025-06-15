@@ -1,7 +1,6 @@
 package com.example.solidconnection.siteuser.service;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -12,7 +11,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -48,23 +48,23 @@ public class MyPageService {
      * */
     @Transactional
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
-        if (nickname != null) {
-            validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
+        SiteUser user = siteUserRepository.findById(siteUser.getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-            try {
-                siteUserRepository.updateNickname(siteUser.getId(), nickname, LocalDateTime.now());
-            } catch (DataIntegrityViolationException e) {
-                throw new CustomException(determineErrorCode(e));
-            }
+        if (nickname != null) {
+            validateNicknameNotChangedRecently(user.getNicknameModifiedAt());
+            validateNicknameUnique(nickname);
+            user.setNickname(nickname);
+            user.setNicknameModifiedAt(LocalDateTime.now());
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
-            if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
-                s3Service.deleteExProfile(siteUser);
+            if (!isDefaultProfileImage(user.getProfileImageUrl())) {
+                s3Service.deleteExProfile(user);
             }
             String profileImageUrl = uploadedFile.fileUrl();
-            siteUserRepository.updateProfileImage(siteUser.getId(), profileImageUrl);
+            user.setProfileImageUrl(profileImageUrl);
         }
     }
 
@@ -84,12 +84,10 @@ public class MyPageService {
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
     }
 
-    private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
-        if (e.getMessage().contains("uk_site_user_nickname")) {
-            return ErrorCode.NICKNAME_ALREADY_EXISTED;
+    private void validateNicknameUnique(String nickname) {
+        if (siteUserRepository.existsByNickname(nickname)) {
+            throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
-
-        return ErrorCode.DATA_INTEGRITY_VIOLATION;
     }
 
     /*
