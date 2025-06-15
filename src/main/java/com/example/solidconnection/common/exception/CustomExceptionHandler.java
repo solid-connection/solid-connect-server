@@ -4,6 +4,7 @@ import com.example.solidconnection.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DATA_INTEGRITY_VIOLATION;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
 import static com.example.solidconnection.common.exception.ErrorCode.JSON_PARSING_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.JWT_EXCEPTION;
@@ -53,6 +55,15 @@ public class CustomExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(INVALID_INPUT, errorMessage);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        log.error("데이터 무결성 제약조건 위반 예외 발생 : {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(DATA_INTEGRITY_VIOLATION, "데이터 무결성 제약조건 위반 예외 발생");
+        return ResponseEntity
+                .status(DATA_INTEGRITY_VIOLATION.getCode())
                 .body(errorResponse);
     }
 
