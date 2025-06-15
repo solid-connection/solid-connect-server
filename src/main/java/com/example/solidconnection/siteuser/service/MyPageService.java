@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -11,6 +12,7 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,7 +50,12 @@ public class MyPageService {
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
         if (nickname != null) {
             validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-            siteUserRepository.updateNickname(siteUser.getId(), nickname, LocalDateTime.now());
+
+            try {
+                siteUserRepository.updateNickname(siteUser.getId(), nickname, LocalDateTime.now());
+            } catch (DataIntegrityViolationException e) {
+                throw new CustomException(determineErrorCode(e));
+            }
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -75,6 +82,14 @@ public class MyPageService {
     private boolean isDefaultProfileImage(String profileImageUrl) {
         String prefix = "profile/";
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
+    }
+
+    private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
+        if (e.getMessage().contains("uk_site_user_nickname")) {
+            return ErrorCode.NICKNAME_ALREADY_EXISTED;
+        }
+
+        return ErrorCode.DATA_INTEGRITY_VIOLATION;
     }
 
     /*

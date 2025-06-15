@@ -39,19 +39,7 @@ class MyPageController {
             @RequestParam(value = "file", required = false) MultipartFile imageFile,
             @RequestParam(value = "nickname", required = false) String nickname
     ) {
-        try {
-            myPageService.updateMyPageInfo(siteUser, imageFile, nickname);
-            return ResponseEntity.ok().build();
-        } catch (DataIntegrityViolationException e) {
-            throw new CustomException(determineErrorCode(e));
-        }
-    }
-
-    private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
-        if (e.getMessage().contains("uk_site_user_nickname")) {
-            return ErrorCode.NICKNAME_ALREADY_EXISTED;
-        }
-
-        return ErrorCode.DATA_INTEGRITY_VIOLATION;
+        myPageService.updateMyPageInfo(siteUser, imageFile, nickname);
+        return ResponseEntity.ok().build();
     }
 }
