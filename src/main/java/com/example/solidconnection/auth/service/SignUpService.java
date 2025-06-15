@@ -51,20 +51,17 @@ public abstract class SignUpService {
         // 검증
         validateSignUpToken(signUpRequest);
         validateUserNotDuplicated(signUpRequest);
+        validateNicknameDuplicated(signUpRequest.nickname());
 
-        try {
-            // 사용자 저장
-            SiteUser siteUser = siteUserRepository.save(createSiteUser(signUpRequest));
+        // 사용자 저장
+        SiteUser siteUser = siteUserRepository.save(createSiteUser(signUpRequest));
 
-            // 관심 지역, 국가 저장
-            saveInterestedRegion(signUpRequest, siteUser);
-            saveInterestedCountry(signUpRequest, siteUser);
+        // 관심 지역, 국가 저장
+        saveInterestedRegion(signUpRequest, siteUser);
+        saveInterestedCountry(signUpRequest, siteUser);
 
-            // 로그인
-            return signInService.signIn(siteUser);
-        } catch (DataIntegrityViolationException e) {
-            throw new CustomException(determineErrorCode(e));
-        }
+        // 로그인
+        return signInService.signIn(siteUser);
     }
 
     private void validateNicknameDuplicated(String nickname) {
@@ -87,14 +84,6 @@ public abstract class SignUpService {
                 .map(country -> new InterestedCountry(savedSiteUser, country))
                 .toList();
         interestedCountyRepository.saveAll(interestedCountries);
-    }
-
-    private ErrorCode determineErrorCode(DataIntegrityViolationException e) {
-        if (e.getMessage().contains("uk_site_user_nickname")) {
-            return ErrorCode.NICKNAME_ALREADY_EXISTED;
-        }
-
-        return ErrorCode.DATA_INTEGRITY_VIOLATION;
     }
 
     protected abstract void validateSignUpToken(SignUpRequest signUpRequest);
