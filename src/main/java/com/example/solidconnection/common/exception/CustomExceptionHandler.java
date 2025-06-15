@@ -60,11 +60,10 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        String errorMessage = ex.getMessage();
-        log.error("데이터 무결성 제약조건 위반 예외 발생 : {}", errorMessage);
-        ErrorResponse errorResponse = new ErrorResponse(DATA_INTEGRITY_VIOLATION, errorMessage);
+        log.error("데이터 무결성 제약조건 위반 예외 발생 : {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(DATA_INTEGRITY_VIOLATION, "데이터 무결성 제약조건 위반 예외 발생");
         return ResponseEntity
-                .status(HttpStatus.CONFLICT)
+                .status(DATA_INTEGRITY_VIOLATION.getCode())
                 .body(errorResponse);
     }
 
