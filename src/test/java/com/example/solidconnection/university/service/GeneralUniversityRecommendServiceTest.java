@@ -2,7 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,23 +23,23 @@ class GeneralUniversityRecommendServiceTest {
     private GeneralUniversityRecommendService generalUniversityRecommendService;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Value("${university.term}")
     private String term;
 
     @BeforeEach
     void setUp() {
-        universityInfoForApplyFixture.괌대학_A_지원_정보();
-        universityInfoForApplyFixture.괌대학_B_지원_정보();
-        universityInfoForApplyFixture.네바다주립대학_라스베이거스_지원_정보();
-        universityInfoForApplyFixture.메모리얼대학_세인트존스_A_지원_정보();
-        universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
-        universityInfoForApplyFixture.코펜하겐IT대학_지원_정보();
-        universityInfoForApplyFixture.그라츠대학_지원_정보();
-        universityInfoForApplyFixture.그라츠공과대학_지원_정보();
-        universityInfoForApplyFixture.린츠_카톨릭대학_지원_정보();
-        universityInfoForApplyFixture.메이지대학_지원_정보();
+        univApplyInfoFixture.괌대학_A_지원_정보();
+        univApplyInfoFixture.괌대학_B_지원_정보();
+        univApplyInfoFixture.네바다주립대학_라스베이거스_지원_정보();
+        univApplyInfoFixture.메모리얼대학_세인트존스_A_지원_정보();
+        univApplyInfoFixture.서던덴마크대학교_지원_정보();
+        univApplyInfoFixture.코펜하겐IT대학_지원_정보();
+        univApplyInfoFixture.그라츠대학_지원_정보();
+        univApplyInfoFixture.그라츠공과대학_지원_정보();
+        univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
+        univApplyInfoFixture.메이지대학_지원_정보();
         generalUniversityRecommendService.init();
     }
 

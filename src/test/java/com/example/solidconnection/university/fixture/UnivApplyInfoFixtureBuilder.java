@@ -13,7 +13,7 @@ import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_
 
 @TestComponent
 @RequiredArgsConstructor
-public class UniversityInfoForApplyFixtureBuilder {
+public class UnivApplyInfoFixtureBuilder {
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
@@ -21,21 +21,21 @@ public class UniversityInfoForApplyFixtureBuilder {
     private String koreanName;
     private University university;
 
-    public UniversityInfoForApplyFixtureBuilder universityInfoForApply() {
-        return new UniversityInfoForApplyFixtureBuilder(universityInfoForApplyRepository);
+    public UnivApplyInfoFixtureBuilder universityInfoForApply() {
+        return new UnivApplyInfoFixtureBuilder(universityInfoForApplyRepository);
     }
 
-    public UniversityInfoForApplyFixtureBuilder term(String term) {
+    public UnivApplyInfoFixtureBuilder term(String term) {
         this.term = term;
         return this;
     }
 
-    public UniversityInfoForApplyFixtureBuilder koreanName(String koreanName) {
+    public UnivApplyInfoFixtureBuilder koreanName(String koreanName) {
         this.koreanName = koreanName;
         return this;
     }
 
-    public UniversityInfoForApplyFixtureBuilder university(University university) {
+    public UnivApplyInfoFixtureBuilder university(University university) {
         this.university = university;
         return this;
     }

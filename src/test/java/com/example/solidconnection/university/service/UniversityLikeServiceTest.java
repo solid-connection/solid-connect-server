@@ -9,7 +9,7 @@ import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,7 +39,7 @@ class UniversityLikeServiceTest {
     private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     private SiteUser user;
     private UnivApplyInfo 괌대학_A_지원_정보;
@@ -47,7 +47,7 @@ class UniversityLikeServiceTest {
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
-        괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
     }
 
     @Nested

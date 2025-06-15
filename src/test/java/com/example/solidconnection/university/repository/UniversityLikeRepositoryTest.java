@@ -6,7 +6,7 @@ import com.example.solidconnection.siteuser.repository.LikedUniversityRepository
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class UniversityLikeRepositoryTest {
     private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Nested
     class 사용자와_좋아요한_대학은_복합_유니크_제약조건을_갖는다 {
@@ -36,7 +36,7 @@ public class UniversityLikeRepositoryTest {
         void 같은_사용자가_같은_대학에_중복으로_좋아요하면_예외_응답을_반환한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
-            UnivApplyInfo university = universityInfoForApplyFixture.괌대학_A_지원_정보();
+            UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
 
             LikedUniversity firstLike = createLikedUniversity(user, university);
             likedUniversityRepository.save(firstLike);
@@ -53,7 +53,7 @@ public class UniversityLikeRepositoryTest {
             // given
             SiteUser user1 = siteUserFixture.사용자(1, "user1");
             SiteUser user2 = siteUserFixture.사용자(2, "user2");
-            UnivApplyInfo university = universityInfoForApplyFixture.괌대학_A_지원_정보();
+            UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
 
             LikedUniversity firstLike = createLikedUniversity(user1, university);
             likedUniversityRepository.save(firstLike);
@@ -71,8 +71,8 @@ public class UniversityLikeRepositoryTest {
         void 같은_사용자가_다른_대학에_좋아요하면_정상_저장된다() {
             // given
             SiteUser user = siteUserFixture.사용자();
-            UnivApplyInfo university1 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-            UnivApplyInfo university2 = universityInfoForApplyFixture.메이지대학_지원_정보();
+            UnivApplyInfo university1 = univApplyInfoFixture.괌대학_A_지원_정보();
+            UnivApplyInfo university2 = univApplyInfoFixture.메이지대학_지원_정보();
 
             LikedUniversity firstLike = createLikedUniversity(user, university1);
             likedUniversityRepository.save(firstLike);
