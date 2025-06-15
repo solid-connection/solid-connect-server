@@ -6,7 +6,7 @@ import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -18,9 +18,9 @@ public class ApplicationFixtureBuilder {
 
     private Gpa gpa;
     private LanguageTest languageTest;
-    private UniversityInfoForApply firstChoiceUniversity;
-    private UniversityInfoForApply secondChoiceUniversity;
-    private UniversityInfoForApply thirdChoiceUniversity;
+    private UnivApplyInfo firstChoiceUniversity;
+    private UnivApplyInfo secondChoiceUniversity;
+    private UnivApplyInfo thirdChoiceUniversity;
     private SiteUser siteUser;
     private String nicknameForApply;
     private String term;
@@ -39,17 +39,17 @@ public class ApplicationFixtureBuilder {
         return this;
     }
 
-    public ApplicationFixtureBuilder firstChoiceUniversity(UniversityInfoForApply firstChoiceUniversity) {
+    public ApplicationFixtureBuilder firstChoiceUniversity(UnivApplyInfo firstChoiceUniversity) {
         this.firstChoiceUniversity = firstChoiceUniversity;
         return this;
     }
 
-    public ApplicationFixtureBuilder secondChoiceUniversity(UniversityInfoForApply secondChoiceUniversity) {
+    public ApplicationFixtureBuilder secondChoiceUniversity(UnivApplyInfo secondChoiceUniversity) {
         this.secondChoiceUniversity = secondChoiceUniversity;
         return this;
     }
 
-    public ApplicationFixtureBuilder thirdChoiceUniversity(UniversityInfoForApply thirdChoiceUniversity) {
+    public ApplicationFixtureBuilder thirdChoiceUniversity(UnivApplyInfo thirdChoiceUniversity) {
         this.thirdChoiceUniversity = thirdChoiceUniversity;
         return this;
     }

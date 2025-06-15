@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.domain;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -55,13 +55,13 @@ public class Application {
     private boolean isDelete = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply firstChoiceUniversity;
+    private UnivApplyInfo firstChoiceUniversity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply secondChoiceUniversity;
+    private UnivApplyInfo secondChoiceUniversity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply thirdChoiceUniversity;
+    private UnivApplyInfo thirdChoiceUniversity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser siteUser;
@@ -85,9 +85,9 @@ public class Application {
             LanguageTest languageTest,
             String term,
             Integer updateCount,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
+            UnivApplyInfo firstChoiceUniversity,
+            UnivApplyInfo secondChoiceUniversity,
+            UnivApplyInfo thirdChoiceUniversity,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
@@ -106,9 +106,9 @@ public class Application {
             Gpa gpa,
             LanguageTest languageTest,
             String term,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
+            UnivApplyInfo firstChoiceUniversity,
+            UnivApplyInfo secondChoiceUniversity,
+            UnivApplyInfo thirdChoiceUniversity,
             String nicknameForApply) {
         this.siteUser = siteUser;
         this.gpa = gpa;
@@ -127,9 +127,9 @@ public class Application {
     }
 
     public void updateUniversityChoice(
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity,
+            UnivApplyInfo firstChoiceUniversity,
+            UnivApplyInfo secondChoiceUniversity,
+            UnivApplyInfo thirdChoiceUniversity,
             String nicknameForApply) {
         if (this.firstChoiceUniversity != null) {
             this.updateCount++;

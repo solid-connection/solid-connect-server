@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.service;
 
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class GeneralUniversityRecommendService {
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     @Getter
-    private List<UniversityInfoForApply> recommendUniversities;
+    private List<UnivApplyInfo> recommendUniversities;
 
     @Value("${university.term}")
     public String term;

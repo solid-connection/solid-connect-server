@@ -3,12 +3,12 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LanguageTestType;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
-import com.example.solidconnection.university.fixture.UniversityInfoForApplyFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ class UniversityQueryServiceTest {
     private UniversityInfoForApplyRepository universityInfoForApplyRepository;
 
     @Autowired
-    private UniversityInfoForApplyFixture universityInfoForApplyFixture;
+    private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Autowired
     private LanguageRequirementFixture languageRequirementFixture;
@@ -46,7 +46,7 @@ class UniversityQueryServiceTest {
     @Test
     void 대학_상세정보를_정상_조회한다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
         UniversityDetailResponse response = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
@@ -58,7 +58,7 @@ class UniversityQueryServiceTest {
     @Test
     void 대학_상세정보_조회시_캐시가_적용된다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
         UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
@@ -85,12 +85,12 @@ class UniversityQueryServiceTest {
     @Test
     void 전체_대학을_조회한다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-        UniversityInfoForApply 괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
-        UniversityInfoForApply 네바다주립대학_라스베이거스_지원_정보 = universityInfoForApplyFixture.네바다주립대학_라스베이거스_지원_정보();
-        UniversityInfoForApply 서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
-        UniversityInfoForApply 그라츠대학_지원_정보 = universityInfoForApplyFixture.그라츠대학_지원_정보();
-        UniversityInfoForApply 메이지대학_지원_정보 = universityInfoForApplyFixture.메이지대학_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
+        UnivApplyInfo 네바다주립대학_라스베이거스_지원_정보 = univApplyInfoFixture.네바다주립대학_라스베이거스_지원_정보();
+        UnivApplyInfo 서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
+        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
+        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
@@ -111,7 +111,7 @@ class UniversityQueryServiceTest {
     @Test
     void 대학_조회시_캐시가_적용된다() {
         // given
-        universityInfoForApplyFixture.괌대학_A_지원_정보();
+        univApplyInfoFixture.괌대학_A_지원_정보();
         String regionCode = "AMERICAS";
         List<String> keywords = List.of("괌");
         LanguageTestType testType = LanguageTestType.TOEFL_IBT;
@@ -134,10 +134,10 @@ class UniversityQueryServiceTest {
     @Test
     void 지역으로_대학을_필터링한다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
-        universityInfoForApplyFixture.코펜하겐IT대학_지원_정보();
-        universityInfoForApplyFixture.그라츠공과대학_지원_정보();
-        universityInfoForApplyFixture.메이지대학_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+        univApplyInfoFixture.코펜하겐IT대학_지원_정보();
+        univApplyInfoFixture.그라츠공과대학_지원_정보();
+        univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
@@ -151,9 +151,9 @@ class UniversityQueryServiceTest {
     @Test
     void 키워드로_대학을_필터링한다() {
         // given
-        universityInfoForApplyFixture.괌대학_A_지원_정보();
-        UniversityInfoForApply 그라츠대학_지원_정보 = universityInfoForApplyFixture.그라츠대학_지원_정보();
-        UniversityInfoForApply 메이지대학_지원_정보 = universityInfoForApplyFixture.메이지대학_지원_정보();
+        univApplyInfoFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
+        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
         UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
@@ -170,10 +170,10 @@ class UniversityQueryServiceTest {
     @Test
     void 어학시험_조건으로_대학을_필터링한다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         languageRequirementFixture.토플_80(괌대학_A_지원_정보);
         languageRequirementFixture.토익_800(괌대학_A_지원_정보);
-        UniversityInfoForApply 괌대학_B_지원_정보 = universityInfoForApplyFixture.괌대학_B_지원_정보();
+        UnivApplyInfo 괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
         languageRequirementFixture.토플_70(괌대학_B_지원_정보);
         languageRequirementFixture.토익_900(괌대학_B_지원_정보);
 
@@ -189,10 +189,10 @@ class UniversityQueryServiceTest {
     @Test
     void 모든_조건으로_대학을_필터링한다() {
         // given
-        UniversityInfoForApply 괌대학_A_지원_정보 = universityInfoForApplyFixture.괌대학_A_지원_정보();
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         languageRequirementFixture.토플_80(괌대학_A_지원_정보);
         languageRequirementFixture.토익_800(괌대학_A_지원_정보);
-        UniversityInfoForApply 서던덴마크대학교_지원_정보 = universityInfoForApplyFixture.서던덴마크대학교_지원_정보();
+        UnivApplyInfo 서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
         languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
 
         // when

@@ -2,7 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
@@ -36,9 +36,9 @@ public class UniversityRecommendService {
     @Transactional(readOnly = true)
     public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
-        List<UniversityInfoForApply> personalRecommends = universityInfoForApplyRepository
+        List<UnivApplyInfo> personalRecommends = universityInfoForApplyRepository
                 .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
-        List<UniversityInfoForApply> trimmedRecommendUniversities
+        List<UnivApplyInfo> trimmedRecommendUniversities
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIVERSITY_NUM, personalRecommends.size()));
         Collections.shuffle(trimmedRecommendUniversities);
 
@@ -52,8 +52,8 @@ public class UniversityRecommendService {
                 .toList());
     }
 
-    private List<UniversityInfoForApply> getGeneralRecommendsExcludingSelected(List<UniversityInfoForApply> alreadyPicked) {
-        List<UniversityInfoForApply> generalRecommend = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
+    private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
+        List<UnivApplyInfo> generalRecommend = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
         generalRecommend.removeAll(alreadyPicked);
         Collections.shuffle(generalRecommend);
         return generalRecommend.subList(0, RECOMMEND_UNIVERSITY_NUM - alreadyPicked.size());
@@ -65,7 +65,7 @@ public class UniversityRecommendService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityRecommendsResponse getGeneralRecommends() {
-        List<UniversityInfoForApply> generalRecommends = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
+        List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
         return new UniversityRecommendsResponse(generalRecommends.stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());

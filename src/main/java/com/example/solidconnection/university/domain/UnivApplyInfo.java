@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,7 +25,8 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class UniversityInfoForApply {
+@Table(name = "university_info_for_apply")
+public class UnivApplyInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,7 +76,7 @@ public class UniversityInfoForApply {
     @Column(length = 1000)
     private String details;
 
-    @OneToMany(mappedBy = "universityInfoForApply", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "univApplyInfo", fetch = FetchType.EAGER)
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
