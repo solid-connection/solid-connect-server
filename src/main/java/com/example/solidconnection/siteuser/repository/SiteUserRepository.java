@@ -24,12 +24,4 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long> {
 
     @Query("SELECT u FROM SiteUser u WHERE u.quitedAt <= :cutoffDate")
     List<SiteUser> findUsersToBeRemoved(@Param("cutoffDate") LocalDate cutoffDate);
-
-    @Modifying
-    @Query("UPDATE SiteUser s SET s.nickname = :nickname, s.nicknameModifiedAt = :modifiedAt WHERE s.id = :id")
-    void updateNickname(@Param("id") Long id, @Param("nickname") String nickname, @Param("modifiedAt") LocalDateTime modifiedAt);
-
-    @Modifying
-    @Query("UPDATE SiteUser s SET s.profileImageUrl = :profileImageUrl WHERE s.id = :id")
-    void updateProfileImage(@Param("id") Long id, @Param("profileImageUrl") String profileImageUrl);
 }
