@@ -57,7 +57,7 @@ class SiteUserRepositoryTest {
             siteUserRepository.save(user1);
 
             // when, then
-            assertThatCode(() -> siteUserRepository.save(user2))
+            assertThatCode(() -> siteUserRepository.saveAndFlush(user2))
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
 
