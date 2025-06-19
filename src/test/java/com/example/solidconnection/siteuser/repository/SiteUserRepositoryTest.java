@@ -47,7 +47,7 @@ class SiteUserRepositoryTest {
     }
 
     @Nested
-    class 닉네임은_중복될_수_없다{
+    class 닉네임은_중복될_수_없다 {
 
         @Test
         void 중복된_닉네임으로_사용자를_저장하면_예외_응답을_반환한다() {
