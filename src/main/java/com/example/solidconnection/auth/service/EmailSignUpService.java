@@ -3,7 +3,7 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.repository.CountryRepository;
-import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
+import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -20,9 +20,9 @@ public class EmailSignUpService extends SignUpService {
 
     public EmailSignUpService(SignInService signInService, SiteUserRepository siteUserRepository,
                               RegionRepository regionRepository, InterestedRegionRepository interestedRegionRepository,
-                              CountryRepository countryRepository, InterestedCountyRepository interestedCountyRepository,
+                              CountryRepository countryRepository, InterestedCountryRepository interestedCountryRepository,
                               EmailSignUpTokenProvider emailSignUpTokenProvider) {
-        super(signInService, siteUserRepository, regionRepository, interestedRegionRepository, countryRepository, interestedCountyRepository);
+        super(signInService, siteUserRepository, regionRepository, interestedRegionRepository, countryRepository, interestedCountryRepository);
         this.emailSignUpTokenProvider = emailSignUpTokenProvider;
     }
 
