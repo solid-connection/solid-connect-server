@@ -1,5 +1,6 @@
 package com.example.solidconnection.siteuser.repository;
 
+
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -35,6 +35,10 @@ import java.util.List;
         @UniqueConstraint(
                 name = "uk_site_user_email_auth_type",
                 columnNames = {"email", "auth_type"}
+        ),
+        @UniqueConstraint(
+                name = "uk_site_user_nickname",
+                columnNames = {"nickname"}
         )
 })
 public class SiteUser {

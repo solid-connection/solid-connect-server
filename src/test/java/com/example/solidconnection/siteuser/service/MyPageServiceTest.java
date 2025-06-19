@@ -29,11 +29,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
-import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
@@ -118,7 +118,8 @@ class MyPageServiceTest {
             myPageService.updateMyPageInfo(user, imageFile, "newNickname");
 
             // then
-            assertThat(user.getProfileImageUrl()).isEqualTo(expectedUrl);
+            SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
+            assertThat(updatedUser.getProfileImageUrl()).isEqualTo(expectedUrl);
         }
 
         @Test
@@ -147,7 +148,8 @@ class MyPageServiceTest {
             myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(커스텀_프로필_사용자);
+            then(s3Service).should().deleteExProfile(argThat(user ->
+                    user.getId().equals(커스텀_프로필_사용자.getId())));
         }
     }
 
@@ -176,22 +178,12 @@ class MyPageServiceTest {
         }
 
         @Test
-        void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
-            // given
-            SiteUser existingUser = siteUserFixture.사용자(1, "existing nickname");
-
-            // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(user, null, existingUser.getNickname()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(NICKNAME_ALREADY_EXISTED.getMessage());
-        }
-
-        @Test
         void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
             // given
             MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);
             user.setNicknameModifiedAt(modifiedAt);
+            siteUserRepository.save(user);
 
             // when & then
             assertThatCode(() -> myPageService.updateMyPageInfo(user, imageFile, "nickname12"))
