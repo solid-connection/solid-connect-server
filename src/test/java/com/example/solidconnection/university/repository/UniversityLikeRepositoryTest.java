@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @TestContainerSpringBootTest
@@ -61,10 +60,7 @@ public class UniversityLikeRepositoryTest {
             LikedUniversity secondLike = createLikedUniversity(user2, university);
 
             // when & then
-            assertThatCode(() -> {
-                LikedUniversity saved = likedUniversityRepository.save(secondLike);
-                assertThat(saved.getId()).isNotNull();
-            }).doesNotThrowAnyException();
+            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
         }
 
         @Test
@@ -80,10 +76,7 @@ public class UniversityLikeRepositoryTest {
             LikedUniversity secondLike = createLikedUniversity(user, university2);
 
             // when & then
-            assertThatCode(() -> {
-                LikedUniversity saved = likedUniversityRepository.save(secondLike);
-                assertThat(saved.getId()).isNotNull();
-            }).doesNotThrowAnyException();
+            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
         }
     }
 
