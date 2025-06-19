@@ -79,15 +79,15 @@ public class MyPageService {
         }
     }
 
-    private boolean isDefaultProfileImage(String profileImageUrl) {
-        String prefix = "profile/";
-        return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
-    }
-
     private void validateNicknameUnique(String nickname) {
         if (siteUserRepository.existsByNickname(nickname)) {
             throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
+    }
+
+    private boolean isDefaultProfileImage(String profileImageUrl) {
+        String prefix = "profile/";
+        return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
     }
 
     /*
