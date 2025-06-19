@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(uniqueConstraints = {
         @UniqueConstraint(
-                name = "uk_liked_university_site_user_university",
+                name = "uk_liked_university_site_user_id_university_info_for_apply_id",
                 columnNames = {"site_user_id", "university_info_for_apply_id"}
         )
 })
