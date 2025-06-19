@@ -3,7 +3,6 @@ package com.example.solidconnection.auth.service;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.country.repository.InterestedCountyRepository;
@@ -12,7 +11,6 @@ import com.example.solidconnection.location.region.repository.InterestedRegionRe
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

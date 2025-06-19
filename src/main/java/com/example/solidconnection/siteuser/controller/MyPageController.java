@@ -1,13 +1,11 @@
 package com.example.solidconnection.siteuser.controller;
 
-import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.common.exception.ErrorCode;
+
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DATA_INTEGRITY_VIOLATION;
 
 @RequiredArgsConstructor
 @RequestMapping("/my")
