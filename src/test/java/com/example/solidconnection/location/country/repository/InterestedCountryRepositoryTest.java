@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @TestContainerSpringBootTest
-public class CountryRepositoryTest {
+public class InterestedCountryRepositoryTest {
 
     @Autowired
     private InterestedCountryRepository interestedCountryRepository;
