@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(
-                name = "uk_site_user_country",
+                name = "uk_interested_country_site_user_id_country_code",
                 columnNames = {"site_user_id", "country_code"}
         )
 })
