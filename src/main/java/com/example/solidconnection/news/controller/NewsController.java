@@ -5,6 +5,7 @@ import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsFindResponse;
 import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.service.NewsCommandService;
 import com.example.solidconnection.news.service.NewsQueryService;
 import com.example.solidconnection.security.annotation.RequireAdminAccess;
@@ -63,18 +64,10 @@ public class NewsController {
     public ResponseEntity<NewsCommandResponse> updateNews(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news_id") Long newsId,
-            @RequestParam(value = "title", required = false) String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "url", required = false) String url,
+            @Valid @RequestPart(value = "newsUpdateRequest") NewsUpdateRequest newsUpdateRequest,
             @RequestParam(value = "file", required = false) MultipartFile imageFile
     ) {
-        NewsCommandResponse newsCommandResponse = newsCommandService.updateNews(
-                newsId,
-                title,
-                description,
-                url,
-                imageFile
-        );
+        NewsCommandResponse newsCommandResponse = newsCommandService.updateNews(newsId, newsUpdateRequest, imageFile);
         return ResponseEntity.ok(newsCommandResponse);
     }
 

@@ -4,6 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
+import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.repository.NewsRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -40,20 +41,20 @@ public class NewsCommandService {
     }
 
     @Transactional
-    public NewsCommandResponse updateNews(Long newsId, String title, String description, String url, MultipartFile imageFile) {
+    public NewsCommandResponse updateNews(Long newsId, NewsUpdateRequest newsUpdateRequest, MultipartFile imageFile) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
-        if (title != null) {
-            validateTitle(title);
-            news.updateTitle(title);
+        if (newsUpdateRequest.title() != null) {
+            validateTitle(newsUpdateRequest.title());
+            news.updateTitle(newsUpdateRequest.title());
         }
-        if (description != null) {
-            validateDescription(description);
-            news.updateDescription(description);
+        if (newsUpdateRequest.description() != null) {
+            validateDescription(newsUpdateRequest.description());
+            news.updateDescription(newsUpdateRequest.description());
         }
-        if (url != null) {
-            validateUrl(url);
-            news.updateUrl(url);
+        if (newsUpdateRequest.url() != null) {
+            validateUrl(newsUpdateRequest.url());
+            news.updateUrl(newsUpdateRequest.url());
         }
         if (imageFile != null) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);

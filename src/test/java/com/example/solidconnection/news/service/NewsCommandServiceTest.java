@@ -4,6 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
+import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.news.repository.NewsRepository;
 import com.example.solidconnection.s3.domain.ImgType;
@@ -85,14 +86,10 @@ class NewsCommandServiceTest {
             String expectedNewImageUrl = "news/5a02ba2f-38f5-4ae9-9a24-53d624a18233-edit";
             given(s3Service.uploadFile(any(), eq(ImgType.NEWS)))
                     .willReturn(new UploadedFileUrlResponse(expectedNewImageUrl));
+            NewsUpdateRequest request = createNewsUpdateRequest(expectedTitle, expectedDescription, expectedUrl);
 
             // when
-            NewsCommandResponse response = newsCommandService.updateNews(
-                    originNews.getId(),
-                    expectedTitle,
-                    expectedDescription,
-                    expectedUrl,
-                    expectedFile
+            NewsCommandResponse response = newsCommandService.updateNews(originNews.getId(), request, expectedFile
             );
 
             // then
@@ -110,11 +107,10 @@ class NewsCommandServiceTest {
             String originalDescription = originNews.getDescription();
             String originalUrl = originNews.getUrl();
             String originalThumbnailUrl = originNews.getThumbnailUrl();
+            NewsUpdateRequest request = createNewsUpdateRequest(expectedTitle, null, null);
 
             // when
-            NewsCommandResponse response = newsCommandService.updateNews(
-                    originNews.getId(), expectedTitle, null, null, null
-            );
+            NewsCommandResponse response = newsCommandService.updateNews(originNews.getId(), request, null);
 
             // then
             News savedNews = newsRepository.findById(response.id()).orElseThrow();
@@ -126,12 +122,13 @@ class NewsCommandServiceTest {
 
         @Test
         void 빈_제목으로_수정시_예외가_발생한다() {
+            // given
+            NewsUpdateRequest request = createNewsUpdateRequest("   ", null, null);
+
             // when & then
             assertThatCode(() -> newsCommandService.updateNews(
                     originNews.getId(),
-                    "   ",
-                    null,
-                    null,
+                    request,
                     null))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NEWS_TITLE_EMPTY.getMessage());
@@ -139,12 +136,13 @@ class NewsCommandServiceTest {
 
         @Test
         void 잘못된_URL_형식으로_수정시_예외가_발생한다() {
+            // given
+            NewsUpdateRequest request = createNewsUpdateRequest(null, null, "invalid-url");
+
             // when & then
             assertThatCode(() -> newsCommandService.updateNews(
                     originNews.getId(),
-                    null,
-                    null,
-                    "invalid-url",
+                    request,
                     null))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NEWS_URL_INVALID.getMessage());
@@ -172,6 +170,10 @@ class NewsCommandServiceTest {
 
     private NewsCreateRequest createNewsCreateRequest() {
         return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
+    }
+
+    private NewsUpdateRequest createNewsUpdateRequest(String title, String description, String url) {
+        return new NewsUpdateRequest(title, description, url);
     }
 
     private MockMultipartFile createImageFile() {
