@@ -24,6 +24,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NEWS_TITLE_
 import static com.example.solidconnection.common.exception.ErrorCode.NEWS_URL_INVALID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -94,10 +95,12 @@ class NewsCommandServiceTest {
 
             // then
             News savedNews = newsRepository.findById(response.id()).orElseThrow();
-            assertThat(savedNews.getTitle()).isEqualTo(expectedTitle);
-            assertThat(savedNews.getDescription()).isEqualTo(expectedDescription);
-            assertThat(savedNews.getThumbnailUrl()).isEqualTo(expectedNewImageUrl);
-            assertThat(savedNews.getUrl()).isEqualTo(expectedUrl);
+            assertAll(
+                    () -> assertThat(savedNews.getTitle()).isEqualTo(expectedTitle),
+                    () -> assertThat(savedNews.getDescription()).isEqualTo(expectedDescription),
+                    () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(expectedNewImageUrl),
+                    () -> assertThat(savedNews.getUrl()).isEqualTo(expectedUrl)
+            );
         }
 
         @Test
@@ -114,10 +117,12 @@ class NewsCommandServiceTest {
 
             // then
             News savedNews = newsRepository.findById(response.id()).orElseThrow();
-            assertThat(savedNews.getTitle()).isEqualTo(expectedTitle);
-            assertThat(savedNews.getDescription()).isEqualTo(originalDescription);
-            assertThat(savedNews.getUrl()).isEqualTo(originalUrl);
-            assertThat(savedNews.getThumbnailUrl()).isEqualTo(originalThumbnailUrl);
+            assertAll(
+                    () -> assertThat(savedNews.getTitle()).isEqualTo(expectedTitle),
+                    () -> assertThat(savedNews.getDescription()).isEqualTo(originalDescription),
+                    () -> assertThat(savedNews.getUrl()).isEqualTo(originalUrl),
+                    () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(originalThumbnailUrl)
+            );
         }
 
         @Test
