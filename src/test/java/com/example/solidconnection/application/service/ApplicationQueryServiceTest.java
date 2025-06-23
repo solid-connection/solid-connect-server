@@ -71,7 +71,6 @@ class ApplicationQueryServiceTest {
     private LanguageTestScore languageTestScore2;
     private LanguageTestScore languageTestScore3;
 
-
     private UniversityInfoForApply 괌대학_A_지원_정보;
     private UniversityInfoForApply 괌대학_B_지원_정보;
     private UniversityInfoForApply 서던덴마크대학교_지원_정보;
@@ -142,11 +141,11 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false))),
+                            List.of(application2), user1),
                     UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                            List.of(ApplicantResponse.of(application3, false)))
+                            List.of(application3), user1)
             ));
         }
 
@@ -194,9 +193,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false)))
+                            List.of(application2), user1)
             );
         }
 
@@ -244,9 +243,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false)))
+                            List.of(application2), user1)
             );
         }
 
@@ -274,7 +273,7 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application, true)))
+                            List.of(application), user1)
             ));
         }
 
@@ -321,7 +320,6 @@ class ApplicationQueryServiceTest {
 
     @Nested
     class 경쟁자_목록_조회_테스트 {
-
         @Test
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
             // given
@@ -360,10 +358,8 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of(
-                            ApplicantResponse.of(application1, true),
-                            ApplicantResponse.of(application2, false)
-                    ))
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(application1, application2), user1)
             );
         }
 

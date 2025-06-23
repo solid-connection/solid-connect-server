@@ -92,11 +92,11 @@ class ApplicationSubmissionServiceTest {
                         .isEqualTo(VerifyStatus.APPROVED),
                 () -> assertThat(savedApplication.isDelete())
                         .isFalse(),
-                () -> assertThat(savedApplication.getFirstChoiceUniversityApplyInfoId())
+                () -> assertThat(savedApplication.getFirstChoiceUnivApplyInfoId())
                         .isEqualTo(괌대학_A_지원_정보.getId()),
-                () -> assertThat(savedApplication.getSecondChoiceUniversityApplyInfoId())
+                () -> assertThat(savedApplication.getSecondChoiceUnivApplyInfoId())
                         .isEqualTo(괌대학_B_지원_정보.getId()),
-                () -> assertThat(savedApplication.getThirdChoiceUniversityApplyInfoId())
+                () -> assertThat(savedApplication.getThirdChoiceUnivApplyInfoId())
                         .isEqualTo(서던덴마크대학교_지원_정보.getId())
         );
     }
