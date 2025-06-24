@@ -2,7 +2,7 @@ package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.LanguageTestType;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -12,7 +12,7 @@ public class LanguageRequirementFixture {
 
     private final LanguageRequirementFixtureBuilder languageRequirementFixtureBuilder;
 
-    public LanguageRequirement 토플_80(UniversityInfoForApply universityInfo) {
+    public LanguageRequirement 토플_80(UnivApplyInfo universityInfo) {
         return languageRequirementFixtureBuilder
                 .languageTestType(LanguageTestType.TOEFL_IBT)
                 .minScore("80")
@@ -20,7 +20,7 @@ public class LanguageRequirementFixture {
                 .create();
     }
 
-    public LanguageRequirement 토플_70(UniversityInfoForApply universityInfo) {
+    public LanguageRequirement 토플_70(UnivApplyInfo universityInfo) {
         return languageRequirementFixtureBuilder
                 .languageTestType(LanguageTestType.TOEFL_IBT)
                 .minScore("70")
@@ -28,7 +28,7 @@ public class LanguageRequirementFixture {
                 .create();
     }
 
-    public LanguageRequirement 토익_800(UniversityInfoForApply universityInfo) {
+    public LanguageRequirement 토익_800(UnivApplyInfo universityInfo) {
         return languageRequirementFixtureBuilder
                 .languageTestType(LanguageTestType.TOEIC)
                 .minScore("800")
@@ -36,7 +36,7 @@ public class LanguageRequirementFixture {
                 .create();
     }
 
-    public LanguageRequirement 토익_900(UniversityInfoForApply universityInfo) {
+    public LanguageRequirement 토익_900(UnivApplyInfo universityInfo) {
         return languageRequirementFixtureBuilder
                 .languageTestType(LanguageTestType.TOEIC)
                 .minScore("900")
@@ -44,7 +44,7 @@ public class LanguageRequirementFixture {
                 .create();
     }
 
-    public LanguageRequirement JLPT_N2(UniversityInfoForApply universityInfo) {
+    public LanguageRequirement JLPT_N2(UnivApplyInfo universityInfo) {
         return languageRequirementFixtureBuilder
                 .languageTestType(LanguageTestType.JLPT)
                 .minScore("N2")

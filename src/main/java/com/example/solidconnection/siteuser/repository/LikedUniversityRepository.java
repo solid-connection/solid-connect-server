@@ -2,7 +2,7 @@ package com.example.solidconnection.siteuser.repository;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LikedUniversity;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +14,5 @@ public interface LikedUniversityRepository extends JpaRepository<LikedUniversity
 
     int countBySiteUser_Id(long siteUserId);
 
-    Optional<LikedUniversity> findBySiteUserAndUniversityInfoForApply(SiteUser siteUser, UniversityInfoForApply universityInfoForApply);
+    Optional<LikedUniversity> findBySiteUserAndUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo);
 }

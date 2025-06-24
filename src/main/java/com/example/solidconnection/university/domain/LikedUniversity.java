@@ -5,7 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +19,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_liked_university_site_user_id_university_info_for_apply_id",
+                columnNames = {"site_user_id", "university_info_for_apply_id"}
+        )
+})
 public class LikedUniversity {
 
     @Id
@@ -23,7 +32,8 @@ public class LikedUniversity {
     private Long id;
 
     @ManyToOne
-    private UniversityInfoForApply universityInfoForApply;
+    @JoinColumn(name = "university_info_for_apply_id")
+    private UnivApplyInfo univApplyInfo;
 
     @ManyToOne
     private SiteUser siteUser;

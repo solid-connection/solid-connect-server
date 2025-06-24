@@ -4,7 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.university.domain.LikedUniversity;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
@@ -36,15 +36,15 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
-        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
-        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
+        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isPresent()) {
             throw new CustomException(ALREADY_LIKED_UNIVERSITY);
         }
 
         LikedUniversity likedUniversity = LikedUniversity.builder()
-                .universityInfoForApply(universityInfoForApply)
+                .univApplyInfo(univApplyInfo)
                 .siteUser(siteUser)
                 .build();
         likedUniversityRepository.save(likedUniversity);
@@ -56,9 +56,9 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
-        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
-        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply);
+        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isEmpty()) {
             throw new CustomException(NOT_LIKED_UNIVERSITY);
         }
@@ -72,8 +72,8 @@ public class UniversityLikeService {
      * */
     @Transactional(readOnly = true)
     public IsLikeResponse getIsLiked(SiteUser siteUser, Long universityInfoForApplyId) {
-        UniversityInfoForApply universityInfoForApply = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
-        boolean isLike = likedUniversityRepository.findBySiteUserAndUniversityInfoForApply(siteUser, universityInfoForApply).isPresent();
+        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        boolean isLike = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
         return new IsLikeResponse(isLike);
     }
 }

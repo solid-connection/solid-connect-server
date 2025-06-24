@@ -2,7 +2,7 @@ package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.LanguageTestType;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.LanguageRequirementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -15,7 +15,7 @@ public class LanguageRequirementFixtureBuilder {
 
     private LanguageTestType languageTestType;
     private String minScore;
-    private UniversityInfoForApply universityInfoForApply;
+    private UnivApplyInfo univApplyInfo;
 
     public LanguageRequirementFixtureBuilder languageTestType(LanguageTestType languageTestType) {
         this.languageTestType = languageTestType;
@@ -27,8 +27,8 @@ public class LanguageRequirementFixtureBuilder {
         return this;
     }
 
-    public LanguageRequirementFixtureBuilder universityInfoForApply(UniversityInfoForApply universityInfoForApply) {
-        this.universityInfoForApply = universityInfoForApply;
+    public LanguageRequirementFixtureBuilder universityInfoForApply(UnivApplyInfo univApplyInfo) {
+        this.univApplyInfo = univApplyInfo;
         return this;
     }
 
@@ -37,9 +37,9 @@ public class LanguageRequirementFixtureBuilder {
                 null,
                 languageTestType,
                 minScore,
-                universityInfoForApply
+                univApplyInfo
         );
-        universityInfoForApply.addLanguageRequirements(languageRequirement);
+        univApplyInfo.addLanguageRequirements(languageRequirement);
         return languageRequirementRepository.save(languageRequirement);
     }
 }

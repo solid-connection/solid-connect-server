@@ -97,7 +97,7 @@ public class MyPageService {
     public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
         List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
         return likedUniversities.stream()
-                .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUniversityInfoForApply()))
+                .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUnivApplyInfo()))
                 .toList();
     }
 }

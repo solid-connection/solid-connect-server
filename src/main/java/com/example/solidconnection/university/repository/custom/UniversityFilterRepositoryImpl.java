@@ -3,9 +3,9 @@ package com.example.solidconnection.university.repository.custom;
 import com.example.solidconnection.location.country.domain.QCountry;
 import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.university.domain.QUnivApplyInfo;
 import com.example.solidconnection.university.domain.QUniversity;
-import com.example.solidconnection.university.domain.QUniversityInfoForApply;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -28,19 +28,19 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
     @Override
-    public List<UniversityInfoForApply> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
-        QUniversityInfoForApply universityInfoForApply = QUniversityInfoForApply.universityInfoForApply;
+    public List<UnivApplyInfo> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+        QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
         return queryFactory
-                .selectFrom(universityInfoForApply)
-                .join(universityInfoForApply.university, university).fetchJoin()
+                .selectFrom(univApplyInfo)
+                .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
                 .join(country.region, region).fetchJoin()
-                .leftJoin(universityInfoForApply.languageRequirements, languageRequirement).fetchJoin()
+                .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         regionCodeEq(region, regionCode)
                                 .and(countryOrUniversityContainsKeyword(country, university, keywords))
@@ -74,40 +74,40 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
     @Override
-    public List<UniversityInfoForApply> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
+    public List<UnivApplyInfo> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term) {
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
-        QUniversityInfoForApply universityInfoForApply = QUniversityInfoForApply.universityInfoForApply;
+        QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
 
-        List<UniversityInfoForApply> filteredUniversityInfoForApply = queryFactory
-                .selectFrom(universityInfoForApply)
-                .join(universityInfoForApply.university, university)
+        List<UnivApplyInfo> filteredUnivApplyInfo = queryFactory
+                .selectFrom(univApplyInfo)
+                .join(univApplyInfo.university, university)
                 .join(university.country, country)
                 .join(university.region, region)
                 .where(regionCodeEq(region, regionCode)
                         .and(countryOrUniversityContainsKeyword(country, university, keywords))
-                        .and(universityInfoForApply.term.eq(term)))
+                        .and(univApplyInfo.term.eq(term)))
                 .fetch();
 
         if (testScore == null || testScore.isEmpty()) {
             if (testType != null) {
-                return filteredUniversityInfoForApply.stream()
+                return filteredUnivApplyInfo.stream()
                         .filter(uifa -> uifa.getLanguageRequirements().stream()
                                 .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))
                         .toList();
             }
-            return filteredUniversityInfoForApply;
+            return filteredUnivApplyInfo;
         }
 
-        return filteredUniversityInfoForApply.stream()
+        return filteredUnivApplyInfo.stream()
                 .filter(uifa -> compareMyTestScoreToMinPassScore(uifa, testType, testScore) >= 0)
                 .toList();
     }
 
-    private int compareMyTestScoreToMinPassScore(UniversityInfoForApply universityInfoForApply, LanguageTestType testType, String testScore) {
-        return universityInfoForApply.getLanguageRequirements().stream()
+    private int compareMyTestScoreToMinPassScore(UnivApplyInfo univApplyInfo, LanguageTestType testType, String testScore) {
+        return univApplyInfo.getLanguageRequirements().stream()
                 .filter(languageRequirement -> languageRequirement.getLanguageTestType().equals(testType))
                 .findFirst()
                 .map(requirement -> testType.compare(testScore, requirement.getMinScore()))
