@@ -1,7 +1,3 @@
-ALTER TABLE application DROP FOREIGN KEY FKeajojvwgn069mfxhbq5ja1sws;
-ALTER TABLE application DROP FOREIGN KEY FKepp2by7frnkt1o1w3v4t4lgtu;
-ALTER TABLE application DROP FOREIGN KEY FKi822ljuirbu9o0lnd9jt7l7qg;
-
 ALTER TABLE application RENAME COLUMN first_choice_university_id TO first_choice_university_info_for_apply_id;
 ALTER TABLE application RENAME COLUMN second_choice_university_id TO second_choice_university_info_for_apply_id;
 ALTER TABLE application RENAME COLUMN third_choice_university_id TO third_choice_university_info_for_apply_id;
