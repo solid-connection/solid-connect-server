@@ -18,9 +18,9 @@ public class ApplicationFixtureBuilder {
 
     private Gpa gpa;
     private LanguageTest languageTest;
-    private UniversityInfoForApply firstChoiceUniversity;
-    private UniversityInfoForApply secondChoiceUniversity;
-    private UniversityInfoForApply thirdChoiceUniversity;
+    private Long firstChoiceUniversityApplyInfoId;
+    private Long secondChoiceUniversityApplyInfoId;
+    private Long thirdChoiceUniversityApplyInfoId;
     private SiteUser siteUser;
     private String nicknameForApply;
     private String term;
@@ -39,18 +39,18 @@ public class ApplicationFixtureBuilder {
         return this;
     }
 
-    public ApplicationFixtureBuilder firstChoiceUniversity(UniversityInfoForApply firstChoiceUniversity) {
-        this.firstChoiceUniversity = firstChoiceUniversity;
+    public ApplicationFixtureBuilder firstChoiceUniversityApplyInfoId(Long firstChoiceUniversityApplyInfoId) {
+        this.firstChoiceUniversityApplyInfoId = firstChoiceUniversityApplyInfoId;
         return this;
     }
 
-    public ApplicationFixtureBuilder secondChoiceUniversity(UniversityInfoForApply secondChoiceUniversity) {
-        this.secondChoiceUniversity = secondChoiceUniversity;
+    public ApplicationFixtureBuilder secondChoiceUniversityApplyInfoId(Long secondChoiceUniversityApplyInfoId) {
+        this.secondChoiceUniversityApplyInfoId = secondChoiceUniversityApplyInfoId;
         return this;
     }
 
-    public ApplicationFixtureBuilder thirdChoiceUniversity(UniversityInfoForApply thirdChoiceUniversity) {
-        this.thirdChoiceUniversity = thirdChoiceUniversity;
+    public ApplicationFixtureBuilder thirdChoiceUniversityApplyInfoId(Long thirdChoiceUniversityApplyInfoId) {
+        this.thirdChoiceUniversityApplyInfoId = thirdChoiceUniversityApplyInfoId;
         return this;
     }
 
@@ -75,9 +75,9 @@ public class ApplicationFixtureBuilder {
                 gpa,
                 languageTest,
                 term,
-                firstChoiceUniversity,
-                secondChoiceUniversity,
-                thirdChoiceUniversity,
+                firstChoiceUniversityApplyInfoId,
+                secondChoiceUniversityApplyInfoId,
+                thirdChoiceUniversityApplyInfoId,
                 nicknameForApply
         );
         application.setVerifyStatus(VerifyStatus.APPROVED);

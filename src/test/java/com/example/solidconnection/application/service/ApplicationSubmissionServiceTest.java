@@ -86,12 +86,18 @@ class ApplicationSubmissionServiceTest {
         // then
         Application savedApplication = applicationRepository.findBySiteUserAndTerm(user, term).orElseThrow();
         assertAll(
-                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount()),
-                () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
-                () -> assertThat(savedApplication.isDelete()).isFalse(),
-                () -> assertThat(savedApplication.getFirstChoiceUniversity().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
-                () -> assertThat(savedApplication.getSecondChoiceUniversity().getId()).isEqualTo(괌대학_B_지원_정보.getId()),
-                () -> assertThat(savedApplication.getThirdChoiceUniversity().getId()).isEqualTo(서던덴마크대학교_지원_정보.getId())
+                () -> assertThat(response.applyCount())
+                        .isEqualTo(savedApplication.getUpdateCount()),
+                () -> assertThat(savedApplication.getVerifyStatus())
+                        .isEqualTo(VerifyStatus.APPROVED),
+                () -> assertThat(savedApplication.isDelete())
+                        .isFalse(),
+                () -> assertThat(savedApplication.getFirstChoiceUnivApplyInfoId())
+                        .isEqualTo(괌대학_A_지원_정보.getId()),
+                () -> assertThat(savedApplication.getSecondChoiceUnivApplyInfoId())
+                        .isEqualTo(괌대학_B_지원_정보.getId()),
+                () -> assertThat(savedApplication.getThirdChoiceUnivApplyInfoId())
+                        .isEqualTo(서던덴마크대학교_지원_정보.getId())
         );
     }
 

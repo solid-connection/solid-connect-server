@@ -20,9 +20,9 @@ public class ApplicationFixture {
             String term,
             Gpa gpa,
             LanguageTest languageTest,
-            UniversityInfoForApply firstChoiceUniversity,
-            UniversityInfoForApply secondChoiceUniversity,
-            UniversityInfoForApply thirdChoiceUniversity
+            Long firstChoiceUniversityApplyInfoId,
+            Long secondChoiceUniversityApplyInfoId,
+            Long thirdChoiceUniversityApplyInfoId
     ) {
         return applicationFixtureBuilder.application()
                 .siteUser(siteUser)
@@ -30,9 +30,9 @@ public class ApplicationFixture {
                 .languageTest(languageTest)
                 .nicknameForApply(nicknameForApply)
                 .term(term)
-                .firstChoiceUniversity(firstChoiceUniversity)
-                .secondChoiceUniversity(secondChoiceUniversity)
-                .thirdChoiceUniversity(thirdChoiceUniversity)
+                .firstChoiceUniversityApplyInfoId(firstChoiceUniversityApplyInfoId)
+                .secondChoiceUniversityApplyInfoId(secondChoiceUniversityApplyInfoId)
+                .thirdChoiceUniversityApplyInfoId(thirdChoiceUniversityApplyInfoId)
                 .create();
     }
 }

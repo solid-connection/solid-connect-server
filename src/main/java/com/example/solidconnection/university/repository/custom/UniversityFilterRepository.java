@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UniversityFilterRepository {
 
-    List<University> findByRegionCodeAndKeywords(String regionCode, List<String> keywords);
+    List<UniversityInfoForApply> findByRegionCodeAndKeywords(String regionCode, List<String> keywords);
 
     List<UniversityInfoForApply> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term);

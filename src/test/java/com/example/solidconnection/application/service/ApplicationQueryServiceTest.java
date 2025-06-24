@@ -106,7 +106,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -116,7 +116,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보,
+                    괌대학_B_지원_정보.getId(),
                     null,
                     null
             );
@@ -126,7 +126,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보,
+                    서던덴마크대학교_지원_정보.getId(),
                     null,
                     null
             );
@@ -141,11 +141,11 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsAll(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false))),
+                            List.of(application2), user1),
                     UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                            List.of(ApplicantResponse.of(application3, false)))
+                            List.of(application3), user1)
             ));
         }
 
@@ -158,7 +158,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -168,7 +168,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보,
+                    괌대학_B_지원_정보.getId(),
                     null,
                     null
             );
@@ -178,7 +178,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보,
+                    서던덴마크대학교_지원_정보.getId(),
                     null,
                     null
             );
@@ -193,9 +193,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false)))
+                            List.of(application2), user1)
             );
         }
 
@@ -208,7 +208,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -218,7 +218,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보,
+                    괌대학_B_지원_정보.getId(),
                     null,
                     null
             );
@@ -228,7 +228,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보,
+                    서던덴마크대학교_지원_정보.getId(),
                     null,
                     null
             );
@@ -243,9 +243,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true))),
+                            List.of(application1), user1),
                     UniversityApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(ApplicantResponse.of(application2, false)))
+                            List.of(application2), user1)
             );
         }
 
@@ -258,7 +258,7 @@ class ApplicationQueryServiceTest {
                     "1988-1",
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -273,7 +273,7 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
                     UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application, true)))
+                            List.of(application), user1)
             ));
         }
 
@@ -286,7 +286,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -298,7 +298,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_B_지원_정보,
+                    괌대학_B_지원_정보.getId(),
                     null,
                     null
             );
@@ -320,7 +320,6 @@ class ApplicationQueryServiceTest {
 
     @Nested
     class 경쟁자_목록_조회_테스트 {
-
         @Test
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
             // given
@@ -330,7 +329,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -340,7 +339,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
@@ -350,7 +349,7 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
-                    괌대학_B_지원_정보,
+                    서던덴마크대학교_지원_정보.getId(),
                     null,
                     null
             );
@@ -359,10 +358,8 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of(
-                            ApplicantResponse.of(application1, true),
-                            ApplicantResponse.of(application2, false)
-                    ))
+                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                            List.of(application1, application2), user1)
             );
         }
 
@@ -375,47 +372,43 @@ class ApplicationQueryServiceTest {
                     term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보,
+                    괌대학_A_지원_정보.getId(),
                     null,
                     null
             );
-            applicationFixture.지원서(
+            Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
                     term,
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    null,
-                    괌대학_B_지원_정보,
-                    null
+                    괌대학_A_지원_정보.getId(),
+                    괌대학_B_지원_정보.getId(),
+                    서던덴마크대학교_지원_정보.getId()
             );
-            applicationFixture.지원서(
+            Application application3 = applicationFixture.지원서(
                     user3,
                     "nickname3",
                     term,
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
+                    서던덴마크대학교_지원_정보.getId(),
                     null,
-                    null,
-                    서던덴마크대학교_지원_정보
+                    null
             );
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1);
 
             // then
-            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(ApplicantResponse.of(application1, true)))
-            );
-
-            assertThat(response.secondChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of())
-            );
-
-            assertThat(response.thirdChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보, List.of())
-            );
+            assertThat(response.firstChoice())
+                    .hasSize(1)
+                    .allSatisfy(uar -> {
+                        assertThat(uar.koreanName()).isEqualTo(괌대학_A_지원_정보.getKoreanName());
+                        assertThat(uar.applicants())
+                                .extracting(ApplicantResponse::nicknameForApply)
+                                .containsExactlyInAnyOrder("nickname1", "nickname2");
+                    });
         }
     }
 }
