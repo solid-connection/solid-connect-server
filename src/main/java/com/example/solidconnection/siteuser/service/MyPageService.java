@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -47,27 +48,23 @@ public class MyPageService {
      * */
     @Transactional
     public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
+        SiteUser user = siteUserRepository.findById(siteUser.getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         if (nickname != null) {
+            validateNicknameNotChangedRecently(user.getNicknameModifiedAt());
             validateNicknameUnique(nickname);
-            validateNicknameNotChangedRecently(siteUser.getNicknameModifiedAt());
-            siteUser.setNickname(nickname);
-            siteUser.setNicknameModifiedAt(LocalDateTime.now());
+            user.setNickname(nickname);
+            user.setNicknameModifiedAt(LocalDateTime.now());
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
-            if (!isDefaultProfileImage(siteUser.getProfileImageUrl())) {
-                s3Service.deleteExProfile(siteUser);
+            if (!isDefaultProfileImage(user.getProfileImageUrl())) {
+                s3Service.deleteExProfile(user);
             }
             String profileImageUrl = uploadedFile.fileUrl();
-            siteUser.setProfileImageUrl(profileImageUrl);
-        }
-        siteUserRepository.save(siteUser);
-    }
-
-    private void validateNicknameUnique(String nickname) {
-        if (siteUserRepository.existsByNickname(nickname)) {
-            throw new CustomException(NICKNAME_ALREADY_EXISTED);
+            user.setProfileImageUrl(profileImageUrl);
         }
     }
 
@@ -79,6 +76,12 @@ public class MyPageService {
             String formatLastModifiedAt
                     = String.format("(마지막 수정 시간 : %s)", NICKNAME_LAST_CHANGE_DATE_FORMAT.format(lastModifiedAt));
             throw new CustomException(CAN_NOT_CHANGE_NICKNAME_YET, formatLastModifiedAt);
+        }
+    }
+
+    private void validateNicknameUnique(String nickname) {
+        if (siteUserRepository.existsByNickname(nickname)) {
+            throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
     }
 
