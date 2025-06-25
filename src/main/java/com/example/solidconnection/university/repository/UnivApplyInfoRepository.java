@@ -22,17 +22,17 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     Optional<UnivApplyInfo> findFirstByKoreanNameAndTerm(String koreanName, String term);
 
     @Query("""
-            SELECT uifa 
-            FROM UnivApplyInfo uifa 
-            WHERE uifa.university IN :universities 
-                AND uifa.term = :term
+            SELECT uai
+            FROM UnivApplyInfo uai
+            WHERE uai.university IN :universities
+                AND uai.term = :term
             """)
     List<UnivApplyInfo> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
-            SELECT uifa
-            FROM UnivApplyInfo uifa
-            JOIN University u ON uifa.university = u
+            SELECT uai
+            FROM UnivApplyInfo uai
+            JOIN University u ON uai.university = u
             WHERE (u.country.code IN (
                       SELECT c.code
                       FROM InterestedCountry ic
@@ -45,7 +45,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                       JOIN ir.region r
                       WHERE ir.siteUser = :siteUser
                   ))
-                  AND uifa.term = :term
+                  AND uai.term = :term
             """)
     List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
 
@@ -64,19 +64,19 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     }
 
     @Query("""
-            SELECT DISTINCT uifa
-            FROM UnivApplyInfo uifa
-            JOIN FETCH uifa.university u
+            SELECT DISTINCT uai
+            FROM UnivApplyInfo uai
+            JOIN FETCH uai.university u
             JOIN FETCH u.country c
             JOIN FETCH u.region r
-            WHERE uifa.id IN :ids
+            WHERE uai.id IN :ids
             """)
     List<UnivApplyInfo> findAllByUniversityIds(@Param("ids") List<Long> ids);
 
     @Query("""
-            SELECT DISTINCT uifa
-            FROM UnivApplyInfo uifa
-            JOIN FETCH uifa.university u
+            SELECT DISTINCT uai
+            FROM UnivApplyInfo uai
+            JOIN FETCH uai.university u
             JOIN FETCH u.country c
             JOIN FETCH u.region r
             WHERE u.id IN :universityIds
