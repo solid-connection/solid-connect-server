@@ -10,7 +10,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
@@ -54,7 +54,7 @@ class MyPageServiceTest {
     private SiteUserRepository siteUserRepository;
 
     @Autowired
-    private LikedUniversityRepository likedUniversityRepository;
+    private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -197,10 +197,10 @@ class MyPageServiceTest {
         LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보(), testUser);
         LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(), testUser);
 
-        likedUniversityRepository.save(likedUnivApplyInfo1);
-        likedUniversityRepository.save(likedUnivApplyInfo2);
-        likedUniversityRepository.save(likedUnivApplyInfo3);
-        return likedUniversityRepository.countBySiteUser_Id(testUser.getId());
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
+        return likedUnivApplyInfoRepository.countBySiteUser_Id(testUser.getId());
     }
 
     private MockMultipartFile createValidImageFile() {

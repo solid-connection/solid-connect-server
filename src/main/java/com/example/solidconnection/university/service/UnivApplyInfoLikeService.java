@@ -2,7 +2,7 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
@@ -26,7 +26,7 @@ public class UnivApplyInfoLikeService {
     public static final String LIKE_CANCELED_MESSAGE = "LIKE_CANCELED";
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
-    private final LikedUniversityRepository likedUniversityRepository;
+    private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Value("${university.term}")
     public String term;
@@ -38,7 +38,7 @@ public class UnivApplyInfoLikeService {
     public LikeResultResponse likeUnivApplyInfo(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUnivApplyInfo.isPresent()) {
             throw new CustomException(ALREADY_LIKED_UNIVERSITY);
         }
@@ -47,7 +47,7 @@ public class UnivApplyInfoLikeService {
                 .univApplyInfo(univApplyInfo)
                 .siteUser(siteUser)
                 .build();
-        likedUniversityRepository.save(likedUnivApplyInfo);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
         return new LikeResultResponse(LIKE_SUCCESS_MESSAGE);
     }
 
@@ -58,12 +58,12 @@ public class UnivApplyInfoLikeService {
     public LikeResultResponse cancelLikeUnivApplyInfo(SiteUser siteUser, long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUnivApplyInfo.isEmpty()) {
             throw new CustomException(NOT_LIKED_UNIVERSITY);
         }
 
-        likedUniversityRepository.delete(optionalLikedUnivApplyInfo.get());
+        likedUnivApplyInfoRepository.delete(optionalLikedUnivApplyInfo.get());
         return new LikeResultResponse(LIKE_CANCELED_MESSAGE);
     }
 
@@ -73,7 +73,7 @@ public class UnivApplyInfoLikeService {
     @Transactional(readOnly = true)
     public IsLikeResponse getIsLiked(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
-        boolean isLike = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
+        boolean isLike = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
         return new IsLikeResponse(isLike);
     }
 }

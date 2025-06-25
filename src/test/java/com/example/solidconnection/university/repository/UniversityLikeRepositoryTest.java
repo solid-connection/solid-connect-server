@@ -2,7 +2,6 @@ package com.example.solidconnection.university.repository;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
@@ -20,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 public class UniversityLikeRepositoryTest {
 
     @Autowired
-    private LikedUniversityRepository likedUniversityRepository;
+    private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -38,12 +37,12 @@ public class UniversityLikeRepositoryTest {
             UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
 
             LikedUnivApplyInfo firstLike = createLikedUniversity(user, university);
-            likedUniversityRepository.save(firstLike);
+            likedUnivApplyInfoRepository.save(firstLike);
 
             LikedUnivApplyInfo secondLike = createLikedUniversity(user, university);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike))
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike))
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -55,12 +54,12 @@ public class UniversityLikeRepositoryTest {
             UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
 
             LikedUnivApplyInfo firstLike = createLikedUniversity(user1, university);
-            likedUniversityRepository.save(firstLike);
+            likedUnivApplyInfoRepository.save(firstLike);
 
             LikedUnivApplyInfo secondLike = createLikedUniversity(user2, university);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike)).doesNotThrowAnyException();
         }
 
         @Test
@@ -71,12 +70,12 @@ public class UniversityLikeRepositoryTest {
             UnivApplyInfo university2 = univApplyInfoFixture.메이지대학_지원_정보();
 
             LikedUnivApplyInfo firstLike = createLikedUniversity(user, university1);
-            likedUniversityRepository.save(firstLike);
+            likedUnivApplyInfoRepository.save(firstLike);
 
             LikedUnivApplyInfo secondLike = createLikedUniversity(user, university2);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike)).doesNotThrowAnyException();
         }
     }
 

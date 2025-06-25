@@ -1,4 +1,4 @@
-package com.example.solidconnection.siteuser.repository;
+package com.example.solidconnection.university.repository;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface LikedUniversityRepository extends JpaRepository<LikedUnivApplyInfo, Long> {
+public interface LikedUnivApplyInfoRepository extends JpaRepository<LikedUnivApplyInfo, Long> {
 
     List<LikedUnivApplyInfo> findAllBySiteUser_Id(long siteUserId);
 

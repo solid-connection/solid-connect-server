@@ -3,7 +3,7 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
@@ -33,7 +33,7 @@ class UnivApplyInfoLikeServiceTest {
     private UnivApplyInfoLikeService univApplyInfoLikeService;
 
     @Autowired
-    private LikedUniversityRepository likedUniversityRepository;
+    private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -61,7 +61,7 @@ class UnivApplyInfoLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
+                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(
                             user, 괌대학_A_지원_정보
                     )).isPresent()
             );
@@ -93,7 +93,7 @@ class UnivApplyInfoLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
+                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(
                             user, 괌대학_A_지원_정보
                     )).isEmpty()
             );
@@ -156,6 +156,6 @@ class UnivApplyInfoLikeServiceTest {
                 .siteUser(siteUser)
                 .univApplyInfo(univApplyInfo)
                 .build();
-        likedUniversityRepository.save(likedUnivApplyInfo);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
     }
 }
