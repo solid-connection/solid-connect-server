@@ -21,7 +21,7 @@ public class UnivApplyInfoFixtureBuilder {
     private String koreanName;
     private University university;
 
-    public UnivApplyInfoFixtureBuilder universityInfoForApply() {
+    public UnivApplyInfoFixtureBuilder univApplyInfo() {
         return new UnivApplyInfoFixtureBuilder(univApplyInfoRepository);
     }
 
