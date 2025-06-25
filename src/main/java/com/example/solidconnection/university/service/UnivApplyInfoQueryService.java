@@ -53,7 +53,7 @@ public class UnivApplyInfoQueryService {
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
 
         return new UniversityInfoForApplyPreviewResponses(universityFilterRepository
-                .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
+                .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
                 .stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());

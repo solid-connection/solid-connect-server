@@ -41,7 +41,7 @@ public class ApplicationQueryService {
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 1. 대학 지원 정보 필터링 (regionCode, keyword)
-        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, List.of(keyword));
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }

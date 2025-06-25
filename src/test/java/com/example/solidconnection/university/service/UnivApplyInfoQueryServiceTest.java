@@ -127,7 +127,7 @@ class UnivApplyInfoQueryServiceTest {
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
         then(univApplyInfoFilterRepository).should(times(1))
-                .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
+                .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
                         regionCode, keywords, testType, testScore, term);
     }
 

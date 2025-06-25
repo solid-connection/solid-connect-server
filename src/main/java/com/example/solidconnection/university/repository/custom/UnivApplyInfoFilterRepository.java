@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface UnivApplyInfoFilterRepository {
 
-    List<UnivApplyInfo> findByRegionCodeAndKeywords(String regionCode, List<String> keywords);
+    List<UnivApplyInfo> findAllByRegionCodeAndKeywords(String regionCode, List<String> keywords);
 
-    List<UnivApplyInfo> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
+    List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term);
 }
