@@ -8,7 +8,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -95,7 +95,7 @@ public class MyPageService {
      * */
     @Transactional(readOnly = true)
     public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
-        List<LikedUniversity> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
+        List<LikedUnivApplyInfo> likedUniversities = likedUniversityRepository.findAllBySiteUser_Id(siteUser.getId());
         return likedUniversities.stream()
                 .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUnivApplyInfo()))
                 .toList();

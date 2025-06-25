@@ -3,7 +3,7 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
-import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
@@ -38,16 +38,16 @@ public class UniversityLikeService {
     public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
 
-        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isPresent()) {
             throw new CustomException(ALREADY_LIKED_UNIVERSITY);
         }
 
-        LikedUniversity likedUniversity = LikedUniversity.builder()
+        LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
                 .univApplyInfo(univApplyInfo)
                 .siteUser(siteUser)
                 .build();
-        likedUniversityRepository.save(likedUniversity);
+        likedUniversityRepository.save(likedUnivApplyInfo);
         return new LikeResultResponse(LIKE_SUCCESS_MESSAGE);
     }
 
@@ -58,7 +58,7 @@ public class UniversityLikeService {
     public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
 
-        Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isEmpty()) {
             throw new CustomException(NOT_LIKED_UNIVERSITY);
         }

@@ -5,7 +5,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
@@ -152,10 +152,10 @@ class UniversityLikeServiceTest {
     }
 
     private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
-        LikedUniversity likedUniversity = LikedUniversity.builder()
+        LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
                 .siteUser(siteUser)
                 .univApplyInfo(univApplyInfo)
                 .build();
-        likedUniversityRepository.save(likedUniversity);
+        likedUniversityRepository.save(likedUnivApplyInfo);
     }
 }
