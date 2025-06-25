@@ -72,7 +72,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
             JOIN FETCH u.region r
             WHERE uai.id IN :ids
             """)
-    List<UnivApplyInfo> findAllByUniversityIds(@Param("ids") List<Long> ids);
+    List<UnivApplyInfo> findAllByIds(@Param("ids") List<Long> ids);
 
     @Query("""
             SELECT DISTINCT uai

@@ -71,7 +71,7 @@ public class ApplicationQueryService {
         }
 
         List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
-        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByUniversityIds(univApplyInfoIds);
+        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
 
         return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
