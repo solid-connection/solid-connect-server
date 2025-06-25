@@ -17,12 +17,12 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class UniversityRecommendService {
+public class UnivApplyInfoRecommendService {
 
-    public static final int RECOMMEND_UNIVERSITY_NUM = 6;
+    public static final int RECOMMEND_UNIV_APPLY_INFO_NUM = 6;
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final GeneralUniversityRecommendService generalUniversityRecommendService;
+    private final GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
     @Value("${university.term}")
     private String term;
@@ -38,25 +38,25 @@ public class UniversityRecommendService {
         // 맞춤 추천 대학교를 불러온다.
         List<UnivApplyInfo> personalRecommends = universityInfoForApplyRepository
                 .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
-        List<UnivApplyInfo> trimmedRecommendUniversities
-                = personalRecommends.subList(0, Math.min(RECOMMEND_UNIVERSITY_NUM, personalRecommends.size()));
+        List<UnivApplyInfo> trimmedRecommends
+                = personalRecommends.subList(0, Math.min(RECOMMEND_UNIV_APPLY_INFO_NUM, personalRecommends.size()));
         Collections.shuffle(trimmedRecommendUniversities);
 
         // 맞춤 추천 대학교의 수가 6개보다 적다면, 일반 추천 대학교를 부족한 수 만큼 불러온다.
-        if (trimmedRecommendUniversities.size() < RECOMMEND_UNIVERSITY_NUM) {
-            trimmedRecommendUniversities.addAll(getGeneralRecommendsExcludingSelected(trimmedRecommendUniversities));
+        if (trimmedRecommends.size() < RECOMMEND_UNIV_APPLY_INFO_NUM) {
+            trimmedRecommends.addAll(getGeneralRecommendsExcludingSelected(trimmedRecommends));
         }
 
-        return new UniversityRecommendsResponse(trimmedRecommendUniversities.stream()
+        return new UniversityRecommendsResponse(trimmedRecommends.stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());
     }
 
     private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
-        List<UnivApplyInfo> generalRecommend = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
+        List<UnivApplyInfo> generalRecommend = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
         generalRecommend.removeAll(alreadyPicked);
         Collections.shuffle(generalRecommend);
-        return generalRecommend.subList(0, RECOMMEND_UNIVERSITY_NUM - alreadyPicked.size());
+        return generalRecommend.subList(0, RECOMMEND_UNIV_APPLY_INFO_NUM - alreadyPicked.size());
     }
 
     /*
@@ -65,7 +65,7 @@ public class UniversityRecommendService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityRecommendsResponse getGeneralRecommends() {
-        List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUniversityRecommendService.getRecommendUniversities());
+        List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
         return new UniversityRecommendsResponse(generalRecommends.stream()
                 .map(UniversityInfoForApplyPreviewResponse::from)
                 .toList());

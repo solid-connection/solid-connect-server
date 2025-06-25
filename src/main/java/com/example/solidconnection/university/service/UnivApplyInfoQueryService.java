@@ -18,7 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class UniversityQueryService {
+public class UnivApplyInfoQueryService {
 
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
@@ -31,10 +31,10 @@ public class UniversityQueryService {
      * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "university:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityDetailResponse getUniversityDetail(Long universityInfoForApplyId) {
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UniversityDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
-                = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+                = universityInfoForApplyRepository.getUniversityInfoForApplyById(univApplyInfoId);
         University university = univApplyInfo.getUniversity();
 
         return UniversityDetailResponse.of(university, univApplyInfo);
@@ -48,8 +48,8 @@ public class UniversityQueryService {
      *   - 언어 시험 점수는 합격 최소 점수보다 높은 것이 조건이다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "university:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityInfoForApplyPreviewResponses searchUniversity(
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UniversityInfoForApplyPreviewResponses searchUnivApplyInfo(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
 
         return new UniversityInfoForApplyPreviewResponses(universityFilterRepository

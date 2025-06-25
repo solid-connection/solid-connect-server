@@ -26,10 +26,10 @@ import static org.mockito.Mockito.times;
 
 @TestContainerSpringBootTest
 @DisplayName("대학교 조회 서비스 테스트")
-class UniversityQueryServiceTest {
+class UnivApplyInfoQueryServiceTest {
 
     @Autowired
-    private UniversityQueryService universityQueryService;
+    private UnivApplyInfoQueryService univApplyInfoQueryService;
 
     @SpyBean
     private UniversityFilterRepository universityFilterRepository;
@@ -49,7 +49,7 @@ class UniversityQueryServiceTest {
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse response = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
+        UniversityDetailResponse response = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.id()).isEqualTo(괌대학_A_지원_정보.getId());
@@ -61,8 +61,8 @@ class UniversityQueryServiceTest {
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse firstResponse = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
-        UniversityDetailResponse secondResponse = universityQueryService.getUniversityDetail(괌대학_A_지원_정보.getId());
+        UniversityDetailResponse firstResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
+        UniversityDetailResponse secondResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
@@ -76,7 +76,7 @@ class UniversityQueryServiceTest {
 
         // when & then
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> universityQueryService.getUniversityDetail(invalidUniversityInfoForApplyId))
+                .isThrownBy(() -> univApplyInfoQueryService.getUnivApplyInfoDetail(invalidUniversityInfoForApplyId))
                 .havingRootCause()
                 .isInstanceOf(CustomException.class)
                 .withMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
@@ -93,7 +93,7 @@ class UniversityQueryServiceTest {
         UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of(), null, null);
 
         // then
@@ -120,9 +120,9 @@ class UniversityQueryServiceTest {
 
         // when
         UniversityInfoForApplyPreviewResponses firstResponse =
-                universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
+                univApplyInfoQueryService.searchUnivApplyInfo(regionCode, keywords, testType, testScore);
         UniversityInfoForApplyPreviewResponses secondResponse =
-                universityQueryService.searchUniversity(regionCode, keywords, testType, testScore);
+                univApplyInfoQueryService.searchUnivApplyInfo(regionCode, keywords, testType, testScore);
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
@@ -140,7 +140,7 @@ class UniversityQueryServiceTest {
         univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 "AMERICAS", List.of(), null, null);
 
         // then
@@ -156,7 +156,7 @@ class UniversityQueryServiceTest {
         UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of("라", "일본"), null, null);
 
         // then
@@ -178,7 +178,7 @@ class UniversityQueryServiceTest {
         languageRequirementFixture.토익_900(괌대학_B_지원_정보);
 
         // when
-        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
@@ -196,7 +196,7 @@ class UniversityQueryServiceTest {
         languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
 
         // when
-        UniversityInfoForApplyPreviewResponses response = universityQueryService.searchUniversity(
+        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 "EUROPE", List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then

@@ -20,15 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
+import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("대학교 추천 서비스 테스트")
-class UniversityRecommendServiceTest {
+class UnivApplyInfoRecommendServiceTest {
 
     @Autowired
-    private UniversityRecommendService universityRecommendService;
+    private UnivApplyInfoRecommendService univApplyInfoRecommendService;
 
     @Autowired
     private InterestedRegionRepository interestedRegionRepository;
@@ -37,7 +37,7 @@ class UniversityRecommendServiceTest {
     private InterestedCountryRepository interestedCountryRepository;
 
     @Autowired
-    private GeneralUniversityRecommendService generalUniversityRecommendService;
+    private GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -72,7 +72,7 @@ class UniversityRecommendServiceTest {
         univApplyInfoFixture.그라츠공과대학_지원_정보();
         univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
         univApplyInfoFixture.메이지대학_지원_정보();
-        generalUniversityRecommendService.init();
+        generalUnivApplyInfoRecommendService.init();
     }
 
     @Test
@@ -81,11 +81,11 @@ class UniversityRecommendServiceTest {
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
@@ -100,11 +100,11 @@ class UniversityRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
                         UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
@@ -118,11 +118,11 @@ class UniversityRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrder(
                         UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
                         UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
@@ -136,13 +136,13 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalUniversityRecommendService.getRecommendUniversities().stream()
+                        generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );
@@ -151,13 +151,13 @@ class UniversityRecommendServiceTest {
     @Test
     void 일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getGeneralRecommends();
+        UniversityRecommendsResponse response = univApplyInfoRecommendService.getGeneralRecommends();
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalUniversityRecommendService.getRecommendUniversities().stream()
+                        generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
                                 .map(UniversityInfoForApplyPreviewResponse::from)
                                 .toList()
                 );

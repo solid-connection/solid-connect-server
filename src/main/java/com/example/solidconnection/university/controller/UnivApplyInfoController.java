@@ -10,8 +10,8 @@ import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
 import com.example.solidconnection.university.service.UniversityLikeService;
-import com.example.solidconnection.university.service.UniversityQueryService;
-import com.example.solidconnection.university.service.UniversityRecommendService;
+import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
+import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,9 +29,9 @@ import java.util.List;
 @RestController
 public class UnivApplyInfoController {
 
-    private final UniversityQueryService universityQueryService;
+    private final UnivApplyInfoQueryService univApplyInfoQueryService;
     private final UniversityLikeService universityLikeService;
-    private final UniversityRecommendService universityRecommendService;
+    private final UnivApplyInfoRecommendService univApplyInfoRecommendService;
     private final MyPageService myPageService;
 
     @GetMapping("/recommend")
@@ -39,9 +39,9 @@ public class UnivApplyInfoController {
             @AuthorizedUser(required = false) SiteUser siteUser
     ) {
         if (siteUser == null) {
-            return ResponseEntity.ok(universityRecommendService.getGeneralRecommends());
+            return ResponseEntity.ok(univApplyInfoRecommendService.getGeneralRecommends());
         } else {
-            return ResponseEntity.ok(universityRecommendService.getPersonalRecommends(siteUser));
+            return ResponseEntity.ok(univApplyInfoRecommendService.getPersonalRecommends(siteUser));
         }
     }
 
@@ -84,7 +84,7 @@ public class UnivApplyInfoController {
     public ResponseEntity<UniversityDetailResponse> getUnivApplyInfoDetails(
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        UniversityDetailResponse universityDetailResponse = universityQueryService.getUniversityDetail(univApplyInfoId);
+        UniversityDetailResponse universityDetailResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(univApplyInfoId);
         return ResponseEntity.ok(universityDetailResponse);
     }
 
@@ -97,7 +97,7 @@ public class UnivApplyInfoController {
             @RequestParam(required = false, defaultValue = "") String testScore
     ) {
         List<UniversityInfoForApplyPreviewResponse> universityInfoForApplyPreviewResponse
-                = universityQueryService.searchUniversity(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
+                = univApplyInfoQueryService.searchUnivApplyInfo(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
         return ResponseEntity.ok(universityInfoForApplyPreviewResponse);
     }
 }
