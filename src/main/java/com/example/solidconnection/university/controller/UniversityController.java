@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/universities")
+@RequestMapping("/univ-apply-infos")
 @RestController
 public class UniversityController {
 
@@ -46,43 +46,43 @@ public class UniversityController {
     }
 
     @GetMapping("/like")
-    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity(
+    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUniversity( // todo: wish 가 아니라 liked 로 변경 필요 - 코드 용어 통일
             @AuthorizedUser SiteUser siteUser
     ) {
         List<UniversityInfoForApplyPreviewResponse> wishUniversities = myPageService.getWishUniversity(siteUser);
         return ResponseEntity.ok(wishUniversities);
     }
 
-    @GetMapping("/{universityInfoForApplyId}/like")
+    @GetMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<IsLikeResponse> getIsLiked(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable Long universityInfoForApplyId
+            @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        IsLikeResponse isLiked = universityLikeService.getIsLiked(siteUser, universityInfoForApplyId);
+        IsLikeResponse isLiked = universityLikeService.getIsLiked(siteUser, univApplyInfoId);
         return ResponseEntity.ok(isLiked);
     }
 
-    @PostMapping("/{universityInfoForApplyId}/like")
+    @PostMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<LikeResultResponse> addWishUniversity(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable Long universityInfoForApplyId
+            @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = universityLikeService.likeUniversity(siteUser, universityInfoForApplyId);
+        LikeResultResponse likeResultResponse = universityLikeService.likeUniversity(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 
-    @DeleteMapping("/{universityInfoForApplyId}/like")
+    @DeleteMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<LikeResultResponse> cancelWishUniversity(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable Long universityInfoForApplyId
+            @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = universityLikeService.cancelLikeUniversity(siteUser, universityInfoForApplyId);
+        LikeResultResponse likeResultResponse = universityLikeService.cancelLikeUniversity(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 
-    @GetMapping("/{universityInfoForApplyId}")
+    @GetMapping("/{univ-apply-info-id}")
     public ResponseEntity<UniversityDetailResponse> getUniversityDetails(
-            @PathVariable Long universityInfoForApplyId
+            @PathVariable("univ-apply-info-id") Long universityInfoForApplyId
     ) {
         UniversityDetailResponse universityDetailResponse = universityQueryService.getUniversityDetail(universityInfoForApplyId);
         return ResponseEntity.ok(universityDetailResponse);
