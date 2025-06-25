@@ -94,7 +94,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         if (testScore == null || testScore.isEmpty()) {
             if (testType != null) {
                 return filteredUnivApplyInfo.stream()
-                        .filter(uifa -> uifa.getLanguageRequirements().stream()
+                        .filter(uai -> uai.getLanguageRequirements().stream()
                                 .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))
                         .toList();
             }
@@ -102,7 +102,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         }
 
         return filteredUnivApplyInfo.stream()
-                .filter(uifa -> compareMyTestScoreToMinPassScore(uifa, testType, testScore) >= 0)
+                .filter(uai -> compareMyTestScoreToMinPassScore(uai, testType, testScore) >= 0)
                 .toList();
     }
 
