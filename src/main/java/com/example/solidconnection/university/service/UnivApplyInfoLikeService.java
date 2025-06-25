@@ -20,7 +20,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_U
 
 @RequiredArgsConstructor
 @Service
-public class UniversityLikeService {
+public class UnivApplyInfoLikeService {
 
     public static final String LIKE_SUCCESS_MESSAGE = "LIKE_SUCCESS";
     public static final String LIKE_CANCELED_MESSAGE = "LIKE_CANCELED";
@@ -35,11 +35,11 @@ public class UniversityLikeService {
      * 대학교를 '좋아요' 한다.
      * */
     @Transactional
-    public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
+    public LikeResultResponse likeUnivApplyInfo(SiteUser siteUser, Long univApplyInfoId) {
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
-        if (optionalLikedUniversity.isPresent()) {
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        if (optionalLikedUnivApplyInfo.isPresent()) {
             throw new CustomException(ALREADY_LIKED_UNIVERSITY);
         }
 
@@ -55,15 +55,15 @@ public class UniversityLikeService {
      * 대학교 '좋아요'를 취소한다.
      * */
     @Transactional
-    public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
+    public LikeResultResponse cancelLikeUnivApplyInfo(SiteUser siteUser, long univApplyInfoId) {
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
-        if (optionalLikedUniversity.isEmpty()) {
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        if (optionalLikedUnivApplyInfo.isEmpty()) {
             throw new CustomException(NOT_LIKED_UNIVERSITY);
         }
 
-        likedUniversityRepository.delete(optionalLikedUniversity.get());
+        likedUniversityRepository.delete(optionalLikedUnivApplyInfo.get());
         return new LikeResultResponse(LIKE_CANCELED_MESSAGE);
     }
 
@@ -71,8 +71,8 @@ public class UniversityLikeService {
      * '좋아요'한 대학교인지 확인한다.
      * */
     @Transactional(readOnly = true)
-    public IsLikeResponse getIsLiked(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
+    public IsLikeResponse getIsLiked(SiteUser siteUser, Long univApplyInfoId) {
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         boolean isLike = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
         return new IsLikeResponse(isLike);
     }

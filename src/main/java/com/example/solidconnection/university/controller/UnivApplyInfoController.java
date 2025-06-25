@@ -9,7 +9,7 @@ import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
-import com.example.solidconnection.university.service.UniversityLikeService;
+import com.example.solidconnection.university.service.UnivApplyInfoLikeService;
 import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
 import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.List;
 public class UnivApplyInfoController {
 
     private final UnivApplyInfoQueryService univApplyInfoQueryService;
-    private final UniversityLikeService universityLikeService;
+    private final UnivApplyInfoLikeService univApplyInfoLikeService;
     private final UnivApplyInfoRecommendService univApplyInfoRecommendService;
     private final MyPageService myPageService;
 
@@ -58,7 +58,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        IsLikeResponse isLiked = universityLikeService.getIsLiked(siteUser, univApplyInfoId);
+        IsLikeResponse isLiked = univApplyInfoLikeService.getIsLiked(siteUser, univApplyInfoId);
         return ResponseEntity.ok(isLiked);
     }
 
@@ -67,7 +67,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = universityLikeService.likeUniversity(siteUser, univApplyInfoId);
+        LikeResultResponse likeResultResponse = univApplyInfoLikeService.likeUnivApplyInfo(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 
@@ -76,7 +76,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = universityLikeService.cancelLikeUniversity(siteUser, univApplyInfoId);
+        LikeResultResponse likeResultResponse = univApplyInfoLikeService.cancelLikeUnivApplyInfo(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 
