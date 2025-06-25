@@ -47,13 +47,13 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                   ))
                   AND uai.term = :term
             """)
-    List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
+    List<UnivApplyInfo> findAllBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
 
     @Query(value = """
                 SELECT *
                 FROM university_info_for_apply
                 WHERE term = :term
-                ORDER BY RAND() 
+                ORDER BY RAND()
                 LIMIT :limitNum
             """, nativeQuery = true)
     List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);

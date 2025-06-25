@@ -37,10 +37,10 @@ public class UnivApplyInfoRecommendService {
     public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
         List<UnivApplyInfo> personalRecommends = univApplyInfoRepository
-                .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
+                .findAllBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
         List<UnivApplyInfo> trimmedRecommends
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIV_APPLY_INFO_NUM, personalRecommends.size()));
-        Collections.shuffle(trimmedRecommendUniversities);
+        Collections.shuffle(trimmedRecommends);
 
         // 맞춤 추천 대학교의 수가 6개보다 적다면, 일반 추천 대학교를 부족한 수 만큼 불러온다.
         if (trimmedRecommends.size() < RECOMMEND_UNIV_APPLY_INFO_NUM) {
