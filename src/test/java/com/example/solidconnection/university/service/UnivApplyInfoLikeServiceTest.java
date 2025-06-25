@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
-import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 import static com.example.solidconnection.university.service.UnivApplyInfoLikeService.LIKE_CANCELED_MESSAGE;
 import static com.example.solidconnection.university.service.UnivApplyInfoLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +75,7 @@ class UnivApplyInfoLikeServiceTest {
             // when & then
             assertThatCode(() -> univApplyInfoLikeService.likeUnivApplyInfo(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(ALREADY_LIKED_UNIVERSITY.getMessage());
+                    .hasMessage(ALREADY_LIKED_UNIV_APPLY_INFO.getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ class UnivApplyInfoLikeServiceTest {
             // when & then
             assertThatCode(() -> univApplyInfoLikeService.cancelLikeUnivApplyInfo(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(NOT_LIKED_UNIVERSITY.getMessage());
+                    .hasMessage(NOT_LIKED_UNIV_APPLY_INFO.getMessage());
         }
     }
 
@@ -116,7 +116,7 @@ class UnivApplyInfoLikeServiceTest {
         // when & then
         assertThatCode(() -> univApplyInfoLikeService.likeUnivApplyInfo(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -148,7 +148,7 @@ class UnivApplyInfoLikeServiceTest {
         // when & then
         assertThatCode(() -> univApplyInfoLikeService.getIsLiked(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
     private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {

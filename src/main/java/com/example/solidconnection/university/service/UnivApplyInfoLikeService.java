@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIVERSITY;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIVERSITY;
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
 
 @RequiredArgsConstructor
 @Service
@@ -40,7 +40,7 @@ public class UnivApplyInfoLikeService {
 
         Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUnivApplyInfo.isPresent()) {
-            throw new CustomException(ALREADY_LIKED_UNIVERSITY);
+            throw new CustomException(ALREADY_LIKED_UNIV_APPLY_INFO);
         }
 
         LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
@@ -60,7 +60,7 @@ public class UnivApplyInfoLikeService {
 
         Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUnivApplyInfo.isEmpty()) {
-            throw new CustomException(NOT_LIKED_UNIVERSITY);
+            throw new CustomException(NOT_LIKED_UNIV_APPLY_INFO);
         }
 
         likedUnivApplyInfoRepository.delete(optionalLikedUnivApplyInfo.get());

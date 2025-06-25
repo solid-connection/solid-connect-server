@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
 import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
@@ -32,7 +32,7 @@ public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<Va
         }
 
         if (isDuplicate(request)) {
-            context.buildConstraintViolationWithTemplate(DUPLICATE_UNIVERSITY_CHOICE.getMessage())
+            context.buildConstraintViolationWithTemplate(DUPLICATE_UNIV_APPLY_INFO_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
         }

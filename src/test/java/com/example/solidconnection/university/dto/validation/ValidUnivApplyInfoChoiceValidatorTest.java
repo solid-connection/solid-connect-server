@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIVERSITY_CHOICE;
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
 import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -94,6 +94,6 @@ class ValidUnivApplyInfoChoiceValidatorTest {
         assertThat(violations)
                 .isNotEmpty()
                 .extracting(MESSAGE)
-                .contains(DUPLICATE_UNIVERSITY_CHOICE.getMessage());
+                .contains(DUPLICATE_UNIV_APPLY_INFO_CHOICE.getMessage());
     }
 }

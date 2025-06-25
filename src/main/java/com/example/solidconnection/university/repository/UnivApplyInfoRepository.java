@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 
 @Repository
 public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long>, UnivApplyInfoFilterRepository {
@@ -61,7 +61,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
 
     default UnivApplyInfo getUnivApplyInfoById(Long id) {
         return findById(id)
-                .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(UNIV_APPLY_INFO_NOT_FOUND));
     }
 
     @Query("""

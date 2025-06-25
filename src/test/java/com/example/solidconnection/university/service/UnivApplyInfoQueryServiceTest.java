@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.List;
 
-import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.then;
@@ -79,7 +79,7 @@ class UnivApplyInfoQueryServiceTest {
                 .isThrownBy(() -> univApplyInfoQueryService.getUnivApplyInfoDetail(invalidUniversityInfoForApplyId))
                 .havingRootCause()
                 .isInstanceOf(CustomException.class)
-                .withMessage(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND.getMessage());
+                .withMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
     @Test
