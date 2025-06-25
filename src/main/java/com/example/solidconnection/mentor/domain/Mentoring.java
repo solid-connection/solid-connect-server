@@ -1,6 +1,6 @@
 package com.example.solidconnection.mentor.domain;
 
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;

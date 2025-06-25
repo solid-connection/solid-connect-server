@@ -1,6 +1,6 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.university.domain.LanguageTestType;
 

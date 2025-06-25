@@ -3,7 +3,7 @@ package com.example.solidconnection.application.fixture;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
