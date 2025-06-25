@@ -45,6 +45,7 @@ public class UnivApplyInfoController {
         }
     }
 
+    // todo: return 타입 UnivApplyInfoPreviewResponses 같이 객체로 묶어서 반환하는 것으로 변경 필요
     @GetMapping("/like")
     public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getMyWishUnivApplyInfo( /* todo: wish 가 아니라 liked 로 변경 필요 - 코드 용어 통일 */
             @AuthorizedUser SiteUser siteUser
