@@ -5,7 +5,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class UnivApplyInfoRecommendService {
 
     public static final int RECOMMEND_UNIV_APPLY_INFO_NUM = 6;
 
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
     private final GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
     @Value("${university.term}")
@@ -36,7 +36,7 @@ public class UnivApplyInfoRecommendService {
     @Transactional(readOnly = true)
     public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
-        List<UnivApplyInfo> personalRecommends = universityInfoForApplyRepository
+        List<UnivApplyInfo> personalRecommends = univApplyInfoRepository
                 .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
         List<UnivApplyInfo> trimmedRecommends
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIV_APPLY_INFO_NUM, personalRecommends.size()));

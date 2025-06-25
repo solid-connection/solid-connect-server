@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ public class GeneralUnivApplyInfoRecommendService {
     /*
      * 해당 시기에 열리는 대학교들 중 랜덤으로 선택해서 목록을 구성한다.
      * */
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
 
     @Getter
     private List<UnivApplyInfo> generalRecommends;
@@ -30,6 +30,6 @@ public class GeneralUnivApplyInfoRecommendService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        generalRecommends = universityInfoForApplyRepository.findRandomByTerm(term, RECOMMEND_UNIV_APPLY_INFO_NUM);
+        generalRecommends = univApplyInfoRepository.findRandomByTerm(term, RECOMMEND_UNIV_APPLY_INFO_NUM);
     }
 }

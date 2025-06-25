@@ -9,7 +9,7 @@ import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewR
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class UnivApplyInfoQueryServiceTest {
     private UniversityFilterRepository universityFilterRepository;
 
     @SpyBean
-    private UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private UnivApplyInfoRepository univApplyInfoRepository;
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
@@ -66,7 +66,7 @@ class UnivApplyInfoQueryServiceTest {
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        then(universityInfoForApplyRepository).should(times(1)).getUniversityInfoForApplyById(괌대학_A_지원_정보.getId());
+        then(univApplyInfoRepository).should(times(1)).getUniversityInfoForApplyById(괌대학_A_지원_정보.getId());
     }
 
     @Test

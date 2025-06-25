@@ -15,7 +15,7 @@ import java.util.Optional;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 
 @Repository
-public interface UniversityInfoForApplyRepository extends JpaRepository<UnivApplyInfo, Long> {
+public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long> {
 
     Optional<UnivApplyInfo> findByIdAndTerm(Long id, String term);
 

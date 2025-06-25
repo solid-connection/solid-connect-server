@@ -8,7 +8,7 @@ import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +31,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION
 public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
     private final UniversityFilterRepositoryImpl universityFilterRepository;
 
     @Value("${university.term}")
@@ -71,7 +71,7 @@ public class ApplicationQueryService {
         }
 
         List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
-        List<UnivApplyInfo> universityInfosForApply = universityInfoForApplyRepository.findAllByUniversityIds(universityInfoForApplyIds);
+        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByUniversityIds(universityInfoForApplyIds);
 
         return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }

@@ -7,7 +7,7 @@ import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class UniversityLikeService {
     public static final String LIKE_SUCCESS_MESSAGE = "LIKE_SUCCESS";
     public static final String LIKE_CANCELED_MESSAGE = "LIKE_CANCELED";
 
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
     private final LikedUniversityRepository likedUniversityRepository;
 
     @Value("${university.term}")
@@ -36,7 +36,7 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
         Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isPresent()) {
@@ -56,7 +56,7 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
-        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
 
         Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isEmpty()) {
@@ -72,7 +72,7 @@ public class UniversityLikeService {
      * */
     @Transactional(readOnly = true)
     public IsLikeResponse getIsLiked(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
         boolean isLike = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
         return new IsLikeResponse(isLike);
     }
