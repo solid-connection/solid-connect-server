@@ -14,7 +14,7 @@ import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepos
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +75,7 @@ class MyPageServiceTest {
     @Test
     void 마이페이지_정보를_조회한다() {
         // given
-        int likedUniversityCount = createLikedUniversities(user);
+        int likedUniversityCount = createLikedUnivApplyInfos(user);
 
         // when
         MyPageResponse response = myPageService.getMyPageInfo(user);
@@ -94,13 +94,13 @@ class MyPageServiceTest {
     @Test
     void 관심_대학교_목록을_조회한다() {
         // given
-        int likedUniversityCount = createLikedUniversities(user);
+        int likedUnivApplyInfo = createLikedUnivApplyInfos(user);
 
         // when
-        List<UniversityInfoForApplyPreviewResponse> response = myPageService.getWishUniversity(user);
+        List<UnivApplyInfoPreviewResponse> response = myPageService.getWishUnivApplyInfo(user);
 
         // then
-        assertThat(response).hasSize(likedUniversityCount);
+        assertThat(response).hasSize(likedUnivApplyInfo);
     }
 
     @Nested
@@ -192,7 +192,7 @@ class MyPageServiceTest {
         }
     }
 
-    private int createLikedUniversities(SiteUser testUser) {
+    private int createLikedUnivApplyInfos(SiteUser testUser) {
         LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보(), testUser);
         LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보(), testUser);
         LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(), testUser);

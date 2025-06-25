@@ -9,7 +9,7 @@ import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,10 +94,10 @@ public class MyPageService {
      * 관심 대학교 목록을 조회한다.
      * */
     @Transactional(readOnly = true)
-    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
-        List<LikedUnivApplyInfo> likedUniversities = likedUnivApplyInfoRepository.findAllBySiteUser_Id(siteUser.getId());
-        return likedUniversities.stream()
-                .map(likedUniversity -> UniversityInfoForApplyPreviewResponse.from(likedUniversity.getUnivApplyInfo()))
+    public List<UnivApplyInfoPreviewResponse> getWishUnivApplyInfo(SiteUser siteUser) {
+        List<LikedUnivApplyInfo> likedUnivApplyInfos = likedUnivApplyInfoRepository.findAllBySiteUser_Id(siteUser.getId());
+        return likedUnivApplyInfos.stream()
+                .map(likedUnivApplyInfo -> UnivApplyInfoPreviewResponse.from(likedUnivApplyInfo.getUnivApplyInfo()))
                 .toList();
     }
 }

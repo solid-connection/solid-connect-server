@@ -4,9 +4,9 @@ import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
+import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +32,12 @@ public class UnivApplyInfoQueryService {
      * */
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
+    public UnivApplyInfoDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
                 = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         University university = univApplyInfo.getUniversity();
 
-        return UniversityDetailResponse.of(university, univApplyInfo);
+        return UnivApplyInfoDetailResponse.of(university, univApplyInfo);
     }
 
     /*
@@ -49,13 +49,13 @@ public class UnivApplyInfoQueryService {
      * */
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "univApplyInfo:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityInfoForApplyPreviewResponses searchUnivApplyInfo(
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfo(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
 
-        return new UniversityInfoForApplyPreviewResponses(universityFilterRepository
+        return new UnivApplyInfoPreviewResponses(universityFilterRepository
                 .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
                 .stream()
-                .map(UniversityInfoForApplyPreviewResponse::from)
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList());
     }
 }

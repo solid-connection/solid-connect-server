@@ -6,9 +6,9 @@ import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.LikeResultResponse;
-import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.service.UnivApplyInfoLikeService;
 import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
 import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
@@ -35,7 +35,7 @@ public class UnivApplyInfoController {
     private final MyPageService myPageService;
 
     @GetMapping("/recommend")
-    public ResponseEntity<UniversityRecommendsResponse> getUnivApplyInfoRecommends(
+    public ResponseEntity<UnivApplyInfoRecommendsResponse> getUnivApplyInfoRecommends(
             @AuthorizedUser(required = false) SiteUser siteUser
     ) {
         if (siteUser == null) {
@@ -46,10 +46,10 @@ public class UnivApplyInfoController {
     }
 
     @GetMapping("/like")
-    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> getMyWishUnivApplyInfo( /* todo: wish 가 아니라 liked 로 변경 필요 - 코드 용어 통일 */
+    public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getMyWishUnivApplyInfo( /* todo: wish 가 아니라 liked 로 변경 필요 - 코드 용어 통일 */
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<UniversityInfoForApplyPreviewResponse> wishUniversities = myPageService.getWishUniversity(siteUser);
+        List<UnivApplyInfoPreviewResponse> wishUniversities = myPageService.getWishUnivApplyInfo(siteUser);
         return ResponseEntity.ok(wishUniversities);
     }
 
@@ -81,23 +81,23 @@ public class UnivApplyInfoController {
     }
 
     @GetMapping("/{univ-apply-info-id}")
-    public ResponseEntity<UniversityDetailResponse> getUnivApplyInfoDetails(
+    public ResponseEntity<UnivApplyInfoDetailResponse> getUnivApplyInfoDetails(
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        UniversityDetailResponse universityDetailResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(univApplyInfoId);
-        return ResponseEntity.ok(universityDetailResponse);
+        UnivApplyInfoDetailResponse univApplyInfoDetailResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(univApplyInfoId);
+        return ResponseEntity.ok(univApplyInfoDetailResponse);
     }
 
-    // todo return타입 UniversityInfoForApplyPreviewResponses로 추후 수정 필요
+    // todo: return타입 UniversityInfoForApplyPreviewResponses로 추후 수정 필요
     @GetMapping("/search")
-    public ResponseEntity<List<UniversityInfoForApplyPreviewResponse>> searchUnivApplyInfo(
+    public ResponseEntity<List<UnivApplyInfoPreviewResponse>> searchUnivApplyInfo(
             @RequestParam(required = false, defaultValue = "") String region,
             @RequestParam(required = false, defaultValue = "") List<String> keyword,
             @RequestParam(required = false, defaultValue = "") LanguageTestType testType,
             @RequestParam(required = false, defaultValue = "") String testScore
     ) {
-        List<UniversityInfoForApplyPreviewResponse> universityInfoForApplyPreviewResponse
-                = univApplyInfoQueryService.searchUnivApplyInfo(region, keyword, testType, testScore).universityInfoForApplyPreviewResponses();
-        return ResponseEntity.ok(universityInfoForApplyPreviewResponse);
+        List<UnivApplyInfoPreviewResponse> univApplyInfoPreviewResponse
+                = univApplyInfoQueryService.searchUnivApplyInfo(region, keyword, testType, testScore).univApplyInfoPreviews();
+        return ResponseEntity.ok(univApplyInfoPreviewResponse);
     }
 }

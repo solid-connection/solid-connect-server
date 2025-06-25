@@ -10,8 +10,8 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,16 +81,16 @@ class UnivApplyInfoRecommendServiceTest {
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
         // when
-        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보)
                 ));
     }
 
@@ -100,14 +100,14 @@ class UnivApplyInfoRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보)
                 ));
     }
 
@@ -118,32 +118,32 @@ class UnivApplyInfoRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보)
                 );
     }
 
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
                         generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(UniversityInfoForApplyPreviewResponse::from)
+                                .map(UnivApplyInfoPreviewResponse::from)
                                 .toList()
                 );
     }
@@ -151,14 +151,14 @@ class UnivApplyInfoRecommendServiceTest {
     @Test
     void 일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = univApplyInfoRecommendService.getGeneralRecommends();
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getGeneralRecommends();
 
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
                         generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(UniversityInfoForApplyPreviewResponse::from)
+                                .map(UnivApplyInfoPreviewResponse::from)
                                 .toList()
                 );
     }

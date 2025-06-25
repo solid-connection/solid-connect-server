@@ -4,9 +4,9 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
+import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
@@ -49,7 +49,7 @@ class UnivApplyInfoQueryServiceTest {
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse response = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
+        UnivApplyInfoDetailResponse response = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.id()).isEqualTo(괌대학_A_지원_정보.getId());
@@ -61,8 +61,8 @@ class UnivApplyInfoQueryServiceTest {
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
         // when
-        UniversityDetailResponse firstResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
-        UniversityDetailResponse secondResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
+        UnivApplyInfoDetailResponse firstResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
+        UnivApplyInfoDetailResponse secondResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(괌대학_A_지원_정보.getId());
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
@@ -93,18 +93,18 @@ class UnivApplyInfoQueryServiceTest {
         UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of(), null, null);
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
+        assertThat(response.univApplyInfoPreviews())
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(그라츠대학_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메이지대학_지원_정보)
                 );
     }
 
@@ -119,9 +119,9 @@ class UnivApplyInfoQueryServiceTest {
         String term = "2024-1";
 
         // when
-        UniversityInfoForApplyPreviewResponses firstResponse =
+        UnivApplyInfoPreviewResponses firstResponse =
                 univApplyInfoQueryService.searchUnivApplyInfo(regionCode, keywords, testType, testScore);
-        UniversityInfoForApplyPreviewResponses secondResponse =
+        UnivApplyInfoPreviewResponses secondResponse =
                 univApplyInfoQueryService.searchUnivApplyInfo(regionCode, keywords, testType, testScore);
 
         // then
@@ -140,12 +140,12 @@ class UnivApplyInfoQueryServiceTest {
         univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 "AMERICAS", List.of(), null, null);
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactlyInAnyOrder(UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보));
+        assertThat(response.univApplyInfoPreviews())
+                .containsExactlyInAnyOrder(UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보));
     }
 
     @Test
@@ -156,14 +156,14 @@ class UnivApplyInfoQueryServiceTest {
         UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
         // when
-        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of("라", "일본"), null, null);
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
+        assertThat(response.univApplyInfoPreviews())
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(그라츠대학_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메이지대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(그라츠대학_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메이지대학_지원_정보)
                 );
     }
 
@@ -178,12 +178,12 @@ class UnivApplyInfoQueryServiceTest {
         languageRequirementFixture.토익_900(괌대학_B_지원_정보);
 
         // when
-        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 null, List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactlyInAnyOrder(UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보));
+        assertThat(response.univApplyInfoPreviews())
+                .containsExactlyInAnyOrder(UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보));
     }
 
     @Test
@@ -196,11 +196,11 @@ class UnivApplyInfoQueryServiceTest {
         languageRequirementFixture.토플_70(서던덴마크대학교_지원_정보);
 
         // when
-        UniversityInfoForApplyPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfo(
                 "EUROPE", List.of(), LanguageTestType.TOEFL_IBT, "70");
 
         // then
-        assertThat(response.universityInfoForApplyPreviewResponses())
-                .containsExactly(UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보));
+        assertThat(response.univApplyInfoPreviews())
+                .containsExactly(UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보));
     }
 }

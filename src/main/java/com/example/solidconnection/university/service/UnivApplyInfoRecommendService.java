@@ -3,8 +3,8 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class UnivApplyInfoRecommendService {
      * - 맞춤 추천 대학교의 수가 6개보다 적다면, 공통 추천 대학교 후보에서 이번 term 에 열리는 학교들을 부족한 수 만큼 불러온다.
      * */
     @Transactional(readOnly = true)
-    public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
+    public UnivApplyInfoRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
         List<UnivApplyInfo> personalRecommends = univApplyInfoRepository
                 .findAllBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
@@ -47,8 +47,8 @@ public class UnivApplyInfoRecommendService {
             trimmedRecommends.addAll(getGeneralRecommendsExcludingSelected(trimmedRecommends));
         }
 
-        return new UniversityRecommendsResponse(trimmedRecommends.stream()
-                .map(UniversityInfoForApplyPreviewResponse::from)
+        return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList());
     }
 
@@ -64,10 +64,10 @@ public class UnivApplyInfoRecommendService {
      * */
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityRecommendsResponse getGeneralRecommends() {
+    public UnivApplyInfoRecommendsResponse getGeneralRecommends() {
         List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
-        return new UniversityRecommendsResponse(generalRecommends.stream()
-                .map(UniversityInfoForApplyPreviewResponse::from)
+        return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList());
     }
 }

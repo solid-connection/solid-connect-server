@@ -5,7 +5,7 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
 
-public record UniversityDetailResponse(
+public record UnivApplyInfoDetailResponse(
         long id,
         String term,
         String koreanName,
@@ -33,10 +33,10 @@ public record UniversityDetailResponse(
         String accommodationUrl,
         String englishCourseUrl) {
 
-    public static UniversityDetailResponse of(
+    public static UnivApplyInfoDetailResponse of(
             University university,
             UnivApplyInfo univApplyInfo) {
-        return new UniversityDetailResponse(
+        return new UnivApplyInfoDetailResponse(
                 univApplyInfo.getId(),
                 univApplyInfo.getTerm(),
                 univApplyInfo.getKoreanName(),

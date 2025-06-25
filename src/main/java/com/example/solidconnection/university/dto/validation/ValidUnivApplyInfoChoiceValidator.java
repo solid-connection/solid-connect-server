@@ -1,6 +1,6 @@
 package com.example.solidconnection.university.dto.validation;
 
-import com.example.solidconnection.application.dto.UniversityChoiceRequest;
+import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -13,10 +13,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_U
 import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
-public class ValidUniversityChoiceValidator implements ConstraintValidator<ValidUniversityChoice, UniversityChoiceRequest> {
+public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<ValidUnivApplyInfoChoice, UnivApplyInfoChoiceRequest> {
 
     @Override
-    public boolean isValid(UniversityChoiceRequest request, ConstraintValidatorContext context) {
+    public boolean isValid(UnivApplyInfoChoiceRequest request, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
 
         if (isFirstChoiceNotSelected(request)) {
@@ -40,15 +40,15 @@ public class ValidUniversityChoiceValidator implements ConstraintValidator<Valid
         return true;
     }
 
-    private boolean isFirstChoiceNotSelected(UniversityChoiceRequest request) {
+    private boolean isFirstChoiceNotSelected(UnivApplyInfoChoiceRequest request) {
         return request.firstChoiceUniversityId() == null;
     }
 
-    private boolean isThirdChoiceWithoutSecond(UniversityChoiceRequest request) {
+    private boolean isThirdChoiceWithoutSecond(UnivApplyInfoChoiceRequest request) {
         return request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null;
     }
 
-    private boolean isDuplicate(UniversityChoiceRequest request) {
+    private boolean isDuplicate(UnivApplyInfoChoiceRequest request) {
         Set<Long> uniqueIds = new HashSet<>();
         return Stream.of(
                         request.firstChoiceUniversityId(),

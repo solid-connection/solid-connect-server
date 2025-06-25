@@ -12,6 +12,6 @@ public record ApplyRequest(
         Long languageTestScoreId,
 
         @Valid
-        UniversityChoiceRequest universityChoiceRequest
+        UnivApplyInfoChoiceRequest universityChoiceRequest // todo:  #345 프론트에 univApplyInfoChoiceRequest 로 요청 받는다고 전달 후, 인자명 & bruno 변경 필요
 ) {
 }
