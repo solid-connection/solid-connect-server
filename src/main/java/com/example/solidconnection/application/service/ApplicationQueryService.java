@@ -58,7 +58,7 @@ public class ApplicationQueryService {
     public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
 
-        List<Long> universityInfoForApplyIds = Stream.of(
+        List<Long> univApplyInfoIds = Stream.of(
                         userLatestApplication.getFirstChoiceUnivApplyInfoId(),
                         userLatestApplication.getSecondChoiceUnivApplyInfoId(),
                         userLatestApplication.getThirdChoiceUnivApplyInfoId()
@@ -66,12 +66,12 @@ public class ApplicationQueryService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (universityInfoForApplyIds.isEmpty()) {
+        if (univApplyInfoIds.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
 
-        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
-        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByUniversityIds(universityInfoForApplyIds);
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
+        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByUniversityIds(univApplyInfoIds);
 
         return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
     }
