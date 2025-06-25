@@ -4,6 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 
 @Repository
-public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long> {
+public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long>, UnivApplyInfoFilterRepository {
 
     Optional<UnivApplyInfo> findByIdAndTerm(Long id, String term);
 

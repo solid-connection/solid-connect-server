@@ -21,7 +21,7 @@ import java.util.List;
 public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
-    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository; // todo: 구현체 숨기고 univApplyInfoRepository만 사용하도록
 
     @Value("${university.term}")
     public String term;
