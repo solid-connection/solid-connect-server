@@ -3,7 +3,7 @@ package com.example.solidconnection.application.service;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
-import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -84,11 +84,11 @@ public class ApplicationQueryService {
         Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUnivApplyInfoId);
         Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
 
-        List<UniversityApplicantsResponse> firstChoiceApplicants =
+        List<ApplicantsResponse> firstChoiceApplicants =
                 createUniversityApplicantsResponses(universityInfosForApply, firstChoiceMap, siteUser);
-        List<UniversityApplicantsResponse> secondChoiceApplicants =
+        List<ApplicantsResponse> secondChoiceApplicants =
                 createUniversityApplicantsResponses(universityInfosForApply, secondChoiceMap, siteUser);
-        List<UniversityApplicantsResponse> thirdChoiceApplicants =
+        List<ApplicantsResponse> thirdChoiceApplicants =
                 createUniversityApplicantsResponses(universityInfosForApply, thirdChoiceMap, siteUser);
 
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
@@ -109,12 +109,12 @@ public class ApplicationQueryService {
         return choiceMap;
     }
 
-    private List<UniversityApplicantsResponse> createUniversityApplicantsResponses(
+    private List<ApplicantsResponse> createUniversityApplicantsResponses(
             List<UnivApplyInfo> universityInfosForApply,
             Map<Long, List<Application>> choiceMap,
             SiteUser siteUser) {
         return universityInfosForApply.stream()
-                .map(uia -> UniversityApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
+                .map(uia -> ApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
                 .toList();
     }
 
