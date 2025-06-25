@@ -5,7 +5,7 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
 
-public interface UniversityFilterRepository {
+public interface UnivApplyInfoFilterRepository {
 
     List<UnivApplyInfo> findByRegionCodeAndKeywords(String regionCode, List<String> keywords);
 

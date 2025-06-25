@@ -8,7 +8,7 @@ import com.example.solidconnection.university.dto.UniversityDetailResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
 import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
-    private final UniversityFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
 
     @Value("${university.term}")
     public String term;
@@ -34,7 +34,7 @@ public class UnivApplyInfoQueryService {
     @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UniversityDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
-                = univApplyInfoRepository.getUniversityInfoForApplyById(univApplyInfoId);
+                = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         University university = univApplyInfo.getUniversity();
 
         return UniversityDetailResponse.of(university, univApplyInfo);

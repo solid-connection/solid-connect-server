@@ -18,12 +18,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UniversityFilterRepositoryImpl implements UniversityFilterRepository {
+public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRepository {
 
     private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public UniversityFilterRepositoryImpl(EntityManager em) {
+    public UnivApplyInfoFilterRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
 

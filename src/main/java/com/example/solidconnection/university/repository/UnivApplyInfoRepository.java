@@ -58,7 +58,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
             """, nativeQuery = true)
     List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
 
-    default UnivApplyInfo getUniversityInfoForApplyById(Long id) {
+    default UnivApplyInfo getUnivApplyInfoById(Long id) {
         return findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));
     }

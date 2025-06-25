@@ -9,7 +9,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
-    private final UniversityFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
 
     @Value("${university.term}")
     public String term;

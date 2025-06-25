@@ -36,7 +36,7 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse likeUniversity(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
 
         Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isPresent()) {
@@ -56,7 +56,7 @@ public class UniversityLikeService {
      * */
     @Transactional
     public LikeResultResponse cancelLikeUniversity(SiteUser siteUser, long universityInfoForApplyId) throws CustomException {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
 
         Optional<LikedUniversity> optionalLikedUniversity = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
         if (optionalLikedUniversity.isEmpty()) {
@@ -72,7 +72,7 @@ public class UniversityLikeService {
      * */
     @Transactional(readOnly = true)
     public IsLikeResponse getIsLiked(SiteUser siteUser, Long universityInfoForApplyId) {
-        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(universityInfoForApplyId);
         boolean isLike = likedUniversityRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
         return new IsLikeResponse(isLike);
     }

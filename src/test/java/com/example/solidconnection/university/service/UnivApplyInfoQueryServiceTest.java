@@ -10,7 +10,7 @@ import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewR
 import com.example.solidconnection.university.fixture.LanguageRequirementFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepository;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ class UnivApplyInfoQueryServiceTest {
     private UnivApplyInfoQueryService univApplyInfoQueryService;
 
     @SpyBean
-    private UniversityFilterRepository universityFilterRepository;
+    private UnivApplyInfoFilterRepository univApplyInfoFilterRepository;
 
     @SpyBean
     private UnivApplyInfoRepository univApplyInfoRepository;
@@ -66,7 +66,7 @@ class UnivApplyInfoQueryServiceTest {
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        then(univApplyInfoRepository).should(times(1)).getUniversityInfoForApplyById(괌대학_A_지원_정보.getId());
+        then(univApplyInfoRepository).should(times(1)).getUnivApplyInfoById(괌대학_A_지원_정보.getId());
     }
 
     @Test
@@ -126,7 +126,7 @@ class UnivApplyInfoQueryServiceTest {
 
         // then
         assertThat(firstResponse).isEqualTo(secondResponse);
-        then(universityFilterRepository).should(times(1))
+        then(univApplyInfoFilterRepository).should(times(1))
                 .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
                         regionCode, keywords, testType, testScore, term);
     }
