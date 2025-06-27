@@ -1,6 +1,6 @@
 package com.example.solidconnection.e2e;
 
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 
@@ -11,7 +11,7 @@ public class DynamicFixture { // todo: test fixture 개선 작업 이후, 이 �
                 email,
                 nickname,
                 "profileImage",
-                PreparationStatus.CONSIDERING,
+                ExchangeStatus.CONSIDERING,
                 Role.MENTEE
         );
     }
