@@ -20,7 +20,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"mentor_id", "sequence"}))
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_channel_mentor_id_sequence",
+                columnNames = {"mentor_id", "sequence"}
+        )
+})
 public class Channel {
 
     @Id
