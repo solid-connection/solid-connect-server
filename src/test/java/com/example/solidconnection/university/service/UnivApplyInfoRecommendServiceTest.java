@@ -24,7 +24,7 @@ import static com.example.solidconnection.university.service.UnivApplyInfoRecomm
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
-@DisplayName("대학교 추천 서비스 테스트")
+@DisplayName("대학 지원 정보 추천 서비스 테스트")
 class UnivApplyInfoRecommendServiceTest {
 
     @Autowired
@@ -76,7 +76,7 @@ class UnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 관심_지역_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_지역_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
@@ -95,7 +95,7 @@ class UnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_국가_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
@@ -112,7 +112,7 @@ class UnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
@@ -134,7 +134,7 @@ class UnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
+    void 관심사_미설정_사용자는_일반_추천_대학_지원_정보를_조회한다() {
         // when
         UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
@@ -149,7 +149,7 @@ class UnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 일반_추천_대학을_조회한다() {
+    void 일반_추천_대학_지원_정보를_조회한다() {
         // when
         UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getGeneralRecommends();
 

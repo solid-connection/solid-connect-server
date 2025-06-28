@@ -26,7 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
-@DisplayName("대학교 좋아요 서비스 테스트")
+@DisplayName("대학 지원 정보 좋아요 서비스 테스트")
 class UnivApplyInfoLikeServiceTest {
 
     @Autowired
@@ -51,7 +51,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Nested
-    class 대학_좋아요를_등록한다 {
+    class 대학_지원_정보_좋아요를_등록한다 {
 
         @Test
         void 성공적으로_좋아요를_등록한다() {
@@ -68,7 +68,7 @@ class UnivApplyInfoLikeServiceTest {
         }
 
         @Test
-        void 이미_좋아요한_대학이면_예외_응답을_반환한다() {
+        void 이미_좋아요했으면_예외_응답을_반환한다() {
             // given
             saveLikedUniversity(user, 괌대학_A_지원_정보);
 
@@ -80,7 +80,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Nested
-    class 대학_좋아요를_취소한다 {
+    class 대학_지원_정보_좋아요를_취소한다 {
 
         @Test
         void 성공적으로_좋아요를_취소한다() {
@@ -100,7 +100,7 @@ class UnivApplyInfoLikeServiceTest {
         }
 
         @Test
-        void 좋아요하지_않은_대학이면_예외_응답을_반환한다() {
+        void 좋아요하지_않았으면_예외_응답을_반환한다() {
             // when & then
             assertThatCode(() -> univApplyInfoLikeService.cancelLikeUnivApplyInfo(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
@@ -109,7 +109,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Test
-    void 존재하지_않는_대학_좋아요_시도하면_예외_응답을_반환한다() {
+    void 존재하지_않는_지원_정보에_좋아요_시도하면_예외_응답을_반환한다() {
         // given
         Long invalidUnivApplyInfoId = 9999L;
 
@@ -120,7 +120,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Test
-    void 좋아요한_대학인지_확인한다() {
+    void 좋아요한_대학_지원_정보인지_확인한다() {
         // given
         saveLikedUniversity(user, 괌대학_A_지원_정보);
 
@@ -132,7 +132,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Test
-    void 좋아요하지_않은_대학인지_확인한다() {
+    void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
         // when
         IsLikeResponse response = univApplyInfoLikeService.getIsLiked(user, 괌대학_A_지원_정보.getId());
 
@@ -141,7 +141,7 @@ class UnivApplyInfoLikeServiceTest {
     }
 
     @Test
-    void 존재하지_않는_대학의_좋아요_여부를_조회하면_예외_응답을_반환한다() {
+    void 존재하지_않는_대학_지원_정보의_좋아요_여부를_조회하면_예외_응답을_반환한다() {
         // given
         Long invalidUnivApplyInfoId = 9999L;
 

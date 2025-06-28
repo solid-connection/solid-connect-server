@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
-@DisplayName("공통 추천 대학 서비스 테스트")
+@DisplayName("대학 지원 정보 공통 추천 서비스 테스트")
 class GeneralUnivApplyInfoRecommendServiceTest {
 
     @Autowired
@@ -44,7 +44,7 @@ class GeneralUnivApplyInfoRecommendServiceTest {
     }
 
     @Test
-    void 모집_시기의_대학들_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
+    void 모집_시기의_대학_지원_정보_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
         // given
         List<UnivApplyInfo> universities = generalUnivApplyInfoRecommendService.getGeneralRecommends();
 

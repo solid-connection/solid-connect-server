@@ -25,7 +25,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @TestContainerSpringBootTest
-@DisplayName("대학교 조회 서비스 테스트")
+@DisplayName("대학 지원 정보 조회 서비스 테스트")
 class UnivApplyInfoQueryServiceTest {
 
     @Autowired
@@ -44,7 +44,7 @@ class UnivApplyInfoQueryServiceTest {
     private LanguageRequirementFixture languageRequirementFixture;
 
     @Test
-    void 대학_상세정보를_정상_조회한다() {
+    void 대학_지원_정보를_상세_조회한다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
@@ -56,7 +56,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 대학_상세정보_조회시_캐시가_적용된다() {
+    void 대학_지원_정보_상세_조회시_캐시가_적용된다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
@@ -70,20 +70,20 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 존재하지_않는_대학_상세정보를_조회하면_예외_응답을_반환한다() {
+    void 존재하지_않는_대학_지원_정보를_조회하면_예외_응답을_반환한다() {
         // given
-        Long invalidUniversityInfoForApplyId = 9999L;
+        Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> univApplyInfoQueryService.getUnivApplyInfoDetail(invalidUniversityInfoForApplyId))
+                .isThrownBy(() -> univApplyInfoQueryService.getUnivApplyInfoDetail(invalidUnivApplyInfoId))
                 .havingRootCause()
                 .isInstanceOf(CustomException.class)
                 .withMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
     @Test
-    void 전체_대학을_조회한다() {
+    void 전체_대학_지원_정보를_조회한다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         UnivApplyInfo 괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
@@ -109,7 +109,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 대학_조회시_캐시가_적용된다() {
+    void 대학_지원_정보_조회시_캐시가_적용된다() {
         // given
         univApplyInfoFixture.괌대학_A_지원_정보();
         String regionCode = "AMERICAS";
@@ -132,7 +132,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 지역으로_대학을_필터링한다() {
+    void 지역으로_대학_지원_정보를_필터링한다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         univApplyInfoFixture.코펜하겐IT대학_지원_정보();
@@ -149,7 +149,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 키워드로_대학을_필터링한다() {
+    void 키워드로_대학_지원_정보를_필터링한다() {
         // given
         univApplyInfoFixture.괌대학_A_지원_정보();
         UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
@@ -168,7 +168,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 어학시험_조건으로_대학을_필터링한다() {
+    void 어학시험_조건으로_대학_지원_정보를_필터링한다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         languageRequirementFixture.토플_80(괌대학_A_지원_정보);
@@ -187,7 +187,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 모든_조건으로_대학을_필터링한다() {
+    void 모든_조건으로_대학_지원_정보를_필터링한다() {
         // given
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
         languageRequirementFixture.토플_80(괌대학_A_지원_정보);
