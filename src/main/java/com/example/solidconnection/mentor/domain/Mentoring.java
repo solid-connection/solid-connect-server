@@ -29,7 +29,7 @@ import static java.time.temporal.ChronoUnit.MICROS;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mentoring {
 

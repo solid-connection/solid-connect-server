@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"mentor_id", "sequence"}))
 public class Channel {
