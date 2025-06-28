@@ -32,11 +32,11 @@ public class Channel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sequence")
+    @Column
     private int sequence;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(nullable = false)
     private ChannelType type;
 
     @Column(nullable = false, length = 500)
