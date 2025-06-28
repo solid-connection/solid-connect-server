@@ -1,7 +1,7 @@
 package com.example.solidconnection.siteuser.fixture;
 
 import com.example.solidconnection.siteuser.domain.AuthType;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -62,7 +62,7 @@ public class SiteUserFixtureBuilder {
                 email,
                 nickname,
                 profileImageUrl,
-                PreparationStatus.CONSIDERING,
+                ExchangeStatus.CONSIDERING,
                 role,
                 authType,
                 passwordEncoder.encode(password)

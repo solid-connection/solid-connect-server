@@ -1,7 +1,7 @@
 package com.example.solidconnection.siteuser.repository;
 
 import com.example.solidconnection.siteuser.domain.AuthType;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.support.TestContainerDataJpaTest;
@@ -83,7 +83,7 @@ class SiteUserRepositoryTest {
                 email,
                 nickname,
                 "profileImageUrl",
-                PreparationStatus.CONSIDERING,
+                ExchangeStatus.CONSIDERING,
                 Role.MENTEE,
                 authType
         );
