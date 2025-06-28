@@ -42,13 +42,13 @@ public class ApplicationSubmissionService {
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
     public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
-        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.universityChoiceRequest();
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
-        long firstChoiceUniversityId = univApplyInfoChoiceRequest.firstChoiceUniversityId();
-        Long secondChoiceUniversityId = univApplyInfoChoiceRequest.secondChoiceUniversityId();
-        Long thirdChoiceUniversityId = univApplyInfoChoiceRequest.thirdChoiceUniversityId();
+        long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
+        Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
+        Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
         Optional<Application> existingApplication = applicationRepository.findBySiteUserAndTerm(siteUser, term);
         int updateCount = existingApplication
@@ -65,9 +65,9 @@ public class ApplicationSubmissionService {
                 languageTestScore.getLanguageTest(),
                 term,
                 updateCount,
-                firstChoiceUniversityId,
-                secondChoiceUniversityId,
-                thirdChoiceUniversityId,
+                firstChoiceUnivApplyInfoId,
+                secondChoiceUnivApplyInfoId,
+                thirdChoiceUnivApplyInfoId,
                 getRandomNickname()
         );
 

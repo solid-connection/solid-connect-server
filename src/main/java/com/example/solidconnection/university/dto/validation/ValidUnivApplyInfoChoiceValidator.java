@@ -41,19 +41,19 @@ public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<Va
     }
 
     private boolean isFirstChoiceNotSelected(UnivApplyInfoChoiceRequest request) {
-        return request.firstChoiceUniversityId() == null;
+        return request.firstChoiceUnivApplyInfoId() == null;
     }
 
     private boolean isThirdChoiceWithoutSecond(UnivApplyInfoChoiceRequest request) {
-        return request.thirdChoiceUniversityId() != null && request.secondChoiceUniversityId() == null;
+        return request.thirdChoiceUnivApplyInfoId() != null && request.secondChoiceUnivApplyInfoId() == null;
     }
 
     private boolean isDuplicate(UnivApplyInfoChoiceRequest request) {
         Set<Long> uniqueIds = new HashSet<>();
         return Stream.of(
-                        request.firstChoiceUniversityId(),
-                        request.secondChoiceUniversityId(),
-                        request.thirdChoiceUniversityId()
+                        request.firstChoiceUnivApplyInfoId(),
+                        request.secondChoiceUnivApplyInfoId(),
+                        request.thirdChoiceUnivApplyInfoId()
                 )
                 .filter(Objects::nonNull)
                 .anyMatch(id -> !uniqueIds.add(id));

@@ -1,5 +1,6 @@
 package com.example.solidconnection.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +13,7 @@ public record ApplyRequest(
         Long languageTestScoreId,
 
         @Valid
-        UnivApplyInfoChoiceRequest universityChoiceRequest // todo:  #345 프론트에 univApplyInfoChoiceRequest 로 요청 받는다고 전달 후, 인자명 & bruno 변경 필요
+        @JsonProperty("universityChoiceRequest")
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest
 ) {
 }
