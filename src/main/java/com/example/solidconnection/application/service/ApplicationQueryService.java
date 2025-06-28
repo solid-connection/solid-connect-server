@@ -71,13 +71,13 @@ public class ApplicationQueryService {
         }
 
         List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
-        List<UnivApplyInfo> universityInfosForApply = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
 
-        return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
-            List<UnivApplyInfo> universityInfosForApply,
+            List<UnivApplyInfo> univApplyInfos,
             List<Application> applications,
             SiteUser siteUser) {
         Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
@@ -85,11 +85,11 @@ public class ApplicationQueryService {
         Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
 
         List<ApplicantsResponse> firstChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, firstChoiceMap, siteUser);
+                createUniversityApplicantsResponses(univApplyInfos, firstChoiceMap, siteUser);
         List<ApplicantsResponse> secondChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, secondChoiceMap, siteUser);
+                createUniversityApplicantsResponses(univApplyInfos, secondChoiceMap, siteUser);
         List<ApplicantsResponse> thirdChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, thirdChoiceMap, siteUser);
+                createUniversityApplicantsResponses(univApplyInfos, thirdChoiceMap, siteUser);
 
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
@@ -110,10 +110,10 @@ public class ApplicationQueryService {
     }
 
     private List<ApplicantsResponse> createUniversityApplicantsResponses(
-            List<UnivApplyInfo> universityInfosForApply,
+            List<UnivApplyInfo> univApplyInfos,
             Map<Long, List<Application>> choiceMap,
             SiteUser siteUser) {
-        return universityInfosForApply.stream()
+        return univApplyInfos.stream()
                 .map(uia -> ApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
                 .toList();
     }
