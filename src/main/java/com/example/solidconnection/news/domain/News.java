@@ -29,4 +29,6 @@ public class News extends BaseEntity {
 
     @Column(length = 500)
     private String url;
+
+    private long siteUserId;
 }
