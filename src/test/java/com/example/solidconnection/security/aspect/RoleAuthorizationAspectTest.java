@@ -74,7 +74,7 @@ class RoleAuthorizationAspectTest {
         @Test
         void 멘토가_어드민_전용_메소드에_접근하면_예외가_발생한다() {
             // given
-            SiteUser mentor = siteUserFixture.멘토();
+            SiteUser mentor = siteUserFixture.멘토(1, "mentor");
 
             // when & then
             assertThatCode(() -> testService.adminOnlyMethod(mentor))
@@ -85,7 +85,7 @@ class RoleAuthorizationAspectTest {
         @Test
         void 멘토는_멘토_또는_어드민_메소드에_접근할_수_있다() {
             // given
-            SiteUser mentor = siteUserFixture.멘토();
+            SiteUser mentor = siteUserFixture.멘토(1, "mentor");
 
             // when
             boolean response = testService.mentorOrAdminMethod(mentor);
@@ -97,7 +97,7 @@ class RoleAuthorizationAspectTest {
         @Test
         void 멘토는_권한_제한이_없는_메소드에_접근할_수_있다() {
             // given
-            SiteUser mentor = siteUserFixture.멘토();
+            SiteUser mentor = siteUserFixture.멘토(1, "mentor");
 
             // when
             boolean response = testService.publicMethod(mentor);

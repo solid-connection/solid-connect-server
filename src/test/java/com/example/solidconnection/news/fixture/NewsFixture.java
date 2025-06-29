@@ -19,4 +19,14 @@ public class NewsFixture {
                 .siteUserId(siteUserId)
                 .create();
     }
+
+    public News 소식지(long siteUserId, String thumbnailUrl) {
+        return newsFixtureBuilder
+                .title("소식지 제목")
+                .description("소식지 설명")
+                .thumbnailUrl(thumbnailUrl)
+                .url("https://youtu.be/test")
+                .siteUserId(siteUserId)
+                .create();
+    }
 }

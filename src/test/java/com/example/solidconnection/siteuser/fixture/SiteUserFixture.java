@@ -56,11 +56,11 @@ public class SiteUserFixture {
                 .create();
     }
 
-    public SiteUser 멘토() {
+    public SiteUser 멘토(int index, String nickname) {
         return siteUserFixtureBuilder.siteUser()
-                .email("mentor@example.com")
+                .email("mentor" + index + "@example.com")
                 .authType(AuthType.EMAIL)
-                .nickname("멘토")
+                .nickname(nickname)
                 .profileImageUrl("profileImageUrl")
                 .role(Role.MENTOR)
                 .password("mentor123")
