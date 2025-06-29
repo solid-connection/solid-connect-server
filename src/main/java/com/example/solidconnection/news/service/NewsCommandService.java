@@ -9,6 +9,8 @@ import com.example.solidconnection.news.repository.NewsRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.siteuser.domain.Role;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,16 @@ public class NewsCommandService {
         return NewsCommandResponse.from(savedNews);
     }
 
+    @Transactional
+    public NewsCommandResponse deleteNewsById(SiteUser siteUser, Long newsId) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
+        validatePermission(siteUser, news);
+        deleteCustomImage(news.getThumbnailUrl());
+        newsRepository.delete(news);
+        return NewsCommandResponse.from(news);
+    }
+
     private String getImageUrl(MultipartFile imageFile) {
         if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
@@ -60,6 +72,14 @@ public class NewsCommandService {
 
     private void validateOwnership(News news, Long siteUserId) {
         if (news.getSiteUserId() != siteUserId) {
+            throw new CustomException(INVALID_NEWS_ACCESS);
+        }
+    }
+
+    private void validatePermission(SiteUser currentUser, News news) {
+        boolean isOwner = news.getSiteUserId() == currentUser.getId();
+        boolean isAdmin = currentUser.getRole().equals(Role.ADMIN);
+        if (!isOwner && !isAdmin) {
             throw new CustomException(INVALID_NEWS_ACCESS);
         }
     }

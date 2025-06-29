@@ -11,6 +11,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,16 @@ public class NewsController {
                 newsId,
                 newsUpdateRequest,
                 imageFile);
+        return ResponseEntity.ok(newsCommandResponse);
+    }
+
+    @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
+    @DeleteMapping("/{news_id}")
+    public ResponseEntity<NewsCommandResponse> deleteNewsById(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news_id") Long newsId
+    ) {
+        NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUser, newsId);
         return ResponseEntity.ok(newsCommandResponse);
     }
 }

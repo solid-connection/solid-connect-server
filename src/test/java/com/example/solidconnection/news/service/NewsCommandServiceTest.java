@@ -314,6 +314,25 @@ public class NewsCommandServiceTest {
         }
     }
 
+    @Nested
+    class 소식지_삭제_테스트 {
+
+        @Test
+        void 소식지를_성공적으로_삭제한다() {
+            // given
+            News originNews = newsFixture.소식지(user.getId());
+            String expectedImageUrl = originNews.getThumbnailUrl();
+
+            // when
+            NewsCommandResponse response = newsCommandService.deleteNewsById(user, originNews.getId());
+
+            // then
+            assertThat(response.id()).isEqualTo(originNews.getId());
+            assertThat(newsRepository.findById(originNews.getId())).isEmpty();
+            then(s3Service).should().deletePostImage(expectedImageUrl);
+        }
+    }
+
     private NewsCreateRequest createNewsCreateRequest() {
         return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
     }
