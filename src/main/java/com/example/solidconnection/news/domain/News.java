@@ -6,13 +6,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
-@NoArgsConstructor
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class News extends BaseEntity {
 
@@ -31,4 +34,17 @@ public class News extends BaseEntity {
     private String url;
 
     private long siteUserId;
+
+    public News(
+            String title,
+            String description,
+            String thumbnailUrl,
+            String url,
+            long siteUserId) {
+        this.title = title;
+        this.description = description;
+        this.thumbnailUrl = thumbnailUrl;
+        this.url = url;
+        this.siteUserId = siteUserId;
+    }
 }
