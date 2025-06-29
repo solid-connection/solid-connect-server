@@ -69,10 +69,10 @@ public class NewsController {
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
-    @DeleteMapping("/{news_id}")
+    @DeleteMapping("/{news-id}")
     public ResponseEntity<NewsCommandResponse> deleteNewsById(
             @AuthorizedUser SiteUser siteUser,
-            @PathVariable("news_id") Long newsId
+            @PathVariable("news-id") Long newsId
     ) {
         NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUser, newsId);
         return ResponseEntity.ok(newsCommandResponse);
