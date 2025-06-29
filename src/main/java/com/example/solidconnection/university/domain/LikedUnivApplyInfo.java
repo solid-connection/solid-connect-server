@@ -19,13 +19,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(uniqueConstraints = {
+@Table(
+        name = "liked_university_info_for_apply",
+        uniqueConstraints = {
         @UniqueConstraint(
                 name = "uk_liked_university_site_user_id_university_info_for_apply_id",
                 columnNames = {"site_user_id", "university_info_for_apply_id"}
         )
 })
-public class LikedUniversity {
+public class LikedUnivApplyInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

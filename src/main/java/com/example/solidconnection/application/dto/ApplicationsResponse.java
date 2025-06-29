@@ -3,7 +3,7 @@ package com.example.solidconnection.application.dto;
 import java.util.List;
 
 public record ApplicationsResponse(
-        List<UniversityApplicantsResponse> firstChoice,
-        List<UniversityApplicantsResponse> secondChoice,
-        List<UniversityApplicantsResponse> thirdChoice) {
+        List<ApplicantsResponse> firstChoice,
+        List<ApplicantsResponse> secondChoice,
+        List<ApplicantsResponse> thirdChoice) {
 }

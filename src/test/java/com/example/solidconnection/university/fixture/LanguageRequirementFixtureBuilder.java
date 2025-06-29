@@ -27,7 +27,7 @@ public class LanguageRequirementFixtureBuilder {
         return this;
     }
 
-    public LanguageRequirementFixtureBuilder universityInfoForApply(UnivApplyInfo univApplyInfo) {
+    public LanguageRequirementFixtureBuilder univApplyInfo(UnivApplyInfo univApplyInfo) {
         this.univApplyInfo = univApplyInfo;
         return this;
     }

@@ -4,11 +4,11 @@ import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityDetailResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponses;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
+import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class UniversityQueryService {
+public class UnivApplyInfoQueryService {
 
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final UniversityFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository; // todo: 구현체 숨기고 univApplyInfoRepository만 사용하도록
 
     @Value("${university.term}")
     public String term;
@@ -31,13 +31,13 @@ public class UniversityQueryService {
      * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "university:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityDetailResponse getUniversityDetail(Long universityInfoForApplyId) {
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UnivApplyInfoDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
-                = universityInfoForApplyRepository.getUniversityInfoForApplyById(universityInfoForApplyId);
+                = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         University university = univApplyInfo.getUniversity();
 
-        return UniversityDetailResponse.of(university, univApplyInfo);
+        return UnivApplyInfoDetailResponse.of(university, univApplyInfo);
     }
 
     /*
@@ -48,14 +48,14 @@ public class UniversityQueryService {
      *   - 언어 시험 점수는 합격 최소 점수보다 높은 것이 조건이다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "university:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UniversityInfoForApplyPreviewResponses searchUniversity(
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfo(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
 
-        return new UniversityInfoForApplyPreviewResponses(universityFilterRepository
-                .findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
+        return new UnivApplyInfoPreviewResponses(universityFilterRepository
+                .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
                 .stream()
-                .map(UniversityInfoForApplyPreviewResponse::from)
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList());
     }
 }

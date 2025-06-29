@@ -6,14 +6,14 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
 
-public record UniversityApplicantsResponse(
+public record ApplicantsResponse(
         String koreanName,
         int studentCapacity,
         String region,
         String country,
         List<ApplicantResponse> applicants) {
-    public static UniversityApplicantsResponse of(UnivApplyInfo univApplyInfo, List<Application> applications, SiteUser siteUser) {
-        return new UniversityApplicantsResponse(
+    public static ApplicantsResponse of(UnivApplyInfo univApplyInfo, List<Application> applications, SiteUser siteUser) {
+        return new ApplicantsResponse(
                 univApplyInfo.getKoreanName(),
                 univApplyInfo.getStudentCapacity(),
                 univApplyInfo.getUniversity().getRegion().getKoreanName(),

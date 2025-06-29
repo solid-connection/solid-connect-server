@@ -2,7 +2,7 @@ package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -15,14 +15,14 @@ import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_
 @RequiredArgsConstructor
 public class UnivApplyInfoFixtureBuilder {
 
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
 
     private String term;
     private String koreanName;
     private University university;
 
-    public UnivApplyInfoFixtureBuilder universityInfoForApply() {
-        return new UnivApplyInfoFixtureBuilder(universityInfoForApplyRepository);
+    public UnivApplyInfoFixtureBuilder univApplyInfo() {
+        return new UnivApplyInfoFixtureBuilder(univApplyInfoRepository);
     }
 
     public UnivApplyInfoFixtureBuilder term(String term) {
@@ -48,6 +48,6 @@ public class UnivApplyInfoFixtureBuilder {
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
                 new HashSet<>(), university
         );
-        return universityInfoForApplyRepository.save(univApplyInfo);
+        return univApplyInfoRepository.save(univApplyInfo);
     }
 }

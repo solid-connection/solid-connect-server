@@ -11,16 +11,16 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
-import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
+import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
-@DisplayName("공통 추천 대학 서비스 테스트")
-class GeneralUniversityRecommendServiceTest {
+@DisplayName("대학 지원 정보 공통 추천 서비스 테스트")
+class GeneralUnivApplyInfoRecommendServiceTest {
 
     @Autowired
-    private GeneralUniversityRecommendService generalUniversityRecommendService;
+    private GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
@@ -40,20 +40,20 @@ class GeneralUniversityRecommendServiceTest {
         univApplyInfoFixture.그라츠공과대학_지원_정보();
         univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
         univApplyInfoFixture.메이지대학_지원_정보();
-        generalUniversityRecommendService.init();
+        generalUnivApplyInfoRecommendService.init();
     }
 
     @Test
-    void 모집_시기의_대학들_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
+    void 모집_시기의_대학_지원_정보_중에서_랜덤하게_N개를_추천_목록으로_구성한다() {
         // given
-        List<UnivApplyInfo> universities = generalUniversityRecommendService.getRecommendUniversities();
+        List<UnivApplyInfo> universities = generalUnivApplyInfoRecommendService.getGeneralRecommends();
 
         // when & then
         assertAll(
                 () -> assertThat(universities)
                         .extracting("term")
                         .allMatch(term::equals),
-                () -> assertThat(universities).hasSize(RECOMMEND_UNIVERSITY_NUM)
+                () -> assertThat(universities).hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
         );
     }
 }

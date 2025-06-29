@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ValidUniversityChoiceValidator.class)
-public @interface ValidUniversityChoice {
+@Constraint(validatedBy = ValidUnivApplyInfoChoiceValidator.class)
+public @interface ValidUnivApplyInfoChoice {
 
     String message() default "유효하지 않은 지망 대학 선택입니다.";
     Class<?>[] groups() default {};
