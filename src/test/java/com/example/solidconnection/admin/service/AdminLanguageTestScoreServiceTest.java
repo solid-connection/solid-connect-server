@@ -4,7 +4,7 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;

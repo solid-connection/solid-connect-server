@@ -22,7 +22,7 @@ import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(of = "id")
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "university_info_for_apply")

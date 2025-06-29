@@ -5,7 +5,7 @@ import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;

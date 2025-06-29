@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.dto.validation;
 
 import com.example.solidconnection.admin.dto.ScoreUpdateRequest;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
