@@ -56,6 +56,17 @@ public class SiteUserFixture {
                 .create();
     }
 
+    public SiteUser 멘토(int index, String nickname) {
+        return siteUserFixtureBuilder.siteUser()
+                .email("mentor" + index + "@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname(nickname)
+                .profileImageUrl("profileImageUrl")
+                .role(Role.MENTOR)
+                .password("mentor123")
+                .create();
+    }
+
     public SiteUser 관리자() {
         return siteUserFixtureBuilder.siteUser()
                 .email("admin@example.com")
