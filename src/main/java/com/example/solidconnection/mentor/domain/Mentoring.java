@@ -1,7 +1,6 @@
 package com.example.solidconnection.mentor.domain;
 
 import com.example.solidconnection.common.VerifyStatus;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -10,8 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -50,15 +47,14 @@ public class Mentoring {
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "mentee_id")
-    private SiteUser siteUser;
-
     @Column(length = 500)
     private String rejectedReason;
 
-    @ManyToOne
-    private Mentor mentor;
+    @Column
+    private long mentorId;
+
+    @Column
+    private long menteeId;
 
     @PrePersist
     public void onPrePersist() {

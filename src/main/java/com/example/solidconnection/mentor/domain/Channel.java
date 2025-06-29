@@ -42,6 +42,6 @@ public class Channel {
     @Column(nullable = false, length = 500)
     private String url;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Mentor mentor;
 }

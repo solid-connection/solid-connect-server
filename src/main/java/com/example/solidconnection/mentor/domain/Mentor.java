@@ -1,17 +1,19 @@
 package com.example.solidconnection.mentor.domain;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.University;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,9 +37,12 @@ public class Mentor {
     @Column(length = 1000)
     private String passTip;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    @Column
+    private long siteUserId;
 
-    @ManyToOne
-    private University university;
+    @Column
+    private long universityId;
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Channel> channels = new ArrayList<>();
 }
