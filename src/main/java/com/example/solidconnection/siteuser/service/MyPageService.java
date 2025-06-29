@@ -39,8 +39,8 @@ public class MyPageService {
      * */
     @Transactional(readOnly = true)
     public MyPageResponse getMyPageInfo(SiteUser siteUser) {
-        int likedUniversityCount = likedUnivApplyInfoRepository.countBySiteUser_Id(siteUser.getId());
-        return MyPageResponse.of(siteUser, likedUniversityCount);
+        int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUser_Id(siteUser.getId());
+        return MyPageResponse.of(siteUser, likedUnivApplyInfoCount);
     }
 
     /*

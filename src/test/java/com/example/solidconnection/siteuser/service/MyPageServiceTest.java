@@ -75,7 +75,7 @@ class MyPageServiceTest {
     @Test
     void 마이페이지_정보를_조회한다() {
         // given
-        int likedUniversityCount = createLikedUnivApplyInfos(user);
+        int likedUnivApplyInfoCount = createLikedUnivApplyInfos(user);
 
         // when
         MyPageResponse response = myPageService.getMyPageInfo(user);
@@ -87,12 +87,12 @@ class MyPageServiceTest {
                 () -> assertThat(response.role()).isEqualTo(user.getRole()),
                 () -> assertThat(response.email()).isEqualTo(user.getEmail()),
                 () -> assertThat(response.likedPostCount()).isEqualTo(user.getPostLikeList().size()),
-                () -> assertThat(response.likedUniversityCount()).isEqualTo(likedUniversityCount)
+                () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount)
         );
     }
 
     @Test
-    void 관심_대학교_목록을_조회한다() {
+    void 관심_대학_지원_정보_목록을_조회한다() {
         // given
         int likedUnivApplyInfo = createLikedUnivApplyInfos(user);
 
