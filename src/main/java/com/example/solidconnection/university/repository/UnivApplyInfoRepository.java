@@ -3,7 +3,6 @@ package com.example.solidconnection.university.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,24 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 
 @Repository
 public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long>, UnivApplyInfoFilterRepository {
-
-    Optional<UnivApplyInfo> findByIdAndTerm(Long id, String term);
-
-    Optional<UnivApplyInfo> findFirstByKoreanNameAndTerm(String koreanName, String term);
-
-    @Query("""
-            SELECT uai
-            FROM UnivApplyInfo uai
-            WHERE uai.university IN :universities
-                AND uai.term = :term
-            """)
-    List<UnivApplyInfo> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
             SELECT uai
@@ -73,14 +59,4 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
             WHERE uai.id IN :ids
             """)
     List<UnivApplyInfo> findAllByIds(@Param("ids") List<Long> ids);
-
-    @Query("""
-            SELECT DISTINCT uai
-            FROM UnivApplyInfo uai
-            JOIN FETCH uai.university u
-            JOIN FETCH u.country c
-            JOIN FETCH u.region r
-            WHERE u.id IN :universityIds
-            """)
-    List<UnivApplyInfo> findByUniversityIdsWithUniversityAndLocation(@Param("universityIds") List<Long> universityIds);
 }
