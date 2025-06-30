@@ -71,3 +71,5 @@ jwt:
 cors:
   allowed-origins:
     - "http://localhost:8080"
+news:
+  default-thumbnail-url: "default-thumbnail-url"

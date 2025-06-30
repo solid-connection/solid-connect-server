@@ -1,6 +1,7 @@
 package com.example.solidconnection.news.service;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.news.config.NewsProperties;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
@@ -29,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 생성/수정/삭제 서비스 테스트")
@@ -38,6 +39,9 @@ class NewsCommandServiceTest {
 
     @Autowired
     private NewsCommandService newsCommandService;
+
+    @Autowired
+    private NewsProperties newsProperties;
 
     @MockBean
     private S3Service s3Service;
@@ -82,8 +86,7 @@ class NewsCommandServiceTest {
     @Nested
     class 소식지_수정_테스트 {
 
-        private final String CUSTOM_IMAGE_URL = "news/custom-image-url";
-        private final String DEFAULT_IMAGE_URL = "news/default-logo.png";
+        private static final String CUSTOM_IMAGE_URL = "news/custom-image-url";
 
         private News originNews;
 
@@ -225,7 +228,7 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(response.id()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(DEFAULT_IMAGE_URL);
+                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl());
                 then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL);
                 then(s3Service).should(never()).uploadFile(null, ImgType.NEWS);
             }
@@ -263,7 +266,7 @@ class NewsCommandServiceTest {
 
             @BeforeEach
             void setUp() {
-                originNews = newsFixture.소식지(user.getId(), DEFAULT_IMAGE_URL);
+                originNews = newsFixture.소식지(user.getId(), newsProperties.defaultThumbnailUrl());
             }
 
             @Test
@@ -284,8 +287,8 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(originNews.getId()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(DEFAULT_IMAGE_URL);
-                then(s3Service).should(never()).deletePostImage(DEFAULT_IMAGE_URL);
+                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl());
+                then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl());
                 then(s3Service).should(never()).uploadFile(any(), any());
             }
 
@@ -308,7 +311,7 @@ class NewsCommandServiceTest {
                 // then
                 News savedNews = newsRepository.findById(originNews.getId()).orElseThrow();
                 assertThat(savedNews.getThumbnailUrl()).isEqualTo(newImageUrl);
-                then(s3Service).should(never()).deletePostImage(DEFAULT_IMAGE_URL);
+                then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl());
                 then(s3Service).should().uploadFile(any(), any());
             }
         }

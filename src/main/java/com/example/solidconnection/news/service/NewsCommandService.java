@@ -1,6 +1,7 @@
 package com.example.solidconnection.news.service;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.news.config.NewsProperties;
 import com.example.solidconnection.news.domain.News;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
@@ -23,10 +24,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FO
 @RequiredArgsConstructor
 public class NewsCommandService {
 
-    // todo: default 이미지 URL을 설정하는 로직 필요
-    private static final String DEFAULT_IMAGE_URL = "news/default-logo.png";
-
     private final S3Service s3Service;
+    private final NewsProperties newsProperties;
     private final NewsRepository newsRepository;
 
     @Transactional
@@ -67,7 +66,7 @@ public class NewsCommandService {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
             return uploadedFile.fileUrl();
         }
-        return DEFAULT_IMAGE_URL;
+        return newsProperties.defaultThumbnailUrl();
     }
 
     private void validateOwnership(News news, Long siteUserId) {
@@ -99,7 +98,7 @@ public class NewsCommandService {
     private void updateThumbnail(News news, MultipartFile imageFile, Boolean resetToDefaultImage) {
         if (Boolean.TRUE.equals(resetToDefaultImage)) {
             deleteCustomImage(news.getThumbnailUrl());
-            news.updateThumbnailUrl(DEFAULT_IMAGE_URL);
+            news.updateThumbnailUrl(newsProperties.defaultThumbnailUrl());
         }
         else if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
@@ -109,7 +108,7 @@ public class NewsCommandService {
     }
 
     private void deleteCustomImage(String imageUrl) {
-        if (!DEFAULT_IMAGE_URL.equals(imageUrl)) {
+        if (!newsProperties.defaultThumbnailUrl().equals(imageUrl)) {
             s3Service.deletePostImage(imageUrl);
         }
     }
