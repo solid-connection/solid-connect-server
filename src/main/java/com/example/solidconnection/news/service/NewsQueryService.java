@@ -1,8 +1,8 @@
 package com.example.solidconnection.news.service;
 
 import com.example.solidconnection.news.domain.News;
-import com.example.solidconnection.news.dto.NewsItemResponse;
 import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsListResponse;
 import com.example.solidconnection.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,11 @@ public class NewsQueryService {
     private final NewsRepository newsRepository;
 
     @Transactional(readOnly = true)
-    public NewsResponse findNewsBySiteUserId(Long siteUserId) {
+    public NewsListResponse findNewsBySiteUserId(Long siteUserId) {
         List<News> newsList = newsRepository.findAllBySiteUserIdOrderByUpdatedAtDesc(siteUserId);
-        List<NewsItemResponse> newsItemsResponseList = newsList.stream()
-                .map(NewsItemResponse::from)
+        List<NewsResponse> newsResponseList = newsList.stream()
+                .map(NewsResponse::from)
                 .toList();
-        return NewsResponse.from(newsItemsResponseList);
+        return NewsListResponse.from(newsResponseList);
     }
 }

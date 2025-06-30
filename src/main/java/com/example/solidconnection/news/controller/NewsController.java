@@ -3,7 +3,7 @@ package com.example.solidconnection.news.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
-import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsListResponse;
 import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.service.NewsCommandService;
 import com.example.solidconnection.news.service.NewsQueryService;
@@ -34,11 +34,11 @@ public class NewsController {
 
     // todo: 추후 Slice 적용
     @GetMapping
-    public ResponseEntity<NewsResponse> findNewsBySiteUserId(
+    public ResponseEntity<NewsListResponse> findNewsBySiteUserId(
             @RequestParam(value = "site-user-id") Long siteUserId
     ) {
-        NewsResponse newsResponse = newsQueryService.findNewsBySiteUserId(siteUserId);
-        return ResponseEntity.ok(newsResponse);
+        NewsListResponse newsListResponse = newsQueryService.findNewsBySiteUserId(siteUserId);
+        return ResponseEntity.ok(newsListResponse);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})

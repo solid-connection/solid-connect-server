@@ -1,8 +1,8 @@
 package com.example.solidconnection.news.service;
 
 import com.example.solidconnection.news.domain.News;
-import com.example.solidconnection.news.dto.NewsItemResponse;
 import com.example.solidconnection.news.dto.NewsResponse;
+import com.example.solidconnection.news.dto.NewsListResponse;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -40,12 +40,12 @@ class NewsQueryServiceTest {
         List<News> newsList = List.of(news1, news2);
 
         // when
-        NewsResponse response = newsQueryService.findNewsBySiteUserId(user1.getId());
+        NewsListResponse response = newsQueryService.findNewsBySiteUserId(user1.getId());
 
         // then
-        assertThat(response.newsItemsResponseList()).hasSize(newsList.size());
-        assertThat(response.newsItemsResponseList())
-                .extracting(NewsItemResponse::updatedAt)
+        assertThat(response.newsResponseList()).hasSize(newsList.size());
+        assertThat(response.newsResponseList())
+                .extracting(NewsResponse::updatedAt)
                 .isSortedAccordingTo(Comparator.reverseOrder());
     }
 }

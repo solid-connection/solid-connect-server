@@ -1,11 +1,25 @@
 package com.example.solidconnection.news.dto;
 
-import java.util.List;
+import com.example.solidconnection.news.domain.News;
+
+import java.time.ZonedDateTime;
 
 public record NewsResponse(
-        List<NewsItemResponse> newsItemsResponseList
+        long id,
+        String title,
+        String description,
+        String thumbnailUrl,
+        String url,
+        ZonedDateTime updatedAt
 ) {
-    public static NewsResponse from(List<NewsItemResponse> newsItemsResponseList) {
-        return new NewsResponse(newsItemsResponseList);
+    public static NewsResponse from(News news) {
+        return new NewsResponse(
+                news.getId(),
+                news.getTitle(),
+                news.getDescription(),
+                news.getThumbnailUrl(),
+                news.getUrl(),
+                news.getUpdatedAt()
+        );
     }
 }
