@@ -45,7 +45,7 @@ public class NewsCommandService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
         validateOwnership(news, siteUserId);
-        updateNews(news, newsUpdateRequest);
+        news.updateNews(newsUpdateRequest.title(), newsUpdateRequest.description(), newsUpdateRequest.url());
         updateThumbnail(news, imageFile, newsUpdateRequest.resetToDefaultImage());
         News savedNews = newsRepository.save(news);
         return NewsCommandResponse.from(savedNews);
@@ -83,18 +83,6 @@ public class NewsCommandService {
         }
     }
 
-    private void updateNews(News news, NewsUpdateRequest request) {
-        if (hasValue(request.title())) {
-            news.updateTitle(request.title());
-        }
-        if (hasValue(request.description())) {
-            news.updateDescription(request.description());
-        }
-        if (hasValue(request.url())) {
-            news.updateUrl(request.url());
-        }
-    }
-
     private void updateThumbnail(News news, MultipartFile imageFile, Boolean resetToDefaultImage) {
         if (Boolean.TRUE.equals(resetToDefaultImage)) {
             deleteCustomImage(news.getThumbnailUrl());
@@ -111,9 +99,5 @@ public class NewsCommandService {
         if (!newsProperties.defaultThumbnailUrl().equals(imageUrl)) {
             s3Service.deletePostImage(imageUrl);
         }
-    }
-
-    private boolean hasValue(String value) {
-        return value != null && !value.trim().isEmpty();
     }
 }

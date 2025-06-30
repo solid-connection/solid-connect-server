@@ -48,15 +48,9 @@ public class News extends BaseEntity {
         this.siteUserId = siteUserId;
     }
 
-    public void updateTitle(String title) {
+    public void updateNews(String title, String description, String url) {
         this.title = title;
-    }
-
-    public void updateDescription(String description) {
         this.description = description;
-    }
-
-    public void updateUrl(String url) {
         this.url = url;
     }
 

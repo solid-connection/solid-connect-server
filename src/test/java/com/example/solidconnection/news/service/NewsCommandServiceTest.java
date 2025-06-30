@@ -132,56 +132,6 @@ class NewsCommandServiceTest {
             }
 
             @Test
-            void 소식지_제목만_수정한다() {
-                // given
-                String expectedTitle = "제목 수정";
-                String originalDescription = originNews.getDescription();
-                String originalUrl = originNews.getUrl();
-                String originalThumbnailUrl = originNews.getThumbnailUrl();
-                NewsUpdateRequest request = createNewsUpdateRequest(
-                        expectedTitle,
-                        null,
-                        null,
-                        null);
-
-                // when
-                NewsCommandResponse response = newsCommandService.updateNews(
-                        user.getId(),
-                        originNews.getId(),
-                        request,
-                        null);
-
-                // then
-                News savedNews = newsRepository.findById(response.id()).orElseThrow();
-                assertAll(
-                        () -> assertThat(savedNews.getTitle()).isEqualTo(expectedTitle),
-                        () -> assertThat(savedNews.getDescription()).isEqualTo(originalDescription),
-                        () -> assertThat(savedNews.getUrl()).isEqualTo(originalUrl),
-                        () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(originalThumbnailUrl)
-                );
-            }
-
-            @Test
-            void 공백으로_수정시_수정되지_않는다() {
-                // given
-                NewsUpdateRequest request = createNewsUpdateRequest("   ", "    ", null, null);
-
-                // when
-                NewsCommandResponse response = newsCommandService.updateNews(
-                        user.getId(),
-                        originNews.getId(),
-                        request,
-                        null);
-
-                // then
-                News savedNews = newsRepository.findById(response.id()).orElseThrow();
-                assertAll(
-                        () -> assertThat(savedNews.getTitle()).isEqualTo(originNews.getTitle()),
-                        () -> assertThat(savedNews.getDescription()).isEqualTo(originNews.getDescription())
-                );
-            }
-
-            @Test
             void 다른_사용자의_소식지를_수정하면_예외_응답을_반환한다() {
                 // given
                 SiteUser anotherUser = siteUserFixture.멘토(2, "anotherMentor");
