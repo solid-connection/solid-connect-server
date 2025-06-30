@@ -7,14 +7,12 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_FOUND;
 
-@Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     boolean existsByNicknameForApply(String nicknameForApply);

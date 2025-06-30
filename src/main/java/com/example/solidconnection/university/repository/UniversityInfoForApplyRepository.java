@@ -7,14 +7,12 @@ import com.example.solidconnection.university.domain.University;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND;
 
-@Repository
 public interface UniversityInfoForApplyRepository extends JpaRepository<UnivApplyInfo, Long> {
 
     Optional<UnivApplyInfo> findByIdAndTerm(Long id, String term);
