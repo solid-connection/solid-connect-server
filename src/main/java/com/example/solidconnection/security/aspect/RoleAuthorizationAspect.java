@@ -29,15 +29,11 @@ public class RoleAuthorizationAspect {
                 break;
             }
         }
-
         if (siteUser == null) {
             throw new CustomException(ACCESS_DENIED);
         }
-
-        final SiteUser finalSiteUser = siteUser;
         Role[] allowedRoles = requireRoleAccess.roles();
-        boolean hasAccess = Arrays.stream(allowedRoles)
-                .anyMatch(role -> role.equals(finalSiteUser.getRole()));
+        boolean hasAccess = Arrays.asList(allowedRoles).contains(siteUser.getRole());
         if (!hasAccess) {
             throw new CustomException(ACCESS_DENIED);
         }
