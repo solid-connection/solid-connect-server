@@ -30,7 +30,7 @@ class NewsQueryServiceTest {
     private NewsFixture newsFixture;
 
     @Test
-    void 특정_멘토의_소식지_목록을_성공적으로_조회한다() {
+    void 특정_사용자의_소식지_목록을_성공적으로_조회한다() {
         // given
         SiteUser user1 = siteUserFixture.멘토(1, "mentor1");
         SiteUser user2 = siteUserFixture.멘토(2, "mentor2");
