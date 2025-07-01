@@ -36,6 +36,14 @@ public class NewsCommandService {
         return NewsCommandResponse.from(savedNews);
     }
 
+    private String getImageUrl(MultipartFile imageFile) {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
+            return uploadedFile.fileUrl();
+        }
+        return newsProperties.defaultThumbnailUrl();
+    }
+
     @Transactional
     public NewsCommandResponse updateNews(
             long siteUserId,
@@ -51,34 +59,8 @@ public class NewsCommandService {
         return NewsCommandResponse.from(savedNews);
     }
 
-    @Transactional
-    public NewsCommandResponse deleteNewsById(SiteUser siteUser, Long newsId) {
-        News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
-        validatePermission(siteUser, news);
-        deleteCustomImage(news.getThumbnailUrl());
-        newsRepository.delete(news);
-        return NewsCommandResponse.from(news);
-    }
-
-    private String getImageUrl(MultipartFile imageFile) {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
-            return uploadedFile.fileUrl();
-        }
-        return newsProperties.defaultThumbnailUrl();
-    }
-
     private void validateOwnership(News news, long siteUserId) {
         if (news.getSiteUserId() != siteUserId) {
-            throw new CustomException(INVALID_NEWS_ACCESS);
-        }
-    }
-
-    private void validatePermission(SiteUser currentUser, News news) {
-        boolean isOwner = news.getSiteUserId() == currentUser.getId();
-        boolean isAdmin = currentUser.getRole().equals(Role.ADMIN);
-        if (!isOwner && !isAdmin) {
             throw new CustomException(INVALID_NEWS_ACCESS);
         }
     }
@@ -92,6 +74,24 @@ public class NewsCommandService {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
             deleteCustomImage(news.getThumbnailUrl());
             news.updateThumbnailUrl(uploadedFile.fileUrl());
+        }
+    }
+
+    @Transactional
+    public NewsCommandResponse deleteNewsById(SiteUser siteUser, Long newsId) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
+        validatePermission(siteUser, news);
+        deleteCustomImage(news.getThumbnailUrl());
+        newsRepository.delete(news);
+        return NewsCommandResponse.from(news);
+    }
+
+    private void validatePermission(SiteUser currentUser, News news) {
+        boolean isOwner = news.getSiteUserId() == currentUser.getId();
+        boolean isAdmin = currentUser.getRole().equals(Role.ADMIN);
+        if (!isOwner && !isAdmin) {
+            throw new CustomException(INVALID_NEWS_ACCESS);
         }
     }
 

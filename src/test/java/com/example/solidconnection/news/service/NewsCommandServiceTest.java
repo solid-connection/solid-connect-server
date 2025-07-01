@@ -83,6 +83,10 @@ class NewsCommandServiceTest {
         }
     }
 
+    private NewsCreateRequest createNewsCreateRequest() {
+        return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
+    }
+
     @Nested
     class 소식지_수정_테스트 {
 
@@ -275,6 +279,19 @@ class NewsCommandServiceTest {
         }
     }
 
+    private NewsUpdateRequest createNewsUpdateRequest(String title, String description, String url, Boolean resetToDefaultImage) {
+        return new NewsUpdateRequest(title, description, url, resetToDefaultImage);
+    }
+
+    private MockMultipartFile createImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
     @Nested
     class 소식지_삭제_테스트 {
 
@@ -294,22 +311,5 @@ class NewsCommandServiceTest {
                     () -> then(s3Service).should().deletePostImage(expectedImageUrl)
             );
         }
-    }
-
-    private NewsCreateRequest createNewsCreateRequest() {
-        return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
-    }
-
-    private NewsUpdateRequest createNewsUpdateRequest(String title, String description, String url, Boolean resetToDefaultImage) {
-        return new NewsUpdateRequest(title, description, url, resetToDefaultImage);
-    }
-
-    private MockMultipartFile createImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
     }
 }
