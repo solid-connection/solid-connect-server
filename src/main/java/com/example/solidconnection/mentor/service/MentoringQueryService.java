@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
+import com.example.solidconnection.mentor.dto.MentoringCountResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
@@ -32,5 +33,15 @@ public class MentoringQueryService {
         return mentorings.stream()
                 .map(MentoringResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public MentoringCountResponse getNewMentoringsCount(Long siteUserId) {
+        Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
+                .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+
+        int count = mentoringRepository.countByMentorIdAndCheckedAtIsNull(mentor.getId());
+
+        return MentoringCountResponse.from(count);
     }
 }

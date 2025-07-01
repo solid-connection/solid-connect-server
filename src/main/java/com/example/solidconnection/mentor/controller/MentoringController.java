@@ -6,6 +6,7 @@ import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
 import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
+import com.example.solidconnection.mentor.dto.MentoringCountResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
@@ -69,5 +70,13 @@ public class MentoringController {
     ) {
         MentoringCheckResponse response = mentoringCommandService.checkMentoring(siteUser.getId(), mentoringId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<MentoringCountResponse> getNewMentoringsCount(
+            @AuthorizedUser SiteUser siteUser
+    ) {
+        MentoringCountResponse responses = mentoringQueryService.getNewMentoringsCount(siteUser.getId());
+        return ResponseEntity.ok(responses);
     }
 }
