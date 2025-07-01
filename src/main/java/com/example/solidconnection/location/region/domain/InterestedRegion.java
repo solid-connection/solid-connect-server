@@ -1,13 +1,7 @@
 package com.example.solidconnection.location.region.domain;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,14 +21,14 @@ public class InterestedRegion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    @Column(name="site_user_id")
+    private long siteUserId;
 
-    @ManyToOne
-    private Region region;
+    @Column(name="region_code")
+    private String regionCode;
 
     public InterestedRegion(SiteUser siteUser, Region region) {
-        this.siteUser = siteUser;
-        this.region = region;
+        this.siteUserId = siteUser.getId();
+        this.regionCode = region.getCode();
     }
 }

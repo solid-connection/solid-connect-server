@@ -38,21 +38,12 @@ public class LanguageTestScore extends BaseEntity {
 
     private String rejectedReason;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    private long siteUserId;
 
     public LanguageTestScore(LanguageTest languageTest, SiteUser siteUser) {
         this.languageTest = languageTest;
         this.verifyStatus = VerifyStatus.PENDING;
-        this.siteUser = siteUser;
-    }
-
-    public void setSiteUser(SiteUser siteUser) {
-        if (this.siteUser != null) {
-            this.siteUser.getLanguageTestScoreList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getLanguageTestScoreList().add(this);
+        this.siteUserId = siteUser.getId();
     }
 
     public void updateLanguageTestScore(LanguageTest languageTest, VerifyStatus verifyStatus, String rejectedReason) {

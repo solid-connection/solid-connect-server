@@ -50,7 +50,7 @@ public class ApplicationSubmissionService {
         Long secondChoiceUniversityId = universityChoiceRequest.secondChoiceUniversityId();
         Long thirdChoiceUniversityId = universityChoiceRequest.thirdChoiceUniversityId();
 
-        Optional<Application> existingApplication = applicationRepository.findBySiteUserAndTerm(siteUser, term);
+        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTerm(siteUser.getId(), term);
         int updateCount = existingApplication
                 .map(application -> {
                     validateUpdateLimitNotExceed(application);
@@ -78,7 +78,7 @@ public class ApplicationSubmissionService {
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
-        GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserAndId(siteUser, gpaScoreId)
+        GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserIdAndId(siteUser.getId(), gpaScoreId)
                 .orElseThrow(() -> new CustomException(GPA_SCORE_NOT_FOUND));
         if (gpaScore.getVerifyStatus() != VerifyStatus.APPROVED) {
             throw new CustomException(INVALID_GPA_SCORE_STATUS);
@@ -88,7 +88,7 @@ public class ApplicationSubmissionService {
 
     private LanguageTestScore getValidLanguageTestScore(SiteUser siteUser, Long languageTestScoreId) {
         LanguageTestScore languageTestScore = languageTestScoreRepository
-                .findLanguageTestScoreBySiteUserAndId(siteUser, languageTestScoreId)
+                .findLanguageTestScoreBySiteUserIdAndId(siteUser.getId(), languageTestScoreId)
                 .orElseThrow(() -> new CustomException(INVALID_LANGUAGE_TEST_SCORE));
         if (languageTestScore.getVerifyStatus() != VerifyStatus.APPROVED) {
             throw new CustomException(INVALID_LANGUAGE_TEST_SCORE_STATUS);

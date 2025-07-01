@@ -37,6 +37,6 @@ public class CountryFixtureBuilder {
 
     public Country findOrCreate() {
         return countryRepositoryForTest.findByCode(code)
-                .orElseGet(() -> countryRepositoryForTest.save(new Country(code, koreanName, region)));
+                .orElseGet(() -> countryRepositoryForTest.save(new Country(code, koreanName, region.getCode())));
     }
 }

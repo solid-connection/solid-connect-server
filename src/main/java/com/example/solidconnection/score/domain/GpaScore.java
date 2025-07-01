@@ -38,22 +38,13 @@ public class GpaScore extends BaseEntity {
 
     private String rejectedReason;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    private long siteUserId;
 
     public GpaScore(Gpa gpa, SiteUser siteUser) {
         this.gpa = gpa;
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.verifyStatus = VerifyStatus.PENDING;
         this.rejectedReason = null;
-    }
-
-    public void setSiteUser(SiteUser siteUser) {
-        if (this.siteUser != null) {
-            this.siteUser.getGpaScoreList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getGpaScoreList().add(this);
     }
 
     public void updateGpaScore(Gpa gpa, VerifyStatus verifyStatus, String rejectedReason) {

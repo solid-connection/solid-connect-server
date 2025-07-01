@@ -30,24 +30,22 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<UnivAppl
     List<UnivApplyInfo> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
-            SELECT uifa
-            FROM UnivApplyInfo uifa
-            JOIN University u ON uifa.university = u
-            WHERE (u.country.code IN (
-                      SELECT c.code
-                      FROM InterestedCountry ic
-                      JOIN ic.country c
-                      WHERE ic.siteUser = :siteUser
-                  )
-                  OR u.region.code IN (
-                      SELECT r.code
-                      FROM InterestedRegion ir
-                      JOIN ir.region r
-                      WHERE ir.siteUser = :siteUser
-                  ))
-                  AND uifa.term = :term
-            """)
-    List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
+        SELECT uifa
+        FROM UnivApplyInfo uifa
+        JOIN University u ON uifa.university = u
+        WHERE (u.country IN (
+                  SELECT ic.countryCode
+                  FROM InterestedCountry ic
+                  WHERE ic.siteUserId = :siteUserId
+              )
+              OR u.region IN (
+                  SELECT ir.regionCode
+                  FROM InterestedRegion ir
+                  WHERE ir.siteUserId = :siteUserId
+              ))
+              AND uifa.term = :term
+        """)
+    List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
 
     @Query(value = """
                 SELECT *

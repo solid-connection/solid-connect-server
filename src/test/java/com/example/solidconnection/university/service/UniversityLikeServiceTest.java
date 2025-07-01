@@ -61,8 +61,8 @@ class UniversityLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
-                            user, 괌대학_A_지원_정보
+                    () -> assertThat(likedUniversityRepository.findBySiteUserIdAndUnivApplyInfoId(
+                            user.getId(), 괌대학_A_지원_정보.getId()
                     )).isPresent()
             );
         }
@@ -93,8 +93,8 @@ class UniversityLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
-                    () -> assertThat(likedUniversityRepository.findBySiteUserAndUnivApplyInfo(
-                            user, 괌대학_A_지원_정보
+                    () -> assertThat(likedUniversityRepository.findBySiteUserIdAndUnivApplyInfoId(
+                            user.getId(), 괌대학_A_지원_정보.getId()
                     )).isEmpty()
             );
         }
@@ -153,8 +153,8 @@ class UniversityLikeServiceTest {
 
     private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         LikedUniversity likedUniversity = LikedUniversity.builder()
-                .siteUser(siteUser)
-                .univApplyInfo(univApplyInfo)
+                .siteUserId(siteUser.getId())
+                .univApplyInfoId(univApplyInfo.getId())
                 .build();
         likedUniversityRepository.save(likedUniversity);
     }

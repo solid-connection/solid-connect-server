@@ -88,12 +88,6 @@ public class SiteUser {
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> postLikeList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LanguageTestScore> languageTestScoreList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GpaScore> gpaScoreList = new ArrayList<>();
-
     public SiteUser(
             String email,
             String nickname,

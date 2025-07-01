@@ -193,14 +193,14 @@ class MyPageServiceTest {
     }
 
     private int createLikedUniversities(SiteUser testUser) {
-        LikedUniversity likedUniversity1 = new LikedUniversity(null, univApplyInfoFixture.괌대학_A_지원_정보(), testUser);
-        LikedUniversity likedUniversity2 = new LikedUniversity(null, univApplyInfoFixture.메이지대학_지원_정보(), testUser);
-        LikedUniversity likedUniversity3 = new LikedUniversity(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(), testUser);
+        LikedUniversity likedUniversity1 = new LikedUniversity(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
+        LikedUniversity likedUniversity2 = new LikedUniversity(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
+        LikedUniversity likedUniversity3 = new LikedUniversity(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
 
         likedUniversityRepository.save(likedUniversity1);
         likedUniversityRepository.save(likedUniversity2);
         likedUniversityRepository.save(likedUniversity3);
-        return likedUniversityRepository.countBySiteUser_Id(testUser.getId());
+        return likedUniversityRepository.countBySiteUserId(testUser.getId());
     }
 
     private MockMultipartFile createValidImageFile() {

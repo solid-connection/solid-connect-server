@@ -37,7 +37,7 @@ public class UniversityRecommendService {
     public UniversityRecommendsResponse getPersonalRecommends(SiteUser siteUser) {
         // 맞춤 추천 대학교를 불러온다.
         List<UnivApplyInfo> personalRecommends = universityInfoForApplyRepository
-                .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser, term);
+                .findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(siteUser.getId(), term);
         List<UnivApplyInfo> trimmedRecommendUniversities
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIVERSITY_NUM, personalRecommends.size()));
         Collections.shuffle(trimmedRecommendUniversities);

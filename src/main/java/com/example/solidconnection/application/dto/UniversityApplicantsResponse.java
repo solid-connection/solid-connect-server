@@ -24,6 +24,6 @@ public record UniversityApplicantsResponse(
     }
 
     private static boolean isUsers(Application application, SiteUser siteUser) {
-        return application.getSiteUser().getId().equals(siteUser.getId());
+        return application.getSiteUserId() == siteUser.getId();
     }
 }

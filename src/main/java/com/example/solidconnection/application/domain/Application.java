@@ -74,15 +74,15 @@ public class Application {
     @Column(name = "third_choice_university_info_for_apply_id")
     private Long thirdChoiceUnivApplyInfoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private SiteUser siteUser;
+    @Column(name = "site_user_id")
+    private long siteUserId;
 
     public Application(
             SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
             String term) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
@@ -100,7 +100,7 @@ public class Application {
             Long secondChoiceUnivApplyInfoId,
             Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
@@ -121,7 +121,7 @@ public class Application {
             Long secondChoiceUnivApplyInfoId,
             Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;

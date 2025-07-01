@@ -22,7 +22,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @Query("""
             SELECT a
             FROM Application a
-            JOIN FETCH a.siteUser
             WHERE (a.firstChoiceUnivApplyInfoId IN :universityIds
                 OR a.secondChoiceUnivApplyInfoId IN :universityIds
                 OR a.thirdChoiceUnivApplyInfoId IN :universityIds)
@@ -30,19 +29,20 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                 AND a.term = :term
                 AND a.isDelete = false
             """)
-    List<Application> findAllByUnivApplyInfoIds(@Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
+    List<Application> findAllByUnivApplyInfoIds(
+            @Param("universityIds") List<Long> universityIds, @Param("status") VerifyStatus status, @Param("term") String term);
 
     @Query("""
             SELECT a
             FROM Application a
-            WHERE a.siteUser = :siteUser
+            WHERE a.siteUserId = :siteUserId
                 AND a.term = :term
                 AND a.isDelete = false
             """)
-    Optional<Application> findBySiteUserAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
+    Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
 
-    default Application getApplicationBySiteUserAndTerm(SiteUser siteUser, String term) {
-        return findBySiteUserAndTerm(siteUser, term)
+    default Application getApplicationBySiteUserIdAndTerm(Long siteUserId, String term) {
+        return findBySiteUserIdAndTerm(siteUserId, term)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 }

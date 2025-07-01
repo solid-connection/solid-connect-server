@@ -32,17 +32,15 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
-        QRegion region = QRegion.region;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
         return queryFactory
                 .selectFrom(univApplyInfo)
                 .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
-                .join(country.region, region).fetchJoin()
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
-                        regionCodeEq(region, regionCode)
+                        regionCodeEq(country, regionCode)
                                 .and(countryOrUniversityContainsKeyword(country, university, keywords))
                 )
                 .distinct()
@@ -50,11 +48,8 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
 
-    private BooleanExpression regionCodeEq(QRegion region, String regionCode) {
-        if (regionCode == null || regionCode.isEmpty()) {
-            return Expressions.asBoolean(true).isTrue();
-        }
-        return region.code.eq(regionCode);
+    private BooleanExpression regionCodeEq(QCountry country, String regionCode) {
+        return regionCode != null ? country.regionCode.eq(regionCode) : null;
     }
 
     private BooleanExpression countryOrUniversityContainsKeyword(QCountry country, QUniversity university, List<String> keywords) {
@@ -86,7 +81,7 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
                 .join(univApplyInfo.university, university)
                 .join(university.country, country)
                 .join(university.region, region)
-                .where(regionCodeEq(region, regionCode)
+                .where(regionCodeEq(country, regionCode)
                         .and(countryOrUniversityContainsKeyword(country, university, keywords))
                         .and(univApplyInfo.term.eq(term)))
                 .fetch();

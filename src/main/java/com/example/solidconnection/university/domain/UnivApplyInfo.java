@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -76,13 +77,15 @@ public class UnivApplyInfo {
     @Column(length = 1000)
     private String details;
 
-    @OneToMany(mappedBy = "univApplyInfo", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "univApplyInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private University university;
 
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
         this.languageRequirements.add(languageRequirements);
     }
+
+
 }
