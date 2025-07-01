@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 조회 서비스 테스트")
@@ -43,9 +44,11 @@ class NewsQueryServiceTest {
         NewsListResponse response = newsQueryService.findNewsBySiteUserId(user1.getId());
 
         // then
-        assertThat(response.newsResponseList()).hasSize(newsList.size());
-        assertThat(response.newsResponseList())
+        assertAll(
+                () -> assertThat(response.newsResponseList()).hasSize(newsList.size()),
+                () -> assertThat(response.newsResponseList())
                 .extracting(NewsResponse::updatedAt)
-                .isSortedAccordingTo(Comparator.reverseOrder());
+                .isSortedAccordingTo(Comparator.reverseOrder())
+        );
     }
 }

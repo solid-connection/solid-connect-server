@@ -178,9 +178,11 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(response.id()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl());
-                then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL);
-                then(s3Service).should(never()).uploadFile(null, ImgType.NEWS);
+                assertAll(
+                        () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl()),
+                        () -> then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL),
+                        () -> then(s3Service).should(never()).uploadFile(null, ImgType.NEWS)
+                );
             }
 
             @Test
@@ -205,9 +207,11 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(response.id()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newImageUrl);
-                then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL);
-                then(s3Service).should().uploadFile(any(), any());
+                assertAll(
+                        () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newImageUrl),
+                        () -> then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL),
+                        () -> then(s3Service).should().uploadFile(any(), any())
+                );
             }
         }
 
@@ -237,9 +241,11 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(originNews.getId()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl());
-                then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl());
-                then(s3Service).should(never()).uploadFile(any(), any());
+                assertAll(
+                        () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl()),
+                        () -> then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl()),
+                        () -> then(s3Service).should(never()).uploadFile(null, ImgType.NEWS)
+                );
             }
 
             @Test
@@ -260,9 +266,11 @@ class NewsCommandServiceTest {
 
                 // then
                 News savedNews = newsRepository.findById(originNews.getId()).orElseThrow();
-                assertThat(savedNews.getThumbnailUrl()).isEqualTo(newImageUrl);
-                then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl());
-                then(s3Service).should().uploadFile(any(), any());
+                assertAll(
+                        () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newImageUrl),
+                        () -> then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl()),
+                        () -> then(s3Service).should().uploadFile(any(), any())
+                );
             }
         }
     }
@@ -280,9 +288,11 @@ class NewsCommandServiceTest {
             NewsCommandResponse response = newsCommandService.deleteNewsById(user, originNews.getId());
 
             // then
-            assertThat(response.id()).isEqualTo(originNews.getId());
-            assertThat(newsRepository.findById(originNews.getId())).isEmpty();
-            then(s3Service).should().deletePostImage(expectedImageUrl);
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(originNews.getId()),
+                    () -> assertThat(newsRepository.findById(originNews.getId())).isEmpty(),
+                    () -> then(s3Service).should().deletePostImage(expectedImageUrl)
+            );
         }
     }
 
