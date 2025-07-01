@@ -3,13 +3,13 @@ package com.example.solidconnection.application.service;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
-import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,8 +31,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION
 public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final UniversityFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
 
     @Value("${university.term}")
     public String term;
@@ -41,7 +41,7 @@ public class ApplicationQueryService {
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
         // 1. 대학 지원 정보 필터링 (regionCode, keyword)
-        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, List.of(keyword));
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
@@ -58,7 +58,7 @@ public class ApplicationQueryService {
     public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term);
 
-        List<Long> universityInfoForApplyIds = Stream.of(
+        List<Long> univApplyInfoIds = Stream.of(
                         userLatestApplication.getFirstChoiceUnivApplyInfoId(),
                         userLatestApplication.getSecondChoiceUnivApplyInfoId(),
                         userLatestApplication.getThirdChoiceUnivApplyInfoId()
@@ -66,30 +66,30 @@ public class ApplicationQueryService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        if (universityInfoForApplyIds.isEmpty()) {
+        if (univApplyInfoIds.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
 
-        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(universityInfoForApplyIds, VerifyStatus.APPROVED, term);
-        List<UnivApplyInfo> universityInfosForApply = universityInfoForApplyRepository.findAllByUniversityIds(universityInfoForApplyIds);
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
 
-        return classifyApplicationsByChoice(universityInfosForApply, applications, siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
-            List<UnivApplyInfo> universityInfosForApply,
+            List<UnivApplyInfo> univApplyInfos,
             List<Application> applications,
             SiteUser siteUser) {
         Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
         Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUnivApplyInfoId);
         Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
 
-        List<UniversityApplicantsResponse> firstChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, firstChoiceMap, siteUser);
-        List<UniversityApplicantsResponse> secondChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, secondChoiceMap, siteUser);
-        List<UniversityApplicantsResponse> thirdChoiceApplicants =
-                createUniversityApplicantsResponses(universityInfosForApply, thirdChoiceMap, siteUser);
+        List<ApplicantsResponse> firstChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, firstChoiceMap, siteUser);
+        List<ApplicantsResponse> secondChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, secondChoiceMap, siteUser);
+        List<ApplicantsResponse> thirdChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, thirdChoiceMap, siteUser);
 
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
@@ -109,12 +109,12 @@ public class ApplicationQueryService {
         return choiceMap;
     }
 
-    private List<UniversityApplicantsResponse> createUniversityApplicantsResponses(
-            List<UnivApplyInfo> universityInfosForApply,
+    private List<ApplicantsResponse> createUniversityApplicantsResponses(
+            List<UnivApplyInfo> univApplyInfos,
             Map<Long, List<Application>> choiceMap,
             SiteUser siteUser) {
-        return universityInfosForApply.stream()
-                .map(uia -> UniversityApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
+        return univApplyInfos.stream()
+                .map(uia -> ApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
                 .toList();
     }
 

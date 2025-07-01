@@ -2,9 +2,8 @@ package com.example.solidconnection.university.repository;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.LikedUniversity;
+import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +16,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @TestContainerSpringBootTest
 @DisplayName("대학교 좋아요 레파지토리 테스트")
-public class UniversityLikeRepositoryTest {
+public class LikedUnivApplyInfoRepositoryTest {
 
     @Autowired
-    private LikedUniversityRepository likedUniversityRepository;
+    private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -35,15 +34,15 @@ public class UniversityLikeRepositoryTest {
         void 같은_사용자가_같은_대학에_중복으로_좋아요하면_예외_응답을_반환한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
-            UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
+            UnivApplyInfo univApplyInfo = univApplyInfoFixture.괌대학_A_지원_정보();
 
-            LikedUniversity firstLike = createLikedUniversity(user, university);
-            likedUniversityRepository.save(firstLike);
+            LikedUnivApplyInfo firstLike = createLikedUnivApplyInfo(user, univApplyInfo);
+            likedUnivApplyInfoRepository.save(firstLike);
 
-            LikedUniversity secondLike = createLikedUniversity(user, university);
+            LikedUnivApplyInfo secondLike = createLikedUnivApplyInfo(user, univApplyInfo);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike))
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike))
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -52,36 +51,36 @@ public class UniversityLikeRepositoryTest {
             // given
             SiteUser user1 = siteUserFixture.사용자(1, "user1");
             SiteUser user2 = siteUserFixture.사용자(2, "user2");
-            UnivApplyInfo university = univApplyInfoFixture.괌대학_A_지원_정보();
+            UnivApplyInfo univApplyInfo = univApplyInfoFixture.괌대학_A_지원_정보();
 
-            LikedUniversity firstLike = createLikedUniversity(user1, university);
-            likedUniversityRepository.save(firstLike);
+            LikedUnivApplyInfo firstLike = createLikedUnivApplyInfo(user1, univApplyInfo);
+            likedUnivApplyInfoRepository.save(firstLike);
 
-            LikedUniversity secondLike = createLikedUniversity(user2, university);
+            LikedUnivApplyInfo secondLike = createLikedUnivApplyInfo(user2, univApplyInfo);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike)).doesNotThrowAnyException();
         }
 
         @Test
         void 같은_사용자가_다른_대학에_좋아요하면_정상_저장된다() {
             // given
             SiteUser user = siteUserFixture.사용자();
-            UnivApplyInfo university1 = univApplyInfoFixture.괌대학_A_지원_정보();
-            UnivApplyInfo university2 = univApplyInfoFixture.메이지대학_지원_정보();
+            UnivApplyInfo univApplyInfo1 = univApplyInfoFixture.괌대학_A_지원_정보();
+            UnivApplyInfo univApplyInfo2 = univApplyInfoFixture.메이지대학_지원_정보();
 
-            LikedUniversity firstLike = createLikedUniversity(user, university1);
-            likedUniversityRepository.save(firstLike);
+            LikedUnivApplyInfo firstLike = createLikedUnivApplyInfo(user, univApplyInfo1);
+            likedUnivApplyInfoRepository.save(firstLike);
 
-            LikedUniversity secondLike = createLikedUniversity(user, university2);
+            LikedUnivApplyInfo secondLike = createLikedUnivApplyInfo(user, univApplyInfo2);
 
             // when & then
-            assertThatCode(() -> likedUniversityRepository.save(secondLike)).doesNotThrowAnyException();
+            assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike)).doesNotThrowAnyException();
         }
     }
 
-    private LikedUniversity createLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
-        return LikedUniversity.builder()
+    private LikedUnivApplyInfo createLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+        return LikedUnivApplyInfo.builder()
                 .siteUserId(siteUser.getId())
                 .univApplyInfoId(univApplyInfo.getId())
                 .build();

@@ -4,7 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
-import com.example.solidconnection.application.dto.UniversityChoiceRequest;
+import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
@@ -42,13 +42,13 @@ public class ApplicationSubmissionService {
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
     public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
-        UniversityChoiceRequest universityChoiceRequest = applyRequest.universityChoiceRequest();
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
-        long firstChoiceUniversityId = universityChoiceRequest.firstChoiceUniversityId();
-        Long secondChoiceUniversityId = universityChoiceRequest.secondChoiceUniversityId();
-        Long thirdChoiceUniversityId = universityChoiceRequest.thirdChoiceUniversityId();
+        long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
+        Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
+        Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
         Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTerm(siteUser.getId(), term);
         int updateCount = existingApplication
@@ -65,9 +65,9 @@ public class ApplicationSubmissionService {
                 languageTestScore.getLanguageTest(),
                 term,
                 updateCount,
-                firstChoiceUniversityId,
-                secondChoiceUniversityId,
-                thirdChoiceUniversityId,
+                firstChoiceUnivApplyInfoId,
+                secondChoiceUnivApplyInfoId,
+                thirdChoiceUnivApplyInfoId,
                 getRandomNickname()
         );
 

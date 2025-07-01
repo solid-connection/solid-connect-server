@@ -6,11 +6,10 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.siteuser.repository.LikedUniversityRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.LikedUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class MyPageService {
     public static final DateTimeFormatter NICKNAME_LAST_CHANGE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private final SiteUserRepository siteUserRepository;
-    private final LikedUniversityRepository likedUniversityRepository;
+    private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
     private final S3Service s3Service;
 
     /*
@@ -40,8 +39,8 @@ public class MyPageService {
      * */
     @Transactional(readOnly = true)
     public MyPageResponse getMyPageInfo(SiteUser siteUser) {
-        int likedUniversityCount = likedUniversityRepository.countBySiteUserId(siteUser.getId());
-        return MyPageResponse.of(siteUser, likedUniversityCount);
+        int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
+        return MyPageResponse.of(siteUser, likedUnivApplyInfoCount);
     }
 
     /*
@@ -95,11 +94,11 @@ public class MyPageService {
      * 관심 대학교 목록을 조회한다.
      * */
     @Transactional(readOnly = true)
-    public List<UniversityInfoForApplyPreviewResponse> getWishUniversity(SiteUser siteUser) {
-        List<UnivApplyInfo> univApplyInfos = likedUniversityRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
+    public List<UnivApplyInfoPreviewResponse> getWishUnivApplyInfo(SiteUser siteUser) {
+        List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
 
         return univApplyInfos.stream()
-                .map(UniversityInfoForApplyPreviewResponse::from)
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList();
     }
 }

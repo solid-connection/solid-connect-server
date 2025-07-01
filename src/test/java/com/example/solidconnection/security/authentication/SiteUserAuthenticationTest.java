@@ -1,7 +1,7 @@
 package com.example.solidconnection.security.authentication;
 
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
-import com.example.solidconnection.siteuser.domain.PreparationStatus;
+import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ class SiteUserAuthenticationTest {
                 "test@example.com",
                 "nickname",
                 "profileImageUrl",
-                PreparationStatus.CONSIDERING,
+                ExchangeStatus.CONSIDERING,
                 Role.MENTEE
         );
     }

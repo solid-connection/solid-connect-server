@@ -10,8 +10,8 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UniversityInfoForApplyPreviewResponse;
-import com.example.solidconnection.university.dto.UniversityRecommendsResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,15 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.example.solidconnection.university.service.UniversityRecommendService.RECOMMEND_UNIVERSITY_NUM;
+import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
-@DisplayName("대학교 추천 서비스 테스트")
-class UniversityRecommendServiceTest {
+@DisplayName("대학 지원 정보 추천 서비스 테스트")
+class UnivApplyInfoRecommendServiceTest {
 
     @Autowired
-    private UniversityRecommendService universityRecommendService;
+    private UnivApplyInfoRecommendService univApplyInfoRecommendService;
 
     @Autowired
     private InterestedRegionRepository interestedRegionRepository;
@@ -37,7 +37,7 @@ class UniversityRecommendServiceTest {
     private InterestedCountryRepository interestedCountryRepository;
 
     @Autowired
-    private GeneralUniversityRecommendService generalUniversityRecommendService;
+    private GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -75,84 +75,83 @@ class UniversityRecommendServiceTest {
     }
 
     @Test
-    void 관심_지역_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_지역_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보)
                 ));
     }
 
     @Test
-    void 관심_국가_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_국가_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보)
                 ));
     }
 
     @Test
-    void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학을_조회한다() {
+    void 관심_지역과_국가_모두_설정한_사용자의_맞춤_추천_대학_지원_정보를_조회한다() {
         // given
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrder(
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(괌대학_B_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(서던덴마크대학교_지원_정보),
-                        UniversityInfoForApplyPreviewResponse.from(코펜하겐IT대학_지원_정보)
+                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보),
+                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보)
                 );
     }
 
     @Test
-    void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
+    void 관심사_미설정_사용자는_일반_추천_대학_지원_정보를_조회한다() {
         // when
-        UniversityRecommendsResponse personalResponse = universityRecommendService.getPersonalRecommends(user);
-        UniversityRecommendsResponse generalResponse = universityRecommendService.getGeneralRecommends();
-
-        // then
-        assertThat(personalResponse.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
-                .containsExactlyInAnyOrderElementsOf(generalResponse.recommendedUniversities());
-    }
-
-
-    @Test
-    void 일반_추천_대학을_조회한다() {
-        // when
-        UniversityRecommendsResponse response = universityRecommendService.getGeneralRecommends();
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
 
         // then
         assertThat(response.recommendedUniversities())
-                .hasSize(RECOMMEND_UNIVERSITY_NUM)
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
+                .allMatch(univ -> univ.koreanName() != null)
+                .allMatch(univ -> univ.id() > 0)
+                .allMatch(univ -> univ.term().equals("2024-1"));
+    }
+    @Test
+    void 일반_추천_대학_지원_정보를_조회한다() {
+        // when
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getGeneralRecommends();
+
+        // then
+        assertThat(response.recommendedUniversities())
+                .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .allMatch(univ -> univ.id() > 0)
                 .allMatch(univ -> univ.koreanName() != null);
     }
