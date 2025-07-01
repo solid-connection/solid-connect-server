@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
+import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
@@ -58,6 +59,15 @@ public class MentoringController {
             @Valid @RequestBody MentoringConfirmRequest mentoringConfirmRequest
     ) {
         MentoringConfirmResponse response = mentoringCommandService.confirmMentoring(siteUser.getId(), mentoringId, mentoringConfirmRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{mentoring-id}/check")
+    public ResponseEntity<MentoringCheckResponse> checkMentoring(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("mentoring-id") Long mentoringId
+    ) {
+        MentoringCheckResponse response = mentoringCommandService.checkMentoring(siteUser.getId(), mentoringId);
         return ResponseEntity.ok(response);
     }
 }

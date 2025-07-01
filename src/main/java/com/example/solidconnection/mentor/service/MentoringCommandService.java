@@ -6,6 +6,7 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
+import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
@@ -20,7 +21,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_N
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.SELF_MENTORING_NOT_ALLOWED;
-import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING_CONFIRM;
+import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +71,21 @@ public class MentoringCommandService {
         return MentoringConfirmResponse.from(mentoring);
     }
 
+    @Transactional
+    public MentoringCheckResponse checkMentoring(Long siteUserId, Long mentoringId) {
+        Mentoring mentoring = mentoringRepository.findById(mentoringId)
+                .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
+
+        Mentor mentor = mentorRepository.findById(mentoring.getMentorId())
+                .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+
+        validateUnauthorizedMentoring(siteUserId, mentor);
+
+        mentoring.check();
+
+        return MentoringCheckResponse.from(mentoring.getId());
+    }
+
     private void validateSelfMentoring(Long siteUserId, MentoringApplyRequest request) {
         if (siteUserId.equals(request.mentorId())) {
             throw new CustomException(SELF_MENTORING_NOT_ALLOWED);
@@ -82,10 +98,10 @@ public class MentoringCommandService {
         }
     }
 
-    // 멘토는 본인의 멘토링에 대해 confirm해야 한다.
+    // 멘토는 본인의 멘토링에 대해 confirm 및 check해야 한다.
     private void validateUnauthorizedMentoring(Long siteUserId, Mentor mentor) {
         if (!siteUserId.equals(mentor.getSiteUserId())) {
-            throw new CustomException(UNAUTHORIZED_MENTORING_CONFIRM);
+            throw new CustomException(UNAUTHORIZED_MENTORING);
         }
     }
 

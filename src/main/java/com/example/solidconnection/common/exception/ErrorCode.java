@@ -109,7 +109,7 @@ public enum ErrorCode {
     ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
     MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자는 멘토로 등록되어 있지 않습니다."),
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
-    UNAUTHORIZED_MENTORING_CONFIRM(HttpStatus.FORBIDDEN.value(), "멘토링 승인 권한이 없습니다."),
+    UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
 
     // general
