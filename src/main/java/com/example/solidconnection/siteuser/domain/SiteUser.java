@@ -64,7 +64,7 @@ public class SiteUser {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private PreparationStatus preparationStage;
+    private ExchangeStatus exchangeStatus;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -98,12 +98,12 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            PreparationStatus preparationStage,
+            ExchangeStatus exchangeStatus,
             Role role) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.preparationStage = preparationStage;
+        this.exchangeStatus = exchangeStatus;
         this.role = role;
         this.authType = AuthType.KAKAO;
     }
@@ -112,13 +112,13 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            PreparationStatus preparationStage,
+            ExchangeStatus exchangeStatus,
             Role role,
             AuthType authType) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.preparationStage = preparationStage;
+        this.exchangeStatus = exchangeStatus;
         this.role = role;
         this.authType = authType;
     }
@@ -128,14 +128,14 @@ public class SiteUser {
             String email,
             String nickname,
             String profileImageUrl,
-            PreparationStatus preparationStage,
+            ExchangeStatus exchangeStatus,
             Role role,
             AuthType authType,
             String password) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-        this.preparationStage = preparationStage;
+        this.exchangeStatus = exchangeStatus;
         this.role = role;
         this.authType = authType;
         this.password = password;
