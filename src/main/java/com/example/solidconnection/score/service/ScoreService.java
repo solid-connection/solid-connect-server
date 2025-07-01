@@ -43,8 +43,7 @@ public class ScoreService {
     public Long submitGpaScore(SiteUser siteUser, GpaScoreRequest gpaScoreRequest, MultipartFile file) {
         UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, ImgType.GPA);
         Gpa gpa = new Gpa(gpaScoreRequest.gpa(), gpaScoreRequest.gpaCriteria(), uploadedFile.fileUrl());
-        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        GpaScore newGpaScore = new GpaScore(gpa, siteUser1);
+        GpaScore newGpaScore = new GpaScore(gpa, siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);
         return savedNewGpaScore.getId();
     }
