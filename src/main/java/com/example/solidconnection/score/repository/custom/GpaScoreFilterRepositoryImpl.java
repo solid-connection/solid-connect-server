@@ -5,7 +5,7 @@ import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.dto.SiteUserResponse;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;

@@ -1,10 +1,10 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
-import com.example.solidconnection.application.dto.UniversityChoiceRequest;
+import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
@@ -73,12 +73,12 @@ class ApplicationSubmissionServiceTest {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 괌대학_B_지원_정보.getId(),
                 서던덴마크대학교_지원_정보.getId()
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when
         ApplicationSubmissionResponse response = applicationSubmissionService.apply(user, request);
@@ -106,12 +106,12 @@ class ApplicationSubmissionServiceTest {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
         assertThatCode(() ->
@@ -126,12 +126,12 @@ class ApplicationSubmissionServiceTest {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
         assertThatCode(() ->
@@ -146,12 +146,12 @@ class ApplicationSubmissionServiceTest {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT; i++) {
             applicationSubmissionService.apply(user, request);

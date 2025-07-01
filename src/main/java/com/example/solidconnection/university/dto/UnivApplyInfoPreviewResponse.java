@@ -5,7 +5,7 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 import java.util.Collections;
 import java.util.List;
 
-public record UniversityInfoForApplyPreviewResponse(
+public record UnivApplyInfoPreviewResponse(
         long id,
         String term,
         String koreanName,
@@ -16,14 +16,14 @@ public record UniversityInfoForApplyPreviewResponse(
         int studentCapacity,
         List<LanguageRequirementResponse> languageRequirements) {
 
-    public static UniversityInfoForApplyPreviewResponse from(UnivApplyInfo univApplyInfo) {
+    public static UnivApplyInfoPreviewResponse from(UnivApplyInfo univApplyInfo) {
         List<LanguageRequirementResponse> languageRequirementResponses = new java.util.ArrayList<>(
                 univApplyInfo.getLanguageRequirements().stream()
                         .map(LanguageRequirementResponse::from)
                         .toList());
         Collections.sort(languageRequirementResponses);
 
-        return new UniversityInfoForApplyPreviewResponse(
+        return new UnivApplyInfoPreviewResponse(
                 univApplyInfo.getId(),
                 univApplyInfo.getTerm(),
                 univApplyInfo.getKoreanName(),
