@@ -72,7 +72,6 @@ class UniversityRecommendServiceTest {
         univApplyInfoFixture.그라츠공과대학_지원_정보();
         univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
         univApplyInfoFixture.메이지대학_지원_정보();
-        generalUniversityRecommendService.init();
     }
 
     @Test
@@ -136,17 +135,15 @@ class UniversityRecommendServiceTest {
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학을_조회한다() {
         // when
-        UniversityRecommendsResponse response = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse personalResponse = universityRecommendService.getPersonalRecommends(user);
+        UniversityRecommendsResponse generalResponse = universityRecommendService.getGeneralRecommends();
 
         // then
-        assertThat(response.recommendedUniversities())
+        assertThat(personalResponse.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIVERSITY_NUM)
-                .containsExactlyInAnyOrderElementsOf(
-                        generalUniversityRecommendService.getRecommendUniversities().stream()
-                                .map(UniversityInfoForApplyPreviewResponse::from)
-                                .toList()
-                );
+                .containsExactlyInAnyOrderElementsOf(generalResponse.recommendedUniversities());
     }
+
 
     @Test
     void 일반_추천_대학을_조회한다() {
@@ -156,10 +153,7 @@ class UniversityRecommendServiceTest {
         // then
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIVERSITY_NUM)
-                .containsExactlyInAnyOrderElementsOf(
-                        generalUniversityRecommendService.getRecommendUniversities().stream()
-                                .map(UniversityInfoForApplyPreviewResponse::from)
-                                .toList()
-                );
+                .allMatch(univ -> univ.id() > 0)
+                .allMatch(univ -> univ.koreanName() != null);
     }
 }

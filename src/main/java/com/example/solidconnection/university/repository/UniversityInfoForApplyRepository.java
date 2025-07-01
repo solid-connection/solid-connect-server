@@ -4,6 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.University;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,32 +31,33 @@ public interface UniversityInfoForApplyRepository extends JpaRepository<UnivAppl
     List<UnivApplyInfo> findByUniversitiesAndTerm(@Param("universities") List<University> universities, @Param("term") String term);
 
     @Query("""
-        SELECT uifa
+        SELECT DISTINCT uifa
         FROM UnivApplyInfo uifa
-        JOIN University u ON uifa.university = u
-        WHERE (u.country IN (
+        LEFT JOIN FETCH uifa.languageRequirements lr
+        JOIN FETCH uifa.university u
+        LEFT JOIN FETCH u.country c
+        LEFT JOIN FETCH u.region r
+        WHERE (c.code IN (
                   SELECT ic.countryCode
                   FROM InterestedCountry ic
                   WHERE ic.siteUserId = :siteUserId
               )
-              OR u.region IN (
+              OR r.code IN (
                   SELECT ir.regionCode
                   FROM InterestedRegion ir
                   WHERE ir.siteUserId = :siteUserId
               ))
               AND uifa.term = :term
-        """)
+    """)
     List<UnivApplyInfo> findUniversityInfoForAppliesBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
-
     @Query(value = """
-                SELECT *
-                FROM university_info_for_apply
-                WHERE term = :term
-                ORDER BY RAND() 
-                LIMIT :limitNum
-            """, nativeQuery = true)
+        SELECT u.*
+        FROM university_info_for_apply u
+        WHERE u.term = :term
+        ORDER BY RAND() 
+        LIMIT :limitNum
+    """, nativeQuery = true)
     List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
-
     default UnivApplyInfo getUniversityInfoForApplyById(Long id) {
         return findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND));

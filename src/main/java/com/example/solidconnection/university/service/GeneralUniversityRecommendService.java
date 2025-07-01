@@ -2,12 +2,11 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,19 +16,24 @@ import static com.example.solidconnection.university.service.UniversityRecommend
 @RequiredArgsConstructor
 public class GeneralUniversityRecommendService {
 
-    /*
-     * 해당 시기에 열리는 대학교들 중 랜덤으로 선택해서 목록을 구성한다.
-     * */
     private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-
-    @Getter
-    private List<UnivApplyInfo> recommendUniversities;
 
     @Value("${university.term}")
     public String term;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        recommendUniversities = universityInfoForApplyRepository.findRandomByTerm(term, RECOMMEND_UNIVERSITY_NUM);
+    @Transactional(readOnly = true)  // 트랜잭션 추가
+    public List<UnivApplyInfo> getRecommendUniversities() {
+        List<UnivApplyInfo> universities = universityInfoForApplyRepository.findRandomByTerm(term, RECOMMEND_UNIVERSITY_NUM);
+
+        universities.forEach(univ -> {
+            Hibernate.initialize(univ.getLanguageRequirements());
+            Hibernate.initialize(univ.getUniversity());
+            if (univ.getUniversity() != null) {
+                Hibernate.initialize(univ.getUniversity().getCountry());
+                Hibernate.initialize(univ.getUniversity().getRegion());
+            }
+        });
+
+        return universities;
     }
 }

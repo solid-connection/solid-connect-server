@@ -49,7 +49,10 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
 
 
     private BooleanExpression regionCodeEq(QCountry country, String regionCode) {
-        return regionCode != null ? country.regionCode.eq(regionCode) : null;
+        if (regionCode == null || regionCode.isEmpty()) {
+            return Expressions.asBoolean(true).isTrue();
+        }
+        return country.regionCode.eq(regionCode);
     }
 
     private BooleanExpression countryOrUniversityContainsKeyword(QCountry country, QUniversity university, List<String> keywords) {
