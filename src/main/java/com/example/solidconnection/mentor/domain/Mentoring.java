@@ -43,9 +43,9 @@ public class Mentoring {
     @Column
     private ZonedDateTime checkedAt;
 
-    @Column
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private VerifyStatus verifyStatus;
+    private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
     @Column(length = 500)
     private String rejectedReason;
