@@ -13,7 +13,6 @@ import com.example.solidconnection.mentor.service.MentoringQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,9 +38,7 @@ public class MentoringController {
             @Valid @RequestBody MentoringApplyRequest mentoringApplyRequest
     ) {
         MentoringApplyResponse response = mentoringCommandService.applyMentoring(siteUser.getId(), mentoringApplyRequest);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        return ResponseEntity.ok(response);
     }
 
     // TODO: RequireRoleAccess 어노테이션 추가 필요
@@ -76,7 +73,7 @@ public class MentoringController {
     public ResponseEntity<MentoringCountResponse> getNewMentoringsCount(
             @AuthorizedUser SiteUser siteUser
     ) {
-        MentoringCountResponse responses = mentoringQueryService.getNewMentoringsCount(siteUser.getId());
-        return ResponseEntity.ok(responses);
+        MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(siteUser.getId());
+        return ResponseEntity.ok(response);
     }
 }
