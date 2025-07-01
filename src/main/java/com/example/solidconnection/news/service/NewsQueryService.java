@@ -17,7 +17,7 @@ public class NewsQueryService {
     private final NewsRepository newsRepository;
 
     @Transactional(readOnly = true)
-    public NewsListResponse findNewsBySiteUserId(Long siteUserId) {
+    public NewsListResponse findNewsBySiteUserId(long siteUserId) {
         List<News> newsList = newsRepository.findAllBySiteUserIdOrderByUpdatedAtDesc(siteUserId);
         List<NewsResponse> newsResponseList = newsList.stream()
                 .map(NewsResponse::from)

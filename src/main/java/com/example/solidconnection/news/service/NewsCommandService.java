@@ -29,7 +29,7 @@ public class NewsCommandService {
     private final NewsRepository newsRepository;
 
     @Transactional
-    public NewsCommandResponse createNews(Long siteUserId,NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
+    public NewsCommandResponse createNews(long siteUserId,NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
         String thumbnailUrl = getImageUrl(imageFile);
         News news = newsCreateRequest.toEntity(thumbnailUrl, siteUserId);
         News savedNews = newsRepository.save(news);
@@ -38,7 +38,7 @@ public class NewsCommandService {
 
     @Transactional
     public NewsCommandResponse updateNews(
-            Long siteUserId,
+            long siteUserId,
             Long newsId,
             NewsUpdateRequest newsUpdateRequest,
             MultipartFile imageFile) {
@@ -69,7 +69,7 @@ public class NewsCommandService {
         return newsProperties.defaultThumbnailUrl();
     }
 
-    private void validateOwnership(News news, Long siteUserId) {
+    private void validateOwnership(News news, long siteUserId) {
         if (news.getSiteUserId() != siteUserId) {
             throw new CustomException(INVALID_NEWS_ACCESS);
         }
