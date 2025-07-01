@@ -18,17 +18,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UniversityFilterRepositoryImpl implements UniversityFilterRepository {
+public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRepository {
 
     private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public UniversityFilterRepositoryImpl(EntityManager em) {
+    public UnivApplyInfoFilterRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
     @Override
-    public List<UnivApplyInfo> findByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+    public List<UnivApplyInfo> findAllByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
@@ -74,7 +74,7 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
     }
 
     @Override
-    public List<UnivApplyInfo> findByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
+    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term) {
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
@@ -94,7 +94,7 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
         if (testScore == null || testScore.isEmpty()) {
             if (testType != null) {
                 return filteredUnivApplyInfo.stream()
-                        .filter(uifa -> uifa.getLanguageRequirements().stream()
+                        .filter(uai -> uai.getLanguageRequirements().stream()
                                 .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))
                         .toList();
             }
@@ -102,7 +102,7 @@ public class UniversityFilterRepositoryImpl implements UniversityFilterRepositor
         }
 
         return filteredUnivApplyInfo.stream()
-                .filter(uifa -> compareMyTestScoreToMinPassScore(uifa, testType, testScore) >= 0)
+                .filter(uai -> compareMyTestScoreToMinPassScore(uai, testType, testScore) >= 0)
                 .toList();
     }
 

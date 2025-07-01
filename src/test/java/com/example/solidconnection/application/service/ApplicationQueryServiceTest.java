@@ -4,7 +4,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
-import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicantsResponse;
 import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
@@ -140,11 +140,11 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsAll(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                    ApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(application1), user1),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(괌대학_B_지원_정보,
                             List.of(application2), user1),
-                    UniversityApplicantsResponse.of(서던덴마크대학교_지원_정보,
+                    ApplicantsResponse.of(서던덴마크대학교_지원_정보,
                             List.of(application3), user1)
             ));
         }
@@ -192,9 +192,9 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                    ApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(application1), user1),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(괌대학_B_지원_정보,
                             List.of(application2), user1)
             );
         }
@@ -242,9 +242,9 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                    ApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(application1), user1),
-                    UniversityApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(괌대학_B_지원_정보,
                             List.of(application2), user1)
             );
         }
@@ -272,7 +272,7 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                    ApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(application), user1)
             ));
         }
@@ -358,7 +358,7 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    UniversityApplicantsResponse.of(괌대학_A_지원_정보,
+                    ApplicantsResponse.of(괌대학_A_지원_정보,
                             List.of(application1, application2), user1)
             );
         }

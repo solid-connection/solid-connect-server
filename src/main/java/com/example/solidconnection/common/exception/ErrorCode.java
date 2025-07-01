@@ -33,8 +33,8 @@ public enum ErrorCode {
     SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER(HttpStatus.BAD_REQUEST.value(), "회원가입 토큰이 우리 서버에서 발급되지 않았습니다."),
 
     // data not found
-    UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),
-    UNIVERSITY_INFO_FOR_APPLY_NOT_FOUND_FOR_TERM(HttpStatus.NOT_FOUND.value(), "해당하는 대학교가 이번 모집 기간에 열리지 않았습니다."),
+    UNIV_APPLY_INFO_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),
+    UNIV_APPLY_INFO_NOT_FOUND_FOR_TERM(HttpStatus.NOT_FOUND.value(), "해당하는 대학교가 이번 모집 기간에 열리지 않았습니다."),
     APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "사용자의 대학 지원 정보를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원을 찾을 수 없습니다."),
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "대학교를 찾을 수 없습니다."),
@@ -71,7 +71,7 @@ public enum ErrorCode {
     PROFILE_IMAGE_NEEDED(HttpStatus.BAD_REQUEST.value(), "프로필 이미지가 필요합니다."),
     FIRST_CHOICE_REQUIRED(HttpStatus.BAD_REQUEST.value(), "1지망 대학교를 입력해주세요."),
     THIRD_CHOICE_REQUIRES_SECOND(HttpStatus.BAD_REQUEST.value(), "2지망 없이 3지망을 선택할 수 없습니다."),
-    DUPLICATE_UNIVERSITY_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
+    DUPLICATE_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
 
     // community
     INVALID_POST_CATEGORY(HttpStatus.BAD_REQUEST.value(), "잘못된 카테고리명입니다."),
@@ -86,8 +86,8 @@ public enum ErrorCode {
     CAN_NOT_UPDATE_DEPRECATED_COMMENT(HttpStatus.BAD_REQUEST.value(), "이미 삭제된 댓글을 수정할 수 없습니다."),
     INVALID_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글 좋아요입니다."),
     DUPLICATE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 게시글입니다."),
-    ALREADY_LIKED_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 대학입니다."),
-    NOT_LIKED_UNIVERSITY(HttpStatus.BAD_REQUEST.value(), "좋아요하지 않은 대학입니다."),
+    ALREADY_LIKED_UNIV_APPLY_INFO(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 대학입니다."),
+    NOT_LIKED_UNIV_APPLY_INFO(HttpStatus.BAD_REQUEST.value(), "좋아요하지 않은 대학입니다."),
 
     // score
     INVALID_GPA_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "학점이 승인되지 않았습니다."),
