@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

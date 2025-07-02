@@ -3,7 +3,6 @@ package com.example.solidconnection.community.board.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.board.domain.Board;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 

@@ -3,7 +3,6 @@ package com.example.solidconnection.community.post.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

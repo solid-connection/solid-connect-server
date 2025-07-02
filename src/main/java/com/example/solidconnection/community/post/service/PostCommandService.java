@@ -31,7 +31,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DEL
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

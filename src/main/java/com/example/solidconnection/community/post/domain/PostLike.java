@@ -1,6 +1,5 @@
 package com.example.solidconnection.community.post.domain;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
