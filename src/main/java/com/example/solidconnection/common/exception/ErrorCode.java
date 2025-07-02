@@ -42,6 +42,7 @@ public enum ErrorCode {
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
+    NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -95,6 +96,10 @@ public enum ErrorCode {
     INVALID_LANGUAGE_TEST_SCORE_STATUS(HttpStatus.BAD_REQUEST.value(), "어학성적이 승인되지 않았습니다."),
     USER_DO_NOT_HAVE_GPA(HttpStatus.BAD_REQUEST.value(), "해당 유저의 학점을 찾을 수 없음"),
     REJECTED_REASON_REQUIRED(HttpStatus.BAD_REQUEST.value(), "거절 사유가 필요합니다."),
+
+    // news
+    INVALID_NEWS_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 소식지만 제어할 수 있습니다."),
+
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

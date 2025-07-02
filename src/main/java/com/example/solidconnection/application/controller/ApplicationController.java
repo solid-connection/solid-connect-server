@@ -6,7 +6,8 @@ import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.security.annotation.RequireAdminAccess;
+import com.example.solidconnection.security.annotation.RequireRoleAccess;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class ApplicationController {
                 .body(applicationSubmissionResponse);
     }
 
-    @RequireAdminAccess
+    @RequireRoleAccess(roles = {Role.ADMIN})
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
             @AuthorizedUser SiteUser siteUser,
