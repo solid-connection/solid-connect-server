@@ -6,6 +6,9 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
 import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
 import com.example.solidconnection.mentor.repository.MentorBatchQueryRepository;
+import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
+import com.example.solidconnection.mentor.dto.MentorPreviewsResponse;
+import com.example.solidconnection.mentor.repository.MentorBatchQueryRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -13,6 +16,8 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
