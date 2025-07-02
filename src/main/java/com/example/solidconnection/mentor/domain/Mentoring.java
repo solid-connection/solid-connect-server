@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -24,6 +25,7 @@ import static java.time.temporal.ChronoUnit.MICROS;
 
 @Entity
 @Getter
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
 @AllArgsConstructor
@@ -59,5 +61,19 @@ public class Mentoring {
     @PrePersist
     public void onPrePersist() {
         this.createdAt = ZonedDateTime.now(UTC).truncatedTo(MICROS); // 나노초 6자리 까지만 저장
+    }
+
+    public void confirm(VerifyStatus status, String rejectedReason) {
+        this.verifyStatus = status;
+        this.rejectedReason = rejectedReason;
+        this.confirmedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+
+        if (this.checkedAt == null) {
+            this.checkedAt = this.confirmedAt;
+        }
+    }
+
+    public void check() {
+        this.checkedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
 }

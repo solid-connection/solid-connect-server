@@ -1,6 +1,6 @@
 package com.example.solidconnection.mentor.service;
 
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
@@ -60,10 +60,9 @@ public class MentoringCommandService {
         if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
             mentor.increaseMenteeCount();
         }
-        else if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED) {
-            if (mentoringConfirmRequest.rejectedReason() == null || mentoringConfirmRequest.rejectedReason().isBlank()) {
-                throw new CustomException(REJECTED_REASON_REQUIRED);
-            }
+        else if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
+                && (mentoringConfirmRequest.rejectedReason() == null || mentoringConfirmRequest.rejectedReason().isBlank())) {
+            throw new CustomException(REJECTED_REASON_REQUIRED);
         }
 
         mentoring.confirm(mentoringConfirmRequest.status(), mentoringConfirmRequest.rejectedReason());

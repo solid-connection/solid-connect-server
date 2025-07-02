@@ -1,6 +1,6 @@
 package com.example.solidconnection.mentor.dto;
 
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.mentor.domain.Mentoring;
 
 import java.time.ZonedDateTime;
