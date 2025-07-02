@@ -20,7 +20,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_A
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.SELF_MENTORING_NOT_ALLOWED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
 @Service
@@ -32,7 +31,6 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(Long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        validateSelfMentoring(siteUserId, mentoringApplyRequest);
         validateAlreadyMentor(siteUserId);
 
         Mentoring mentoring = Mentoring.builder()
@@ -83,12 +81,6 @@ public class MentoringCommandService {
         mentoring.check();
 
         return MentoringCheckResponse.from(mentoring.getId());
-    }
-
-    private void validateSelfMentoring(Long siteUserId, MentoringApplyRequest request) {
-        if (siteUserId.equals(request.mentorId())) {
-            throw new CustomException(SELF_MENTORING_NOT_ALLOWED);
-        }
     }
 
     private void validateAlreadyMentor(Long siteUserId) {

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
     Optional<Mentor> findBySiteUserId(Long siteUserId);
+    boolean existsBySiteUserId(Long siteUserId);
 }

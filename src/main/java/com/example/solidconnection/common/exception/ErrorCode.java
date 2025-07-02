@@ -105,7 +105,6 @@ public enum ErrorCode {
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
 
     // mentor
-    SELF_MENTORING_NOT_ALLOWED(HttpStatus.BAD_REQUEST.value(), "자기 자신을 멘토로 설정할 수 없습니다."),
     ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
     MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자는 멘토로 등록되어 있지 않습니다."),
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
