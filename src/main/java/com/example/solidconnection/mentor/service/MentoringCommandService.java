@@ -92,7 +92,7 @@ public class MentoringCommandService {
     }
 
     private void validateAlreadyMentor(Long siteUserId) {
-        if (mentorRepository.existsById(siteUserId)) {
+        if (mentorRepository.existsBySiteUserId(siteUserId)) {
             throw new CustomException(ALREADY_MENTOR);
         }
     }
