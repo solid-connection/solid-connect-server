@@ -7,6 +7,7 @@ import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.dto.MentoringCountResponse;
+import com.example.solidconnection.mentor.dto.MentoringListResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
@@ -45,10 +46,10 @@ public class MentoringController {
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/apply")
-    public ResponseEntity<List<MentoringResponse>> getMentorings(
+    public ResponseEntity<MentoringListResponse> getMentorings(
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<MentoringResponse> responses = mentoringQueryService.getMentorings(siteUser.getId());
+        MentoringListResponse responses = mentoringQueryService.getMentorings(siteUser.getId());
         return ResponseEntity.ok(responses);
     }
 

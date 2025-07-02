@@ -4,6 +4,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringCountResponse;
+import com.example.solidconnection.mentor.dto.MentoringListResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
@@ -15,8 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,12 +60,12 @@ class MentoringQueryServiceTest {
             Mentoring mentoring3 = mentoringFixture.거절된_멘토링(mentor.getId(), menteeUser.getId(), "거절 사유");
 
             // when
-            List<MentoringResponse> responses = mentoringQueryService.getMentorings(mentorUser.getId());
+            MentoringListResponse responses = mentoringQueryService.getMentorings(mentorUser.getId());
 
             // then
             assertAll(
-                    () -> assertThat(responses).hasSize(3),
-                    () -> assertThat(responses).extracting(MentoringResponse::id)
+                    () -> assertThat(responses.mentoringResponseList()).hasSize(3),
+                    () -> assertThat(responses.mentoringResponseList()).extracting(MentoringResponse::id)
                             .containsExactlyInAnyOrder(
                                     mentoring1.getId(),
                                     mentoring2.getId(),
@@ -86,10 +85,10 @@ class MentoringQueryServiceTest {
         @Test
         void 멘토링이_없는_경우_빈_리스트를_반환한다() {
             // when
-            List<MentoringResponse> responses = mentoringQueryService.getMentorings(mentorUser.getId());
+            MentoringListResponse responses = mentoringQueryService.getMentorings(mentorUser.getId());
 
             // then
-            assertThat(responses).isEmpty();
+            assertThat(responses.mentoringResponseList()).isEmpty();
         }
     }
 
