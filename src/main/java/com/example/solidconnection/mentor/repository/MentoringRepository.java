@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface MentoringRepository extends JpaRepository<Mentoring, Long> {
 
-    List<Mentoring> findAllByMentorId(Long mentorId);
-    int countByMentorIdAndCheckedAtIsNull(Long mentorId);
+    List<Mentoring> findAllByMentorId(long mentorId);
+    int countByMentorIdAndCheckedAtIsNull(long mentorId);
 }
