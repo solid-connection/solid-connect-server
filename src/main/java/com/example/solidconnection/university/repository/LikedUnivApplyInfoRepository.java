@@ -1,6 +1,5 @@
 package com.example.solidconnection.university.repository;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,13 +16,14 @@ public interface LikedUnivApplyInfoRepository extends JpaRepository<LikedUnivApp
     int countBySiteUserId(long siteUserId);
 
     Optional<LikedUnivApplyInfo> findBySiteUserIdAndUnivApplyInfoId(long siteUserId, long univApplyInfoId);
+
     @Query("""
             SELECT u
             FROM UnivApplyInfo u
             JOIN LikedUnivApplyInfo l ON u.id = l.univApplyInfoId
             WHERE l.siteUserId = :siteUserId
             """)
-    List<UnivApplyInfo> findUnivApplyInfosBySiteUserId(@Param("siteUserId") Long siteUserId);
+    List<UnivApplyInfo> findUnivApplyInfosBySiteUserId(@Param("siteUserId") long siteUserId);
 
-    boolean existsBySiteUserIdAndUnivApplyInfoId(Long siteUserId, Long univApplyInfoId);
+    boolean existsBySiteUserIdAndUnivApplyInfoId(long siteUserId, Long univApplyInfoId);
 }

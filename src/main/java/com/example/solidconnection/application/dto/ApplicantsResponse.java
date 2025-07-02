@@ -5,6 +5,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 
 import java.util.List;
+import java.util.Objects;
 
 public record ApplicantsResponse(
         String koreanName,
@@ -24,6 +25,6 @@ public record ApplicantsResponse(
     }
 
     private static boolean isUsers(Application application, SiteUser siteUser) {
-        return application.getSiteUserId() == siteUser.getId();
+        return Objects.equals(application.getSiteUserId(), siteUser.getId());
     }
 }

@@ -47,7 +47,6 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .fetch();
     }
 
-
     private BooleanExpression regionCodeEq(QCountry country, String regionCode) {
         if (regionCode == null || regionCode.isEmpty()) {
             return Expressions.asBoolean(true).isTrue();

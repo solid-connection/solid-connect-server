@@ -2,7 +2,6 @@ package com.example.solidconnection.score.repository;
 
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.custom.GpaScoreFilterRepository;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +13,7 @@ public interface GpaScoreRepository extends JpaRepository<GpaScore, Long>, GpaSc
 
     Optional<GpaScore> findGpaScoreBySiteUserId(long siteUserId);
 
-    Optional<GpaScore> findGpaScoreBySiteUserIdAndId(long siteUser, Long id);
-    List<GpaScore> findBySiteUserId(Long siteUserId);
+    Optional<GpaScore> findGpaScoreBySiteUserIdAndId(long siteUserId, Long id);
+
+    List<GpaScore> findBySiteUserId(long siteUserId);
 }

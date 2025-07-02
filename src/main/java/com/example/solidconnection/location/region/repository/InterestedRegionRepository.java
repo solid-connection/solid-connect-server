@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface InterestedRegionRepository extends JpaRepository<InterestedRegion, Long> {
+
     List<InterestedRegion> findAllBySiteUserId(long siteUserId);
 }

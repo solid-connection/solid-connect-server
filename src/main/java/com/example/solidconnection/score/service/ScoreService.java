@@ -2,7 +2,6 @@ package com.example.solidconnection.score.service;
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -23,12 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +32,6 @@ public class ScoreService {
     private final GpaScoreRepository gpaScoreRepository;
     private final S3Service s3Service;
     private final LanguageTestScoreRepository languageTestScoreRepository;
-    private final SiteUserRepository siteUserRepository;
 
     @Transactional
     public Long submitGpaScore(SiteUser siteUser, GpaScoreRequest gpaScoreRequest, MultipartFile file) {

@@ -1,7 +1,6 @@
 package com.example.solidconnection.university.repository;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepository;
 import org.springframework.data.jpa.repository.JpaRepository;

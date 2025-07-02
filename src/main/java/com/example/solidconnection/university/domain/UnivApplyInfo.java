@@ -86,6 +86,4 @@ public class UnivApplyInfo {
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
         this.languageRequirements.add(languageRequirements);
     }
-
-
 }
