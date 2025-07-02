@@ -16,7 +16,6 @@ import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
