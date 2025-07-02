@@ -39,9 +39,7 @@ public class MentoringCommandService {
                 .verifyStatus(VerifyStatus.PENDING)
                 .build();
 
-        return MentoringApplyResponse.from(
-                mentoringRepository.save(mentoring)
-        );
+        return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
     }
 
     @Transactional

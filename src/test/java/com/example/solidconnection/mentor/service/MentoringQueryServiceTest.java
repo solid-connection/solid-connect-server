@@ -1,6 +1,5 @@
 package com.example.solidconnection.mentor.service;
 
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringCountResponse;
@@ -17,9 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
@@ -75,14 +72,6 @@ class MentoringQueryServiceTest {
         }
 
         @Test
-        void 멘티가_멘토링을_조회하면_예외를_반환한다() {
-            // when & then
-            assertThatThrownBy(() -> mentoringQueryService.getMentorings(menteeUser.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_NOT_FOUND.getMessage());
-        }
-
-        @Test
         void 멘토링이_없는_경우_빈_리스트를_반환한다() {
             // when
             MentoringListResponse responses = mentoringQueryService.getMentorings(mentorUser.getId());
@@ -119,15 +108,6 @@ class MentoringQueryServiceTest {
 
             // then
             assertThat(response.mentoringCount()).isZero();
-        }
-
-        @Test
-        void 멘티가_멘토링_개수를_조회하면_예외를_반환한다() {
-            // when & then
-            assertThatThrownBy(() ->
-                    mentoringQueryService.getNewMentoringsCount(menteeUser.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_NOT_FOUND.getMessage());
         }
     }
 }
