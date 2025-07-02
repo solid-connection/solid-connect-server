@@ -8,13 +8,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ID;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @EntityGraph(attributePaths = {"postImageList", "board", "siteUser"})
+    List<Post> findByBoardCode(String boardCode);
+    @EntityGraph(attributePaths = {"postImageList"})
     Optional<Post> findPostById(Long id);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

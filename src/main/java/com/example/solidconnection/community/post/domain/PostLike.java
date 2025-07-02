@@ -26,22 +26,15 @@ public class PostLike {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_user_id")
-    private SiteUser siteUser;
+    private long siteUserId;
 
-    public void setPostAndSiteUser(Post post, SiteUser siteUser) {
+    public void setPostAndSiteUser(Post post, long siteuserId) {
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
         this.post = post;
         post.getPostLikeList().add(this);
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostLikeList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getPostLikeList().add(this);
+        this.siteUserId = siteuserId;
     }
 
     public void resetPostAndSiteUser() {
@@ -49,10 +42,5 @@ public class PostLike {
             this.post.getPostLikeList().remove(this);
         }
         this.post = null;
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostLikeList().remove(this);
-        }
-        this.siteUser = null;
     }
 }

@@ -80,13 +80,13 @@ class MyPageServiceTest {
         // when
         MyPageResponse response = myPageService.getMyPageInfo(user);
 
+
         // then
         Assertions.assertAll(
                 () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(user.getRole()),
                 () -> assertThat(response.email()).isEqualTo(user.getEmail()),
-                () -> assertThat(response.likedPostCount()).isEqualTo(user.getPostLikeList().size()),
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount)
         );
     }

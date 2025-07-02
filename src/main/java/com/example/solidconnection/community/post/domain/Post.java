@@ -50,13 +50,12 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostCategory category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_code")
-    private Board board;
+    @Column
+    private String boardCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_user_id")
-    private SiteUser siteUser;
+    @Column
+    private long siteUserId;
+
 
     @BatchSize(size = 20)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,6 +65,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImageList = new ArrayList<>();
 
+    @BatchSize(size = 5)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> postLikeList = new ArrayList<>();
 
@@ -78,29 +78,9 @@ public class Post extends BaseEntity {
         this.category = category;
     }
 
-    public void setBoardAndSiteUser(Board board, SiteUser siteUser) {
-        if (this.board != null) {
-            this.board.getPostList().remove(this);
-        }
-        this.board = board;
-        board.getPostList().add(this);
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getPostList().add(this);
-    }
-
-    public void resetBoardAndSiteUser() {
-        if (this.board != null) {
-            this.board.getPostList().remove(this);
-            this.board = null;
-        }
-        if (this.siteUser != null) {
-            this.siteUser.getPostList().remove(this);
-            this.siteUser = null;
-        }
+    public void setBoardAndSiteUser(String boardCode, long siteUserId) {
+        this.boardCode = boardCode;
+        this.siteUserId = siteUserId;
     }
 
     public void update(PostUpdateRequest postUpdateRequest) {

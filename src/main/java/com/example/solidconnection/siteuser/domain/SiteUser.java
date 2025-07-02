@@ -77,15 +77,6 @@ public class SiteUser {
     @Column(nullable = true)
     private String password;
 
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> postList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL)
-    private List<Comment> commentList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostLike> postLikeList = new ArrayList<>();
-
     public SiteUser(
             String email,
             String nickname,

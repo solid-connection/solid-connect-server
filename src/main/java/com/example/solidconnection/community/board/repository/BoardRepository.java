@@ -13,7 +13,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOA
 
 public interface BoardRepository extends JpaRepository<Board, String> {
 
-    @EntityGraph(attributePaths = {"postList"})
     Optional<Board> findBoardByCode(@Param("code") String code);
 
     default Board getByCodeUsingEntityGraph(String code) {

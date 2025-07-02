@@ -30,14 +30,7 @@ public class PostLikeService {
         Post post = postRepository.getById(postId);
         validateDuplicatePostLike(post, siteUser);
         PostLike postLike = new PostLike();
-
-        /*
-         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
-         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
-         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
-         */
-        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        postLike.setPostAndSiteUser(post, siteUser1);
+        postLike.setPostAndSiteUser(post, siteUser.getId());
         postLikeRepository.save(postLike);
         postRepository.increaseLikeCount(post.getId());
 
@@ -48,7 +41,7 @@ public class PostLikeService {
     public PostDislikeResponse dislikePost(SiteUser siteUser, Long postId) {
         Post post = postRepository.getById(postId);
 
-        PostLike postLike = postLikeRepository.getByPostAndSiteUser(post, siteUser);
+        PostLike postLike = postLikeRepository.getByPostAndSiteUserId(post, siteUser.getId());
         postLike.resetPostAndSiteUser();
         postLikeRepository.deleteById(postLike.getId());
         postRepository.decreaseLikeCount(post.getId());
@@ -57,7 +50,7 @@ public class PostLikeService {
     }
 
     private void validateDuplicatePostLike(Post post, SiteUser siteUser) {
-        if (postLikeRepository.findPostLikeByPostAndSiteUser(post, siteUser).isPresent()) {
+        if (postLikeRepository.findPostLikeByPostAndSiteUserId(post, siteUser.getId()).isPresent()) {
             throw new CustomException(DUPLICATE_POST_LIKE);
         }
     }
