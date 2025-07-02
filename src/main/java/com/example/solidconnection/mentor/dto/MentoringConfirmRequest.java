@@ -7,6 +7,7 @@ public record MentoringConfirmRequest(
 
         @NotNull(message = "승인 상태를 설정해주세요.")
         VerifyStatus status,
+
         String rejectedReason
 ) {
 }
