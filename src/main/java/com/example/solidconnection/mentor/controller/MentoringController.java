@@ -10,6 +10,8 @@ import com.example.solidconnection.mentor.dto.MentoringCountResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
+import com.example.solidconnection.security.annotation.RequireRoleAccess;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +43,7 @@ public class MentoringController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: RequireRoleAccess 어노테이션 추가 필요
+    @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/apply")
     public ResponseEntity<List<MentoringResponse>> getMentorings(
             @AuthorizedUser SiteUser siteUser
@@ -50,6 +52,7 @@ public class MentoringController {
         return ResponseEntity.ok(responses);
     }
 
+    @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PatchMapping("/{mentoring-id}/apply")
     public ResponseEntity<MentoringConfirmResponse> confirmMentoring(
             @AuthorizedUser SiteUser siteUser,
@@ -60,6 +63,7 @@ public class MentoringController {
         return ResponseEntity.ok(response);
     }
 
+    @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PatchMapping("/{mentoring-id}/check")
     public ResponseEntity<MentoringCheckResponse> checkMentoring(
             @AuthorizedUser SiteUser siteUser,
@@ -69,6 +73,7 @@ public class MentoringController {
         return ResponseEntity.ok(response);
     }
 
+    @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/check")
     public ResponseEntity<MentoringCountResponse> getNewMentoringsCount(
             @AuthorizedUser SiteUser siteUser
