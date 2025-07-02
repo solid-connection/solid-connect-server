@@ -15,8 +15,8 @@ public class MentorFixtureBuilder {
     private boolean hasBadge = false;
     private String introduction;
     private String passTip;
-    private Long siteUserId;
-    private Long universityId;
+    private long siteUserId;
+    private long universityId;
 
     public MentorFixtureBuilder mentor() {
         return new MentorFixtureBuilder(mentorRepository);

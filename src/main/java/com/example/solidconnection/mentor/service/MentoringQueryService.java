@@ -24,7 +24,7 @@ public class MentoringQueryService {
     private final MentorRepository mentorRepository;
 
     @Transactional(readOnly = true)
-    public MentoringListResponse getMentorings(Long siteUserId) {
+    public MentoringListResponse getMentorings(long siteUserId) {
         Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
@@ -37,7 +37,7 @@ public class MentoringQueryService {
     }
 
     @Transactional(readOnly = true)
-    public MentoringCountResponse getNewMentoringsCount(Long siteUserId) {
+    public MentoringCountResponse getNewMentoringsCount(long siteUserId) {
         Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 

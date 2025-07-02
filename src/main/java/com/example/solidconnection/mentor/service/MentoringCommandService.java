@@ -30,7 +30,7 @@ public class MentoringCommandService {
     private final MentorRepository mentorRepository;
 
     @Transactional
-    public MentoringApplyResponse applyMentoring(Long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
+    public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
         validateAlreadyMentor(siteUserId);
 
         Mentoring mentoring = Mentoring.builder()
@@ -45,7 +45,7 @@ public class MentoringCommandService {
     }
 
     @Transactional
-    public MentoringConfirmResponse confirmMentoring(Long siteUserId, Long mentoringId, MentoringConfirmRequest mentoringConfirmRequest) {
+    public MentoringConfirmResponse confirmMentoring(long siteUserId, long mentoringId, MentoringConfirmRequest mentoringConfirmRequest) {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
                 .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
 
@@ -69,7 +69,7 @@ public class MentoringCommandService {
     }
 
     @Transactional
-    public MentoringCheckResponse checkMentoring(Long siteUserId, Long mentoringId) {
+    public MentoringCheckResponse checkMentoring(long siteUserId, long mentoringId) {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
                 .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
 
@@ -83,15 +83,15 @@ public class MentoringCommandService {
         return MentoringCheckResponse.from(mentoring.getId());
     }
 
-    private void validateAlreadyMentor(Long siteUserId) {
+    private void validateAlreadyMentor(long siteUserId) {
         if (mentorRepository.existsBySiteUserId(siteUserId)) {
             throw new CustomException(ALREADY_MENTOR);
         }
     }
 
     // 멘토는 본인의 멘토링에 대해 confirm 및 check해야 한다.
-    private void validateUnauthorizedMentoring(Long siteUserId, Mentor mentor) {
-        if (!siteUserId.equals(mentor.getSiteUserId())) {
+    private void validateUnauthorizedMentoring(long siteUserId, Mentor mentor) {
+        if (siteUserId != mentor.getSiteUserId()) {
             throw new CustomException(UNAUTHORIZED_MENTORING);
         }
     }

@@ -3,7 +3,7 @@ package com.example.solidconnection.mentor.dto;
 import com.example.solidconnection.mentor.domain.Mentoring;
 
 public record MentoringApplyResponse(
-        Long mentoringId
+        long mentoringId
 ) {
 
     public static MentoringApplyResponse from(Mentoring mentoring) {

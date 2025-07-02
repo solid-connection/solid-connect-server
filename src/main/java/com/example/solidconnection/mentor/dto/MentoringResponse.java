@@ -6,9 +6,9 @@ import com.example.solidconnection.mentor.domain.Mentoring;
 import java.time.ZonedDateTime;
 
 public record MentoringResponse(
-        Long id,
-        Long mentorId,
-        Long menteeId,
+        long id,
+        long mentorId,
+        long menteeId,
         ZonedDateTime createdAt,
         ZonedDateTime confirmedAt,
         VerifyStatus verifyStatus,

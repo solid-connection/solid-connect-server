@@ -1,10 +1,10 @@
 package com.example.solidconnection.mentor.dto;
 
 public record MentoringCheckResponse(
-        Long mentoringId
+        long mentoringId
 ) {
 
-    public static MentoringCheckResponse from(Long mentoringId) {
+    public static MentoringCheckResponse from(long mentoringId) {
         return new MentoringCheckResponse(mentoringId);
     }
 }
