@@ -39,7 +39,6 @@ public class LanguageTestScoreFixtureBuilder {
 
     public LanguageTestScore create() {
         LanguageTestScore languageTestScore = new LanguageTestScore(languageTest, siteUser);
-        languageTestScore.setSiteUser(siteUser);
         languageTestScore.setVerifyStatus(verifyStatus);
         return languageTestScoreRepository.save(languageTestScore);
     }
