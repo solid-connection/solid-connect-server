@@ -1,7 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;

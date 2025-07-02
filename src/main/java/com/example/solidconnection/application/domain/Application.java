@@ -1,5 +1,6 @@
 package com.example.solidconnection.application.domain;
 
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -17,7 +18,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import static com.example.solidconnection.application.domain.VerifyStatus.PENDING;
+import static com.example.solidconnection.common.VerifyStatus.PENDING;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)

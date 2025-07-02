@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum ImgType {
-    PROFILE("profile"), GPA("gpa"), LANGUAGE_TEST("language"), COMMUNITY("community");
+    PROFILE("profile"), GPA("gpa"), LANGUAGE_TEST("language"), COMMUNITY("community"), NEWS("news");
 
     private final String type;
 
