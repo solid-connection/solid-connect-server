@@ -10,7 +10,7 @@ public class MentorFixture {
 
     private final MentorFixtureBuilder mentorFixtureBuilder;
 
-    public Mentor 멘토(Long siteUserId, Long universityId) {
+    public Mentor 멘토(long siteUserId, long universityId) {
         return mentorFixtureBuilder.mentor()
                 .siteUserId(siteUserId)
                 .universityId(universityId)

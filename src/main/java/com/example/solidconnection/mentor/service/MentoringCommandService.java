@@ -42,6 +42,12 @@ public class MentoringCommandService {
         return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
     }
 
+    private void validateAlreadyMentor(long siteUserId) {
+        if (mentorRepository.existsBySiteUserId(siteUserId)) {
+            throw new CustomException(ALREADY_MENTOR);
+        }
+    }
+
     @Transactional
     public MentoringConfirmResponse confirmMentoring(long siteUserId, long mentoringId, MentoringConfirmRequest mentoringConfirmRequest) {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
@@ -66,6 +72,12 @@ public class MentoringCommandService {
         return MentoringConfirmResponse.from(mentoring);
     }
 
+    private void validateAlreadyConfirmed(Mentoring mentoring) {
+        if (mentoring.getVerifyStatus() != VerifyStatus.PENDING) {
+            throw new CustomException(MENTORING_ALREADY_CONFIRMED);
+        }
+    }
+
     @Transactional
     public MentoringCheckResponse checkMentoring(long siteUserId, long mentoringId) {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
@@ -81,22 +93,10 @@ public class MentoringCommandService {
         return MentoringCheckResponse.from(mentoring.getId());
     }
 
-    private void validateAlreadyMentor(long siteUserId) {
-        if (mentorRepository.existsBySiteUserId(siteUserId)) {
-            throw new CustomException(ALREADY_MENTOR);
-        }
-    }
-
     // 멘토는 본인의 멘토링에 대해 confirm 및 check해야 한다.
     private void validateUnauthorizedMentoring(long siteUserId, Mentor mentor) {
         if (siteUserId != mentor.getSiteUserId()) {
             throw new CustomException(UNAUTHORIZED_MENTORING);
-        }
-    }
-
-    private void validateAlreadyConfirmed(Mentoring mentoring) {
-        if (mentoring.getVerifyStatus() != VerifyStatus.PENDING) {
-            throw new CustomException(MENTORING_ALREADY_CONFIRMED);
         }
     }
 }
