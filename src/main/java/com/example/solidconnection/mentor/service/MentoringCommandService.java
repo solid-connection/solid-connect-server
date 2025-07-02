@@ -59,15 +59,16 @@ public class MentoringCommandService {
         validateUnauthorizedMentoring(siteUserId, mentor);
         validateAlreadyConfirmed(mentoring);
 
-        if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
-            mentor.increaseMenteeCount();
-        }
-        else if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
+        if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
                 && (mentoringConfirmRequest.rejectedReason() == null || mentoringConfirmRequest.rejectedReason().isBlank())) {
             throw new CustomException(REJECTED_REASON_REQUIRED);
         }
 
         mentoring.confirm(mentoringConfirmRequest.status(), mentoringConfirmRequest.rejectedReason());
+
+        if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
+            mentor.increaseMenteeCount();
+        }
 
         return MentoringConfirmResponse.from(mentoring);
     }
