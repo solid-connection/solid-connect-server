@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     Optional<Mentor> findBySiteUserId(long siteUserId);
+
     boolean existsBySiteUserId(long siteUserId);
 }
