@@ -79,7 +79,7 @@ class PostLikeServiceTest {
                     () -> assertThat(response.likeCount()).isEqualTo(beforeLikeCount + 1),
                     () -> assertThat(response.isLiked()).isTrue(),
                     () -> assertThat(likedPost.getLikeCount()).isEqualTo(beforeLikeCount + 1),
-                    () -> assertThat(postLikeRepository.findPostLikeByPostAndSiteUser(likedPost, user)).isPresent()
+                    () -> assertThat(postLikeRepository.findPostLikeByPostAndSiteUserId(likedPost, user.getId())).isPresent()
             );
         }
 
@@ -117,7 +117,7 @@ class PostLikeServiceTest {
                     () -> assertThat(response.likeCount()).isEqualTo(beforeLikeCount - 1),
                     () -> assertThat(response.isLiked()).isFalse(),
                     () -> assertThat(unlikedPost.getLikeCount()).isEqualTo(beforeLikeCount - 1),
-                    () -> assertThat(postLikeRepository.findPostLikeByPostAndSiteUser(unlikedPost, user)).isEmpty()
+                    () -> assertThat(postLikeRepository.findPostLikeByPostAndSiteUserId(unlikedPost, user.getId())).isEmpty()
             );
         }
 

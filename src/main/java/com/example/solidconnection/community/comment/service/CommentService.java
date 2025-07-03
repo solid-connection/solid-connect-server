@@ -17,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
@@ -35,14 +38,44 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
-        return commentRepository.findCommentTreeByPostId(postId)
-                .stream()
-                .map(comment -> PostFindCommentResponse.from(isOwner(comment, siteUser), comment))
+        SiteUser commentOwner = siteUserRepository.findById(siteUser.getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
+        List<Comment> filteredComments = filterCommentsByDeletionRules(allComments);
+
+        return filteredComments.stream()
+                .map(comment -> PostFindCommentResponse.from(
+                        isOwner(comment, siteUser), comment, commentOwner))
                 .collect(Collectors.toList());
     }
 
+    private List<Comment> filterCommentsByDeletionRules(List<Comment> comments) {
+        Map<Long, List<Comment>> commentsByParent = comments.stream()
+                .filter(comment -> comment.getParentComment() != null)
+                .collect(Collectors.groupingBy(comment -> comment.getParentComment().getId()));
+
+        List<Comment> result = new ArrayList<>();
+
+        List<Comment> parentComments = comments.stream()
+                .filter(comment -> comment.getParentComment() == null)
+                .toList();
+        for (Comment parent : parentComments) {
+            List<Comment> children = commentsByParent.getOrDefault(parent.getId(), List.of());
+            boolean allDeleted = parent.isDeleted() &&
+                    children.stream().allMatch(Comment::isDeleted);
+            if (!allDeleted) {
+                result.add(parent);
+                result.addAll(children.stream()
+                        .filter(child -> !child.isDeleted())
+                        .toList());
+            }
+        }
+        return result;
+    }
+
     private Boolean isOwner(Comment comment, SiteUser siteUser) {
-        return comment.getSiteUser().getId().equals(siteUser.getId());
+        return Objects.equals(comment.getSiteUserId(), siteUser.getId());
     }
 
     @Transactional
@@ -54,14 +87,7 @@ public class CommentService {
             parentComment = commentRepository.getById(commentCreateRequest.parentId());
             validateCommentDepth(parentComment);
         }
-
-        /*
-         * todo: siteUser를 영속 상태로 만들 수 있도록 컨트롤러에서 siteUserId 를 넘겨줄 것인지,
-         *  siteUser 에 postList 를 FetchType.EAGER 로 설정할 것인지,
-         *  post 와 siteUser 사이의 양방향을 끊을 것인지 생각해봐야한다.
-         */
-        SiteUser siteUser1 = siteUserRepository.findById(siteUser.getId()).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        Comment comment = commentCreateRequest.toEntity(siteUser1, post, parentComment);
+        Comment comment = commentCreateRequest.toEntity(siteUser, post, parentComment);
         Comment createdComment = commentRepository.save(comment);
 
         return CommentCreateResponse.from(createdComment);
@@ -100,18 +126,18 @@ public class CommentService {
             // 대댓글인 경우
             Comment parentComment = comment.getParentComment();
             // 대댓글을 삭제합니다.
-            comment.resetPostAndSiteUserAndParentComment();
+            comment.resetPostAndParentComment();
             commentRepository.deleteById(commentId);
             // 대댓글 삭제 이후, 부모댓글이 무의미하다면 이역시 삭제합니다.
             if (parentComment.getCommentList().isEmpty() && parentComment.getContent() == null) {
-                parentComment.resetPostAndSiteUserAndParentComment();
+                parentComment.resetPostAndParentComment();
                 commentRepository.deleteById(parentComment.getId());
             }
         } else {
             // 댓글인 경우
             if (comment.getCommentList().isEmpty()) {
                 // 대댓글이 없는 경우
-                comment.resetPostAndSiteUserAndParentComment();
+                comment.resetPostAndParentComment();
                 commentRepository.deleteById(commentId);
             } else {
                 // 대댓글이 있는 경우
@@ -122,7 +148,7 @@ public class CommentService {
     }
 
     private void validateOwnership(Comment comment, SiteUser siteUser) {
-        if (!comment.getSiteUser().getId().equals(siteUser.getId())) {
+        if (!Objects.equals(comment.getSiteUserId(), siteUser.getId())) {
             throw new CustomException(INVALID_POST_ACCESS);
         }
     }

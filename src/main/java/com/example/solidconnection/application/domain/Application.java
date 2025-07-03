@@ -7,12 +7,10 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -75,15 +73,15 @@ public class Application {
     @Column(name = "third_choice_university_info_for_apply_id")
     private Long thirdChoiceUnivApplyInfoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private SiteUser siteUser;
+    @Column(name = "site_user_id")
+    private long siteUserId;
 
     public Application(
             SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
             String term) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
@@ -101,7 +99,7 @@ public class Application {
             Long secondChoiceUnivApplyInfoId,
             Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;
@@ -122,7 +120,7 @@ public class Application {
             Long secondChoiceUnivApplyInfoId,
             Long thirdChoiceUnivApplyInfoId,
             String nicknameForApply) {
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.term = term;

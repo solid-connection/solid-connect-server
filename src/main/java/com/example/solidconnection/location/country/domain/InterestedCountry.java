@@ -1,11 +1,11 @@
 package com.example.solidconnection.location.country.domain;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -27,14 +27,14 @@ public class InterestedCountry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    @Column(name="site_user_id")
+    private long siteUserId;
 
-    @ManyToOne
-    private Country country;
+    @Column(name="country_code")
+    private String countryCode;
 
     public InterestedCountry(SiteUser siteUser, Country country) {
-        this.siteUser = siteUser;
-        this.country = country;
+        this.siteUserId = siteUser.getId();
+        this.countryCode = country.getCode();
     }
 }

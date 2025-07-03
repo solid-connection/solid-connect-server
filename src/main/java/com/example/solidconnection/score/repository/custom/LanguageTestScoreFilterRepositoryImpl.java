@@ -70,7 +70,7 @@ public class LanguageTestScoreFilterRepositoryImpl implements LanguageTestScoreF
         List<LanguageTestScoreSearchResponse> content = queryFactory
                 .select(LANGUAGE_TEST_SCORE_SEARCH_RESPONSE_PROJECTION)
                 .from(languageTestScore)
-                .join(languageTestScore.siteUser, siteUser)
+                .join(siteUser).on(languageTestScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),
@@ -84,7 +84,7 @@ public class LanguageTestScoreFilterRepositoryImpl implements LanguageTestScoreF
         Long totalCount = queryFactory
                 .select(languageTestScore.count())
                 .from(languageTestScore)
-                .join(languageTestScore.siteUser, siteUser)
+                .join(siteUser).on(languageTestScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),

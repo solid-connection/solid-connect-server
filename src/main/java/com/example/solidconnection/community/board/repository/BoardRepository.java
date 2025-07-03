@@ -3,7 +3,6 @@ package com.example.solidconnection.community.board.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.board.domain.Board;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -13,7 +12,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOA
 
 public interface BoardRepository extends JpaRepository<Board, String> {
 
-    @EntityGraph(attributePaths = {"postList"})
     Optional<Board> findBoardByCode(@Param("code") String code);
 
     default Board getByCodeUsingEntityGraph(String code) {

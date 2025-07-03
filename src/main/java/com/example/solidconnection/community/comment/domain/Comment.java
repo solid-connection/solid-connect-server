@@ -2,7 +2,6 @@ package com.example.solidconnection.community.comment.domain;
 
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.post.domain.Post;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,13 +40,15 @@ public class Comment extends BaseEntity {
     @Column(length = 255)
     private String content;
 
+    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    private boolean isDeleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_user_id")
-    private SiteUser siteUser;
+    @Column
+    private long siteUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -60,7 +61,7 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public void setParentCommentAndPostAndSiteUser(Comment parentComment, Post post, SiteUser siteUser) {
+    public void setParentCommentAndPostAndSiteUser(Comment parentComment, Post post, long siteUserId) {
 
         if (this.parentComment != null) {
             this.parentComment.getCommentList().remove(this);
@@ -74,14 +75,10 @@ public class Comment extends BaseEntity {
         this.post = post;
         post.getCommentList().add(this);
 
-        if (this.siteUser != null) {
-            this.siteUser.getCommentList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getCommentList().add(this);
+        this.siteUserId = siteUserId;
     }
 
-    public void setPostAndSiteUser(Post post, SiteUser siteUser) {
+    public void setPostAndSiteUser(Post post, long siteUserId) {
 
         if (this.post != null) {
             this.post.getCommentList().remove(this);
@@ -89,21 +86,13 @@ public class Comment extends BaseEntity {
         this.post = post;
         post.getCommentList().add(this);
 
-        if (this.siteUser != null) {
-            this.siteUser.getCommentList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getCommentList().add(this);
+        this.siteUserId = siteUserId;
     }
 
-    public void resetPostAndSiteUserAndParentComment() {
+    public void resetPostAndParentComment() {
         if (this.post != null) {
             this.post.getCommentList().remove(this);
             this.post = null;
-        }
-        if (this.siteUser != null) {
-            this.siteUser.getCommentList().remove(this);
-            this.siteUser = null;
         }
         if (this.parentComment != null) {
             this.parentComment.getCommentList().remove(this);
@@ -116,6 +105,6 @@ public class Comment extends BaseEntity {
     }
 
     public void deprecateComment() {
-        this.content = null;
+        this.isDeleted = true;
     }
 }

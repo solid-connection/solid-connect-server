@@ -1,10 +1,8 @@
 package com.example.solidconnection.location.country.domain;
 
-import com.example.solidconnection.location.region.domain.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,12 +21,12 @@ public class Country {
     @Column(nullable = false, length = 100)
     private String koreanName;
 
-    @ManyToOne
-    private Region region;
+    @Column(name="region_code")
+    private String regionCode;
 
-    public Country(String code, String koreanName, Region region) {
+    public Country(String code, String koreanName, String regionCode) {
         this.code = code;
         this.koreanName = koreanName;
-        this.region = region;
+        this.regionCode = regionCode;
     }
 }
