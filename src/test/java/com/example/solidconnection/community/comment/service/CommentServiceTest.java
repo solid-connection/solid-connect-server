@@ -108,6 +108,30 @@ class CommentServiceTest {
                             ))
             );
         }
+
+        @Test
+        void 부모댓글과_대댓글이_모두_삭제되면_응답에서_제외한다() {
+            // given
+            Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
+            Comment childComment1 = commentFixture.자식_댓글("자식 댓글1", post, user2, parentComment);
+            Comment childComment2 = commentFixture.자식_댓글("자식 댓글2", post, user2, parentComment);
+
+            parentComment.deprecateComment();
+            childComment1.deprecateComment();
+            childComment2.deprecateComment();
+            commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
+
+            // when
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).isEmpty(),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .doesNotContain(parentComment.getId(), childComment1.getId(), childComment2.getId())
+            );
+        }
     }
 
     @Nested
@@ -281,7 +305,8 @@ class CommentServiceTest {
             // then
             Comment deletedComment = commentRepository.findById(response.id()).orElseThrow();
             assertAll(
-                    () -> assertThat(deletedComment.getContent()).isNull(),
+                    () -> assertThat(deletedComment.getContent()).isEqualTo("부모 댓글"),
+                    () -> assertThat(deletedComment.isDeleted()).isTrue(),
                     () -> assertThat(deletedComment.getCommentList())
                             .extracting(Comment::getId)
                             .containsExactlyInAnyOrder(childComment.getId()),
@@ -313,27 +338,6 @@ class CommentServiceTest {
                     () -> assertThat(remainingChildComments)
                             .extracting(Comment::getId)
                             .containsExactly(childComment2.getId())
-            );
-        }
-
-        @Test
-        @Transactional
-        void 대댓글을_삭제하고_부모댓글이_삭제된_상태면_부모댓글도_삭제된다() {
-            // given
-            Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
-            Comment childComment = commentFixture.자식_댓글("자식 댓글", post, user2, parentComment);
-            List<Comment> comments = post.getCommentList();
-            int expectedCommentsCount = comments.size() - 2;
-            parentComment.deprecateComment();
-
-            // when
-            CommentDeleteResponse response = commentService.deleteCommentById(user2, childComment.getId());
-
-            // then
-            assertAll(
-                    () -> assertThat(commentRepository.findById(response.id())).isEmpty(),
-                    () -> assertThat(commentRepository.findById(parentComment.getId())).isEmpty(),
-                    () -> assertThat(post.getCommentList()).hasSize(expectedCommentsCount)
             );
         }
 

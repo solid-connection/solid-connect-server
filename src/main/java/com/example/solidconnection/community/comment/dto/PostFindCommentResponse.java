@@ -20,7 +20,7 @@ public record PostFindCommentResponse(
         return new PostFindCommentResponse(
                 comment.getId(),
                 getParentCommentId(comment),
-                comment.getContent(),
+                getDisplayContent(comment),
                 isOwner,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
@@ -33,5 +33,8 @@ public record PostFindCommentResponse(
             return comment.getParentComment().getId();
         }
         return null;
+    }
+    private static String getDisplayContent(Comment comment) {
+        return comment.isDeleted() ? "" : comment.getContent();
     }
 }

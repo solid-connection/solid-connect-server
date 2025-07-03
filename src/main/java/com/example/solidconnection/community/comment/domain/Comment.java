@@ -2,7 +2,6 @@ package com.example.solidconnection.community.comment.domain;
 
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.post.domain.Post;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +39,9 @@ public class Comment extends BaseEntity {
 
     @Column(length = 255)
     private String content;
+
+    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -87,7 +89,7 @@ public class Comment extends BaseEntity {
         this.siteUserId = siteUserId;
     }
 
-    public void resetPostAndSiteUserAndParentComment() {
+    public void resetPostAndParentComment() {
         if (this.post != null) {
             this.post.getCommentList().remove(this);
             this.post = null;
@@ -103,6 +105,6 @@ public class Comment extends BaseEntity {
     }
 
     public void deprecateComment() {
-        this.content = null;
+        this.isDeleted = true;
     }
 }
