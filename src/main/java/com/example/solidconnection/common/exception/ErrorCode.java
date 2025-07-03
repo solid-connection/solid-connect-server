@@ -43,6 +43,7 @@ public enum ErrorCode {
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
+    MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
