@@ -1,28 +1,24 @@
 package com.example.solidconnection.mentor.dto;
 
-import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.mentor.domain.Mentoring;
+import com.example.solidconnection.siteuser.domain.SiteUser;
 
 import java.time.ZonedDateTime;
 
 public record MentoringResponse(
-        long id,
-        long mentorId,
-        long menteeId,
-        ZonedDateTime createdAt,
-        ZonedDateTime confirmedAt,
-        VerifyStatus verifyStatus,
-        String rejectedReason
+        long mentoringId,
+        String profileImageUrl,
+        String nickname,
+        boolean isChecked,
+        ZonedDateTime createAt
 ) {
-    public static MentoringResponse from(Mentoring mentoring) {
+    public static MentoringResponse from(Mentoring mentoring, SiteUser mentee) {
         return new MentoringResponse(
                 mentoring.getId(),
-                mentoring.getMentorId(),
-                mentoring.getMenteeId(),
-                mentoring.getCreatedAt(),
-                mentoring.getConfirmedAt(),
-                mentoring.getVerifyStatus(),
-                mentoring.getRejectedReason()
+                mentee.getProfileImageUrl(),
+                mentee.getNickname(),
+                mentoring.getCheckedAt() != null,
+                mentoring.getCreatedAt()
         );
     }
 }

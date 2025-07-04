@@ -61,8 +61,8 @@ class MentoringQueryServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(responses.mentoringResponseList()).hasSize(3),
-                    () -> assertThat(responses.mentoringResponseList()).extracting(MentoringResponse::id)
+                    () -> assertThat(responses.requests()).hasSize(3),
+                    () -> assertThat(responses.requests()).extracting(MentoringResponse::mentoringId)
                             .containsExactlyInAnyOrder(
                                     mentoring1.getId(),
                                     mentoring2.getId(),
@@ -77,7 +77,7 @@ class MentoringQueryServiceTest {
             MentoringListResponse responses = mentoringQueryService.getMentorings(mentorUser.getId());
 
             // then
-            assertThat(responses.mentoringResponseList()).isEmpty();
+            assertThat(responses.requests()).isEmpty();
         }
     }
 
@@ -95,7 +95,7 @@ class MentoringQueryServiceTest {
             MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(mentorUser.getId());
 
             // then
-            assertThat(response.mentoringCount()).isEqualTo(2);
+            assertThat(response.uncheckedCount()).isEqualTo(2);
         }
 
         @Test
@@ -107,7 +107,7 @@ class MentoringQueryServiceTest {
             MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(mentorUser.getId());
 
             // then
-            assertThat(response.mentoringCount()).isZero();
+            assertThat(response.uncheckedCount()).isZero();
         }
     }
 }

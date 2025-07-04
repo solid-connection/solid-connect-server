@@ -1,10 +1,10 @@
 package com.example.solidconnection.mentor.dto;
 
 public record MentoringCountResponse(
-        int mentoringCount
+        int uncheckedCount
 ) {
 
-    public static MentoringCountResponse from(int mentoringCount) {
-        return new MentoringCountResponse(mentoringCount);
+    public static MentoringCountResponse from(int uncheckedCount) {
+        return new MentoringCountResponse(uncheckedCount);
     }
 }
