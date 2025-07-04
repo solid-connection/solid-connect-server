@@ -128,7 +128,7 @@ class CommentServiceTest {
                     () -> assertThat(savedComment.getContent()).isEqualTo(request.content()),
                     () -> assertThat(savedComment.getParentComment()).isNull(),
                     () -> assertThat(savedComment.getPost().getId()).isEqualTo(post.getId()),
-                    () -> assertThat(savedComment.getSiteUser().getId()).isEqualTo(user1.getId())
+                    () -> assertThat(savedComment.getSiteUserId()).isEqualTo(user1.getId())
             );
         }
 
@@ -148,7 +148,7 @@ class CommentServiceTest {
                     () -> assertThat(savedComment.getContent()).isEqualTo(request.content()),
                     () -> assertThat(savedComment.getParentComment().getId()).isEqualTo(parentComment.getId()),
                     () -> assertThat(savedComment.getPost().getId()).isEqualTo(post.getId()),
-                    () -> assertThat(savedComment.getSiteUser().getId()).isEqualTo(user2.getId())
+                    () -> assertThat(savedComment.getSiteUserId()).isEqualTo(user2.getId())
             );
         }
 
@@ -205,7 +205,7 @@ class CommentServiceTest {
                     () -> assertThat(updatedComment.getContent()).isEqualTo(request.content()),
                     () -> assertThat(updatedComment.getParentComment()).isNull(),
                     () -> assertThat(updatedComment.getPost().getId()).isEqualTo(post.getId()),
-                    () -> assertThat(updatedComment.getSiteUser().getId()).isEqualTo(user1.getId())
+                    () -> assertThat(updatedComment.getSiteUserId()).isEqualTo(user1.getId())
             );
         }
 

@@ -16,6 +16,7 @@ import com.example.solidconnection.community.post.repository.PostLikeRepository;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
@@ -23,10 +24,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class PostQueryService {
     private final BoardRepository boardRepository;
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
+    private final SiteUserRepository siteUserRepository;
     private final CommentService commentService;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
@@ -44,11 +48,10 @@ public class PostQueryService {
 
         String boardCode = validateCode(code);
         PostCategory postCategory = validatePostCategory(category);
+        boardRepository.getByCode(boardCode);
+        List<Post> postList = postRepository.findByBoardCode(boardCode);
 
-        Board board = boardRepository.getByCodeUsingEntityGraph(boardCode);
-        List<Post> postList = getPostListByPostCategory(board.getPostList(), postCategory);
-
-        return PostListResponse.from(postList);
+        return PostListResponse.from(getPostListByPostCategory(postList, postCategory));
     }
 
     @Transactional(readOnly = true)
@@ -57,8 +60,12 @@ public class PostQueryService {
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
 
-        PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(post.getBoard());
-        PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(post.getSiteUser());
+        Board board = boardRepository.findBoardByCode(post.getBoardCode())
+                .orElseThrow(()->new CustomException(INVALID_BOARD_CODE));
+        SiteUser postAuthor = siteUserRepository.findById(post.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(board);
+        PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(postAuthor);
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
         List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser, postId);
 
@@ -80,11 +87,11 @@ public class PostQueryService {
     }
 
     private Boolean getIsOwner(Post post, SiteUser siteUser) {
-        return post.getSiteUser().getId().equals(siteUser.getId());
+        return Objects.equals(post.getSiteUserId(), siteUser.getId());
     }
 
     private Boolean getIsLiked(Post post, SiteUser siteUser) {
-        return postLikeRepository.findPostLikeByPostAndSiteUser(post, siteUser)
+        return postLikeRepository.findPostLikeByPostAndSiteUserId(post, siteUser.getId())
                 .isPresent();
     }
 

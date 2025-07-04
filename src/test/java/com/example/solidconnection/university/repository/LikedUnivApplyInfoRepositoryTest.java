@@ -81,8 +81,8 @@ public class LikedUnivApplyInfoRepositoryTest {
 
     private LikedUnivApplyInfo createLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         return LikedUnivApplyInfo.builder()
-                .siteUser(siteUser)
-                .univApplyInfo(univApplyInfo)
+                .siteUserId(siteUser.getId())
+                .univApplyInfoId(univApplyInfo.getId())
                 .build();
     }
 }
