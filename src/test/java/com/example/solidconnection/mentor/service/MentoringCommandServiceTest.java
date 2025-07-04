@@ -27,10 +27,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_A
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
 @TestContainerSpringBootTest
 @DisplayName("멘토링 CUD 서비스 테스트")
 class MentoringCommandServiceTest {
