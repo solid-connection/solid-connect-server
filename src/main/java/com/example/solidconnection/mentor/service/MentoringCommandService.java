@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_MENTOR;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
@@ -31,8 +30,6 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        validateAlreadyMentor(siteUserId);
-
         Mentoring mentoring = Mentoring.builder()
                 .mentorId(mentoringApplyRequest.mentorId())
                 .menteeId(siteUserId)
@@ -40,12 +37,6 @@ public class MentoringCommandService {
                 .build();
 
         return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
-    }
-
-    private void validateAlreadyMentor(long siteUserId) {
-        if (mentorRepository.existsBySiteUserId(siteUserId)) {
-            throw new CustomException(ALREADY_MENTOR);
-        }
     }
 
     @Transactional

@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_MENTOR;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
@@ -89,18 +88,6 @@ class MentoringCommandServiceTest {
                     () -> assertThat(mentoring.getMenteeId()).isEqualTo(menteeUser.getId()),
                     () -> assertThat(mentoring.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
             );
-        }
-
-        @Test
-        void 이미_멘토인_사용자가_신청시_예외_응답을_반환한다() {
-            // given
-            MentoringApplyRequest request = new MentoringApplyRequest(mentor2.getId());
-
-            // when & then
-            assertThatThrownBy(() ->
-                    mentoringCommandService.applyMentoring(mentorUser1.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(ALREADY_MENTOR.getMessage());
         }
     }
 

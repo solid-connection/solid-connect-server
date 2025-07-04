@@ -8,7 +8,6 @@ import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.dto.MentoringCountResponse;
 import com.example.solidconnection.mentor.dto.MentoringListResponse;
-import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mentorings")
@@ -35,6 +32,7 @@ public class MentoringController {
     private final MentoringCommandService mentoringCommandService;
     private final MentoringQueryService mentoringQueryService;
 
+    @RequireRoleAccess(roles = Role.MENTEE)
     @PostMapping("/apply")
     public ResponseEntity<MentoringApplyResponse> applyMentoring(
             @AuthorizedUser SiteUser siteUser,
