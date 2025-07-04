@@ -183,7 +183,7 @@ class MentoringCommandServiceTest {
         void 존재하지_않는_멘토링_아이디로_요청시_예외_응답을_반환한다() {
             // given
             MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
-            Long invalidMentoringId = 9999L;
+            long invalidMentoringId = 9999L;
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser1.getId(), invalidMentoringId, request))
@@ -223,7 +223,7 @@ class MentoringCommandServiceTest {
         @Test
         void 존재하지_않는_멘토링_아이디로_요청시_예외_응답을_반환한다() {
             // given
-            Long invalidMentoringId = 9999L;
+            long invalidMentoringId = 9999L;
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.checkMentoring(mentorUser1.getId(), invalidMentoringId))
