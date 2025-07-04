@@ -56,8 +56,28 @@ public class Mentoring {
     @Column
     private long menteeId;
 
+    public Mentoring(long mentorId, long menteeId, VerifyStatus verifyStatus) {
+        this.mentorId = mentorId;
+        this.menteeId = menteeId;
+        this.verifyStatus = verifyStatus;
+    }
+
     @PrePersist
     public void onPrePersist() {
         this.createdAt = ZonedDateTime.now(UTC).truncatedTo(MICROS); // 나노초 6자리 까지만 저장
+    }
+
+    public void confirm(VerifyStatus status, String rejectedReason) {
+        this.verifyStatus = status;
+        this.rejectedReason = rejectedReason;
+        this.confirmedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+
+        if (this.checkedAt == null) {
+            this.checkedAt = this.confirmedAt;
+        }
+    }
+
+    public void check() {
+        this.checkedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
 }
