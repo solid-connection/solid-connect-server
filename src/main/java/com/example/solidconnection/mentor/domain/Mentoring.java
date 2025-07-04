@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -25,7 +24,6 @@ import static java.time.temporal.ChronoUnit.MICROS;
 
 @Entity
 @Getter
-@Builder
 @EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
 @AllArgsConstructor
@@ -57,6 +55,12 @@ public class Mentoring {
 
     @Column
     private long menteeId;
+
+    public Mentoring(long mentorId, long menteeId, VerifyStatus verifyStatus) {
+        this.mentorId = mentorId;
+        this.menteeId = menteeId;
+        this.verifyStatus = verifyStatus;
+    }
 
     @PrePersist
     public void onPrePersist() {
