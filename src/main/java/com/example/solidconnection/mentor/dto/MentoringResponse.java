@@ -10,7 +10,7 @@ public record MentoringResponse(
         String profileImageUrl,
         String nickname,
         boolean isChecked,
-        ZonedDateTime createAt
+        ZonedDateTime createdAt
 ) {
     public static MentoringResponse from(Mentoring mentoring, SiteUser mentee) {
         return new MentoringResponse(
