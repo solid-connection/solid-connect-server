@@ -30,11 +30,7 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        Mentoring mentoring = new Mentoring(
-                mentoringApplyRequest.mentorId(),
-                siteUserId,
-                VerifyStatus.PENDING
-        );
+        Mentoring mentoring = new Mentoring(mentoringApplyRequest.mentorId(), siteUserId, VerifyStatus.PENDING);
 
         return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
     }

@@ -74,7 +74,7 @@ public class MentoringController {
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/check")
-    public ResponseEntity<MentoringCountResponse> getNewMentoringsCount(
+    public ResponseEntity<MentoringCountResponse> getUncheckedMentoringsCount(
             @AuthorizedUser SiteUser siteUser
     ) {
         MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(siteUser.getId());
