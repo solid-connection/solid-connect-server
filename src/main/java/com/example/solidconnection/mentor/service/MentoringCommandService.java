@@ -44,10 +44,10 @@ public class MentoringCommandService {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
                 .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
 
-        Mentor mentor = mentorRepository.findById(mentoring.getMentorId())
+        Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
-        validateMentoringOwnership(siteUserId, mentor);
+        validateMentoringOwnership(mentor, mentoring);
         validateMentoringPermission(mentoring);
 
         if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
@@ -75,10 +75,10 @@ public class MentoringCommandService {
         Mentoring mentoring = mentoringRepository.findById(mentoringId)
                 .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
 
-        Mentor mentor = mentorRepository.findById(mentoring.getMentorId())
+        Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
-        validateMentoringOwnership(siteUserId, mentor);
+        validateMentoringOwnership(mentor, mentoring);
 
         mentoring.check();
 
@@ -86,8 +86,8 @@ public class MentoringCommandService {
     }
 
     // 멘토는 본인의 멘토링에 대해 confirm 및 check해야 한다.
-    private void validateMentoringOwnership(long siteUserId, Mentor mentor) {
-        if (siteUserId != mentor.getSiteUserId()) {
+    private void validateMentoringOwnership(Mentor mentor, Mentoring mentoring) {
+        if (mentoring.getMentorId() != mentor.getId()) {
             throw new CustomException(UNAUTHORIZED_MENTORING);
         }
     }
