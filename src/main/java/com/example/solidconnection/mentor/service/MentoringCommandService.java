@@ -44,7 +44,7 @@ public class MentoringCommandService {
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
         validateMentoringOwnership(mentor, mentoring);
-        validateMentoringPermission(mentoring);
+        validateMentoringNotConfirmed(mentoring);
 
         if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
                 && (mentoringConfirmRequest.rejectedReason() == null || mentoringConfirmRequest.rejectedReason().isBlank())) {
@@ -60,7 +60,7 @@ public class MentoringCommandService {
         return MentoringConfirmResponse.from(mentoring);
     }
 
-    private void validateMentoringPermission(Mentoring mentoring) {
+    private void validateMentoringNotConfirmed(Mentoring mentoring) {
         if (mentoring.getVerifyStatus() != VerifyStatus.PENDING) {
             throw new CustomException(MENTORING_ALREADY_CONFIRMED);
         }
