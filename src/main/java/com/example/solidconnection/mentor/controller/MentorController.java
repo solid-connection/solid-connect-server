@@ -8,7 +8,10 @@ import com.example.solidconnection.mentor.service.MentorQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
+import org.springframework.data.web.SortDefault.SortDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +41,13 @@ public class MentorController {
     public ResponseEntity<SliceResponse<MentorPreviewResponse>> getMentorPreviews(
             @AuthorizedUser SiteUser siteUser,
             @RequestParam("region") String region,
-            @PageableDefault(size = 3, sort = "menteeCount", direction = DESC) Pageable pageable
+
+            @PageableDefault(size = 3, sort = "menteeCount", direction = DESC)
+            @SortDefaults({
+                    @SortDefault(sort = "menteeCount", direction = Sort.Direction.DESC),
+                    @SortDefault(sort = "id", direction = Sort.Direction.ASC)
+            })
+            Pageable pageable
     ) {
         SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, siteUser, pageable);
         return ResponseEntity.ok(response);
