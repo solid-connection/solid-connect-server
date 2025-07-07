@@ -160,8 +160,7 @@ class MentoringCommandServiceTest {
             MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
 
             // when & then
-            assertThatThrownBy(() ->
-                    mentoringCommandService.confirmMentoring(mentorUser2.getId(), mentoring.getId(), request))
+            assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser2.getId(), mentoring.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(UNAUTHORIZED_MENTORING.getMessage());
         }
@@ -173,8 +172,7 @@ class MentoringCommandServiceTest {
             MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
 
             // when & then
-            assertThatThrownBy(() ->
-                    mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
+            assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MENTORING_ALREADY_CONFIRMED.getMessage());
         }
