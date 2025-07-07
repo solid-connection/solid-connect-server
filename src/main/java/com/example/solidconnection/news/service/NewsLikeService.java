@@ -20,6 +20,15 @@ public class NewsLikeService {
     private final NewsRepository newsRepository;
     private final LikedNewsRepository likedNewsRepository;
 
+    @Transactional(readOnly = true)
+    public LikedNewsResponse getNewsLikeStatus(long siteUserId, Long newsId) {
+        if (!newsRepository.existsById(newsId)) {
+            throw new CustomException(NEWS_NOT_FOUND);
+        }
+        boolean isLiked = likedNewsRepository.existsByNewsIdAndSiteUserId(newsId, siteUserId);
+        return LikedNewsResponse.of(newsId, isLiked);
+    }
+
     @Transactional
     public LikedNewsResponse addNewsLike(long siteUserId, Long newsId) {
         if (!newsRepository.existsById(newsId)) {
