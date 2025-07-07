@@ -11,8 +11,8 @@ import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +46,7 @@ public class MentorQueryService {
 
     @Transactional(readOnly = true)
     public MentorPreviewsResponse getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
-        Page<Mentor> mentorPage = mentorRepository.findAll(pageable);
+        Slice<Mentor> mentorPage = mentorRepository.findBy(pageable);
         List<Mentor> mentors = mentorPage.toList();
 
         List<MentorPreviewResponse> content = getContent(mentors, siteUser);
@@ -69,7 +69,7 @@ public class MentorQueryService {
         return mentorPreviews;
     }
 
-    private int getPageNumber(Page<Mentor> page) {
+    private int getPageNumber(Slice<Mentor> page) {
         return page.hasNext() ? page.nextPageable().getPageNumber() + 1 : NO_NEXT_PAGE_NUMBER; // one-based index
     }
 }
