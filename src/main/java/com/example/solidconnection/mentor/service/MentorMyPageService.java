@@ -4,8 +4,8 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
-import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
+import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.service.MyPageService;
@@ -36,18 +36,18 @@ public class MentorMyPageService {
     }
 
     @Transactional
-    public void updateMentorMyPage(SiteUser siteUser, MentorMyPageUpdateRequest mentorMyPageUpdateRequest, MultipartFile imageFile) {
+    public void updateMentorMyPage(SiteUser siteUser, MentorMyPageUpdateRequest request, MultipartFile imageFile) {
         Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
-        myPageService.updateMyPageInfo(siteUser, imageFile, mentorMyPageUpdateRequest.nickname());
-        mentor.updateIntroduction(mentorMyPageUpdateRequest.introduction());
-        mentor.updatePassTip(mentorMyPageUpdateRequest.passTip());
+        myPageService.updateMyPageInfo(siteUser, imageFile, request.nickname());
+        mentor.updateIntroduction(request.introduction());
+        mentor.updatePassTip(request.passTip());
 
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
-        for (ChannelRequest request : mentorMyPageUpdateRequest.channels()) {
-            newChannels.add(new Channel(sequence++, request.type(), request.url()));
+        for (ChannelRequest channelRequest : request.channels()) {
+            newChannels.add(new Channel(sequence++, channelRequest.type(), channelRequest.url()));
         }
         mentor.updateChannels(newChannels);
     }
