@@ -81,6 +81,15 @@ public class NewsController {
         return ResponseEntity.ok(newsCommandResponse);
     }
 
+    @GetMapping("/{news-id}/like")
+    public ResponseEntity<LikedNewsResponse> getNewsLikeStatus(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news-id") Long newsId
+    ) {
+        LikedNewsResponse likedNewsResponse = newsLikeService.getNewsLikeStatus(siteUser.getId(), newsId);
+        return ResponseEntity.ok(likedNewsResponse);
+    }
+
     @PostMapping("/{news-id}/like")
     public ResponseEntity<LikedNewsResponse> addNewsLike(
             @AuthorizedUser SiteUser siteUser,
