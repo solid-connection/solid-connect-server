@@ -135,6 +135,7 @@ class MentorMyPageServiceTest {
 
             // when
             mentorMyPageService.updateMentorMyPage(mentorUser, request, null);
+
             // then
             List<Channel> updatedChannels = channelRepositoryForTest.findAllByMentorId(mentor.getId());
             assertAll(
