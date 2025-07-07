@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RequestMapping("/mentor/my")
@@ -37,10 +35,9 @@ public class MentorMyPageController {
     @PutMapping
     public ResponseEntity<String> updateMentorMyPage(
             @AuthorizedUser SiteUser siteUser,
-            @Valid MentorMyPageUpdateRequest mentorMyPageUpdateRequest,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile
+            @Valid MentorMyPageUpdateRequest mentorMyPageUpdateRequest
     ) {
-        mentorMyPageService.updateMentorMyPage(siteUser, mentorMyPageUpdateRequest, imageFile);
+        mentorMyPageService.updateMentorMyPage(siteUser, mentorMyPageUpdateRequest);
         return ResponseEntity.ok().build();
     }
 }

@@ -12,15 +12,12 @@ import com.example.solidconnection.mentor.repository.ChannelRepositoryForTest;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
@@ -28,8 +25,6 @@ import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
 import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
 
 @TestContainerSpringBootTest
 @DisplayName("멘토 마이페이지 서비스 테스트")
@@ -52,9 +47,6 @@ class MentorMyPageServiceTest {
 
     @Autowired
     private ChannelRepositoryForTest channelRepositoryForTest;
-
-    @MockBean
-    private MyPageService myPageService;
 
     private SiteUser mentorUser;
     private Mentor mentor;
@@ -92,29 +84,14 @@ class MentorMyPageServiceTest {
     class 멘토의_마이_페이지를_수정한다 {
 
         @Test
-        void 멘토의_사용자_정보_수정은_기존_수정로직에_위임한다() {
-            // given
-            String newNickname = "새로운 닉네임";
-            MockMultipartFile newProfileImg = createImageFile();
-            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest(newNickname, "자기소개", "합격 팁", List.of());
-
-            // when
-            mentorMyPageService.updateMentorMyPage(mentorUser, request, newProfileImg);
-
-            // then
-            then(myPageService).should(times(1))
-                    .updateMyPageInfo(mentorUser, newProfileImg, newNickname);
-        }
-
-        @Test
         void 멘토_정보를_수정한다() {
             // given
             String newIntroduction = "새로운 자기소개";
             String newPassTip = "새로운 합격 팁";
-            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest("nickname", newIntroduction, newPassTip, List.of());
+            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest(newIntroduction, newPassTip, List.of());
 
             // when
-            mentorMyPageService.updateMentorMyPage(mentorUser, request, null);
+            mentorMyPageService.updateMentorMyPage(mentorUser, request);
 
             // then
             Mentor updatedMentor = mentorRepository.findById(mentor.getId()).get();
@@ -131,10 +108,10 @@ class MentorMyPageServiceTest {
                     new ChannelRequest(BLOG, "https://blog.com"),
                     new ChannelRequest(INSTAGRAM, "https://instagram.com")
             );
-            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest("nickname", "introduction", "passTip", newChannels);
+            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest("introduction", "passTip", newChannels);
 
             // when
-            mentorMyPageService.updateMentorMyPage(mentorUser, request, null);
+            mentorMyPageService.updateMentorMyPage(mentorUser, request);
 
             // then
             List<Channel> updatedChannels = channelRepositoryForTest.findAllByMentorId(mentor.getId());
@@ -145,14 +122,5 @@ class MentorMyPageServiceTest {
                             .containsExactly("https://blog.com", "https://instagram.com")
             );
         }
-    }
-
-    private MockMultipartFile createImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
     }
 }

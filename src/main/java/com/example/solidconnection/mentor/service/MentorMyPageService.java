@@ -12,7 +12,6 @@ import com.example.solidconnection.siteuser.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +37,11 @@ public class MentorMyPageService {
     }
 
     @Transactional
-    public void updateMentorMyPage(SiteUser siteUser, MentorMyPageUpdateRequest request, MultipartFile imageFile) {
+    public void updateMentorMyPage(SiteUser siteUser, MentorMyPageUpdateRequest request) {
         validateChannelRegistrationLimit(request.channels());
         Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
-        myPageService.updateMyPageInfo(siteUser, imageFile, request.nickname());
         mentor.updateIntroduction(request.introduction());
         mentor.updatePassTip(request.passTip());
         updateChannel(request.channels(), mentor);
