@@ -46,6 +46,31 @@ class NewsLikeServiceTest {
     }
 
     @Nested
+    class 소식지_좋아요_상태를_조회한다 {
+
+        @Test
+        void 좋아요한_소식지인지_확인한다() {
+            // given
+            newsLikeService.addNewsLike(user.getId(), news.getId());
+
+            // when
+            LikedNewsResponse response = newsLikeService.getNewsLikeStatus(user.getId(), news.getId());
+
+            // then
+            assertThat(response.isLike()).isTrue();
+        }
+
+        @Test
+        void 좋아요하지_않은_소식지의_좋아요_상태를_조회한다() {
+            // when
+            LikedNewsResponse response = newsLikeService.getNewsLikeStatus(user.getId(), news.getId());
+
+            // then
+            assertThat(response.isLike()).isFalse();
+        }
+    }
+
+    @Nested
     class 소식지_좋아요를_등록한다 {
 
         @Test
