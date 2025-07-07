@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.service;
 
+import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.mentor.domain.Channel;
@@ -7,7 +8,6 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.dto.ChannelResponse;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
 import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
-import com.example.solidconnection.mentor.dto.MentorPreviewsResponse;
 import com.example.solidconnection.mentor.fixture.ChannelFixture;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
@@ -136,7 +136,7 @@ class MentorQueryServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor2);
 
             // when
-            MentorPreviewsResponse response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
 
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
@@ -160,7 +160,7 @@ class MentorQueryServiceTest {
             mentoringFixture.대기중_멘토링(mentor1.getId(), currentUser.getId());
 
             // when
-            MentorPreviewsResponse response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
 
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
@@ -174,7 +174,7 @@ class MentorQueryServiceTest {
         @Test
         void 다음_페이지_번호를_응답한다() {
             // given
-            MentorPreviewsResponse response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 1));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 1));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(2);
@@ -183,7 +183,7 @@ class MentorQueryServiceTest {
         @Test
         void 다음_페이지가_없으면_페이지_없음을_의미하는_값을_응답한다() {
             // given
-            MentorPreviewsResponse response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(NO_NEXT_PAGE_NUMBER);

@@ -1,8 +1,9 @@
 package com.example.solidconnection.mentor.controller;
 
+import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
-import com.example.solidconnection.mentor.dto.MentorPreviewsResponse;
+import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
 import com.example.solidconnection.mentor.service.MentorQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,12 @@ public class MentorController {
     }
 
     @GetMapping
-    public ResponseEntity<MentorPreviewsResponse> getMentorPreviews(
+    public ResponseEntity<SliceResponse<MentorPreviewResponse>> getMentorPreviews(
             @AuthorizedUser SiteUser siteUser,
             @RequestParam("region") String region,
             @PageableDefault(size = 3, sort = "menteeCount", direction = DESC) Pageable pageable
     ) {
-        MentorPreviewsResponse response = mentorQueryService.getMentorPreviews(region, siteUser, pageable);
+        SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, siteUser, pageable);
         return ResponseEntity.ok(response);
     }
 }

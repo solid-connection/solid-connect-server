@@ -1,10 +1,10 @@
 package com.example.solidconnection.mentor.service;
 
+import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
 import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
-import com.example.solidconnection.mentor.dto.MentorPreviewsResponse;
 import com.example.solidconnection.mentor.repository.MentorBatchQueryRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
@@ -45,14 +45,14 @@ public class MentorQueryService {
     }
 
     @Transactional(readOnly = true)
-    public MentorPreviewsResponse getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
+    public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
         Slice<Mentor> mentorPage = mentorRepository.findBy(pageable);
         List<Mentor> mentors = mentorPage.toList();
 
         List<MentorPreviewResponse> content = getContent(mentors, siteUser);
         int pageNumber = getPageNumber(mentorPage);
 
-        return new MentorPreviewsResponse(content, pageNumber);
+        return new SliceResponse<>(content, pageNumber);
     }
 
     private List<MentorPreviewResponse> getContent(List<Mentor> mentors, SiteUser siteUser) {
