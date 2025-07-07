@@ -1,8 +1,8 @@
 package com.example.solidconnection.mentor.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
+import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.service.MentorMyPageService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -33,7 +33,7 @@ public class MentorMyPageController {
         return ResponseEntity.ok(mentorMyPageResponse);
     }
 
-    @RequireRoleAccess(roles = {Role.MENTOR})
+    @RequireRoleAccess(roles = Role.MENTOR)
     @PutMapping
     public ResponseEntity<String> updateMentorMyPage(
             @AuthorizedUser SiteUser siteUser,
