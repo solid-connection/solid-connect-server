@@ -1,9 +1,7 @@
 package com.example.solidconnection.mentor.repository;
 
 import com.example.solidconnection.mentor.domain.Mentor;
-import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
-import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -30,9 +28,6 @@ class MentorBatchQueryRepositoryTest {
 
     @Autowired
     private SiteUserFixture siteUserFixture;
-
-    @Autowired
-    private MentoringFixture mentoringFixture;
 
     private long universityId = 1L; // todo: 멘토 인증 기능 추가 변경 필요
     private Mentor mentor1, mentor2;
@@ -65,7 +60,6 @@ class MentorBatchQueryRepositoryTest {
     @Test
     void 멘토_ID_와_현재_사용자의_지원_여부를_매핑한다() {
         // given
-        Mentoring 대기중_멘토링 = mentoringFixture.대기중_멘토링(mentor1.getId(), currentUser.getId());
         List<Mentor> mentors = List.of(mentor1, mentor2);
 
         // when
