@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_NEWS;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_NEWS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -68,6 +69,33 @@ class NewsLikeServiceTest {
             assertThatCode(() -> newsLikeService.addNewsLike(user.getId(), news.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ALREADY_LIKED_NEWS.getMessage());
+        }
+    }
+
+    @Nested
+    class 소식지_좋아요를_취소한다 {
+
+        @Test
+        void 성공적으로_좋아요를_취소한다() {
+            // given
+            newsLikeService.addNewsLike(user.getId(), news.getId());
+
+            // when
+            LikedNewsResponse response = newsLikeService.cancelNewsLike(user.getId(), news.getId());
+
+            // then
+            assertAll(
+                () -> assertThat(response.isLike()).isFalse(),
+                () -> assertThat(likedNewsRepository.existsByNewsIdAndSiteUserId(news.getId(), user.getId())).isFalse()
+            );
+        }
+
+        @Test
+        void 좋아요하지_않았으면_예외_응답을_반환한다() {
+            // when & then
+            assertThatCode(() -> newsLikeService.cancelNewsLike(user.getId(), news.getId()))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(NOT_LIKED_NEWS.getMessage());
         }
     }
 }
