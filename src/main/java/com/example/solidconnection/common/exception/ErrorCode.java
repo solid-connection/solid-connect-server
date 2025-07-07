@@ -99,6 +99,7 @@ public enum ErrorCode {
 
     // news
     INVALID_NEWS_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 소식지만 제어할 수 있습니다."),
+    ALREADY_LIKED_NEWS(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 소식지입니다."),
 
 
     // database
