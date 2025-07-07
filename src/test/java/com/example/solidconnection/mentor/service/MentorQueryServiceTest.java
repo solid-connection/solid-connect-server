@@ -85,7 +85,6 @@ class MentorQueryServiceTest {
             SiteUser appliedUser = siteUserFixture.사용자(3, "멘토링 지원한 사용자");
             mentoringFixture.대기중_멘토링(mentor.getId(), appliedUser.getId());
 
-
             // when
             MentorDetailResponse notAppliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), notAppliedUser);
             MentorDetailResponse appliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), appliedUser);
