@@ -17,12 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
 public class MentorMyPageService {
 
+    private static final int CHANNEL_REGISTRATION_LIMIT = 4;
     private static final int CHANNEL_SEQUENCE_START_NUMBER = 1;
 
     private final MyPageService myPageService;
@@ -37,17 +39,27 @@ public class MentorMyPageService {
 
     @Transactional
     public void updateMentorMyPage(SiteUser siteUser, MentorMyPageUpdateRequest request, MultipartFile imageFile) {
+        validateChannelRegistrationLimit(request.channels());
         Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
 
         myPageService.updateMyPageInfo(siteUser, imageFile, request.nickname());
         mentor.updateIntroduction(request.introduction());
         mentor.updatePassTip(request.passTip());
+        updateChannel(request.channels(), mentor);
+    }
 
+    private void validateChannelRegistrationLimit(List<ChannelRequest> channelRequests) {
+        if (channelRequests.size() > CHANNEL_REGISTRATION_LIMIT) {
+            throw new CustomException(CHANNEL_REGISTRATION_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void updateChannel(List<ChannelRequest> channelRequests, Mentor mentor) {
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
-        for (ChannelRequest channelRequest : request.channels()) {
-            newChannels.add(new Channel(sequence++, channelRequest.type(), channelRequest.url()));
+        for (ChannelRequest request : channelRequests) {
+            newChannels.add(new Channel(sequence++, request.type(), request.url()));
         }
         mentor.updateChannels(newChannels);
     }
