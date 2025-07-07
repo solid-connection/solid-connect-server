@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_NEWS;
 import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_NEWS;
 
 @RequiredArgsConstructor
 @Service
@@ -30,5 +31,16 @@ public class NewsLikeService {
         LikedNews likedNews = new LikedNews(newsId, siteUserId);
         LikedNews savedLikedNews = likedNewsRepository.save(likedNews);
         return LikedNewsResponse.of(savedLikedNews.getId(), true);
+    }
+
+    @Transactional
+    public LikedNewsResponse cancelNewsLike(long siteUserId, Long newsId) {
+        if (!newsRepository.existsById(newsId)) {
+            throw new CustomException(NEWS_NOT_FOUND);
+        }
+        LikedNews likedNews = likedNewsRepository.findByNewsIdAndSiteUserId(newsId, siteUserId)
+                .orElseThrow(() -> new CustomException(NOT_LIKED_NEWS));
+        likedNewsRepository.delete(likedNews);
+        return LikedNewsResponse.of(likedNews.getId(), false);
     }
 }
