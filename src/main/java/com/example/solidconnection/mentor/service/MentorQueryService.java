@@ -46,12 +46,12 @@ public class MentorQueryService {
     public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
         Slice<Mentor> mentorSlice = mentorRepository.findBy(pageable);
         List<Mentor> mentors = mentorSlice.toList();
-        List<MentorPreviewResponse> content = getContent(mentors, siteUser);
+        List<MentorPreviewResponse> content = getMentorPreviewResponses(mentors, siteUser);
 
         return SliceResponse.of(content, mentorSlice);
     }
 
-    private List<MentorPreviewResponse> getContent(List<Mentor> mentors, SiteUser siteUser) {
+    private List<MentorPreviewResponse> getMentorPreviewResponses(List<Mentor> mentors, SiteUser siteUser) {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, siteUser.getId());
 
