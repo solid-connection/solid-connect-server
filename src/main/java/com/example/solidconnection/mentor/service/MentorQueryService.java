@@ -26,8 +26,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_
 @Service
 public class MentorQueryService {
 
-    private static final int NO_NEXT_PAGE_NUMBER = -1;
-
     private final MentorRepository mentorRepository;
     private final MentoringRepository mentoringRepository;
     private final SiteUserRepository siteUserRepository;
@@ -46,13 +44,11 @@ public class MentorQueryService {
 
     @Transactional(readOnly = true)
     public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
-        Slice<Mentor> mentorPage = mentorRepository.findBy(pageable);
-        List<Mentor> mentors = mentorPage.toList();
-
+        Slice<Mentor> mentorSlice = mentorRepository.findBy(pageable);
+        List<Mentor> mentors = mentorSlice.toList();
         List<MentorPreviewResponse> content = getContent(mentors, siteUser);
-        int pageNumber = getPageNumber(mentorPage);
 
-        return new SliceResponse<>(content, pageNumber);
+        return SliceResponse.of(content, mentorSlice);
     }
 
     private List<MentorPreviewResponse> getContent(List<Mentor> mentors, SiteUser siteUser) {
@@ -67,9 +63,5 @@ public class MentorQueryService {
             mentorPreviews.add(response);
         }
         return mentorPreviews;
-    }
-
-    private int getPageNumber(Slice<Mentor> page) {
-        return page.hasNext() ? page.nextPageable().getPageNumber() + 1 : NO_NEXT_PAGE_NUMBER; // one-based index
     }
 }
