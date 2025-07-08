@@ -44,7 +44,7 @@ public class MentorQueryService {
 
     @Transactional(readOnly = true)
     public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
-        Slice<Mentor> mentorSlice = mentorRepository.findBy(pageable);
+        Slice<Mentor> mentorSlice = mentorRepository.findAllBy(pageable);
         List<Mentor> mentors = mentorSlice.toList();
         List<MentorPreviewResponse> content = getMentorPreviewResponses(mentors, siteUser);
 
