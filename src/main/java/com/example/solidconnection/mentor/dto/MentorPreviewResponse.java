@@ -1,11 +1,9 @@
 package com.example.solidconnection.mentor.dto;
 
-import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 
-import java.util.Comparator;
 import java.util.List;
 
 public record MentorPreviewResponse(
@@ -33,15 +31,8 @@ public record MentorPreviewResponse(
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),
-                toChannelResponses(mentor.getChannels()),
+                mentor.getChannels().stream().map(ChannelResponse::from).toList(),
                 isApplied
         );
-    }
-
-    private static List<ChannelResponse> toChannelResponses(List<Channel> channels) {
-        return channels.stream()
-                .sorted(Comparator.comparingInt(Channel::getSequence))
-                .map(ChannelResponse::from)
-                .toList();
     }
 }

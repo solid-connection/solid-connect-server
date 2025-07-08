@@ -71,7 +71,7 @@ class MentorQueryServiceTest {
                     () -> assertThat(response.id()).isEqualTo(mentor.getId()),
                     () -> assertThat(response.nickname()).isEqualTo(mentorUser.getNickname()),
                     () -> assertThat(response.channels()).extracting(ChannelResponse::url)
-                            .containsOnly(channel1.getUrl(), channel2.getUrl())
+                            .containsExactly(channel1.getUrl(), channel2.getUrl())
             );
         }
 
