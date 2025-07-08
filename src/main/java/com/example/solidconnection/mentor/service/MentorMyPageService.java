@@ -8,7 +8,6 @@ import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ public class MentorMyPageService {
     private static final int CHANNEL_REGISTRATION_LIMIT = 4;
     private static final int CHANNEL_SEQUENCE_START_NUMBER = 1;
 
-    private final MyPageService myPageService;
     private final MentorRepository mentorRepository;
 
     @Transactional(readOnly = true)
