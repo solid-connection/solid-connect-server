@@ -56,9 +56,9 @@ public class UnivApplyInfoRecommendService {
         List<UnivApplyInfo> generalRecommend = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
         generalRecommend.removeAll(alreadyPicked);
         Collections.shuffle(generalRecommend);
-        return generalRecommend.subList(0, RECOMMEND_UNIV_APPLY_INFO_NUM - alreadyPicked.size());
+        int needed = RECOMMEND_UNIV_APPLY_INFO_NUM - alreadyPicked.size();
+        return generalRecommend.subList(0, Math.min(needed, generalRecommend.size()));
     }
-
     /*
      * 공통 추천 대학교를 불러온다.
      * */

@@ -2,10 +2,12 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,11 +22,14 @@ public class GeneralUnivApplyInfoRecommendService {
      * */
     private final UnivApplyInfoRepository univApplyInfoRepository;
 
+    @Getter
+    private List<UnivApplyInfo> generalRecommends;
+
     @Value("${university.term}")
     public String term;
 
-    @Transactional(readOnly = true)
-    public List<UnivApplyInfo> getGeneralRecommends() {
-        return univApplyInfoRepository.findRandomByTerm(term, RECOMMEND_UNIV_APPLY_INFO_NUM);
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+        generalRecommends = univApplyInfoRepository.findRandomByTerm(term, RECOMMEND_UNIV_APPLY_INFO_NUM);
     }
 }

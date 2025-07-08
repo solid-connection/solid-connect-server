@@ -37,22 +37,14 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     """)
     List<UnivApplyInfo> findAllBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
 
-    @Query("""
-    SELECT DISTINCT uai
-    FROM UnivApplyInfo uai
-    LEFT JOIN FETCH uai.languageRequirements lr
-    LEFT JOIN FETCH uai.university u
-    LEFT JOIN FETCH u.country c
-    LEFT JOIN FETCH u.region r
-    WHERE uai.term = :term
-    ORDER BY FUNCTION('RAND')
-    """)
-    List<UnivApplyInfo> findAllRandomByTerm(@Param("term") String term);
-    default List<UnivApplyInfo> findRandomByTerm(String term, int limitNum) {
-        return findAllRandomByTerm(term).stream()
-                .limit(limitNum)
-                .collect(Collectors.toList());
-    }
+    @Query(value = """
+                SELECT *
+                FROM university_info_for_apply
+                WHERE term = :term
+                ORDER BY RAND()
+                LIMIT :limitNum
+            """, nativeQuery = true)
+    List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
 
     default UnivApplyInfo getUnivApplyInfoById(Long id) {
         return findById(id)
