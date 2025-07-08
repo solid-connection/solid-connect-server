@@ -91,20 +91,18 @@ public class NewsController {
     }
 
     @PostMapping("/{news-id}/like")
-    public ResponseEntity<LikedNewsResponse> addNewsLike(
+    public void addNewsLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news-id") Long newsId
     ) {
-        LikedNewsResponse likedNewsResponse = newsLikeService.addNewsLike(siteUser.getId(), newsId);
-        return ResponseEntity.ok(likedNewsResponse);
+        newsLikeService.addNewsLike(siteUser.getId(), newsId);
     }
 
     @DeleteMapping("/{news-id}/like")
-    public ResponseEntity<LikedNewsResponse> cancelNewsLike(
+    public void cancelNewsLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news-id") Long newsId
     ) {
-        LikedNewsResponse likedNewsResponse = newsLikeService.cancelNewsLike(siteUser.getId(), newsId);
-        return ResponseEntity.ok(likedNewsResponse);
+        newsLikeService.cancelNewsLike(siteUser.getId(), newsId);
     }
 }

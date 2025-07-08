@@ -18,7 +18,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIK
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_NEWS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 좋아요 서비스 테스트")
@@ -76,13 +75,10 @@ class NewsLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_등록한다() {
             // when
-            LikedNewsResponse response = newsLikeService.addNewsLike(user.getId(), news.getId());
+            newsLikeService.addNewsLike(user.getId(), news.getId());
 
             // then
-            assertAll(
-                () -> assertThat(response.isLike()).isTrue(),
-                () -> assertThat(likedNewsRepository.existsByNewsIdAndSiteUserId(news.getId(), user.getId())).isTrue()
-            );
+            assertThat(likedNewsRepository.existsByNewsIdAndSiteUserId(news.getId(), user.getId())).isTrue();
         }
 
         @Test
@@ -106,13 +102,10 @@ class NewsLikeServiceTest {
             newsLikeService.addNewsLike(user.getId(), news.getId());
 
             // when
-            LikedNewsResponse response = newsLikeService.cancelNewsLike(user.getId(), news.getId());
+            newsLikeService.cancelNewsLike(user.getId(), news.getId());
 
             // then
-            assertAll(
-                () -> assertThat(response.isLike()).isFalse(),
-                () -> assertThat(likedNewsRepository.existsByNewsIdAndSiteUserId(news.getId(), user.getId())).isFalse()
-            );
+            assertThat(likedNewsRepository.existsByNewsIdAndSiteUserId(news.getId(), user.getId())).isFalse();
         }
 
         @Test

@@ -30,7 +30,7 @@ public class NewsLikeService {
     }
 
     @Transactional
-    public LikedNewsResponse addNewsLike(long siteUserId, long newsId) {
+    public void addNewsLike(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
@@ -38,18 +38,16 @@ public class NewsLikeService {
             throw new CustomException(ALREADY_LIKED_NEWS);
         }
         LikedNews likedNews = new LikedNews(newsId, siteUserId);
-        LikedNews savedLikedNews = likedNewsRepository.save(likedNews);
-        return LikedNewsResponse.of(savedLikedNews.getId(), true);
+        likedNewsRepository.save(likedNews);
     }
 
     @Transactional
-    public LikedNewsResponse cancelNewsLike(long siteUserId, long newsId) {
+    public void cancelNewsLike(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
         LikedNews likedNews = likedNewsRepository.findByNewsIdAndSiteUserId(newsId, siteUserId)
                 .orElseThrow(() -> new CustomException(NOT_LIKED_NEWS));
         likedNewsRepository.delete(likedNews);
-        return LikedNewsResponse.of(likedNews.getId(), false);
     }
 }
