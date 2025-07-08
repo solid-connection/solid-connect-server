@@ -21,7 +21,7 @@ public class NewsLikeService {
     private final LikedNewsRepository likedNewsRepository;
 
     @Transactional(readOnly = true)
-    public LikedNewsResponse getNewsLikeStatus(long siteUserId, long newsId) {
+    public LikedNewsResponse isNewsLiked(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }

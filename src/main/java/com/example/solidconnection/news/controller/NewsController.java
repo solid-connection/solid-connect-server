@@ -82,11 +82,11 @@ public class NewsController {
     }
 
     @GetMapping("/{news-id}/like")
-    public ResponseEntity<LikedNewsResponse> getNewsLikeStatus(
+    public ResponseEntity<LikedNewsResponse> isNewsLiked(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("news-id") Long newsId
     ) {
-        LikedNewsResponse likedNewsResponse = newsLikeService.getNewsLikeStatus(siteUser.getId(), newsId);
+        LikedNewsResponse likedNewsResponse = newsLikeService.isNewsLiked(siteUser.getId(), newsId);
         return ResponseEntity.ok(likedNewsResponse);
     }
 

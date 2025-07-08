@@ -53,7 +53,7 @@ class NewsLikeServiceTest {
             newsLikeService.addNewsLike(user.getId(), news.getId());
 
             // when
-            LikedNewsResponse response = newsLikeService.getNewsLikeStatus(user.getId(), news.getId());
+            LikedNewsResponse response = newsLikeService.isNewsLiked(user.getId(), news.getId());
 
             // then
             assertThat(response.isLike()).isTrue();
@@ -62,7 +62,7 @@ class NewsLikeServiceTest {
         @Test
         void 좋아요하지_않은_소식지의_좋아요_상태를_조회한다() {
             // when
-            LikedNewsResponse response = newsLikeService.getNewsLikeStatus(user.getId(), news.getId());
+            LikedNewsResponse response = newsLikeService.isNewsLiked(user.getId(), news.getId());
 
             // then
             assertThat(response.isLike()).isFalse();
