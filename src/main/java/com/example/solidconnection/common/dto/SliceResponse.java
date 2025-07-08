@@ -12,7 +12,7 @@ public record SliceResponse<T>(
     private static final int NO_NEXT_PAGE = -1;
     private static final int BASE_NUMBER = 1; // 1-based
 
-    public static <T, R> SliceResponse<R> of(Slice<T> slice, List<R> content) {
+    public static <T, R> SliceResponse<R> of(List<R> content, Slice<T> slice) {
         int nextPageNumber = slice.hasNext()
                 ? slice.getNumber() + BASE_NUMBER + 1
                 : NO_NEXT_PAGE;
