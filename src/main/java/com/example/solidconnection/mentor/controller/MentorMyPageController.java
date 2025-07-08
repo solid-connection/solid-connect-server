@@ -22,7 +22,7 @@ public class MentorMyPageController {
 
     private final MentorMyPageService mentorMyPageService;
 
-    @RequireRoleAccess(roles = {Role.MENTOR})
+    @RequireRoleAccess(roles = Role.MENTOR)
     @GetMapping
     public ResponseEntity<MentorMyPageResponse> getMentorMyPage(
             @AuthorizedUser SiteUser siteUser
