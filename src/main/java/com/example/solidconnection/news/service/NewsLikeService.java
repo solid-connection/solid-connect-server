@@ -25,8 +25,8 @@ public class NewsLikeService {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
-        boolean isLiked = likedNewsRepository.existsByNewsIdAndSiteUserId(newsId, siteUserId);
-        return LikedNewsResponse.of(newsId, isLiked);
+        boolean isLike = likedNewsRepository.existsByNewsIdAndSiteUserId(newsId, siteUserId);
+        return LikedNewsResponse.of(isLike);
     }
 
     @Transactional
