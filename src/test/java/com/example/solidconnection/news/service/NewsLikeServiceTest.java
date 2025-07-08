@@ -60,7 +60,7 @@ class NewsLikeServiceTest {
         }
 
         @Test
-        void 좋아요하지_않은_소식지의_좋아요_상태를_조회한다(){
+        void 좋아요하지_않은_소식지의_좋아요_상태를_조회한다() {
             // when
             LikedNewsResponse response = newsLikeService.getNewsLikeStatus(user.getId(), news.getId());
 
