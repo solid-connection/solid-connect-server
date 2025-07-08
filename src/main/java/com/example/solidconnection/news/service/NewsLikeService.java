@@ -21,7 +21,7 @@ public class NewsLikeService {
     private final LikedNewsRepository likedNewsRepository;
 
     @Transactional(readOnly = true)
-    public LikedNewsResponse getNewsLikeStatus(long siteUserId, Long newsId) {
+    public LikedNewsResponse getNewsLikeStatus(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
@@ -30,7 +30,7 @@ public class NewsLikeService {
     }
 
     @Transactional
-    public LikedNewsResponse addNewsLike(long siteUserId, Long newsId) {
+    public LikedNewsResponse addNewsLike(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
@@ -43,7 +43,7 @@ public class NewsLikeService {
     }
 
     @Transactional
-    public LikedNewsResponse cancelNewsLike(long siteUserId, Long newsId) {
+    public LikedNewsResponse cancelNewsLike(long siteUserId, long newsId) {
         if (!newsRepository.existsById(newsId)) {
             throw new CustomException(NEWS_NOT_FOUND);
         }
