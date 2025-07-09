@@ -3,13 +3,13 @@ package com.example.solidconnection.university.repository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 
@@ -37,14 +37,17 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     """)
     List<UnivApplyInfo> findAllBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
 
-    @Query(value = """
-                SELECT *
-                FROM university_info_for_apply
-                WHERE term = :term
-                ORDER BY RAND()
-                LIMIT :limitNum
-            """, nativeQuery = true)
-    List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, @Param("limitNum") int limitNum);
+    @Query("""
+        SELECT uai
+        FROM UnivApplyInfo uai
+        LEFT JOIN FETCH uai.languageRequirements lr
+        LEFT JOIN FETCH uai.university u
+        LEFT JOIN FETCH u.country c
+        LEFT JOIN FETCH u.region r
+        WHERE uai.term = :term
+        ORDER BY FUNCTION('RAND')
+    """)
+    List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, Pageable pageable); // JPA에서 LIMIT 사용이 불가하므로 Pageable을 통해 0page에서 정해진 개수 만큼 가져오는 방식으로 구현
 
     default UnivApplyInfo getUnivApplyInfoById(Long id) {
         return findById(id)

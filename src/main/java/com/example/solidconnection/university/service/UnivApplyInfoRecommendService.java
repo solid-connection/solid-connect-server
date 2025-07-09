@@ -59,6 +59,7 @@ public class UnivApplyInfoRecommendService {
         int needed = RECOMMEND_UNIV_APPLY_INFO_NUM - alreadyPicked.size();
         return generalRecommend.subList(0, Math.min(needed, generalRecommend.size()));
     }
+
     /*
      * 공통 추천 대학교를 불러온다.
      * */
