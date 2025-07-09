@@ -60,7 +60,6 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImageList = new ArrayList<>();
 
-    @BatchSize(size = 5)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> postLikeList = new ArrayList<>();
 
@@ -73,7 +72,7 @@ public class Post extends BaseEntity {
         this.category = category;
     }
 
-    public void setBoardAndSiteUser(String boardCode, long siteUserId) {
+    public void setBoardAndSiteUserId(String boardCode, long siteUserId) {
         this.boardCode = boardCode;
         this.siteUserId = siteUserId;
     }
