@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface BoardRepositoryForTest extends JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b WHERE b.code = :code")
-    Optional<Board> findByCodeWithPosts(@Param("code") String code);
+    Optional<Board> findByCode(@Param("code") String code);
 }

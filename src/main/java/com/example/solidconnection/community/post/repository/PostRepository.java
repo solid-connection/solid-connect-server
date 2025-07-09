@@ -16,6 +16,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POS
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByBoardCode(String boardCode);
+
     @EntityGraph(attributePaths = {"postImageList"})
     Optional<Post> findPostById(Long id);
 

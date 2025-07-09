@@ -87,6 +87,8 @@ class MyPageServiceTest {
                 () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(user.getRole()),
                 () -> assertThat(response.email()).isEqualTo(user.getEmail()),
+                // () -> assertThat(response.likedPostCount()).isEqualTo(user.getLikedPostList().size()),
+                // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount)
         );
     }

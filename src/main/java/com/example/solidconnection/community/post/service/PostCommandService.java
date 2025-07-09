@@ -16,7 +16,6 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
@@ -41,7 +40,6 @@ public class PostCommandService {
     private final S3Service s3Service;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
-    private final SiteUserRepository siteUserRepository;
 
     @Transactional
     public PostCreateResponse createPost(SiteUser siteUser, PostCreateRequest postCreateRequest,

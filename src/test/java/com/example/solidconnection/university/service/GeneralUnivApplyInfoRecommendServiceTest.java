@@ -40,6 +40,7 @@ class GeneralUnivApplyInfoRecommendServiceTest {
         univApplyInfoFixture.그라츠공과대학_지원_정보();
         univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
         univApplyInfoFixture.메이지대학_지원_정보();
+        generalUnivApplyInfoRecommendService.init();
     }
 
     @Test

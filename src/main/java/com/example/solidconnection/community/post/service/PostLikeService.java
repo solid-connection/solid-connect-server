@@ -8,7 +8,6 @@ import com.example.solidconnection.community.post.dto.PostLikeResponse;
 import com.example.solidconnection.community.post.repository.PostLikeRepository;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -22,14 +21,13 @@ public class PostLikeService {
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
-    private final SiteUserRepository siteUserRepository;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public PostLikeResponse likePost(SiteUser siteUser, Long postId) {
         Post post = postRepository.getById(postId);
         validateDuplicatePostLike(post, siteUser);
         PostLike postLike = new PostLike();
-        postLike.setPostAndSiteUser(post, siteUser.getId());
+        postLike.setPostAndSiteUserId(post, siteUser.getId());
         postLikeRepository.save(postLike);
         postRepository.increaseLikeCount(post.getId());
 
@@ -41,7 +39,7 @@ public class PostLikeService {
         Post post = postRepository.getById(postId);
 
         PostLike postLike = postLikeRepository.getByPostAndSiteUserId(post, siteUser.getId());
-        postLike.resetPostAndSiteUser();
+        postLike.resetPost();
         postLikeRepository.deleteById(postLike.getId());
         postRepository.decreaseLikeCount(post.getId());
 

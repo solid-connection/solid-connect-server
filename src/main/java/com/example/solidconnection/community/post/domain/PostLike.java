@@ -27,16 +27,16 @@ public class PostLike {
 
     private long siteUserId;
 
-    public void setPostAndSiteUser(Post post, long siteuserId) {
+    public void setPostAndSiteUserId(Post post, long siteUserId) {
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
         this.post = post;
         post.getPostLikeList().add(this);
-        this.siteUserId = siteuserId;
+        this.siteUserId = siteUserId;
     }
 
-    public void resetPostAndSiteUser() {
+    public void resetPost() {
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
