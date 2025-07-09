@@ -15,7 +15,7 @@ public class MentorFixture {
                 .siteUserId(siteUserId)
                 .universityId(universityId)
                 .introduction("멘토 소개")
-                .passTip("멘토 팁")
+                .passTip("합격 팁")
                 .create();
     }
 }

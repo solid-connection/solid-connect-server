@@ -43,6 +43,7 @@ public enum ErrorCode {
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
+    MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -106,7 +107,6 @@ public enum ErrorCode {
 
     // mentor
     ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
-    MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 사용자는 멘토로 등록되어 있지 않습니다."),
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
