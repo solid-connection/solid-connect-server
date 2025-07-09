@@ -12,7 +12,7 @@ public interface LanguageTestScoreRepository extends JpaRepository<LanguageTestS
 
     Optional<LanguageTestScore> findLanguageTestScoreBySiteUserIdAndLanguageTest_LanguageTestType(long siteUserId, LanguageTestType languageTestType);
 
-    Optional<LanguageTestScore> findLanguageTestScoreBySiteUserIdAndId(long siteUser, Long id);
+    Optional<LanguageTestScore> findLanguageTestScoreBySiteUserIdAndId(long siteUserId, Long id);
 
     List<LanguageTestScore> findBySiteUserId(long siteUserId);
 }
