@@ -49,4 +49,8 @@ public class Mentor {
     @OrderBy("sequence ASC")
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Channel> channels = new ArrayList<>();
+
+    public void increaseMenteeCount() {
+        this.menteeCount++;
+    }
 }

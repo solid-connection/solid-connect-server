@@ -54,23 +54,6 @@ public class MentoringFixture {
                 .create();
     }
 
-    public Mentoring 멘토링(
-            long mentorId,
-            long menteeId,
-            VerifyStatus status,
-            String rejectedReason,
-            ZonedDateTime confirmedAt,
-            ZonedDateTime checkedAt) {
-        return mentoringFixtureBuilder.mentoring()
-                .mentorId(mentorId)
-                .menteeId(menteeId)
-                .verifyStatus(status)
-                .rejectedReason(rejectedReason)
-                .confirmedAt(confirmedAt)
-                .checkedAt(checkedAt)
-                .create();
-    }
-
     private ZonedDateTime getCurrentTime() {
         return ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }

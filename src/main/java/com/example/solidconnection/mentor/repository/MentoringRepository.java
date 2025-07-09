@@ -9,7 +9,11 @@ import java.util.List;
 
 public interface MentoringRepository extends JpaRepository<Mentoring, Long> {
 
+    int countByMentorIdAndCheckedAtIsNull(long mentorId);
+
     boolean existsByMentorIdAndMenteeId(long mentorId, long menteeId);
+
+    List<Mentoring> findAllByMentorId(long mentorId);
 
     @Query("""
             SELECT m FROM Mentoring m
