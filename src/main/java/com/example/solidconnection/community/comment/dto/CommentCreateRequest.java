@@ -24,9 +24,9 @@ public record CommentCreateRequest(
         );
 
         if (parentComment == null) {
-            comment.setPostAndSiteUser(post, siteUser.getId());
+            comment.setPostAndSiteUserId(post, siteUser.getId());
         } else {
-            comment.setParentCommentAndPostAndSiteUser(parentComment, post, siteUser.getId());
+            comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
         }
         return comment;
     }

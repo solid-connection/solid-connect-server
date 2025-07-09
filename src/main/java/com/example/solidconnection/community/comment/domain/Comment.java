@@ -2,7 +2,6 @@ package com.example.solidconnection.community.comment.domain;
 
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.community.post.domain.Post;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,7 +58,7 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public void setParentCommentAndPostAndSiteUser(Comment parentComment, Post post, long siteUserId) {
+    public void setParentCommentAndPostAndSiteUserId(Comment parentComment, Post post, long siteUserId) {
 
         if (this.parentComment != null) {
             this.parentComment.getCommentList().remove(this);
@@ -76,7 +75,7 @@ public class Comment extends BaseEntity {
         this.siteUserId = siteUserId;
     }
 
-    public void setPostAndSiteUser(Post post, long siteUserId) {
+    public void setPostAndSiteUserId(Post post, long siteUserId) {
 
         if (this.post != null) {
             this.post.getCommentList().remove(this);
@@ -87,7 +86,7 @@ public class Comment extends BaseEntity {
         this.siteUserId = siteUserId;
     }
 
-    public void resetPostAndSiteUserAndParentComment() {
+    public void resetPostAndParentComment() {
         if (this.post != null) {
             this.post.getCommentList().remove(this);
             this.post = null;

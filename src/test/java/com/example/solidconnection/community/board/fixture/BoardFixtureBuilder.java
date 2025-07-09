@@ -25,7 +25,7 @@ public class BoardFixtureBuilder {
     }
 
     public Board findOrCreate() {
-        return boardRepositoryForTest.findByCodeWithPosts(code)
+        return boardRepositoryForTest.findByCode(code)
                 .orElseGet(() -> boardRepositoryForTest.save(new Board(code, koreanName)));
     }
 }

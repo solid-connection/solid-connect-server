@@ -96,18 +96,18 @@ public class CommentService {
             // 대댓글인 경우
             Comment parentComment = comment.getParentComment();
             // 대댓글을 삭제합니다.
-            comment.resetPostAndSiteUserAndParentComment();
+            comment.resetPostAndParentComment();
             commentRepository.deleteById(commentId);
             // 대댓글 삭제 이후, 부모댓글이 무의미하다면 이역시 삭제합니다.
             if (parentComment.getCommentList().isEmpty() && parentComment.getContent() == null) {
-                parentComment.resetPostAndSiteUserAndParentComment();
+                parentComment.resetPostAndParentComment();
                 commentRepository.deleteById(parentComment.getId());
             }
         } else {
             // 댓글인 경우
             if (comment.getCommentList().isEmpty()) {
                 // 대댓글이 없는 경우
-                comment.resetPostAndSiteUserAndParentComment();
+                comment.resetPostAndParentComment();
                 commentRepository.deleteById(commentId);
             } else {
                 // 대댓글이 있는 경우
