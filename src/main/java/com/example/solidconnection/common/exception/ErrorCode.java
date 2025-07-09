@@ -101,6 +101,9 @@ public enum ErrorCode {
     // news
     INVALID_NEWS_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 소식지만 제어할 수 있습니다."),
 
+    // mentor
+    CHANNEL_SEQUENCE_NOT_UNIQUE(HttpStatus.BAD_REQUEST.value(), "채널의 순서가 중복되었습니다."),
+    CHANNEL_REGISTRATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "등록 가능한 채널 수를 초과하였습니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

@@ -53,4 +53,23 @@ public class Mentor {
     public void increaseMenteeCount() {
         this.menteeCount++;
     }
+
+    public void updateIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void updatePassTip(String passTip) {
+        this.passTip = passTip;
+    }
+
+    public void updateChannels(List<Channel> channels) {
+        this.channels.clear();
+        if (channels == null || channels.isEmpty()) {
+            return;
+        }
+        for (Channel channel : channels) {
+            channel.updateMentor(this);
+            this.channels.add(channel);
+        }
+    }
 }
