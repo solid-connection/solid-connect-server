@@ -34,7 +34,7 @@ public class MentorMyPageController {
 
     @RequireRoleAccess(roles = Role.MENTOR)
     @PutMapping
-    public ResponseEntity<String> updateMentorMyPage(
+    public ResponseEntity<Void> updateMentorMyPage(
             @AuthorizedUser SiteUser siteUser,
             @Valid @RequestBody MentorMyPageUpdateRequest mentorMyPageUpdateRequest
     ) {
