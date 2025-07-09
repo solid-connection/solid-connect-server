@@ -57,7 +57,7 @@ public class ScoreService {
                 gpaScoreRepository.findBySiteUserId(siteUser.getId())
                         .stream()
                         .map(GpaScoreStatusResponse::from)
-                        .collect(Collectors.toList());
+                        .toList();
 
         return GpaScoreStatusesResponse.from(gpaScoreStatusResponseList);
     }

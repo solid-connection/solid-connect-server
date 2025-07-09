@@ -37,7 +37,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             """)
     Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
 
-    default Application getApplicationBySiteUserIdAndTerm(Long siteUserId, String term) {
+    default Application getApplicationBySiteUserIdAndTerm(long siteUserId, String term) {
         return findBySiteUserIdAndTerm(siteUserId, term)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
