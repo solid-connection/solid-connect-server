@@ -1,21 +1,16 @@
 package com.example.solidconnection.community.post.domain;
 
 import com.example.solidconnection.common.BaseEntity;
-import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -50,13 +45,12 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostCategory category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_code")
-    private Board board;
+    @Column
+    private String boardCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_user_id")
-    private SiteUser siteUser;
+    @Column
+    private long siteUserId;
+
 
     @BatchSize(size = 20)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -78,29 +72,9 @@ public class Post extends BaseEntity {
         this.category = category;
     }
 
-    public void setBoardAndSiteUser(Board board, SiteUser siteUser) {
-        if (this.board != null) {
-            this.board.getPostList().remove(this);
-        }
-        this.board = board;
-        board.getPostList().add(this);
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getPostList().add(this);
-    }
-
-    public void resetBoardAndSiteUser() {
-        if (this.board != null) {
-            this.board.getPostList().remove(this);
-            this.board = null;
-        }
-        if (this.siteUser != null) {
-            this.siteUser.getPostList().remove(this);
-            this.siteUser = null;
-        }
+    public void setBoardAndSiteUserId(String boardCode, long siteUserId) {
+        this.boardCode = boardCode;
+        this.siteUserId = siteUserId;
     }
 
     public void update(PostUpdateRequest postUpdateRequest) {

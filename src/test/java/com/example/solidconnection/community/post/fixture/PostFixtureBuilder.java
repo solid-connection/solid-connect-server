@@ -71,7 +71,7 @@ public class PostFixtureBuilder {
                 likeCount,
                 viewCount,
                 postCategory);
-        post.setBoardAndSiteUser(board, siteUser);
+        post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
         return postRepository.save(post);
     }
 }

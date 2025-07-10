@@ -36,7 +36,7 @@ public record PostCreateRequest(
                 0L,
                 PostCategory.valueOf(this.postCategory)
         );
-        post.setBoardAndSiteUser(board, siteUser);
+        post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
         return post;
     }
 }

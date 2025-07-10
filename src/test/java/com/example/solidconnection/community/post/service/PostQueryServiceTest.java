@@ -93,7 +93,7 @@ class PostQueryServiceTest {
         List<Post> posts = List.of(post1, post2, post3);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getCategory().equals(PostCategory.자유)
-                        && post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                        && post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
@@ -115,7 +115,7 @@ class PostQueryServiceTest {
         // given
         List<Post> posts = List.of(post1, post2, post3);
         List<Post> expectedPosts = posts.stream()
-                .filter(post -> post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                .filter(post -> post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 

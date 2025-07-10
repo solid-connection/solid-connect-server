@@ -77,7 +77,7 @@ class PostViewCountConcurrencyTest {
                 0L,
                 PostCategory.valueOf("자유")
         );
-        post.setBoardAndSiteUser(board, siteUser);
+        post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
 
         return post;
     }

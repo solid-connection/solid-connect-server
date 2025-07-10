@@ -40,14 +40,14 @@ public class CommentFixtureBuilder {
 
     public Comment createParent() {
         Comment comment = new Comment(content);
-        comment.setPostAndSiteUser(post, siteUser);
+        comment.setPostAndSiteUserId(post, siteUser.getId());
         return commentRepository.save(comment);
     }
 
     public Comment createChild() {
         Comment comment = new Comment(content);
-        comment.setPostAndSiteUser(post, siteUser);
-        comment.setParentCommentAndPostAndSiteUser(parentComment, post, siteUser);
+        comment.setPostAndSiteUserId(post, siteUser.getId());
+        comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
         return commentRepository.save(comment);
     }
 }
