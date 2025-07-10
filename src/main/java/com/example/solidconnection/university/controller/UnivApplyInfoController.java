@@ -47,37 +47,37 @@ public class UnivApplyInfoController {
 
     // todo: return 타입 UnivApplyInfoPreviewResponses 같이 객체로 묶어서 반환하는 것으로 변경 필요
     @GetMapping("/like")
-    public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getMyWishUnivApplyInfo( /* todo: wish 가 아니라 liked 로 변경 필요 - 코드 용어 통일 */
+    public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getLikedUnivApplyInfos(
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<UnivApplyInfoPreviewResponse> wishUniversities = myPageService.getWishUnivApplyInfo(siteUser);
-        return ResponseEntity.ok(wishUniversities);
+        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = myPageService.getLikedUnivApplyInfos(siteUser);
+        return ResponseEntity.ok(likedUnivApplyInfos);
     }
 
     @GetMapping("/{univ-apply-info-id}/like")
-    public ResponseEntity<IsLikeResponse> getIsLiked(
+    public ResponseEntity<IsLikeResponse> isUnivApplyInfoLiked(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        IsLikeResponse isLiked = univApplyInfoLikeService.getIsLiked(siteUser, univApplyInfoId);
+        IsLikeResponse isLiked = univApplyInfoLikeService.isUnivApplyInfoLiked(siteUser, univApplyInfoId);
         return ResponseEntity.ok(isLiked);
     }
 
     @PostMapping("/{univ-apply-info-id}/like")
-    public ResponseEntity<LikeResultResponse> addWishUnivApplyInfo(
+    public ResponseEntity<LikeResultResponse> addUnivApplyInfoLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = univApplyInfoLikeService.likeUnivApplyInfo(siteUser, univApplyInfoId);
+        LikeResultResponse likeResultResponse = univApplyInfoLikeService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 
     @DeleteMapping("/{univ-apply-info-id}/like")
-    public ResponseEntity<LikeResultResponse> cancelWishUnivApplyInfo(
+    public ResponseEntity<LikeResultResponse> cancelUnivApplyInfoLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = univApplyInfoLikeService.cancelLikeUnivApplyInfo(siteUser, univApplyInfoId);
+        LikeResultResponse likeResultResponse = univApplyInfoLikeService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
         return ResponseEntity.ok(likeResultResponse);
     }
 

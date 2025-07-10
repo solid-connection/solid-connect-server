@@ -97,7 +97,7 @@ class MyPageServiceTest {
         int likedUnivApplyInfo = createLikedUnivApplyInfos(user);
 
         // when
-        List<UnivApplyInfoPreviewResponse> response = myPageService.getWishUnivApplyInfo(user);
+        List<UnivApplyInfoPreviewResponse> response = myPageService.getLikedUnivApplyInfos(user);
 
         // then
         assertThat(response).hasSize(likedUnivApplyInfo);

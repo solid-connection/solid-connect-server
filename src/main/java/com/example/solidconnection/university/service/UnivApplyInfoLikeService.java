@@ -35,7 +35,7 @@ public class UnivApplyInfoLikeService {
      * 대학교를 '좋아요' 한다.
      * */
     @Transactional
-    public LikeResultResponse likeUnivApplyInfo(SiteUser siteUser, Long univApplyInfoId) {
+    public LikeResultResponse addUnivApplyInfoLike(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
         Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId());
@@ -55,7 +55,7 @@ public class UnivApplyInfoLikeService {
      * 대학교 '좋아요'를 취소한다.
      * */
     @Transactional
-    public LikeResultResponse cancelLikeUnivApplyInfo(SiteUser siteUser, long univApplyInfoId) {
+    public LikeResultResponse cancelUnivApplyInfoLike(SiteUser siteUser, long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
         Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId());
@@ -71,7 +71,7 @@ public class UnivApplyInfoLikeService {
      * '좋아요'한 대학교인지 확인한다.
      * */
     @Transactional(readOnly = true)
-    public IsLikeResponse getIsLiked(SiteUser siteUser, Long univApplyInfoId) {
+    public IsLikeResponse isUnivApplyInfoLiked(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         boolean isLike = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId()).isPresent();
         return new IsLikeResponse(isLike);

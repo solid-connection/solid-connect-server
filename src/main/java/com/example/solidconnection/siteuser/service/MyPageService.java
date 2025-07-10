@@ -94,7 +94,7 @@ public class MyPageService {
      * 관심 대학교 목록을 조회한다.
      * */
     @Transactional(readOnly = true)
-    public List<UnivApplyInfoPreviewResponse> getWishUnivApplyInfo(SiteUser siteUser) {
+    public List<UnivApplyInfoPreviewResponse> getLikedUnivApplyInfos(SiteUser siteUser) {
         List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
 
         return univApplyInfos.stream()
