@@ -35,7 +35,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                 AND a.term = :term
                 AND a.isDelete = false
             """)
-    Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
+    Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") long siteUserId, @Param("term") String term);
 
     default Application getApplicationBySiteUserIdAndTerm(long siteUserId, String term) {
         return findBySiteUserIdAndTerm(siteUserId, term)

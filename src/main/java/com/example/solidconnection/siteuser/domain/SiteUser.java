@@ -1,5 +1,9 @@
 package com.example.solidconnection.siteuser.domain;
 
+import com.example.solidconnection.community.comment.domain.Comment;
+import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostLike;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -17,6 +22,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -67,7 +74,7 @@ public class SiteUser {
     @Setter
     private LocalDate quitedAt;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     public SiteUser(

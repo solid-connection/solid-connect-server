@@ -1,11 +1,13 @@
 package com.example.solidconnection.news.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.news.dto.LikedNewsResponse;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsListResponse;
 import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.service.NewsCommandService;
+import com.example.solidconnection.news.service.NewsLikeService;
 import com.example.solidconnection.news.service.NewsQueryService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -31,6 +33,7 @@ public class NewsController {
 
     private final NewsQueryService newsQueryService;
     private final NewsCommandService newsCommandService;
+    private final NewsLikeService newsLikeService;
 
     // todo: 추후 Slice 적용
     @GetMapping
@@ -76,5 +79,32 @@ public class NewsController {
     ) {
         NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUser, newsId);
         return ResponseEntity.ok(newsCommandResponse);
+    }
+
+    @GetMapping("/{news-id}/like")
+    public ResponseEntity<LikedNewsResponse> isNewsLiked(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news-id") Long newsId
+    ) {
+        LikedNewsResponse likedNewsResponse = newsLikeService.isNewsLiked(siteUser.getId(), newsId);
+        return ResponseEntity.ok(likedNewsResponse);
+    }
+
+    @PostMapping("/{news-id}/like")
+    public ResponseEntity<Void> addNewsLike(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news-id") Long newsId
+    ) {
+        newsLikeService.addNewsLike(siteUser.getId(), newsId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{news-id}/like")
+    public ResponseEntity<Void> cancelNewsLike(
+            @AuthorizedUser SiteUser siteUser,
+            @PathVariable("news-id") Long newsId
+    ) {
+        newsLikeService.cancelNewsLike(siteUser.getId(), newsId);
+        return ResponseEntity.ok().build();
     }
 }

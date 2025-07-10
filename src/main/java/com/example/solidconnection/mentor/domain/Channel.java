@@ -44,4 +44,14 @@ public class Channel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Mentor mentor;
+
+    public Channel(int sequence, ChannelType type, String url) {
+        this.sequence = sequence;
+        this.type = type;
+        this.url = url;
+    }
+
+    public void updateMentor(Mentor mentor) {
+        this.mentor = mentor;
+    }
 }
