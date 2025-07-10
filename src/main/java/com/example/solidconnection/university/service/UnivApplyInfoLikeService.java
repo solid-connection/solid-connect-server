@@ -38,14 +38,14 @@ public class UnivApplyInfoLikeService {
     public LikeResultResponse likeUnivApplyInfo(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId());
         if (optionalLikedUnivApplyInfo.isPresent()) {
             throw new CustomException(ALREADY_LIKED_UNIV_APPLY_INFO);
         }
 
         LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
-                .univApplyInfo(univApplyInfo)
-                .siteUser(siteUser)
+                .univApplyInfoId(univApplyInfo.getId())
+                .siteUserId(siteUser.getId())
                 .build();
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
         return new LikeResultResponse(LIKE_SUCCESS_MESSAGE);
@@ -58,7 +58,7 @@ public class UnivApplyInfoLikeService {
     public LikeResultResponse cancelLikeUnivApplyInfo(SiteUser siteUser, long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
 
-        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo);
+        Optional<LikedUnivApplyInfo> optionalLikedUnivApplyInfo = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId());
         if (optionalLikedUnivApplyInfo.isEmpty()) {
             throw new CustomException(NOT_LIKED_UNIV_APPLY_INFO);
         }
@@ -73,7 +73,7 @@ public class UnivApplyInfoLikeService {
     @Transactional(readOnly = true)
     public IsLikeResponse getIsLiked(SiteUser siteUser, Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
-        boolean isLike = likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(siteUser, univApplyInfo).isPresent();
+        boolean isLike = likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(siteUser.getId(), univApplyInfo.getId()).isPresent();
         return new IsLikeResponse(isLike);
     }
 }

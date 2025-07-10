@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class GeneralUnivApplyInfoRecommendService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-        generalRecommends = univApplyInfoRepository.findRandomByTerm(term, RECOMMEND_UNIV_APPLY_INFO_NUM);
+        Pageable page = PageRequest.of(0, RECOMMEND_UNIV_APPLY_INFO_NUM);
+        generalRecommends = univApplyInfoRepository.findRandomByTerm(term, page);
     }
 }

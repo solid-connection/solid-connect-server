@@ -143,11 +143,9 @@ class UnivApplyInfoRecommendServiceTest {
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
                         generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(UnivApplyInfoPreviewResponse::from)
-                                .toList()
+                                .map(UnivApplyInfoPreviewResponse::from).toList()
                 );
     }
-
     @Test
     void 일반_추천_대학_지원_정보를_조회한다() {
         // when

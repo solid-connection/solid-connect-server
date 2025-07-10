@@ -84,7 +84,7 @@ class ApplicationSubmissionServiceTest {
         ApplicationSubmissionResponse response = applicationSubmissionService.apply(user, request);
 
         // then
-        Application savedApplication = applicationRepository.findBySiteUserAndTerm(user, term).orElseThrow();
+        Application savedApplication = applicationRepository.findBySiteUserIdAndTerm(user.getId(), term).orElseThrow();
         assertAll(
                 () -> assertThat(response.applyCount())
                         .isEqualTo(savedApplication.getUpdateCount()),

@@ -70,7 +70,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         List<GpaScoreSearchResponse> content = queryFactory
                 .select(GPA_SCORE_SEARCH_RESPONSE_PROJECTION)
                 .from(gpaScore)
-                .join(gpaScore.siteUser, siteUser)
+                .join(siteUser).on(gpaScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),
@@ -84,7 +84,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         Long totalCount = queryFactory
                 .select(gpaScore.count())
                 .from(gpaScore)
-                .join(gpaScore.siteUser, siteUser)
+                .join(siteUser).on(gpaScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),

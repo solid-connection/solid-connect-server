@@ -56,7 +56,7 @@ public class ApplicationQueryService {
 
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
-        Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
+        Application userLatestApplication = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term);
 
         List<Long> univApplyInfoIds = Stream.of(
                         userLatestApplication.getFirstChoiceUnivApplyInfoId(),
@@ -120,7 +120,7 @@ public class ApplicationQueryService {
 
     @Transactional(readOnly = true)
     public void validateSiteUserCanViewApplicants(SiteUser siteUser) {
-        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term).getVerifyStatus();
+        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);
         }

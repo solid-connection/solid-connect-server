@@ -1,12 +1,10 @@
 package com.example.solidconnection.university.domain;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -33,10 +31,9 @@ public class LikedUnivApplyInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "university_info_for_apply_id")
-    private UnivApplyInfo univApplyInfo;
+    @Column(name="university_info_for_apply_id")
+    private long univApplyInfoId;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    @Column(name="site_user_id")
+    private long siteUserId;
 }

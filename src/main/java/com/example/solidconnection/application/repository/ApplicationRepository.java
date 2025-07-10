@@ -3,7 +3,6 @@ package com.example.solidconnection.application.repository;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +19,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @Query("""
             SELECT a
             FROM Application a
-            JOIN FETCH a.siteUser
             WHERE (a.firstChoiceUnivApplyInfoId IN :univApplyInfoIds
                 OR a.secondChoiceUnivApplyInfoId IN :univApplyInfoIds
                 OR a.thirdChoiceUnivApplyInfoId IN :univApplyInfoIds)
@@ -33,14 +31,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @Query("""
             SELECT a
             FROM Application a
-            WHERE a.siteUser = :siteUser
+            WHERE a.siteUserId = :siteUserId
                 AND a.term = :term
                 AND a.isDelete = false
             """)
-    Optional<Application> findBySiteUserAndTerm(@Param("siteUser") SiteUser siteUser, @Param("term") String term);
+    Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") long siteUserId, @Param("term") String term);
 
-    default Application getApplicationBySiteUserAndTerm(SiteUser siteUser, String term) {
-        return findBySiteUserAndTerm(siteUser, term)
+    default Application getApplicationBySiteUserIdAndTerm(long siteUserId, String term) {
+        return findBySiteUserIdAndTerm(siteUserId, term)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 }

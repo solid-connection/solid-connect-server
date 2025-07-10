@@ -8,7 +8,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class MyPageService {
      * */
     @Transactional(readOnly = true)
     public MyPageResponse getMyPageInfo(SiteUser siteUser) {
-        int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUser_Id(siteUser.getId());
+        int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
         return MyPageResponse.of(siteUser, likedUnivApplyInfoCount);
     }
 
@@ -95,9 +95,10 @@ public class MyPageService {
      * */
     @Transactional(readOnly = true)
     public List<UnivApplyInfoPreviewResponse> getWishUnivApplyInfo(SiteUser siteUser) {
-        List<LikedUnivApplyInfo> likedUnivApplyInfos = likedUnivApplyInfoRepository.findAllBySiteUser_Id(siteUser.getId());
-        return likedUnivApplyInfos.stream()
-                .map(likedUnivApplyInfo -> UnivApplyInfoPreviewResponse.from(likedUnivApplyInfo.getUnivApplyInfo()))
+        List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
+
+        return univApplyInfos.stream()
+                .map(UnivApplyInfoPreviewResponse::from)
                 .toList();
     }
 }

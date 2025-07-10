@@ -61,8 +61,8 @@ class UnivApplyInfoLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
-                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(
-                            user, 괌대학_A_지원_정보
+                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(
+                            user.getId(), 괌대학_A_지원_정보.getId()
                     )).isPresent()
             );
         }
@@ -93,8 +93,8 @@ class UnivApplyInfoLikeServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
-                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserAndUnivApplyInfo(
-                            user, 괌대학_A_지원_정보
+                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(
+                            user.getId(), 괌대학_A_지원_정보.getId()
                     )).isEmpty()
             );
         }
@@ -153,8 +153,8 @@ class UnivApplyInfoLikeServiceTest {
 
     private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
-                .siteUser(siteUser)
-                .univApplyInfo(univApplyInfo)
+                .siteUserId(siteUser.getId())
+                .univApplyInfoId(univApplyInfo.getId())
                 .build();
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
     }

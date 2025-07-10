@@ -193,14 +193,14 @@ class MyPageServiceTest {
     }
 
     private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보(), testUser);
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보(), testUser);
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(), testUser);
+        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
 
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
-        return likedUnivApplyInfoRepository.countBySiteUser_Id(testUser.getId());
+        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
     }
 
     private MockMultipartFile createValidImageFile() {
