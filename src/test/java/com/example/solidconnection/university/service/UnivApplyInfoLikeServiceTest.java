@@ -63,7 +63,7 @@ class UnivApplyInfoLikeServiceTest {
         @Test
         void 이미_좋아요했으면_예외_응답을_반환한다() {
             // given
-            saveLikedUniversity(user, 괌대학_A_지원_정보);
+            saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when & then
             assertThatCode(() -> univApplyInfoLikeService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
@@ -78,7 +78,7 @@ class UnivApplyInfoLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_취소한다() {
             // given
-            saveLikedUniversity(user, 괌대학_A_지원_정보);
+            saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when
             univApplyInfoLikeService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
@@ -112,7 +112,7 @@ class UnivApplyInfoLikeServiceTest {
     @Test
     void 좋아요한_대학_지원_정보인지_확인한다() {
         // given
-        saveLikedUniversity(user, 괌대학_A_지원_정보);
+        saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
         // when
         IsLikeResponse response = univApplyInfoLikeService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
@@ -141,7 +141,7 @@ class UnivApplyInfoLikeServiceTest {
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
-    private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+    private void saveLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
                 .siteUserId(siteUser.getId())
                 .univApplyInfoId(univApplyInfo.getId())
