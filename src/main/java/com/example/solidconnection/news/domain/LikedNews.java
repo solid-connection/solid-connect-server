@@ -33,4 +33,9 @@ public class LikedNews {
 
     @Column(name = "site_user_id")
     private long siteUserId;
+
+    public LikedNews(long newsId, long siteUserId) {
+        this.newsId = newsId;
+        this.siteUserId = siteUserId;
+    }
 }
