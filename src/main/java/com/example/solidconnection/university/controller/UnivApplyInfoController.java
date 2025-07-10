@@ -5,7 +5,6 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
-import com.example.solidconnection.university.dto.LikeResultResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
@@ -64,21 +63,21 @@ public class UnivApplyInfoController {
     }
 
     @PostMapping("/{univ-apply-info-id}/like")
-    public ResponseEntity<LikeResultResponse> addUnivApplyInfoLike(
+    public ResponseEntity<Void> addUnivApplyInfoLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = univApplyInfoLikeService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
-        return ResponseEntity.ok(likeResultResponse);
+        univApplyInfoLikeService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{univ-apply-info-id}/like")
-    public ResponseEntity<LikeResultResponse> cancelUnivApplyInfoLike(
+    public ResponseEntity<Void> cancelUnivApplyInfoLike(
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        LikeResultResponse likeResultResponse = univApplyInfoLikeService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
-        return ResponseEntity.ok(likeResultResponse);
+        univApplyInfoLikeService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{univ-apply-info-id}")
