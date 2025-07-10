@@ -7,10 +7,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,31 @@ public class Mentor {
     @Column
     private long universityId;
 
+    @BatchSize(size = 10)
+    @OrderBy("sequence ASC")
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Channel> channels = new ArrayList<>();
+
+    public void increaseMenteeCount() {
+        this.menteeCount++;
+    }
+
+    public void updateIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void updatePassTip(String passTip) {
+        this.passTip = passTip;
+    }
+
+    public void updateChannels(List<Channel> channels) {
+        this.channels.clear();
+        if (channels == null || channels.isEmpty()) {
+            return;
+        }
+        for (Channel channel : channels) {
+            channel.updateMentor(this);
+            this.channels.add(channel);
+        }
+    }
 }

@@ -43,6 +43,7 @@ public enum ErrorCode {
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
+    MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -99,7 +100,16 @@ public enum ErrorCode {
 
     // news
     INVALID_NEWS_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 소식지만 제어할 수 있습니다."),
+    ALREADY_LIKED_NEWS(HttpStatus.BAD_REQUEST.value(), "이미 좋아요한 소식지입니다."),
+    NOT_LIKED_NEWS(HttpStatus.BAD_REQUEST.value(), "좋아요하지 않은 소식지입니다."),
 
+    // mentor
+    CHANNEL_SEQUENCE_NOT_UNIQUE(HttpStatus.BAD_REQUEST.value(), "채널의 순서가 중복되었습니다."),
+    CHANNEL_REGISTRATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "등록 가능한 채널 수를 초과하였습니다."),
+    ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
+    MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
+    UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
+    MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
