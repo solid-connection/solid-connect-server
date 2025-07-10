@@ -34,6 +34,7 @@ public record PostFindCommentResponse(
         }
         return null;
     }
+
     private static String getDisplayContent(Comment comment) {
         return comment.isDeleted() ? "" : comment.getContent();
     }

@@ -132,6 +132,36 @@ class CommentServiceTest {
                             .doesNotContain(parentComment.getId(), childComment1.getId(), childComment2.getId())
             );
         }
+
+        @Test
+        void 부모댓글이_삭제된_경우에도_자식댓글이_존재하면_자식댓글의_내용만_반환한다() {
+            // given
+            Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
+            Comment childComment1 = commentFixture.자식_댓글("자식 댓글1", post, user2, parentComment);
+            Comment childComment2 = commentFixture.자식_댓글("자식 댓글2", post, user2, parentComment);
+
+            parentComment.deprecateComment();
+            commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
+
+            // when
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(3),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .containsExactlyInAnyOrder(parentComment.getId(), childComment1.getId(), childComment2.getId()),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::content)
+                            .containsExactly(""),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> !response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::content)
+                            .containsExactlyInAnyOrder("자식 댓글1", "자식 댓글2")
+            );
+        }
     }
 
     @Nested

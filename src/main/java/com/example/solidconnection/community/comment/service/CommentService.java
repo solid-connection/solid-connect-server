@@ -129,7 +129,7 @@ public class CommentService {
             comment.resetPostAndParentComment();
             commentRepository.deleteById(commentId);
             // 대댓글 삭제 이후, 부모댓글이 무의미하다면 이역시 삭제합니다.
-            if (parentComment.getCommentList().isEmpty() && parentComment.getContent() == null) {
+            if (parentComment.getCommentList().isEmpty() && parentComment.isDeleted()) {
                 parentComment.resetPostAndParentComment();
                 commentRepository.deleteById(parentComment.getId());
             }

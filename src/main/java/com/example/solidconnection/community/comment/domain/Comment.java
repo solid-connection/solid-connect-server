@@ -41,7 +41,7 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
