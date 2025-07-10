@@ -15,6 +15,7 @@ import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import jakarta.transaction.Transactional;
@@ -160,6 +161,50 @@ class CommentServiceTest {
                             .filteredOn(response -> !response.id().equals(parentComment.getId()))
                             .extracting(PostFindCommentResponse::content)
                             .containsExactlyInAnyOrder("자식 댓글1", "자식 댓글2")
+            );
+        }
+
+        @Test
+        void 부모댓글이_삭제된_경우_부모댓글의_사용자정보는_null이고_자식댓글의_사용자정보는_정상적으로_반환한다() {
+            // given
+            Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
+            Comment childComment1 = commentFixture.자식_댓글("자식 댓글1", post, user2, parentComment);
+            Comment childComment2 = commentFixture.자식_댓글("자식 댓글2", post, user2, parentComment);
+
+            System.out.println("Child1 User ID: " + childComment1.getSiteUserId());
+            System.out.println("Child2 User ID: " + childComment2.getSiteUserId());
+            System.out.println("User2 ID: " + user2.getId());
+
+            parentComment.deprecateComment();
+            commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
+
+            // when
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(3),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .containsExactlyInAnyOrder(parentComment.getId(), childComment1.getId(), childComment2.getId()),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::content)
+                            .containsExactly(""),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::postFindSiteUserResponse)
+                            .containsExactly((PostFindSiteUserResponse) null),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> !response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::content)
+                            .containsExactlyInAnyOrder("자식 댓글1", "자식 댓글2"),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> !response.id().equals(parentComment.getId()))
+                            .extracting(PostFindCommentResponse::postFindSiteUserResponse)
+                            .isNotNull()
+                            .extracting(PostFindSiteUserResponse::id)
+                            .containsExactlyInAnyOrder(user2.getId(), user2.getId())
             );
         }
     }

@@ -24,7 +24,7 @@ public record PostFindCommentResponse(
                 isOwner,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
-                PostFindSiteUserResponse.from(siteUser)
+                getDisplaySiteUserResponse(comment, siteUser)
         );
     }
 
@@ -35,7 +35,12 @@ public record PostFindCommentResponse(
         return null;
     }
 
-    private static String getDisplayContent(Comment comment) {
+    private static String getDisplayContent(Comment comment)
+    {
         return comment.isDeleted() ? "" : comment.getContent();
+    }
+
+    private static PostFindSiteUserResponse getDisplaySiteUserResponse(Comment comment, SiteUser siteUser) {
+        return comment.isDeleted() ? null : PostFindSiteUserResponse.from(siteUser);
     }
 }
