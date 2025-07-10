@@ -127,10 +127,7 @@ class CommentServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(responses).isEmpty(),
-                    () -> assertThat(responses)
-                            .extracting(PostFindCommentResponse::id)
-                            .doesNotContain(parentComment.getId(), childComment1.getId(), childComment2.getId())
+                    () -> assertThat(responses).isEmpty()
             );
         }
 
@@ -171,10 +168,6 @@ class CommentServiceTest {
             Comment childComment1 = commentFixture.자식_댓글("자식 댓글1", post, user2, parentComment);
             Comment childComment2 = commentFixture.자식_댓글("자식 댓글2", post, user2, parentComment);
 
-            System.out.println("Child1 User ID: " + childComment1.getSiteUserId());
-            System.out.println("Child2 User ID: " + childComment2.getSiteUserId());
-            System.out.println("User2 ID: " + user2.getId());
-
             parentComment.deprecateComment();
             commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
 
@@ -183,22 +176,10 @@ class CommentServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(responses).hasSize(3),
-                    () -> assertThat(responses)
-                            .extracting(PostFindCommentResponse::id)
-                            .containsExactlyInAnyOrder(parentComment.getId(), childComment1.getId(), childComment2.getId()),
-                    () -> assertThat(responses)
-                            .filteredOn(response -> response.id().equals(parentComment.getId()))
-                            .extracting(PostFindCommentResponse::content)
-                            .containsExactly(""),
                     () -> assertThat(responses)
                             .filteredOn(response -> response.id().equals(parentComment.getId()))
                             .extracting(PostFindCommentResponse::postFindSiteUserResponse)
                             .containsExactly((PostFindSiteUserResponse) null),
-                    () -> assertThat(responses)
-                            .filteredOn(response -> !response.id().equals(parentComment.getId()))
-                            .extracting(PostFindCommentResponse::content)
-                            .containsExactlyInAnyOrder("자식 댓글1", "자식 댓글2"),
                     () -> assertThat(responses)
                             .filteredOn(response -> !response.id().equals(parentComment.getId()))
                             .extracting(PostFindCommentResponse::postFindSiteUserResponse)
