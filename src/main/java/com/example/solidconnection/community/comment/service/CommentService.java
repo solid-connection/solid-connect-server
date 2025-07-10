@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
@@ -38,15 +39,20 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
-        SiteUser commentOwner = siteUserRepository.findById(siteUser.getId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
         List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
         List<Comment> filteredComments = filterCommentsByDeletionRules(allComments);
 
+        Set<Long> userIds = filteredComments.stream()
+                .map(Comment::getSiteUserId)
+                .collect(Collectors.toSet());
+
+        Map<Long, SiteUser> userMap = siteUserRepository.findAllById(userIds)
+                .stream()
+                .collect(Collectors.toMap(SiteUser::getId, user -> user));
+
         return filteredComments.stream()
                 .map(comment -> PostFindCommentResponse.from(
-                        isOwner(comment, siteUser), comment, commentOwner))
+                        isOwner(comment, siteUser), comment, userMap.get(comment.getSiteUserId())))
                 .collect(Collectors.toList());
     }
 
