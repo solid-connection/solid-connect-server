@@ -40,6 +40,9 @@ public class Comment extends BaseEntity {
     @Column(length = 255)
     private String content;
 
+    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    private boolean isDeleted = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -102,6 +105,6 @@ public class Comment extends BaseEntity {
     }
 
     public void deprecateComment() {
-        this.content = null;
+        this.isDeleted = true;
     }
 }

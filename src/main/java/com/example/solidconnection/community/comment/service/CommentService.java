@@ -17,8 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
@@ -36,12 +39,45 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
-        SiteUser commentOwner = siteUserRepository.findById(siteUser.getId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return commentRepository.findCommentTreeByPostId(postId)
+        List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
+        List<Comment> filteredComments = filterCommentsByDeletionRules(allComments);
+
+        Set<Long> userIds = filteredComments.stream()
+                .map(Comment::getSiteUserId)
+                .collect(Collectors.toSet());
+
+        Map<Long, SiteUser> userMap = siteUserRepository.findAllById(userIds)
                 .stream()
-                .map(comment -> PostFindCommentResponse.from(isOwner(comment, siteUser), comment, siteUser))
+                .collect(Collectors.toMap(SiteUser::getId, user -> user));
+
+        return filteredComments.stream()
+                .map(comment -> PostFindCommentResponse.from(
+                        isOwner(comment, siteUser), comment, userMap.get(comment.getSiteUserId())))
                 .collect(Collectors.toList());
+    }
+
+    private List<Comment> filterCommentsByDeletionRules(List<Comment> comments) {
+        Map<Long, List<Comment>> commentsByParent = comments.stream()
+                .filter(comment -> comment.getParentComment() != null)
+                .collect(Collectors.groupingBy(comment -> comment.getParentComment().getId()));
+
+        List<Comment> result = new ArrayList<>();
+
+        List<Comment> parentComments = comments.stream()
+                .filter(comment -> comment.getParentComment() == null)
+                .toList();
+        for (Comment parent : parentComments) {
+            List<Comment> children = commentsByParent.getOrDefault(parent.getId(), List.of());
+            boolean allDeleted = parent.isDeleted() &&
+                    children.stream().allMatch(Comment::isDeleted);
+            if (!allDeleted) {
+                result.add(parent);
+                result.addAll(children.stream()
+                        .filter(child -> !child.isDeleted())
+                        .toList());
+            }
+        }
+        return result;
     }
 
     private Boolean isOwner(Comment comment, SiteUser siteUser) {
@@ -99,7 +135,7 @@ public class CommentService {
             comment.resetPostAndParentComment();
             commentRepository.deleteById(commentId);
             // 대댓글 삭제 이후, 부모댓글이 무의미하다면 이역시 삭제합니다.
-            if (parentComment.getCommentList().isEmpty() && parentComment.getContent() == null) {
+            if (parentComment.getCommentList().isEmpty() && parentComment.isDeleted()) {
                 parentComment.resetPostAndParentComment();
                 commentRepository.deleteById(parentComment.getId());
             }

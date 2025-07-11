@@ -20,11 +20,11 @@ public record PostFindCommentResponse(
         return new PostFindCommentResponse(
                 comment.getId(),
                 getParentCommentId(comment),
-                comment.getContent(),
+                getDisplayContent(comment),
                 isOwner,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
-                PostFindSiteUserResponse.from(siteUser)
+                getDisplaySiteUserResponse(comment, siteUser)
         );
     }
 
@@ -33,5 +33,14 @@ public record PostFindCommentResponse(
             return comment.getParentComment().getId();
         }
         return null;
+    }
+
+    private static String getDisplayContent(Comment comment)
+    {
+        return comment.isDeleted() ? "" : comment.getContent();
+    }
+
+    private static PostFindSiteUserResponse getDisplaySiteUserResponse(Comment comment, SiteUser siteUser) {
+        return comment.isDeleted() ? null : PostFindSiteUserResponse.from(siteUser);
     }
 }
