@@ -2,7 +2,7 @@ package com.example.solidconnection.security.authentication;
 
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 
-public class SiteUserAuthentication extends JwtAuthentication {
+public class SiteUserAuthentication extends TokenAuthentication {
 
     public SiteUserAuthentication(String token) {
         super(token, null);

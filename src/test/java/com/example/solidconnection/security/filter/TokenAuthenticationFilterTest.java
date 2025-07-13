@@ -25,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @TestContainerSpringBootTest
 @DisplayName("토큰 인증 필터 테스트")
-class JwtAuthenticationFilterTest {
+class TokenAuthenticationFilterTest {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;

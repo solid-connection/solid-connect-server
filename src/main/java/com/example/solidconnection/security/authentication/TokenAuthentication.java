@@ -4,13 +4,13 @@ import java.util.Collections;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public abstract class JwtAuthentication extends AbstractAuthenticationToken {
+public abstract class TokenAuthentication extends AbstractAuthenticationToken {
 
     private final Object principal; // 인증 주체
 
     private final String credentials; // 증명 수단
 
-    public JwtAuthentication(String token, Object principal) {
+    public TokenAuthentication(String token, Object principal) {
         super(principal instanceof UserDetails ?
                       ((UserDetails) principal).getAuthorities() :
                       Collections.emptyList());
