@@ -2,12 +2,11 @@ package com.example.solidconnection.scheduler;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component

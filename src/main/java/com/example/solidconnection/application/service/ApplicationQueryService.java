@@ -1,20 +1,17 @@
 package com.example.solidconnection.application.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
+
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.common.VerifyStatus;
-import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +20,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service

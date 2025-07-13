@@ -1,5 +1,7 @@
 package com.example.solidconnection.common.resolver;
 
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-
-import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 
 @Component
 @RequiredArgsConstructor

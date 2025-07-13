@@ -6,14 +6,13 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -48,8 +47,8 @@ public class UnivApplyInfoRecommendService {
         }
 
         return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
-                .map(UnivApplyInfoPreviewResponse::from)
-                .toList());
+                                                           .map(UnivApplyInfoPreviewResponse::from)
+                                                           .toList());
     }
 
     private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
@@ -68,7 +67,7 @@ public class UnivApplyInfoRecommendService {
     public UnivApplyInfoRecommendsResponse getGeneralRecommends() {
         List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
         return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
-                .map(UnivApplyInfoPreviewResponse::from)
-                .toList());
+                                                           .map(UnivApplyInfoPreviewResponse::from)
+                                                           .toList());
     }
 }

@@ -6,4 +6,5 @@ public record NicknameUpdateRequest(
         @NotBlank(message = "닉네임을 입력해주세요.")
         String nickname
 ) {
+
 }

@@ -3,19 +3,18 @@ package com.example.solidconnection.university.repository.custom;
 import com.example.solidconnection.location.country.domain.QCountry;
 import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
 import com.example.solidconnection.university.domain.QUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRepository {
@@ -84,8 +83,8 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(university.country, country)
                 .join(university.region, region)
                 .where(regionCodeEq(country, regionCode)
-                        .and(countryOrUniversityContainsKeyword(country, university, keywords))
-                        .and(univApplyInfo.term.eq(term)))
+                               .and(countryOrUniversityContainsKeyword(country, university, keywords))
+                               .and(univApplyInfo.term.eq(term)))
                 .fetch();
 
         if (testScore == null || testScore.isEmpty()) {

@@ -2,7 +2,6 @@ package com.example.solidconnection.mentor.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
 
 public record MentorMyPageUpdateRequest(
@@ -15,4 +14,5 @@ public record MentorMyPageUpdateRequest(
         @Valid
         List<ChannelRequest> channels
 ) {
+
 }

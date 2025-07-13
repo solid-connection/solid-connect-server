@@ -20,4 +20,5 @@ public record NewsUpdateRequest(
 
         Boolean resetToDefaultImage
 ) {
+
 }

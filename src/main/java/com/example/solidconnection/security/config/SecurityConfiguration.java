@@ -1,5 +1,7 @@
 package com.example.solidconnection.security.config;
 
+import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
+
 import com.example.solidconnection.common.exception.CustomAccessDeniedHandler;
 import com.example.solidconnection.common.exception.CustomAuthenticationEntryPoint;
 import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
@@ -19,8 +21,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 
 @Configuration
 @EnableWebSecurity

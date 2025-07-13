@@ -1,19 +1,18 @@
 package com.example.solidconnection.security.filter;
 
+import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
+
 import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.Optional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 
 @Component
 @RequiredArgsConstructor

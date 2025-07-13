@@ -1,5 +1,9 @@
 package com.example.solidconnection.community.comment.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.comment.dto.CommentCreateRequest;
@@ -13,21 +17,15 @@ import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,8 +71,8 @@ public class CommentService {
             if (!allDeleted) {
                 result.add(parent);
                 result.addAll(children.stream()
-                        .filter(child -> !child.isDeleted())
-                        .toList());
+                                      .filter(child -> !child.isDeleted())
+                                      .toList());
             }
         }
         return result;

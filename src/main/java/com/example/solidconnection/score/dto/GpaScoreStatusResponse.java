@@ -9,6 +9,7 @@ public record GpaScoreStatusResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static GpaScoreStatusResponse from(GpaScore gpaScore) {
         return new GpaScoreStatusResponse(
                 gpaScore.getId(),

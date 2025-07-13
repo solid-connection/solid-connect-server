@@ -1,5 +1,10 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.repository.BoardRepository;
@@ -17,19 +22,13 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.util.RedisUtils;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Objects;
-
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 
 @Service
 @RequiredArgsConstructor

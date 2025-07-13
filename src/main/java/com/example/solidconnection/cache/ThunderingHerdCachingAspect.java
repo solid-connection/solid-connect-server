@@ -1,8 +1,20 @@
 package com.example.solidconnection.cache;
 
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.community.post.service.RedisConstants.LOCK_TIMEOUT_MS;
+import static com.example.solidconnection.community.post.service.RedisConstants.MAX_WAIT_TIME_MS;
+import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LIMIT_PERCENT;
+
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.cache.manager.CacheManager;
 import com.example.solidconnection.util.RedisUtils;
+import java.time.Duration;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,19 +25,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
-import static com.example.solidconnection.community.post.service.RedisConstants.LOCK_TIMEOUT_MS;
-import static com.example.solidconnection.community.post.service.RedisConstants.MAX_WAIT_TIME_MS;
-import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LIMIT_PERCENT;
 
 @Aspect
 @Component

@@ -12,4 +12,5 @@ public record LanguageTestScoreRequest(
         @NotBlank(message = "어학 점수를 입력해주세요.")
         String languageTestScore
 ) {
+
 }

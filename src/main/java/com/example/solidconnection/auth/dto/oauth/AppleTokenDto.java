@@ -7,4 +7,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record AppleTokenDto(
         @JsonProperty("id_token") String idToken
 ) {
+
 }

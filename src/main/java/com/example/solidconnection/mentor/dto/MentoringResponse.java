@@ -2,7 +2,6 @@ package com.example.solidconnection.mentor.dto;
 
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-
 import java.time.ZonedDateTime;
 
 public record MentoringResponse(
@@ -12,6 +11,7 @@ public record MentoringResponse(
         boolean isChecked,
         ZonedDateTime createdAt
 ) {
+
     public static MentoringResponse from(Mentoring mentoring, SiteUser mentee) {
         return new MentoringResponse(
                 mentoring.getId(),

@@ -13,4 +13,5 @@ public record AppleOAuthClientProperties(
         String keyId,
         String secretKey
 ) {
+
 }

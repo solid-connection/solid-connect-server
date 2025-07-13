@@ -1,13 +1,12 @@
 package com.example.solidconnection.community.post.repository;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 

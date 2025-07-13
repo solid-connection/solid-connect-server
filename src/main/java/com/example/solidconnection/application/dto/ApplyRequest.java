@@ -16,4 +16,5 @@ public record ApplyRequest(
         @JsonProperty("universityChoiceRequest")
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest
 ) {
+
 }

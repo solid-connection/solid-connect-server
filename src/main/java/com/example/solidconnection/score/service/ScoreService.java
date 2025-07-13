@@ -16,13 +16,12 @@ import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class ScoreService {
     public Long submitLanguageTestScore(SiteUser siteUser, LanguageTestScoreRequest languageTestScoreRequest, MultipartFile file) {
         UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, ImgType.LANGUAGE_TEST);
         LanguageTest languageTest = new LanguageTest(languageTestScoreRequest.languageTestType(),
-                languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
+                                                     languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
         LanguageTestScore newScore = new LanguageTestScore(languageTest, siteUser);
         LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);
         return savedNewScore.getId();

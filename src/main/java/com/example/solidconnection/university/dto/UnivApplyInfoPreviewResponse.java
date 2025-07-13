@@ -1,7 +1,6 @@
 package com.example.solidconnection.university.dto;
 
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-
 import java.util.Collections;
 import java.util.List;
 

@@ -4,7 +4,6 @@ import com.example.solidconnection.community.board.dto.PostFindBoardResponse;
 import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 

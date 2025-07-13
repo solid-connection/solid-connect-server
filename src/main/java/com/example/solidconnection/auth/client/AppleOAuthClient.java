@@ -1,10 +1,15 @@
 package com.example.solidconnection.auth.client;
 
+import static com.example.solidconnection.common.exception.ErrorCode.APPLE_AUTHORIZATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
+
 import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.AppleTokenDto;
 import com.example.solidconnection.auth.dto.oauth.AppleUserInfoDto;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
+import java.security.PublicKey;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.security.PublicKey;
-import java.util.Objects;
-
-import static com.example.solidconnection.common.exception.ErrorCode.APPLE_AUTHORIZATION_FAILED;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
 
 /*
  * 애플 인증을 위한 OAuth2 클라이언트

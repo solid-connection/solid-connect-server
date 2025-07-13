@@ -3,7 +3,6 @@ package com.example.solidconnection.mentor.dto;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-
 import java.util.List;
 
 public record MentorDetailResponse(

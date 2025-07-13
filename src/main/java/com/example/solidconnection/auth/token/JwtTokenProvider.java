@@ -1,5 +1,7 @@
 package com.example.solidconnection.auth.token;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
+
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
@@ -7,14 +9,11 @@ import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
 @Component
 @RequiredArgsConstructor

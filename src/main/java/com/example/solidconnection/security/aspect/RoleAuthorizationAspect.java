@@ -1,18 +1,17 @@
 package com.example.solidconnection.security.aspect;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-
-import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 
 @Aspect
 @Component

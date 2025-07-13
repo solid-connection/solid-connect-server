@@ -9,4 +9,5 @@ public record KakaoOAuthClientProperties(
         String redirectUrl,
         String clientId
 ) {
+
 }

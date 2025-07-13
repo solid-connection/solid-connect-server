@@ -1,5 +1,8 @@
 package com.example.solidconnection.news.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_NEWS_ACCESS;
+import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.config.NewsProperties;
 import com.example.solidconnection.news.domain.News;
@@ -17,9 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_NEWS_ACCESS;
-import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 public class NewsCommandService {
@@ -29,7 +29,7 @@ public class NewsCommandService {
     private final NewsRepository newsRepository;
 
     @Transactional
-    public NewsCommandResponse createNews(long siteUserId,NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
+    public NewsCommandResponse createNews(long siteUserId, NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
         String thumbnailUrl = getImageUrl(imageFile);
         News news = newsCreateRequest.toEntity(thumbnailUrl, siteUserId);
         News savedNews = newsRepository.save(news);
@@ -69,8 +69,7 @@ public class NewsCommandService {
         if (Boolean.TRUE.equals(resetToDefaultImage)) {
             deleteCustomImage(news.getThumbnailUrl());
             news.updateThumbnailUrl(newsProperties.defaultThumbnailUrl());
-        }
-        else if (imageFile != null && !imageFile.isEmpty()) {
+        } else if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
             deleteCustomImage(news.getThumbnailUrl());
             news.updateThumbnailUrl(uploadedFile.fileUrl());

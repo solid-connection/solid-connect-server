@@ -6,6 +6,7 @@ public record PostDislikeResponse(
         Long likeCount,
         Boolean isLiked
 ) {
+
     public static PostDislikeResponse from(Post post) {
         return new PostDislikeResponse(
                 post.getLikeCount(),

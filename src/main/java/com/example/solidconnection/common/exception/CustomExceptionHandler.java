@@ -1,8 +1,16 @@
 package com.example.solidconnection.common.exception;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DATA_INTEGRITY_VIOLATION;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
+import static com.example.solidconnection.common.exception.ErrorCode.JSON_PARSING_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.JWT_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_DEFINED_ERROR;
+
 import com.example.solidconnection.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.JwtException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -10,15 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DATA_INTEGRITY_VIOLATION;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
-import static com.example.solidconnection.common.exception.ErrorCode.JSON_PARSING_FAILED;
-import static com.example.solidconnection.common.exception.ErrorCode.JWT_EXCEPTION;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_DEFINED_ERROR;
 
 @Slf4j
 @ControllerAdvice

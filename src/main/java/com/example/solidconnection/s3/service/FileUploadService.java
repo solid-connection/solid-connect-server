@@ -1,5 +1,8 @@
 package com.example.solidconnection.s3.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
+
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -7,16 +10,12 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.solidconnection.common.exception.CustomException;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-
-import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
-import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 
 @Component
 @EnableAsync
@@ -39,7 +38,7 @@ public class FileUploadService {
 
         try {
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+                                       .withCannedAcl(CannedAccessControlList.PublicRead));
             log.info("이미지 업로드 정상적 완료 thread: {}", Thread.currentThread().getName());
         } catch (AmazonServiceException e) {
             log.error("이미지 업로드 중 s3 서비스 예외 발생 : {}", e.getMessage());

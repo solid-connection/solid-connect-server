@@ -8,6 +8,7 @@ public record LanguageTestResponse(
         String languageTestScore,
         String languageTestReportUrl
 ) {
+
     public static LanguageTestResponse from(LanguageTest languageTest) {
         return new LanguageTestResponse(
                 languageTest.getLanguageTestType(),

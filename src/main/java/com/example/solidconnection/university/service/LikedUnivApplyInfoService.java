@@ -1,5 +1,8 @@
 package com.example.solidconnection.university.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
@@ -8,16 +11,12 @@ import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
 
 @RequiredArgsConstructor
 @Service

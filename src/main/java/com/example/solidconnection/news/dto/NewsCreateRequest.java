@@ -19,6 +19,7 @@ public record NewsCreateRequest(
         @URL(message = "올바른 URL 형식이 아닙니다.")
         String url
 ) {
+
     public News toEntity(String thumbnailUrl, long siteUserId) {
         return new News(
                 title,

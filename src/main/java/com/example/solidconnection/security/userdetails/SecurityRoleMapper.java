@@ -1,9 +1,8 @@
 package com.example.solidconnection.security.userdetails;
 
 import com.example.solidconnection.siteuser.domain.Role;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import java.util.List;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class SecurityRoleMapper {
 

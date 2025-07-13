@@ -1,11 +1,10 @@
 package com.example.solidconnection.security.userdetails;
 
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import java.util.Collection;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
 
 public class SiteUserDetails implements UserDetails {
 

@@ -13,4 +13,5 @@ public record ChannelRequest(
         @URL
         String url
 ) {
+
 }

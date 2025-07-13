@@ -1,7 +1,10 @@
 package com.example.solidconnection.university.service;
 
+import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
+
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +13,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
 
 @Service
 @RequiredArgsConstructor

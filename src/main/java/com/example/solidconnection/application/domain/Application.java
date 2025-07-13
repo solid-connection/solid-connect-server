@@ -1,5 +1,7 @@
 package com.example.solidconnection.application.domain;
 
+import static com.example.solidconnection.common.VerifyStatus.PENDING;
+
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
@@ -17,8 +19,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import static com.example.solidconnection.common.VerifyStatus.PENDING;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -48,23 +48,23 @@ public class Application {
     private LanguageTest languageTest;
 
     @Setter
-    @Column(columnDefinition = "varchar(50) not null default 'PENDING'", name="verify_status")
+    @Column(columnDefinition = "varchar(50) not null default 'PENDING'", name = "verify_status")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus;
 
-    @Column(length = 100, name="nickname_for_apply")
+    @Column(length = 100, name = "nickname_for_apply")
     private String nicknameForApply;
 
-    @Column(columnDefinition = "int not null default 1", name="update_count")
+    @Column(columnDefinition = "int not null default 1", name = "update_count")
     private Integer updateCount;
 
-    @Column(length = 50, nullable = false, name="term")
+    @Column(length = 50, nullable = false, name = "term")
     private String term;
 
-    @Column(name="is_delete")
+    @Column(name = "is_delete")
     private boolean isDelete = false;
 
-    @Column(nullable = false , name = "first_choice_university_info_for_apply_id")
+    @Column(nullable = false, name = "first_choice_university_info_for_apply_id")
     private long firstChoiceUnivApplyInfoId;
 
     @Column(name = "second_choice_university_info_for_apply_id")

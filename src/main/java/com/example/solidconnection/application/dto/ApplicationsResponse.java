@@ -6,4 +6,5 @@ public record ApplicationsResponse(
         List<ApplicantsResponse> firstChoice,
         List<ApplicantsResponse> secondChoice,
         List<ApplicantsResponse> thirdChoice) {
+
 }

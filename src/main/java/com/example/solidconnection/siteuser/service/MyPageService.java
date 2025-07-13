@@ -1,5 +1,9 @@
 package com.example.solidconnection.siteuser.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -8,17 +12,12 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
-import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service

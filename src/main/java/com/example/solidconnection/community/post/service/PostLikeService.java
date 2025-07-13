@@ -1,5 +1,7 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostLike;
@@ -12,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
 
 @Service
 @RequiredArgsConstructor

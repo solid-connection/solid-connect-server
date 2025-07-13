@@ -2,19 +2,18 @@ package com.example.solidconnection.university.service;
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.university.domain.LanguageTestType;
-import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -53,9 +52,9 @@ public class UnivApplyInfoQueryService {
             String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
 
         return new UnivApplyInfoPreviewResponses(universityFilterRepository
-                .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
-                .stream()
-                .map(UnivApplyInfoPreviewResponse::from)
-                .toList());
+                                                         .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
+                                                         .stream()
+                                                         .map(UnivApplyInfoPreviewResponse::from)
+                                                         .toList());
     }
 }

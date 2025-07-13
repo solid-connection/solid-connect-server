@@ -1,18 +1,17 @@
 package com.example.solidconnection.common;
 
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.MICROS;
+
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import java.time.ZonedDateTime;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.ZonedDateTime;
-
-import static java.time.ZoneOffset.UTC;
-import static java.time.temporal.ChronoUnit.MICROS;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

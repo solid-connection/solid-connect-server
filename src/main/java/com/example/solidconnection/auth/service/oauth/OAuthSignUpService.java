@@ -1,5 +1,7 @@
 package com.example.solidconnection.auth.service.oauth;
 
+import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_EXISTED;
+
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.auth.service.SignUpService;
@@ -12,8 +14,6 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import org.springframework.stereotype.Service;
-
-import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_EXISTED;
 
 @Service
 public class OAuthSignUpService extends SignUpService {

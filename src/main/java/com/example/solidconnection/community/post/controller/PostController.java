@@ -14,6 +14,8 @@ import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.community.post.service.PostQueryService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,9 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

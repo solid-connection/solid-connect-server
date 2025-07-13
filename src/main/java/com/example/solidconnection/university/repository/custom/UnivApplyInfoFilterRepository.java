@@ -2,7 +2,6 @@ package com.example.solidconnection.university.repository.custom;
 
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-
 import java.util.List;
 
 public interface UnivApplyInfoFilterRepository {
