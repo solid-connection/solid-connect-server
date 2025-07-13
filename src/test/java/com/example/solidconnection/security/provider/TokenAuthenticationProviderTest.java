@@ -26,10 +26,10 @@ import org.springframework.security.core.Authentication;
 
 @TestContainerSpringBootTest
 @DisplayName("사용자 인증정보 provider 테스트")
-class SiteUserAuthenticationProviderTest {
+class TokenAuthenticationProviderTest {
 
     @Autowired
-    private SiteUserAuthenticationProvider siteUserAuthenticationProvider;
+    private TokenAuthenticationProvider tokenAuthenticationProvider;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -52,8 +52,8 @@ class SiteUserAuthenticationProviderTest {
 
         // when & then
         assertAll(
-                () -> assertThat(siteUserAuthenticationProvider.supports(supportedType)).isTrue(),
-                () -> assertThat(siteUserAuthenticationProvider.supports(notSupportedType)).isFalse()
+                () -> assertThat(tokenAuthenticationProvider.supports(supportedType)).isTrue(),
+                () -> assertThat(tokenAuthenticationProvider.supports(notSupportedType)).isFalse()
         );
     }
 
@@ -64,7 +64,7 @@ class SiteUserAuthenticationProviderTest {
         TokenAuthentication auth = new TokenAuthentication(token);
 
         // when
-        Authentication result = siteUserAuthenticationProvider.authenticate(auth);
+        Authentication result = tokenAuthenticationProvider.authenticate(auth);
 
         // then
         assertThat(result).isNotNull();
@@ -83,7 +83,7 @@ class SiteUserAuthenticationProviderTest {
             TokenAuthentication expiredAuth = new TokenAuthentication(createExpiredToken());
 
             // when & then
-            assertThatCode(() -> siteUserAuthenticationProvider.authenticate(expiredAuth))
+            assertThatCode(() -> tokenAuthenticationProvider.authenticate(expiredAuth))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(INVALID_TOKEN.getMessage());
         }
@@ -95,7 +95,7 @@ class SiteUserAuthenticationProviderTest {
                     createWrongSubjectTypeToken());
 
             // when & then
-            assertThatCode(() -> siteUserAuthenticationProvider.authenticate(wrongSubjectTypeAuth))
+            assertThatCode(() -> tokenAuthenticationProvider.authenticate(wrongSubjectTypeAuth))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(INVALID_TOKEN.getMessage());
         }
@@ -108,7 +108,7 @@ class SiteUserAuthenticationProviderTest {
             TokenAuthentication auth = new TokenAuthentication(token);
 
             // when & then
-            assertThatCode(() -> siteUserAuthenticationProvider.authenticate(auth))
+            assertThatCode(() -> tokenAuthenticationProvider.authenticate(auth))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(AUTHENTICATION_FAILED.getMessage());
         }
