@@ -6,26 +6,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public abstract class JwtAuthentication extends AbstractAuthenticationToken {
 
-    private final String credentials;
+    private final Object principal; // 인증 주체
 
-    private final Object principal;
+    private final String credentials; // 증명 수단
 
     public JwtAuthentication(String token, Object principal) {
         super(principal instanceof UserDetails ?
                       ((UserDetails) principal).getAuthorities() :
                       Collections.emptyList());
-        this.credentials = token;
         this.principal = principal;
-    }
-
-    @Override
-    public Object getCredentials() {
-        return this.credentials;
+        this.credentials = token;
     }
 
     @Override
     public Object getPrincipal() {
         return this.principal;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return this.credentials;
     }
 
     public final String getToken() {
