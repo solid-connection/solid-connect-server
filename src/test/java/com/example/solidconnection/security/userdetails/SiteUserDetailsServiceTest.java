@@ -1,22 +1,21 @@
 package com.example.solidconnection.security.userdetails;
 
-import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.support.TestContainerSpringBootTest;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDate;
-
 import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.time.LocalDate;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @DisplayName("사용자 인증 정보 서비스 테스트")
 @TestContainerSpringBootTest

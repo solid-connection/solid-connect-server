@@ -1,5 +1,10 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
+import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
@@ -13,18 +18,12 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
-import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("멘토 마이페이지 서비스 테스트")

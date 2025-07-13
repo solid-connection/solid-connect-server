@@ -1,5 +1,11 @@
 package com.example.solidconnection.common.resolver;
 
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
@@ -14,12 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 @TestContainerSpringBootTest
 @DisplayName("인증된 사용자 argument resolver 테스트")

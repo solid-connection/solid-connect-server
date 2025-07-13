@@ -1,5 +1,11 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.post.domain.Post;
@@ -17,12 +23,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_LIKE;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_LIKE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("게시글 좋아요 서비스 테스트")
@@ -90,10 +90,10 @@ class PostLikeServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postLikeService.likePost(
-                            user,
-                            post.getId()
-                    ))
+                                       postLikeService.likePost(
+                                               user,
+                                               post.getId()
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(DUPLICATE_POST_LIKE.getMessage());
         }
@@ -125,10 +125,10 @@ class PostLikeServiceTest {
         void 좋아요하지_않은_게시글을_좋아요_취소하면_예외_응답을_반환한다() {
             // when & then
             assertThatThrownBy(() ->
-                    postLikeService.dislikePost(
-                            user,
-                            post.getId()
-                    ))
+                                       postLikeService.dislikePost(
+                                               user,
+                                               post.getId()
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_LIKE.getMessage());
         }

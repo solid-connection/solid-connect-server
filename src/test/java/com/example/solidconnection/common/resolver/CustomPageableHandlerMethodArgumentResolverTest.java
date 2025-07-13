@@ -1,6 +1,10 @@
 package com.example.solidconnection.common.resolver;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.lang.reflect.Method;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,11 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
-
-import java.lang.reflect.Method;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("커스텀 페이지 요청 argument resolver 테스트")

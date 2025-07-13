@@ -1,11 +1,19 @@
 package com.example.solidconnection.application.service;
 
+import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -21,14 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
-import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("지원서 제출 서비스 테스트")
@@ -115,7 +115,7 @@ class ApplicationSubmissionServiceTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_GPA_SCORE_STATUS.getMessage());
@@ -135,7 +135,7 @@ class ApplicationSubmissionServiceTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_LANGUAGE_TEST_SCORE_STATUS.getMessage());
@@ -159,7 +159,7 @@ class ApplicationSubmissionServiceTest {
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user, request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());

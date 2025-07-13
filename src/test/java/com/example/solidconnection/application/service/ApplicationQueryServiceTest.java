@@ -1,12 +1,14 @@
 package com.example.solidconnection.application.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.ApplicantResponse;
-import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -17,16 +19,13 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("지원서 조회 서비스 테스트")
@@ -141,11 +140,11 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsAll(List.of(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(application1), user1),
+                                          List.of(application1), user1),
                     ApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(application2), user1),
+                                          List.of(application2), user1),
                     ApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                            List.of(application3), user1)
+                                          List.of(application3), user1)
             ));
         }
 
@@ -193,9 +192,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(application1), user1),
+                                          List.of(application1), user1),
                     ApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(application2), user1)
+                                          List.of(application2), user1)
             );
         }
 
@@ -243,9 +242,9 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(application1), user1),
+                                          List.of(application1), user1),
                     ApplicantsResponse.of(괌대학_B_지원_정보,
-                            List.of(application2), user1)
+                                          List.of(application2), user1)
             );
         }
 
@@ -273,7 +272,7 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(application), user1)
+                                          List.of(application), user1)
             ));
         }
 
@@ -312,14 +311,15 @@ class ApplicationQueryServiceTest {
 
             // then
             assertThat(response.firstChoice().stream()
-                    .flatMap(univ -> univ.applicants().stream())
-                    .filter(ApplicantResponse::isMine))
+                               .flatMap(univ -> univ.applicants().stream())
+                               .filter(ApplicantResponse::isMine))
                     .containsExactly(ApplicantResponse.of(secondApplication, true));
         }
     }
 
     @Nested
     class 경쟁자_목록_조회_테스트 {
+
         @Test
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
             // given
@@ -359,7 +359,7 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
-                            List.of(application1, application2), user1)
+                                          List.of(application1, application2), user1)
             );
         }
 

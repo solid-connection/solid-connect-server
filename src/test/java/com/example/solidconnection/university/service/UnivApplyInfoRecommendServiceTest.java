@@ -1,5 +1,8 @@
 package com.example.solidconnection.university.service;
 
+import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.fixture.CountryFixture;
 import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
@@ -13,15 +16,11 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("대학 지원 정보 추천 서비스 테스트")
@@ -146,6 +145,7 @@ class UnivApplyInfoRecommendServiceTest {
                                 .map(UnivApplyInfoPreviewResponse::from).toList()
                 );
     }
+
     @Test
     void 일반_추천_대학_지원_정보를_조회한다() {
         // when

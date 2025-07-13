@@ -14,22 +14,22 @@ public class PostFixture {
     private final PostFixtureBuilder postFixtureBuilder;
 
     public Post 게시글(
-        String title,
-        String content,
-        Boolean isQuestion,
-        PostCategory postCategory,
-        Board board,
-        SiteUser siteUser
+            String title,
+            String content,
+            Boolean isQuestion,
+            PostCategory postCategory,
+            Board board,
+            SiteUser siteUser
     ) {
         return postFixtureBuilder
-            .title(title)
-            .content(content)
-            .isQuestion(isQuestion)
-            .likeCount(0L)
-            .viewCount(0L)
-            .postCategory(postCategory)
-            .board(board)
-            .siteUser(siteUser)
-            .create();
+                .title(title)
+                .content(content)
+                .isQuestion(isQuestion)
+                .likeCount(0L)
+                .viewCount(0L)
+                .postCategory(postCategory)
+                .board(board)
+                .siteUser(siteUser)
+                .create();
     }
 }

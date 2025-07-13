@@ -1,7 +1,11 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.spy;
+
 import com.example.solidconnection.auth.token.config.JwtProperties;
+import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +22,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.spy;
 
 @TestContainerSpringBootTest
 @DisplayName("토큰 인증 필터 테스트")

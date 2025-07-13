@@ -1,5 +1,8 @@
 package com.example.solidconnection.location.country.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.fixture.CountryFixture;
@@ -10,9 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @TestContainerSpringBootTest
 public class InterestedCountryRepositoryTest {
@@ -34,12 +34,12 @@ public class InterestedCountryRepositoryTest {
             // given
             SiteUser user = siteUserFixture.사용자();
             Country country = countryFixture.미국();
-            
+
             InterestedCountry firstInterest = new InterestedCountry(user, country);
             interestedCountryRepository.save(firstInterest);
-            
+
             InterestedCountry secondInterest = new InterestedCountry(user, country);
-            
+
             // when & then
             assertThatCode(() -> interestedCountryRepository.save(secondInterest))
                     .isInstanceOf(DataIntegrityViolationException.class);
@@ -51,12 +51,12 @@ public class InterestedCountryRepositoryTest {
             SiteUser user1 = siteUserFixture.사용자(1, "user1");
             SiteUser user2 = siteUserFixture.사용자(2, "user2");
             Country country = countryFixture.미국();
-            
+
             InterestedCountry firstInterest = new InterestedCountry(user1, country);
             interestedCountryRepository.save(firstInterest);
-            
+
             InterestedCountry secondInterest = new InterestedCountry(user2, country);
-            
+
             // when & then
             assertThatCode(() -> {
                 InterestedCountry saved = interestedCountryRepository.save(secondInterest);
@@ -70,12 +70,12 @@ public class InterestedCountryRepositoryTest {
             SiteUser user = siteUserFixture.사용자();
             Country country1 = countryFixture.미국();
             Country country2 = countryFixture.일본();
-            
+
             InterestedCountry firstInterest = new InterestedCountry(user, country1);
             interestedCountryRepository.save(firstInterest);
-            
+
             InterestedCountry secondInterest = new InterestedCountry(user, country2);
-            
+
             // when & then
             assertThatCode(() -> {
                 InterestedCountry saved = interestedCountryRepository.save(secondInterest);

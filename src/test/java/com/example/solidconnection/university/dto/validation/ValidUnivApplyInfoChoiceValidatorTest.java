@@ -1,20 +1,19 @@
 package com.example.solidconnection.university.dto.validation;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
+import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
-import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("대학 선택 유효성 검사 테스트")
 class ValidUnivApplyInfoChoiceValidatorTest {

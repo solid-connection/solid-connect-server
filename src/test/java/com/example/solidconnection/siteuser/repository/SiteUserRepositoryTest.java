@@ -1,5 +1,7 @@
 package com.example.solidconnection.siteuser.repository;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -9,8 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @TestContainerDataJpaTest
 class SiteUserRepositoryTest {

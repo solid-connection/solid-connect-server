@@ -1,8 +1,12 @@
 package com.example.solidconnection.common.exception;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.common.response.ErrorResponse;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
-
-import java.io.IOException;
-
-import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestContainerSpringBootTest
 @DisplayName("커스텀 인가 예외 처리 테스트")

@@ -1,5 +1,13 @@
 package com.example.solidconnection.community.comment.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_ID;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.comment.domain.Comment;
@@ -19,21 +27,12 @@ import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_ID;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("댓글 서비스 테스트")
@@ -196,7 +195,7 @@ class CommentServiceTest {
         @Test
         void 댓글을_성공적으로_생성한다() {
             // given
-            CommentCreateRequest request = new CommentCreateRequest(post.getId(),"댓글", null);
+            CommentCreateRequest request = new CommentCreateRequest(post.getId(), "댓글", null);
 
             // when
             CommentCreateResponse response = commentService.createComment(user1, request);
@@ -241,10 +240,10 @@ class CommentServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    commentService.createComment(
-                            user1,
-                            request
-                    ))
+                                       commentService.createComment(
+                                               user1,
+                                               request
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_COMMENT_LEVEL.getMessage());
         }
@@ -257,10 +256,10 @@ class CommentServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    commentService.createComment(
-                            user1,
-                            request
-                    ))
+                                       commentService.createComment(
+                                               user1,
+                                               request
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_COMMENT_ID.getMessage());
         }
@@ -297,11 +296,11 @@ class CommentServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    commentService.updateComment(
-                            user2,
-                            comment.getId(),
-                            request
-                    ))
+                                       commentService.updateComment(
+                                               user2,
+                                               comment.getId(),
+                                               request
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_ACCESS.getMessage());
         }
@@ -314,11 +313,11 @@ class CommentServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    commentService.updateComment(
-                            user1,
-                            comment.getId(),
-                            request
-                    ))
+                                       commentService.updateComment(
+                                               user1,
+                                               comment.getId(),
+                                               request
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPDATE_DEPRECATED_COMMENT.getMessage());
         }
@@ -404,10 +403,10 @@ class CommentServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    commentService.deleteCommentById(
-                            user2,
-                            comment.getId()
-                    ))
+                                       commentService.deleteCommentById(
+                                               user2,
+                                               comment.getId()
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_ACCESS.getMessage());
         }

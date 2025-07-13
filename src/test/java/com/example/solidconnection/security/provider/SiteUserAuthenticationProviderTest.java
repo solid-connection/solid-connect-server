@@ -1,29 +1,28 @@
 package com.example.solidconnection.security.provider;
 
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.authentication.SiteUserAuthentication;
-import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.net.PasswordAuthentication;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-
-import java.net.PasswordAuthentication;
-import java.util.Date;
-
-import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("사용자 인증정보 provider 테스트")

@@ -1,16 +1,15 @@
 package com.example.solidconnection.security.userdetails;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.util.Collection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("사용자 인증 정보 테스트")
 @TestContainerSpringBootTest

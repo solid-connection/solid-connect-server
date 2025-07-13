@@ -1,5 +1,7 @@
 package com.example.solidconnection.university.repository;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -11,8 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @TestContainerSpringBootTest
 @DisplayName("대학교 좋아요 레파지토리 테스트")
