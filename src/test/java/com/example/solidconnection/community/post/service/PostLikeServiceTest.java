@@ -84,7 +84,7 @@ class PostLikeServiceTest {
         }
 
         @Test
-        void 이미_좋아요한_게시글을_다시_좋아요하면_예외_응답을_반환한다() {
+        void 이미_좋아요한_게시글을_다시_좋아요하면_예외가_발생한다() {
             // given
             postLikeService.likePost(user, post.getId());
 
@@ -122,7 +122,7 @@ class PostLikeServiceTest {
         }
 
         @Test
-        void 좋아요하지_않은_게시글을_좋아요_취소하면_예외_응답을_반환한다() {
+        void 좋아요하지_않은_게시글을_좋아요_취소하면_예외가_발생한다() {
             // when & then
             assertThatThrownBy(() ->
                     postLikeService.dislikePost(

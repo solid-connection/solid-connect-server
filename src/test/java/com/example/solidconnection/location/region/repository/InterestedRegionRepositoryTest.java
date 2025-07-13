@@ -30,7 +30,7 @@ public class InterestedRegionRepositoryTest {
     class 사용자와_지역은_복합_유니크_제약_조건을_가진다 {
 
         @Test
-        void 같은_사용자가_같은_지역에_관심_표시를_하면_예외_응답을_반환한다() {
+        void 같은_사용자가_같은_지역에_관심_표시를_하면_예외가_발생한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
             Region region = regionFixture.영미권();

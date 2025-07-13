@@ -163,7 +163,7 @@ class AdminGpaScoreServiceTest {
         }
 
         @Test
-        void 존재하지_않는_GPA_수정_시_예외_응답을_반환한다() {
+        void 존재하지_않는_GPA_수정_시_예외가_발생한다() {
             // given
             long invalidGpaScoreId = 9999L;
             GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(

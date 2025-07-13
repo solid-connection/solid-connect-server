@@ -166,7 +166,7 @@ class MyPageServiceTest {
         }
 
         @Test
-        void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외_응답을_반환한다() {
+        void 최소_대기기간이_지나지_않은_상태에서_변경하면_예외가_발생한다() {
             // given
             MockMultipartFile imageFile = createValidImageFile();
             LocalDateTime modifiedAt = LocalDateTime.now().minusDays(MIN_DAYS_BETWEEN_NICKNAME_CHANGES - 1);

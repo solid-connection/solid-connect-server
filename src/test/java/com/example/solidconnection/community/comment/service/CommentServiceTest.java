@@ -233,7 +233,7 @@ class CommentServiceTest {
         }
 
         @Test
-        void 대대댓글_생성_시도하면_예외_응답을_반환한다() {
+        void 대대댓글_생성_시도하면_예외가_발생한다() {
             // given
             Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
             Comment childComment = commentFixture.자식_댓글("자식 댓글", post, user2, parentComment);
@@ -290,7 +290,7 @@ class CommentServiceTest {
         }
 
         @Test
-        void 다른_사용자의_댓글을_수정하면_예외_응답을_반환한다() {
+        void 다른_사용자의_댓글을_수정하면_예외가_발생한다() {
             // given
             Comment comment = commentFixture.부모_댓글("원본 댓글", post, user1);
             CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
@@ -307,7 +307,7 @@ class CommentServiceTest {
         }
 
         @Test
-        void 삭제된_댓글을_수정하면_예외_응답을_반환한다() {
+        void 삭제된_댓글을_수정하면_예외가_발생한다() {
             // given
             Comment comment = commentFixture.부모_댓글(null, post, user1);
             CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
@@ -398,7 +398,7 @@ class CommentServiceTest {
         }
 
         @Test
-        void 다른_사용자의_댓글을_삭제하면_예외_응답을_반환한다() {
+        void 다른_사용자의_댓글을_삭제하면_예외가_발생한다() {
             // given
             Comment comment = commentFixture.부모_댓글("부모 댓글", post, user1);
 

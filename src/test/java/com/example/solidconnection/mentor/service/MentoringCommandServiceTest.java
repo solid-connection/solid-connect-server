@@ -141,7 +141,7 @@ class MentoringCommandServiceTest {
         }
 
         @Test
-        void 거절_시_사유가_없으면_예외_응답을_반환한다() {
+        void 거절_시_사유가_없으면_예외가_발생한다() {
             // given
             Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
             MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.REJECTED, null);
@@ -178,7 +178,7 @@ class MentoringCommandServiceTest {
         }
 
         @Test
-        void 존재하지_않는_멘토링_아이디로_요청시_예외_응답을_반환한다() {
+        void 존재하지_않는_멘토링_아이디로_요청시_예외가_발생한다() {
             // given
             MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
             long invalidMentoringId = 9999L;
@@ -219,7 +219,7 @@ class MentoringCommandServiceTest {
         }
 
         @Test
-        void 존재하지_않는_멘토링_아이디로_요청시_예외_응답을_반환한다() {
+        void 존재하지_않는_멘토링_아이디로_요청시_예외가_발생한다() {
             // given
             long invalidMentoringId = 9999L;
 

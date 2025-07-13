@@ -102,7 +102,7 @@ class ApplicationSubmissionServiceTest {
     }
 
     @Test
-    void 미승인된_GPA_성적으로_지원하면_예외_응답을_반환한다() {
+    void 미승인된_GPA_성적으로_지원하면_예외가_발생한다() {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
@@ -122,7 +122,7 @@ class ApplicationSubmissionServiceTest {
     }
 
     @Test
-    void 미승인된_어학성적으로_지원하면_예외_응답을_반환한다() {
+    void 미승인된_어학성적으로_지원하면_예외가_발생한다() {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user);
@@ -142,7 +142,7 @@ class ApplicationSubmissionServiceTest {
     }
 
     @Test
-    void 지원서_수정_횟수를_초과하면_예외_응답을_반환한다() {
+    void 지원서_수정_횟수를_초과하면_예외가_발생한다() {
         // given
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);

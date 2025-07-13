@@ -37,7 +37,7 @@ class CustomAuthenticationEntryPointTest {
     }
 
     @Test
-    void 인증되지_않은_사용자_접근시_401_예외_응답을_반환한다() throws IOException {
+    void 인증되지_않은_사용자_접근시_401_예외가_발생한다() throws IOException {
         // given
         AuthenticationException authException = new AuthenticationServiceException(AUTHENTICATION_FAILED.getMessage());
 

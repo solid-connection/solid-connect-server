@@ -76,10 +76,10 @@ class SiteUserAuthenticationProviderTest {
     }
 
     @Nested
-    class 예외_응답을_반환하다 {
+    class 예외_발생 {
 
         @Test
-        void 유효하지_않은_토큰이면_예외_응답을_반환한다() {
+        void 유효하지_않은_토큰이면_예외가_발생한다() {
             // given
             SiteUserAuthentication expiredAuth = new SiteUserAuthentication(createExpiredToken());
 
@@ -90,7 +90,7 @@ class SiteUserAuthenticationProviderTest {
         }
 
         @Test
-        void 사용자_정보의_형식이_다르면_예외_응답을_반환한다() {
+        void 사용자_정보의_형식이_다르면_예외가_발생한다() {
             // given
             SiteUserAuthentication wrongSubjectTypeAuth = new SiteUserAuthentication(createWrongSubjectTypeToken());
 
@@ -101,7 +101,7 @@ class SiteUserAuthenticationProviderTest {
         }
 
         @Test
-        void 유효한_토큰이지만_해당되는_사용자가_없으면_예외_응답을_반환한다() {
+        void 유효한_토큰이지만_해당되는_사용자가_없으면_예외가_발생한다() {
             // given
             long notExistingUserId = user.getId() + 100;
             String token = createValidToken(notExistingUserId);

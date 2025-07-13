@@ -164,7 +164,7 @@ class AdminLanguageTestScoreServiceTest {
         }
 
         @Test
-        void 존재하지_않는_어학점수_수정_시_예외_응답을_반환한다() {
+        void 존재하지_않는_어학점수_수정_시_예외가_발생한다() {
             // given
             long invalidLanguageTestScoreId = 9999L;
             LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(

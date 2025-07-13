@@ -90,7 +90,7 @@ class JwtTokenProviderTest {
         }
 
         @Test
-        void 유효하지_않은_토큰의_subject_를_추출하면_예외_응답을_반환한다() {
+        void 유효하지_않은_토큰의_subject_를_추출하면_예외가_발생한다() {
             // given
             String subject = "subject123";
             String token = createExpiredToken(subject);
@@ -125,7 +125,7 @@ class JwtTokenProviderTest {
         }
 
         @Test
-        void 유효하지_않은_토큰의_claim_을_추출하면_예외_응답을_반환한다() {
+        void 유효하지_않은_토큰의_claim_을_추출하면_예외가_발생한다() {
             // given
             String subject = "subject";
             Claims expectedClaims = Jwts.claims().setSubject(subject);

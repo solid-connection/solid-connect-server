@@ -136,7 +136,7 @@ class NewsCommandServiceTest {
             }
 
             @Test
-            void 다른_사용자의_소식지를_수정하면_예외_응답을_반환한다() {
+            void 다른_사용자의_소식지를_수정하면_예외가_발생한다() {
                 // given
                 SiteUser anotherUser = siteUserFixture.멘토(2, "anotherMentor");
                 NewsUpdateRequest request = createNewsUpdateRequest(

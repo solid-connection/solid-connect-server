@@ -48,7 +48,7 @@ class EmailSignInServiceTest {
     class 로그인에_실패한다 {
 
         @Test
-        void 이메일과_일치하는_사용자가_없으면_예외_응답을_반환한다() {
+        void 이메일과_일치하는_사용자가_없으면_예외가_발생한다() {
             // given
             EmailSignInRequest signInRequest = new EmailSignInRequest("이메일", "비밀번호");
 
@@ -59,7 +59,7 @@ class EmailSignInServiceTest {
         }
 
         @Test
-        void 비밀번호가_일치하지_않으면_예외_응답을_반환한다() {
+        void 비밀번호가_일치하지_않으면_예외가_발생한다() {
             // given
             String email = "testEmail";
             siteUserFixture.사용자(email, "testPassword");
