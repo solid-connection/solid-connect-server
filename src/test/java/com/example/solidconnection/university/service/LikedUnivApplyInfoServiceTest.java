@@ -3,34 +3,33 @@ package com.example.solidconnection.university.service;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
-import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
-import com.example.solidconnection.university.dto.LikeResultResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
-import static com.example.solidconnection.university.service.UnivApplyInfoLikeService.LIKE_CANCELED_MESSAGE;
-import static com.example.solidconnection.university.service.UnivApplyInfoLikeService.LIKE_SUCCESS_MESSAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("대학 지원 정보 좋아요 서비스 테스트")
-class UnivApplyInfoLikeServiceTest {
+class LikedUnivApplyInfoServiceTest {
 
     @Autowired
-    private UnivApplyInfoLikeService univApplyInfoLikeService;
+    private LikedUnivApplyInfoService likedUnivApplyInfoService;
 
     @Autowired
     private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
@@ -50,30 +49,43 @@ class UnivApplyInfoLikeServiceTest {
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
     }
 
+    @Test
+    void 관심_대학_지원_정보_목록을_조회한다() {
+        // given
+        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
+        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
+        saveLikedUnivApplyInfo(user, 메이지대학_지원_정보);
+        saveLikedUnivApplyInfo(user, 그라츠대학_지원_정보);
+
+        // when
+        List<UnivApplyInfoPreviewResponse> response = likedUnivApplyInfoService.getLikedUnivApplyInfos(user);
+
+        // then
+        assertThat(response).extracting(UnivApplyInfoPreviewResponse::id)
+                .containsExactlyInAnyOrder(메이지대학_지원_정보.getId(), 그라츠대학_지원_정보.getId());
+    }
+
     @Nested
     class 대학_지원_정보_좋아요를_등록한다 {
 
         @Test
         void 성공적으로_좋아요를_등록한다() {
             // when
-            LikeResultResponse response = univApplyInfoLikeService.likeUnivApplyInfo(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
 
             // then
-            assertAll(
-                    () -> assertThat(response.result()).isEqualTo(LIKE_SUCCESS_MESSAGE),
-                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(
-                            user.getId(), 괌대학_A_지원_정보.getId()
-                    )).isPresent()
-            );
+            assertThat(
+                    likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(user.getId(), 괌대학_A_지원_정보.getId())
+            ).isPresent();
         }
 
         @Test
         void 이미_좋아요했으면_예외_응답을_반환한다() {
             // given
-            saveLikedUniversity(user, 괌대학_A_지원_정보);
+            saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when & then
-            assertThatCode(() -> univApplyInfoLikeService.likeUnivApplyInfo(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -85,24 +97,21 @@ class UnivApplyInfoLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_취소한다() {
             // given
-            saveLikedUniversity(user, 괌대학_A_지원_정보);
+            saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when
-            LikeResultResponse response = univApplyInfoLikeService.cancelLikeUnivApplyInfo(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
 
             // then
-            assertAll(
-                    () -> assertThat(response.result()).isEqualTo(LIKE_CANCELED_MESSAGE),
-                    () -> assertThat(likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(
-                            user.getId(), 괌대학_A_지원_정보.getId()
-                    )).isEmpty()
-            );
+            assertThat(
+                    likedUnivApplyInfoRepository.findBySiteUserIdAndUnivApplyInfoId(user.getId(), 괌대학_A_지원_정보.getId())
+            ).isEmpty();
         }
 
         @Test
         void 좋아요하지_않았으면_예외_응답을_반환한다() {
             // when & then
-            assertThatCode(() -> univApplyInfoLikeService.cancelLikeUnivApplyInfo(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NOT_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -114,7 +123,7 @@ class UnivApplyInfoLikeServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> univApplyInfoLikeService.likeUnivApplyInfo(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
@@ -122,10 +131,10 @@ class UnivApplyInfoLikeServiceTest {
     @Test
     void 좋아요한_대학_지원_정보인지_확인한다() {
         // given
-        saveLikedUniversity(user, 괌대학_A_지원_정보);
+        saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = univApplyInfoLikeService.getIsLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -134,7 +143,7 @@ class UnivApplyInfoLikeServiceTest {
     @Test
     void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
         // when
-        IsLikeResponse response = univApplyInfoLikeService.getIsLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -146,12 +155,12 @@ class UnivApplyInfoLikeServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> univApplyInfoLikeService.getIsLiked(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
 
-    private void saveLikedUniversity(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+    private void saveLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
         LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
                 .siteUserId(siteUser.getId())
                 .univApplyInfoId(univApplyInfo.getId())
