@@ -2,7 +2,6 @@ package com.example.solidconnection.university.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
@@ -31,7 +30,6 @@ public class UnivApplyInfoController {
     private final UnivApplyInfoQueryService univApplyInfoQueryService;
     private final UnivApplyInfoLikeService univApplyInfoLikeService;
     private final UnivApplyInfoRecommendService univApplyInfoRecommendService;
-    private final MyPageService myPageService;
 
     @GetMapping("/recommend")
     public ResponseEntity<UnivApplyInfoRecommendsResponse> getUnivApplyInfoRecommends(
@@ -49,7 +47,7 @@ public class UnivApplyInfoController {
     public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getLikedUnivApplyInfos(
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = myPageService.getLikedUnivApplyInfos(siteUser);
+        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = univApplyInfoLikeService.getLikedUnivApplyInfos(siteUser);
         return ResponseEntity.ok(likedUnivApplyInfos);
     }
 

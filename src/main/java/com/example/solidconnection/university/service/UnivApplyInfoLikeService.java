@@ -5,6 +5,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
@@ -26,6 +28,17 @@ public class UnivApplyInfoLikeService {
 
     @Value("${university.term}")
     public String term;
+
+    /*
+     * '좋아요'한 대학교 목록을 조회한다.
+     * */
+    @Transactional(readOnly = true)
+    public List<UnivApplyInfoPreviewResponse> getLikedUnivApplyInfos(SiteUser siteUser) {
+        List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
+        return univApplyInfos.stream()
+                .map(UnivApplyInfoPreviewResponse::from)
+                .toList();
+    }
 
     /*
      * 대학교를 '좋아요' 한다.

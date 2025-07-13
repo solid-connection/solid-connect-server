@@ -10,12 +10,11 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
-import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +25,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
@@ -89,18 +87,6 @@ class MyPageServiceTest {
                 () -> assertThat(response.likedPostCount()).isEqualTo(user.getPostLikeList().size()),
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount)
         );
-    }
-
-    @Test
-    void 관심_대학_지원_정보_목록을_조회한다() {
-        // given
-        int likedUnivApplyInfo = createLikedUnivApplyInfos(user);
-
-        // when
-        List<UnivApplyInfoPreviewResponse> response = myPageService.getLikedUnivApplyInfos(user);
-
-        // then
-        assertThat(response).hasSize(likedUnivApplyInfo);
     }
 
     @Nested

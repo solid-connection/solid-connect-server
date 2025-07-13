@@ -6,10 +6,8 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
@@ -88,17 +85,5 @@ public class MyPageService {
     private boolean isDefaultProfileImage(String profileImageUrl) {
         String prefix = "profile/";
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
-    }
-
-    /*
-     * 관심 대학교 목록을 조회한다.
-     * */
-    @Transactional(readOnly = true)
-    public List<UnivApplyInfoPreviewResponse> getLikedUnivApplyInfos(SiteUser siteUser) {
-        List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUser.getId());
-
-        return univApplyInfos.stream()
-                .map(UnivApplyInfoPreviewResponse::from)
-                .toList();
     }
 }

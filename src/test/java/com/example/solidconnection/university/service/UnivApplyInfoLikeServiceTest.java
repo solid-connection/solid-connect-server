@@ -7,6 +7,7 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_UNIV_APPLY_INFO;
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
@@ -44,6 +47,22 @@ class UnivApplyInfoLikeServiceTest {
     void setUp() {
         user = siteUserFixture.사용자();
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+    }
+
+    @Test
+    void 관심_대학_지원_정보_목록을_조회한다() {
+        // given
+        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
+        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
+        saveLikedUnivApplyInfo(user, 메이지대학_지원_정보);
+        saveLikedUnivApplyInfo(user, 그라츠대학_지원_정보);
+
+        // when
+        List<UnivApplyInfoPreviewResponse> response = univApplyInfoLikeService.getLikedUnivApplyInfos(user);
+
+        // then
+        assertThat(response).extracting(UnivApplyInfoPreviewResponse::id)
+                .containsExactlyInAnyOrder(메이지대학_지원_정보.getId(), 그라츠대학_지원_정보.getId());
     }
 
     @Nested
