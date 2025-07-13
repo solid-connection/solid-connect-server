@@ -1,6 +1,6 @@
 package com.example.solidconnection.security.config;
 
-import com.example.solidconnection.security.provider.TokenAuthenticationProvider;
+import com.example.solidconnection.security.authentication.TokenAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

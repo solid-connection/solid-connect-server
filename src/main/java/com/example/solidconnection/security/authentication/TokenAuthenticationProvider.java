@@ -1,7 +1,6 @@
-package com.example.solidconnection.security.provider;
+package com.example.solidconnection.security.authentication;
 
 import com.example.solidconnection.auth.service.TokenProvider;
-import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
 import lombok.RequiredArgsConstructor;
