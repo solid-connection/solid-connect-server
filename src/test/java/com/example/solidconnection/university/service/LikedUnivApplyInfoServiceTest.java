@@ -26,10 +26,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @TestContainerSpringBootTest
 @DisplayName("대학 지원 정보 좋아요 서비스 테스트")
-class UnivApplyInfoLikeServiceTest {
+class LikedUnivApplyInfoServiceTest {
 
     @Autowired
-    private UnivApplyInfoLikeService univApplyInfoLikeService;
+    private LikedUnivApplyInfoService likedUnivApplyInfoService;
 
     @Autowired
     private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
@@ -58,7 +58,7 @@ class UnivApplyInfoLikeServiceTest {
         saveLikedUnivApplyInfo(user, 그라츠대학_지원_정보);
 
         // when
-        List<UnivApplyInfoPreviewResponse> response = univApplyInfoLikeService.getLikedUnivApplyInfos(user);
+        List<UnivApplyInfoPreviewResponse> response = likedUnivApplyInfoService.getLikedUnivApplyInfos(user);
 
         // then
         assertThat(response).extracting(UnivApplyInfoPreviewResponse::id)
@@ -71,7 +71,7 @@ class UnivApplyInfoLikeServiceTest {
         @Test
         void 성공적으로_좋아요를_등록한다() {
             // when
-            univApplyInfoLikeService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
 
             // then
             assertThat(
@@ -85,7 +85,7 @@ class UnivApplyInfoLikeServiceTest {
             saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when & then
-            assertThatCode(() -> univApplyInfoLikeService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -100,7 +100,7 @@ class UnivApplyInfoLikeServiceTest {
             saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when
-            univApplyInfoLikeService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
 
             // then
             assertThat(
@@ -111,7 +111,7 @@ class UnivApplyInfoLikeServiceTest {
         @Test
         void 좋아요하지_않았으면_예외_응답을_반환한다() {
             // when & then
-            assertThatCode(() -> univApplyInfoLikeService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NOT_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -123,7 +123,7 @@ class UnivApplyInfoLikeServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> univApplyInfoLikeService.addUnivApplyInfoLike(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
@@ -134,7 +134,7 @@ class UnivApplyInfoLikeServiceTest {
         saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = univApplyInfoLikeService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -143,7 +143,7 @@ class UnivApplyInfoLikeServiceTest {
     @Test
     void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
         // when
-        IsLikeResponse response = univApplyInfoLikeService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -155,7 +155,7 @@ class UnivApplyInfoLikeServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> univApplyInfoLikeService.isUnivApplyInfoLiked(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user, invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }

@@ -7,7 +7,7 @@ import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
-import com.example.solidconnection.university.service.UnivApplyInfoLikeService;
+import com.example.solidconnection.university.service.LikedUnivApplyInfoService;
 import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
 import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.List;
 public class UnivApplyInfoController {
 
     private final UnivApplyInfoQueryService univApplyInfoQueryService;
-    private final UnivApplyInfoLikeService univApplyInfoLikeService;
+    private final LikedUnivApplyInfoService likedUnivApplyInfoService;
     private final UnivApplyInfoRecommendService univApplyInfoRecommendService;
 
     @GetMapping("/recommend")
@@ -47,7 +47,7 @@ public class UnivApplyInfoController {
     public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getLikedUnivApplyInfos(
             @AuthorizedUser SiteUser siteUser
     ) {
-        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = univApplyInfoLikeService.getLikedUnivApplyInfos(siteUser);
+        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = likedUnivApplyInfoService.getLikedUnivApplyInfos(siteUser);
         return ResponseEntity.ok(likedUnivApplyInfos);
     }
 
@@ -56,7 +56,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        IsLikeResponse isLiked = univApplyInfoLikeService.isUnivApplyInfoLiked(siteUser, univApplyInfoId);
+        IsLikeResponse isLiked = likedUnivApplyInfoService.isUnivApplyInfoLiked(siteUser, univApplyInfoId);
         return ResponseEntity.ok(isLiked);
     }
 
@@ -65,7 +65,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        univApplyInfoLikeService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
+        likedUnivApplyInfoService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
         return ResponseEntity.ok().build();
     }
 
@@ -74,7 +74,7 @@ public class UnivApplyInfoController {
             @AuthorizedUser SiteUser siteUser,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        univApplyInfoLikeService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
+        likedUnivApplyInfoService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
         return ResponseEntity.ok().build();
     }
 

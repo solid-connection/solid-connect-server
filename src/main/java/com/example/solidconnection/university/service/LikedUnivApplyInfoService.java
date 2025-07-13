@@ -21,7 +21,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_U
 
 @RequiredArgsConstructor
 @Service
-public class UnivApplyInfoLikeService {
+public class LikedUnivApplyInfoService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
