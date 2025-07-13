@@ -28,7 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class TokenAuthenticationFilterTest {
 
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -53,7 +53,7 @@ class TokenAuthenticationFilterTest {
         request = new MockHttpServletRequest();
 
         // when
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        tokenAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // then
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
@@ -68,7 +68,7 @@ class TokenAuthenticationFilterTest {
         request = createRequestWithToken(token);
 
         // when
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+        tokenAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // then
         assertThat(SecurityContextHolder.getContext().getAuthentication())
