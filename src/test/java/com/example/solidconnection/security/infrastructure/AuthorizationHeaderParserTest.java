@@ -1,4 +1,4 @@
-package com.example.solidconnection.security.filter;
+package com.example.solidconnection.security.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;

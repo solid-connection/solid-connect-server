@@ -1,6 +1,7 @@
 package com.example.solidconnection.security.filter;
 
 import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.infrastructure.AuthorizationHeaderParser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

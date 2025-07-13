@@ -3,6 +3,7 @@ package com.example.solidconnection.security.filter;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.security.infrastructure.AuthorizationHeaderParser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
