@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
 
 import com.example.solidconnection.auth.token.config.JwtProperties;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
@@ -72,7 +72,7 @@ class TokenAuthenticationFilterTest {
 
         // then
         assertThat(SecurityContextHolder.getContext().getAuthentication())
-                .isExactlyInstanceOf(SiteUserAuthentication.class);
+                .isExactlyInstanceOf(TokenAuthentication.class);
         then(filterChain).should().doFilter(request, response);
     }
 

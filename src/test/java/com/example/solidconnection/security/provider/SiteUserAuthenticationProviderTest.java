@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -47,7 +47,7 @@ class SiteUserAuthenticationProviderTest {
     @Test
     void 처리할_수_있는_타입인지를_반환한다() {
         // given
-        Class<?> supportedType = SiteUserAuthentication.class;
+        Class<?> supportedType = TokenAuthentication.class;
         Class<?> notSupportedType = PasswordAuthentication.class;
 
         // when & then
@@ -61,7 +61,7 @@ class SiteUserAuthenticationProviderTest {
     void 유효한_토큰이면_정상적으로_인증_정보를_반환한다() {
         // given
         String token = createValidToken(user.getId());
-        SiteUserAuthentication auth = new SiteUserAuthentication(token);
+        TokenAuthentication auth = new TokenAuthentication(token);
 
         // when
         Authentication result = siteUserAuthenticationProvider.authenticate(auth);
@@ -80,7 +80,7 @@ class SiteUserAuthenticationProviderTest {
         @Test
         void 유효하지_않은_토큰이면_예외가_발생한다() {
             // given
-            SiteUserAuthentication expiredAuth = new SiteUserAuthentication(createExpiredToken());
+            TokenAuthentication expiredAuth = new TokenAuthentication(createExpiredToken());
 
             // when & then
             assertThatCode(() -> siteUserAuthenticationProvider.authenticate(expiredAuth))
@@ -91,7 +91,8 @@ class SiteUserAuthenticationProviderTest {
         @Test
         void 사용자_정보의_형식이_다르면_예외가_발생한다() {
             // given
-            SiteUserAuthentication wrongSubjectTypeAuth = new SiteUserAuthentication(createWrongSubjectTypeToken());
+            TokenAuthentication wrongSubjectTypeAuth = new TokenAuthentication(
+                    createWrongSubjectTypeToken());
 
             // when & then
             assertThatCode(() -> siteUserAuthenticationProvider.authenticate(wrongSubjectTypeAuth))
@@ -104,7 +105,7 @@ class SiteUserAuthenticationProviderTest {
             // given
             long notExistingUserId = user.getId() + 100;
             String token = createValidToken(notExistingUserId);
-            SiteUserAuthentication auth = new SiteUserAuthentication(token);
+            TokenAuthentication auth = new TokenAuthentication(token);
 
             // when & then
             assertThatCode(() -> siteUserAuthenticationProvider.authenticate(auth))

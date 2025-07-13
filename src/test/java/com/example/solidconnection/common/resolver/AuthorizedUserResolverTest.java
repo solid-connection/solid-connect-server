@@ -3,11 +3,12 @@ package com.example.solidconnection.common.resolver;
 import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -87,8 +88,8 @@ class AuthorizedUserResolverTest {
         }
     }
 
-    private SiteUserAuthentication createAuthenticationWithUser(SiteUser siteUser) {
+    private TokenAuthentication createAuthenticationWithUser(SiteUser siteUser) {
         SiteUserDetails userDetails = new SiteUserDetails(siteUser);
-        return new SiteUserAuthentication("token", userDetails);
+        return new TokenAuthentication("token", userDetails);
     }
 }

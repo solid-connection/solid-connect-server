@@ -1,7 +1,6 @@
 package com.example.solidconnection.security.filter;
 
 import com.example.solidconnection.security.authentication.TokenAuthentication;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,14 +33,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        TokenAuthentication authToken = createAuthentication(token.get());
+        TokenAuthentication authToken = new TokenAuthentication(token.get());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);
-    }
-
-    private TokenAuthentication createAuthentication(String token) {
-        return new SiteUserAuthentication(token);
     }
 }

@@ -4,11 +4,18 @@ import java.util.Collections;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public abstract class TokenAuthentication extends AbstractAuthenticationToken {
+public class TokenAuthentication extends AbstractAuthenticationToken {
 
     private final Object principal; // 인증 주체
 
     private final String credentials; // 증명 수단
+
+    public TokenAuthentication(String token) {
+        super(Collections.emptyList());
+        this.principal = null;
+        this.credentials = token;
+        setAuthenticated(false);
+    }
 
     public TokenAuthentication(String token, Object principal) {
         super(principal instanceof UserDetails ?
@@ -16,6 +23,7 @@ public abstract class TokenAuthentication extends AbstractAuthenticationToken {
                       Collections.emptyList());
         this.principal = principal;
         this.credentials = token;
+        setAuthenticated(true);
     }
 
     @Override

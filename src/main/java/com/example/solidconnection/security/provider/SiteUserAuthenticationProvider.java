@@ -2,7 +2,6 @@ package com.example.solidconnection.security.provider;
 
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.security.authentication.TokenAuthentication;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,11 @@ public class SiteUserAuthenticationProvider implements AuthenticationProvider {
 
         String username = tokenProvider.parseSubject(token);
         SiteUserDetails userDetails = (SiteUserDetails) siteUserDetailsService.loadUserByUsername(username);
-        return new SiteUserAuthentication(token, userDetails);
+        return new TokenAuthentication(token, userDetails);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return SiteUserAuthentication.class.isAssignableFrom(authentication);
+        return TokenAuthentication.class.isAssignableFrom(authentication);
     }
 }
