@@ -96,7 +96,7 @@ class AuthServiceTest {
         }
 
         @Test
-        void 요청의_리프레시_토큰이_저장되어있지_않다면_예외_응답을_반환한다() {
+        void 요청의_리프레시_토큰이_저장되어있지_않다면_예외가_발생한다() {
             // given
             String invalidRefreshToken = authTokenProvider.generateAccessToken(new Subject("subject")).token();
             ReissueRequest reissueRequest = new ReissueRequest(invalidRefreshToken);

@@ -128,7 +128,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 전체_카테고리로_생성하면_예외_응답을_반환한다() {
+        void 전체_카테고리로_생성하면_예외가_발생한다() {
             // given
             PostCreateRequest request = createPostCreateRequest(PostCategory.전체.name());
             List<MultipartFile> imageFiles = List.of();
@@ -141,7 +141,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 존재하지_않는_카테고리로_생성하면_예외_응답을_반환한다() {
+        void 존재하지_않는_카테고리로_생성하면_예외가_발생한다() {
             // given
             PostCreateRequest request = createPostCreateRequest("INVALID_CATEGORY");
             List<MultipartFile> imageFiles = List.of();
@@ -154,7 +154,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 이미지를_5개_초과하여_업로드하면_예외_응답을_반환한다() {
+        void 이미지를_5개_초과하여_업로드하면_예외가_발생한다() {
             // given
             PostCreateRequest request = createPostCreateRequest(PostCategory.자유.name());
             List<MultipartFile> imageFiles = createSixImageFiles();
@@ -204,7 +204,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 다른_사용자의_게시글을_수정하면_예외_응답을_반환한다() {
+        void 다른_사용자의_게시글을_수정하면_예외가_발생한다() {
             // given
             SiteUser user2 = siteUserFixture.사용자(2, "test2");
             PostUpdateRequest request = createPostUpdateRequest();
@@ -223,7 +223,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 질문_게시글을_수정하면_예외_응답을_반환한다() {
+        void 질문_게시글을_수정하면_예외가_발생한다() {
             // given
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = List.of();
@@ -241,7 +241,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 이미지를_5개_초과하여_수정하면_예외_응답을_반환한다() {
+        void 이미지를_5개_초과하여_수정하면_예외가_발생한다() {
             // given
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = createSixImageFiles();
@@ -283,7 +283,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 다른_사용자의_게시글을_삭제하면_예외_응답을_반환한다() {
+        void 다른_사용자의_게시글을_삭제하면_예외가_발생한다() {
             // given
             SiteUser user2 = siteUserFixture.사용자(2, "test2");
 
@@ -298,7 +298,7 @@ class PostCommandServiceTest {
         }
 
         @Test
-        void 질문_게시글을_삭제하면_예외_응답을_반환한다() {
+        void 질문_게시글을_삭제하면_예외가_발생한다() {
             // when & then
             assertThatThrownBy(() ->
                     postCommandService.deletePostById(

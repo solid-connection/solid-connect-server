@@ -22,7 +22,7 @@ class SiteUserRepositoryTest {
     class 이메일과_인증_유형이_동일한_사용자는_저장할_수_없다 {
 
         @Test
-        void 이메일과_인증_유형이_동일한_사용자를_저장하면_예외_응답을_반환한다() {
+        void 이메일과_인증_유형이_동일한_사용자를_저장하면_예외가_발생한다() {
             // given
             SiteUser user1 = createSiteUser("email", "nickname1", AuthType.KAKAO);
             SiteUser user2 = createSiteUser("email", "nickname2", AuthType.KAKAO);
@@ -50,7 +50,7 @@ class SiteUserRepositoryTest {
     class 닉네임은_중복될_수_없다 {
 
         @Test
-        void 중복된_닉네임으로_사용자를_저장하면_예외_응답을_반환한다() {
+        void 중복된_닉네임으로_사용자를_저장하면_예외가_발생한다() {
             // given
             SiteUser user1 = createSiteUser("email1", "nickname", AuthType.KAKAO);
             SiteUser user2 = createSiteUser("email2", "nickname", AuthType.KAKAO);
@@ -62,7 +62,7 @@ class SiteUserRepositoryTest {
         }
 
         @Test
-        void 중복된_닉네임으로_변경하면_예외_응답을_반환한다() {
+        void 중복된_닉네임으로_변경하면_예외가_발생한다() {
             // given
             SiteUser user1 = createSiteUser("email1", "nickname1", AuthType.KAKAO);
             SiteUser user2 = createSiteUser("email2", "nickname2", AuthType.KAKAO);

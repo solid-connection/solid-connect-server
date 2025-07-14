@@ -82,7 +82,7 @@ class NewsLikeServiceTest {
         }
 
         @Test
-        void 이미_좋아요했으면_예외_응답을_반환한다() {
+        void 이미_좋아요했으면_예외가_발생한다() {
             // given
             newsLikeService.addNewsLike(user.getId(), news.getId());
 
@@ -109,7 +109,7 @@ class NewsLikeServiceTest {
         }
 
         @Test
-        void 좋아요하지_않았으면_예외_응답을_반환한다() {
+        void 좋아요하지_않았으면_예외가_발생한다() {
             // when & then
             assertThatCode(() -> newsLikeService.cancelNewsLike(user.getId(), news.getId()))
                 .isInstanceOf(CustomException.class)

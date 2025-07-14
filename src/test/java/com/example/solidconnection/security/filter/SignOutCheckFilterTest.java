@@ -55,7 +55,7 @@ class SignOutCheckFilterTest {
     }
 
     @Test
-    void 로그아웃한_토큰이면_예외를_응답한다() {
+    void 로그아웃한_토큰이면_예외가_발생한다() {
         // given
         String token = createToken(subject);
         request = createRequest(token);

@@ -80,7 +80,7 @@ class OAuthSignUpTokenProviderTest {
         }
 
         @Test
-        void 만료되었으면_예외_응답을_반환한다() {
+        void 만료되었으면_예외가_발생한다() {
             // given
             String expiredToken = createExpiredToken();
 
@@ -91,7 +91,7 @@ class OAuthSignUpTokenProviderTest {
         }
 
         @Test
-        void 정해진_형식에_맞지_않으면_예외_응답을_반환한다_jwt_가_아닌_토큰() {
+        void 정해진_형식에_맞지_않으면_예외가_발생한다_jwt_가_아닌_토큰() {
             // given
             String notJwt = "not jwt";
 
@@ -102,7 +102,7 @@ class OAuthSignUpTokenProviderTest {
         }
 
         @Test
-        void 정해진_형식에_맞지_않으면_예외_응답을_반환한다_authType_클래스_불일치() {
+        void 정해진_형식에_맞지_않으면_예외가_발생한다_authType_클래스_불일치() {
             // given
             Map<String, Object> wrongClaim = new HashMap<>(Map.of(AUTH_TYPE_CLAIM_KEY, "카카오"));
             String wrongAuthType = createBaseJwtBuilder().addClaims(wrongClaim).compact();
@@ -114,7 +114,7 @@ class OAuthSignUpTokenProviderTest {
         }
 
         @Test
-        void 정해진_형식에_맞지_않으면_예외_응답을_반환한다_subject_누락() {
+        void 정해진_형식에_맞지_않으면_예외가_발생한다_subject_누락() {
             // given
             Map<String, Object> claim = new HashMap<>(Map.of(AUTH_TYPE_CLAIM_KEY, AuthType.APPLE));
             String noSubject = createBaseJwtBuilder().addClaims(claim).compact();
@@ -126,7 +126,7 @@ class OAuthSignUpTokenProviderTest {
         }
 
         @Test
-        void 우리_서버에_발급된_토큰이_아니면_예외_응답을_반환한다() {
+        void 우리_서버에_발급된_토큰이_아니면_예외가_발생한다() {
             // given
             Map<String, Object> validClaim = new HashMap<>(Map.of(AUTH_TYPE_CLAIM_KEY, AuthType.APPLE));
             String signUpToken = createBaseJwtBuilder().addClaims(validClaim).setSubject("email").compact();

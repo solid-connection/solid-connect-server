@@ -80,7 +80,7 @@ class LikedUnivApplyInfoServiceTest {
         }
 
         @Test
-        void 이미_좋아요했으면_예외_응답을_반환한다() {
+        void 이미_좋아요했으면_예외가_발생한다() {
             // given
             saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
@@ -109,7 +109,7 @@ class LikedUnivApplyInfoServiceTest {
         }
 
         @Test
-        void 좋아요하지_않았으면_예외_응답을_반환한다() {
+        void 좋아요하지_않았으면_예외가_발생한다() {
             // when & then
             assertThatCode(() -> likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
@@ -118,7 +118,7 @@ class LikedUnivApplyInfoServiceTest {
     }
 
     @Test
-    void 존재하지_않는_지원_정보에_좋아요_시도하면_예외_응답을_반환한다() {
+    void 존재하지_않는_지원_정보에_좋아요_시도하면_예외가_발생한다() {
         // given
         Long invalidUnivApplyInfoId = 9999L;
 
@@ -150,7 +150,7 @@ class LikedUnivApplyInfoServiceTest {
     }
 
     @Test
-    void 존재하지_않는_대학_지원_정보의_좋아요_여부를_조회하면_예외_응답을_반환한다() {
+    void 존재하지_않는_대학_지원_정보의_좋아요_여부를_조회하면_예외가_발생한다() {
         // given
         Long invalidUnivApplyInfoId = 9999L;
 

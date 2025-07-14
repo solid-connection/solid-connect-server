@@ -36,7 +36,7 @@ class CustomAccessDeniedHandlerTest {
     }
 
     @Test
-    void 권한이_없는_사용자_접근시_403_예외_응답을_반환한다() throws IOException {
+    void 권한이_없는_사용자_접근시_403_예외가_발생한다() throws IOException {
         // given
         AccessDeniedException accessDeniedException = new AccessDeniedException(ACCESS_DENIED.getMessage());
 

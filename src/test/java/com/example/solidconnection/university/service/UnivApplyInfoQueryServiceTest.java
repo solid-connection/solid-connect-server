@@ -70,7 +70,7 @@ class UnivApplyInfoQueryServiceTest {
     }
 
     @Test
-    void 존재하지_않는_대학_지원_정보를_조회하면_예외_응답을_반환한다() {
+    void 존재하지_않는_대학_지원_정보를_조회하면_예외가_발생한다() {
         // given
         Long invalidUnivApplyInfoId = 9999L;
 

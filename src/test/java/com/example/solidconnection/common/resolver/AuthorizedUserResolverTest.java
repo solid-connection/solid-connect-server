@@ -59,7 +59,7 @@ class AuthorizedUserResolverTest {
     class security_context_에_저장된_사용자가_없는_경우 {
 
         @Test
-        void required_가_true_이면_예외_응답을_반환한다() {
+        void required_가_true_이면_예외가_발생한다() {
             // given
             MethodParameter parameter = mock(MethodParameter.class);
             AuthorizedUser authorizedUser = mock(AuthorizedUser.class);

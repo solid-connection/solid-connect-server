@@ -48,10 +48,10 @@ class SiteUserDetailsServiceTest {
     }
 
     @Nested
-    class 예외_응답을_반환한다 {
+    class 예외가_발생한다 {
 
         @Test
-        void 지정되지_않은_형식의_식별자가_주어지면_예외_응답을_반환한다() {
+        void 지정되지_않은_형식의_식별자가_주어지면_예외가_발생한다() {
             // given
             String username = "notNumber";
 
@@ -62,7 +62,7 @@ class SiteUserDetailsServiceTest {
         }
 
         @Test
-        void 식별자에_해당하는_사용자가_없으면_예외_응답을_반환한다() {
+        void 식별자에_해당하는_사용자가_없으면_예외가_발생한다() {
             // given
             String username = "1234";
 
@@ -73,7 +73,7 @@ class SiteUserDetailsServiceTest {
         }
 
         @Test
-        void 탈퇴한_사용자이면_예외_응답을_반환한다() {
+        void 탈퇴한_사용자이면_예외가_발생한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
             user.setQuitedAt(LocalDate.now());

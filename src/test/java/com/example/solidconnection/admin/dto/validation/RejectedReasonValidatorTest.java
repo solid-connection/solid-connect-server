@@ -52,7 +52,7 @@ class RejectedReasonValidatorTest {
         }
 
         @Test
-        void 거절_상태일_때_거절사유가_없으면_예외_응답을_반환한다() {
+        void 거절_상태일_때_거절사유가_없으면_예외가_발생한다() {
             // given
             GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
                     3.0,
@@ -92,7 +92,7 @@ class RejectedReasonValidatorTest {
         }
 
         @Test
-        void 거절_상태일_때_거절사유가_없으면_예외_응답을_반환한다() {
+        void 거절_상태일_때_거절사유가_없으면_예외가_발생한다() {
             // given
             LanguageTestScoreUpdateRequest request = new LanguageTestScoreUpdateRequest(
                     LanguageTestType.TOEIC,

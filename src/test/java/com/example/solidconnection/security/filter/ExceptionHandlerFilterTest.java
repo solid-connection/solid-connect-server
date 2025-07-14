@@ -73,7 +73,7 @@ class ExceptionHandlerFilterTest {
 
     @ParameterizedTest
     @MethodSource("provideException")
-    void 필터_체인에서_예외가_발생하면_예외_응답을_반환한다(Throwable throwable) throws Exception {
+    void 필터_체인에서_예외가_발생하면_예외가_발생한다(Throwable throwable) throws Exception {
         // given
         willThrow(throwable).given(filterChain).doFilter(request, response);
 

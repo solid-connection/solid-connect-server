@@ -54,7 +54,7 @@ class ValidUnivApplyInfoChoiceValidatorTest {
     }
 
     @Test
-    void 두_번째_지망_없이_세_번째_지망을_선택하면_예외_응답을_반환한다() {
+    void 두_번째_지망_없이_세_번째_지망을_선택하면_예외가_발생한다() {
         // given
         UnivApplyInfoChoiceRequest request = new UnivApplyInfoChoiceRequest(1L, null, 3L);
 
@@ -68,7 +68,7 @@ class ValidUnivApplyInfoChoiceValidatorTest {
     }
 
     @Test
-    void 첫_번째_지망을_선택하지_않으면_예외_응답을_반환한다() {
+    void 첫_번째_지망을_선택하지_않으면_예외가_발생한다() {
         // given
         UnivApplyInfoChoiceRequest request = new UnivApplyInfoChoiceRequest(null, 2L, 3L);
 
@@ -83,7 +83,7 @@ class ValidUnivApplyInfoChoiceValidatorTest {
     }
 
     @Test
-    void 대학을_중복_선택하면_예외_응답을_반환한다() {
+    void 대학을_중복_선택하면_예외가_발생한다() {
         // given
         UnivApplyInfoChoiceRequest request = new UnivApplyInfoChoiceRequest(1L, 1L, 2L);
 

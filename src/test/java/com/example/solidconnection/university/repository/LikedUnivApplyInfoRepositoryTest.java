@@ -31,7 +31,7 @@ public class LikedUnivApplyInfoRepositoryTest {
     class 사용자와_좋아요한_대학은_복합_유니크_제약조건을_갖는다 {
 
         @Test
-        void 같은_사용자가_같은_대학에_중복으로_좋아요하면_예외_응답을_반환한다() {
+        void 같은_사용자가_같은_대학에_중복으로_좋아요하면_예외가_발생한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
             UnivApplyInfo univApplyInfo = univApplyInfoFixture.괌대학_A_지원_정보();

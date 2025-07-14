@@ -101,7 +101,7 @@ class MentorQueryServiceTest {
     class 멘토_단일_조회_실패 {
 
         @Test
-        void 존재하지_않는_멘토를_조회하면_예외_응답을_반환한다() {
+        void 존재하지_않는_멘토를_조회하면_예외가_발생한다() {
             // given
             long notExistingMentorId = 999L;
 
