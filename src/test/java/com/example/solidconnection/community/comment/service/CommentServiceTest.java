@@ -250,7 +250,7 @@ class CommentServiceTest {
         }
 
         @Test
-        void 존재하지_않는_부모댓글로_대댓글_작성시_예외를_반환한다() {
+        void 존재하지_않는_부모댓글로_대댓글_작성시_예외가_빌생한다() {
             // given
             long invalidCommentId = 9999L;
             CommentCreateRequest request = new CommentCreateRequest(post.getId(), "자식 댓글", invalidCommentId);

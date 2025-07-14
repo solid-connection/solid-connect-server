@@ -76,7 +76,7 @@ class SiteUserAuthenticationProviderTest {
     }
 
     @Nested
-    class 예외_발생 {
+    class 예외가_발생한다 {
 
         @Test
         void 유효하지_않은_토큰이면_예외가_발생한다() {
