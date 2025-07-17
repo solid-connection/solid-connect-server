@@ -1,5 +1,11 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
+
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
@@ -14,12 +20,6 @@ import com.example.solidconnection.mentor.repository.MentoringRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
 @Service
 @RequiredArgsConstructor

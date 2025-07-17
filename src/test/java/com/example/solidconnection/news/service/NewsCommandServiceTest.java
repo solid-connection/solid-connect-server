@@ -1,5 +1,15 @@
 package com.example.solidconnection.news.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_NEWS_ACCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.then;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.config.NewsProperties;
 import com.example.solidconnection.news.domain.News;
@@ -22,16 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_NEWS_ACCESS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.never;
-import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 생성/수정/삭제 서비스 테스트")

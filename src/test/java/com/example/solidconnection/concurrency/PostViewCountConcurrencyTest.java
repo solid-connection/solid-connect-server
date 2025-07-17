@@ -1,5 +1,8 @@
 package com.example.solidconnection.concurrency;
 
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.repository.BoardRepository;
 import com.example.solidconnection.community.post.domain.Post;
@@ -10,19 +13,15 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.RedisUtils;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestContainerSpringBootTest
 @DisplayName("게시글 조회수 동시성 테스트")

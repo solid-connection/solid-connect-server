@@ -1,5 +1,7 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
@@ -11,11 +13,8 @@ import com.example.solidconnection.location.region.repository.InterestedRegionRe
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-
-import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import org.springframework.transaction.annotation.Transactional;
 
 /*
  * 우리 서버에서 인증되었음을 확인하기 위한 signUpToken 을 검증한다.

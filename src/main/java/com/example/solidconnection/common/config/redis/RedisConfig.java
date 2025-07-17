@@ -1,5 +1,7 @@
 package com.example.solidconnection.common.config.redis;
 
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
+
 import com.example.solidconnection.cache.CacheUpdateListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +17,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
 
 @Configuration
 @EnableRedisRepositories

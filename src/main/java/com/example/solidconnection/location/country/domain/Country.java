@@ -21,7 +21,7 @@ public class Country {
     @Column(nullable = false, length = 100)
     private String koreanName;
 
-    @Column(name="region_code")
+    @Column(name = "region_code")
     private String regionCode;
 
     public Country(String code, String koreanName, String regionCode) {

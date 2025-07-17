@@ -17,6 +17,7 @@ public record CommentCreateRequest(
 
         Long parentId
 ) {
+
     public Comment toEntity(SiteUser siteUser, Post post, Comment parentComment) {
 
         Comment comment = new Comment(

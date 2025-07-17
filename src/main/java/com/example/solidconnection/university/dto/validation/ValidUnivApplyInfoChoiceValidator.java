@@ -1,17 +1,16 @@
 package com.example.solidconnection.university.dto.validation;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
+import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
+
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
-import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
 
 public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<ValidUnivApplyInfoChoice, UnivApplyInfoChoiceRequest> {
 

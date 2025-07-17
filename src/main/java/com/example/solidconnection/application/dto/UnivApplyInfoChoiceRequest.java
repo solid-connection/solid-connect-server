@@ -14,4 +14,5 @@ public record UnivApplyInfoChoiceRequest(
 
         @JsonProperty("thirdChoiceUniversityId")
         Long thirdChoiceUnivApplyInfoId) {
+
 }

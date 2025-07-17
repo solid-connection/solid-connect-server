@@ -1,5 +1,8 @@
 package com.example.solidconnection.admin.dto.validation;
 
+import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.common.VerifyStatus;
@@ -8,15 +11,11 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("거절 사유 유효성 검사 테스트")
 class RejectedReasonValidatorTest {

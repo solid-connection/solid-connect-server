@@ -9,4 +9,5 @@ public record MentoringConfirmRequest(
 
         String rejectedReason
 ) {
+
 }

@@ -7,6 +7,7 @@ public record GpaResponse(
         double gpaCriteria,
         String gpaReportUrl
 ) {
+
     public static GpaResponse from(Gpa gpa) {
         return new GpaResponse(
                 gpa.getGpa(),

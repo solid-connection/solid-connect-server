@@ -1,5 +1,8 @@
 package com.example.solidconnection.mentor.domain;
 
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.MICROS;
+
 import com.example.solidconnection.common.VerifyStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,17 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.ZonedDateTime;
-
-import static java.time.ZoneOffset.UTC;
-import static java.time.temporal.ChronoUnit.MICROS;
 
 @Entity
 @Getter

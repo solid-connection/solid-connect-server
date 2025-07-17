@@ -27,10 +27,10 @@ public class InterestedRegion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="site_user_id")
+    @Column(name = "site_user_id")
     private long siteUserId;
 
-    @Column(name="region_code")
+    @Column(name = "region_code")
     private String regionCode;
 
     public InterestedRegion(SiteUser siteUser, Region region) {

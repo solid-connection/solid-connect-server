@@ -1,5 +1,8 @@
 package com.example.solidconnection.auth.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,9 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("인증 토큰 제공자 테스트")

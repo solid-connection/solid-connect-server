@@ -9,6 +9,7 @@ public record LanguageTestScoreStatusResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static LanguageTestScoreStatusResponse from(LanguageTestScore languageTestScore) {
         return new LanguageTestScoreStatusResponse(
                 languageTestScore.getId(),

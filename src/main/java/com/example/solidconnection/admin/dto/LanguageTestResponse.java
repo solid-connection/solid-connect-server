@@ -7,4 +7,5 @@ public record LanguageTestResponse(
         String languageTestScore,
         String languageTestReportUrl
 ) {
+
 }

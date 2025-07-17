@@ -1,5 +1,7 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
+
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
@@ -10,17 +12,14 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service

@@ -1,5 +1,9 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.domain.BoardCode;
@@ -18,18 +22,13 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.util.RedisUtils;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +60,7 @@ public class PostQueryService {
         Boolean isLiked = getIsLiked(post, siteUser);
 
         Board board = boardRepository.findBoardByCode(post.getBoardCode())
-                .orElseThrow(()->new CustomException(INVALID_BOARD_CODE));
+                .orElseThrow(() -> new CustomException(INVALID_BOARD_CODE));
         SiteUser postAuthor = siteUserRepository.findById(post.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(board);

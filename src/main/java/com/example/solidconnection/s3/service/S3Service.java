@@ -1,5 +1,11 @@
 package com.example.solidconnection.s3.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
+
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -9,6 +15,11 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
-import static com.example.solidconnection.common.exception.ErrorCode.FILE_NOT_EXIST;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
-import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
-import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor

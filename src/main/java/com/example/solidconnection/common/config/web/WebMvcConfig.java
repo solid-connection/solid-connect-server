@@ -2,12 +2,11 @@ package com.example.solidconnection.common.config.web;
 
 import com.example.solidconnection.common.resolver.AuthorizedUserResolver;
 import com.example.solidconnection.common.resolver.CustomPageableHandlerMethodArgumentResolver;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor

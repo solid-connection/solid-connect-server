@@ -11,6 +11,7 @@ public record LanguageTestScoreResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static LanguageTestScoreResponse from(LanguageTestScore languageTestScore) {
         return new LanguageTestScoreResponse(
                 languageTestScore.getId(),

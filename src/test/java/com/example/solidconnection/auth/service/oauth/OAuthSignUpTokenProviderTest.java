@@ -1,5 +1,12 @@
 package com.example.solidconnection.auth.service.oauth;
 
+import static com.example.solidconnection.auth.service.oauth.OAuthSignUpTokenProvider.AUTH_TYPE_CLAIM_KEY;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
@@ -10,22 +17,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.example.solidconnection.auth.service.oauth.OAuthSignUpTokenProvider.AUTH_TYPE_CLAIM_KEY;
-import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("OAuth 회원가입 토큰 제공자 테스트")

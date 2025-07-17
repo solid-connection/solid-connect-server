@@ -1,14 +1,13 @@
 package com.example.solidconnection.mentor.fixture;
 
-import com.example.solidconnection.common.VerifyStatus;
-import com.example.solidconnection.mentor.domain.Mentoring;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.test.context.TestComponent;
-
-import java.time.ZonedDateTime;
-
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.MICROS;
+
+import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.mentor.domain.Mentoring;
+import java.time.ZonedDateTime;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor

@@ -1,5 +1,8 @@
 package com.example.solidconnection.location.region.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
@@ -10,9 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 @TestContainerSpringBootTest
 public class InterestedRegionRepositoryTest {

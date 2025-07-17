@@ -1,5 +1,13 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
@@ -21,14 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("멘토링 CUD 서비스 테스트")
@@ -148,7 +148,7 @@ class MentoringCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
+                                       mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(REJECTED_REASON_REQUIRED.getMessage());
         }

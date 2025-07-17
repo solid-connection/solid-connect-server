@@ -1,13 +1,21 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.common.exception.CustomException;
+import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.spy;
+
 import com.example.solidconnection.auth.token.config.JwtProperties;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,15 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import java.util.Date;
-import java.util.Objects;
-
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.spy;
 
 @TestContainerSpringBootTest
 @DisplayName("로그아웃 체크 필터 테스트")

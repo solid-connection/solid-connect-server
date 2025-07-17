@@ -1,13 +1,13 @@
 package com.example.solidconnection.community.board.fixture;
 
-import com.example.solidconnection.community.board.domain.Board;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.test.context.TestComponent;
-
 import static com.example.solidconnection.community.board.domain.BoardCode.AMERICAS;
 import static com.example.solidconnection.community.board.domain.BoardCode.ASIA;
 import static com.example.solidconnection.community.board.domain.BoardCode.EUROPE;
 import static com.example.solidconnection.community.board.domain.BoardCode.FREE;
+
+import com.example.solidconnection.community.board.domain.Board;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor

@@ -1,7 +1,7 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.application.dto.validation.RejectedReasonRequired;
+import com.example.solidconnection.common.VerifyStatus;
 import jakarta.validation.constraints.NotNull;
 
 @RejectedReasonRequired
@@ -18,4 +18,5 @@ public record GpaScoreUpdateRequest(
 
         String rejectedReason
 ) implements ScoreUpdateRequest {
+
 }

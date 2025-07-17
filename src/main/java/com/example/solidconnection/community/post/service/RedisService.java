@@ -1,16 +1,15 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_TTL;
+
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
-import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_TTL;
 
 @Service
 public class RedisService { // todo: 정말 필요한지 고민 필요
@@ -40,7 +39,7 @@ public class RedisService { // todo: 정말 필요한지 고민 필요
 
     public boolean isPresent(String key) {
         return Boolean.TRUE.equals(redisTemplate.opsForValue()
-                .setIfAbsent(key, "1", Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()), TimeUnit.SECONDS));
+                                           .setIfAbsent(key, "1", Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()), TimeUnit.SECONDS));
     }
 
     public boolean isKeyExists(String key) {

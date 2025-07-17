@@ -1,5 +1,8 @@
 package com.example.solidconnection.auth.service.oauth;
 
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
@@ -8,17 +11,13 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
-import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

@@ -1,5 +1,17 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.post.domain.Post;
@@ -21,6 +33,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.RedisUtils;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,20 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
-import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @TestContainerSpringBootTest
 @DisplayName("게시글 생성/수정/삭제 서비스 테스트")
@@ -135,7 +134,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -148,7 +147,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -161,7 +160,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1, request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -212,12 +211,12 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.updatePost(
-                            user2,
-                            post.getId(),
-                            request,
-                            imageFiles
-                    ))
+                                       postCommandService.updatePost(
+                                               user2,
+                                               post.getId(),
+                                               request,
+                                               imageFiles
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_ACCESS.getMessage());
         }
@@ -230,12 +229,12 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.updatePost(
-                            user1,
-                            questionPost.getId(),
-                            request,
-                            imageFiles
-                    ))
+                                       postCommandService.updatePost(
+                                               user1,
+                                               questionPost.getId(),
+                                               request,
+                                               imageFiles
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
         }
@@ -248,12 +247,12 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.updatePost(
-                            user1,
-                            post.getId(),
-                            request,
-                            imageFiles
-                    ))
+                                       postCommandService.updatePost(
+                                               user1,
+                                               post.getId(),
+                                               request,
+                                               imageFiles
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -289,10 +288,10 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.deletePostById(
-                            user2,
-                            post.getId()
-                    ))
+                                       postCommandService.deletePostById(
+                                               user2,
+                                               post.getId()
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_ACCESS.getMessage());
         }
@@ -301,10 +300,10 @@ class PostCommandServiceTest {
         void 질문_게시글을_삭제하면_예외가_발생한다() {
             // when & then
             assertThatThrownBy(() ->
-                    postCommandService.deletePostById(
-                            user1,
-                            questionPost.getId()
-                    ))
+                                       postCommandService.deletePostById(
+                                               user1,
+                                               questionPost.getId()
+                                       ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
         }

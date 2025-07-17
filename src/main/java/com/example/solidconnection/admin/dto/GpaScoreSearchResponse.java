@@ -4,4 +4,5 @@ public record GpaScoreSearchResponse(
         GpaScoreStatusResponse gpaScoreStatusResponse,
         SiteUserResponse siteUserResponse
 ) {
+
 }

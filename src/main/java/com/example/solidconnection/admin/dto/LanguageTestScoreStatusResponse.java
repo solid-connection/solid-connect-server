@@ -1,7 +1,6 @@
 package com.example.solidconnection.admin.dto;
 
 import com.example.solidconnection.common.VerifyStatus;
-
 import java.time.ZonedDateTime;
 
 public record LanguageTestScoreStatusResponse(
@@ -12,4 +11,5 @@ public record LanguageTestScoreStatusResponse(
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt
 ) {
+
 }

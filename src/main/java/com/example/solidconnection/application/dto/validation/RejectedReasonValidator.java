@@ -1,12 +1,12 @@
 package com.example.solidconnection.application.dto.validation;
 
+import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
+
 import com.example.solidconnection.admin.dto.ScoreUpdateRequest;
 import com.example.solidconnection.common.VerifyStatus;
 import io.micrometer.common.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
 
 public class RejectedReasonValidator implements ConstraintValidator<RejectedReasonRequired, ScoreUpdateRequest> {
 

@@ -1,5 +1,9 @@
 package com.example.solidconnection.score.repository.custom;
 
+import static com.example.solidconnection.score.domain.QLanguageTestScore.languageTestScore;
+import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
+import static io.jsonwebtoken.lang.Strings.hasText;
+
 import com.example.solidconnection.admin.dto.LanguageTestResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreStatusResponse;
@@ -11,20 +15,15 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-
-import static com.example.solidconnection.score.domain.QLanguageTestScore.languageTestScore;
-import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
-import static io.jsonwebtoken.lang.Strings.hasText;
 
 @Repository
 public class LanguageTestScoreFilterRepositoryImpl implements LanguageTestScoreFilterRepository {

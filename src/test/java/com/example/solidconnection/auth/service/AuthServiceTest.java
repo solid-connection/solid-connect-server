@@ -1,5 +1,10 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
@@ -8,18 +13,12 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import java.time.LocalDate;
-
-import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("인증 서비스 테스트")
 @TestContainerSpringBootTest

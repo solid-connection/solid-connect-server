@@ -10,6 +10,7 @@ public record GpaScoreResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static GpaScoreResponse from(GpaScore gpaScore) {
         return new GpaScoreResponse(
                 gpaScore.getId(),

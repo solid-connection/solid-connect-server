@@ -1,18 +1,17 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 /*
  * 보안을 위해 이메일과 비밀번호 중 무엇이 틀렸는지 구체적으로 응답하지 않는다.

@@ -6,4 +6,5 @@ public record MentorPreviewsResponse(
         List<MentorPreviewResponse> content,
         int nextPageNumber
 ) {
+
 }

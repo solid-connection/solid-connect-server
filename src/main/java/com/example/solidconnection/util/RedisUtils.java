@@ -1,8 +1,9 @@
 package com.example.solidconnection.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_LOCK_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LOCK_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PREFIX;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,11 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_LOCK_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LOCK_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PREFIX;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class RedisUtils {

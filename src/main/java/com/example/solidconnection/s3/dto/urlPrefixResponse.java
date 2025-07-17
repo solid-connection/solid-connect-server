@@ -6,4 +6,5 @@ public record urlPrefixResponse(
         String cloudFrontDefault,
         String cloudFrontUploaded
 ) {
+
 }

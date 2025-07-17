@@ -1,5 +1,9 @@
 package com.example.solidconnection.news.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_NEWS;
+import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_NEWS;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.LikedNews;
 import com.example.solidconnection.news.dto.LikedNewsResponse;
@@ -8,10 +12,6 @@ import com.example.solidconnection.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIKED_NEWS;
-import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_NEWS;
 
 @RequiredArgsConstructor
 @Service

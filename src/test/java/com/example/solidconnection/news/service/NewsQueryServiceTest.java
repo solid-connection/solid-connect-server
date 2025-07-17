@@ -1,21 +1,20 @@
 package com.example.solidconnection.news.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.news.domain.News;
-import com.example.solidconnection.news.dto.NewsResponse;
 import com.example.solidconnection.news.dto.NewsListResponse;
+import com.example.solidconnection.news.dto.NewsResponse;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Comparator;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("소식지 조회 서비스 테스트")
@@ -47,8 +46,8 @@ class NewsQueryServiceTest {
         assertAll(
                 () -> assertThat(response.newsResponseList()).hasSize(newsList.size()),
                 () -> assertThat(response.newsResponseList())
-                .extracting(NewsResponse::updatedAt)
-                .isSortedAccordingTo(Comparator.reverseOrder())
+                        .extracting(NewsResponse::updatedAt)
+                        .isSortedAccordingTo(Comparator.reverseOrder())
         );
     }
 }

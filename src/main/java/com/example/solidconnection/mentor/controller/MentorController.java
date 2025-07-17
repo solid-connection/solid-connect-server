@@ -1,5 +1,7 @@
 package com.example.solidconnection.mentor.controller;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
@@ -18,8 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RequiredArgsConstructor
 @RequestMapping("/mentors")

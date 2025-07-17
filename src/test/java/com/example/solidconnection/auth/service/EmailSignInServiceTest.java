@@ -1,5 +1,8 @@
 package com.example.solidconnection.auth.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -12,9 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("이메일 로그인 서비스 테스트")
 @TestContainerSpringBootTest

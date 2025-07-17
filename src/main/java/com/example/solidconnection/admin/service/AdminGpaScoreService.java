@@ -1,5 +1,7 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
+
 import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
@@ -14,8 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service

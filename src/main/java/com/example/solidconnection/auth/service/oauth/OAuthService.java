@@ -11,9 +11,8 @@ import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /*
  * OAuth 제공자로부터 이메일을 받아 기존 회원인지, 신규 회원인지 판별하고, 이에 따라 다르게 응답한다.
@@ -57,5 +56,6 @@ public abstract class OAuthService {
     }
 
     protected abstract OAuthUserInfoDto getOAuthUserInfo(String code);
+
     protected abstract AuthType getAuthType();
 }

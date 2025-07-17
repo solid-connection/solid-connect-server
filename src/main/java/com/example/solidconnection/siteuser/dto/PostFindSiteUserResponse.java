@@ -7,6 +7,7 @@ public record PostFindSiteUserResponse(
         String nickname,
         String profileImageUrl
 ) {
+
     public static PostFindSiteUserResponse from(SiteUser siteUser) {
         return new PostFindSiteUserResponse(
                 siteUser.getId(),
