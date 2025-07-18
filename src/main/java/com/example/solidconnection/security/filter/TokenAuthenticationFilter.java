@@ -1,7 +1,7 @@
 package com.example.solidconnection.security.filter;
 
-import com.example.solidconnection.security.authentication.JwtAuthentication;
-import com.example.solidconnection.security.authentication.SiteUserAuthentication;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.infrastructure.AuthorizationHeaderParser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationManager authenticationManager;
     private final AuthorizationHeaderParser authorizationHeaderParser;
@@ -34,14 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        JwtAuthentication authToken = createAuthentication(token.get());
+        TokenAuthentication authToken = new TokenAuthentication(token.get());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);
-    }
-
-    private JwtAuthentication createAuthentication(String token) {
-        return new SiteUserAuthentication(token);
     }
 }

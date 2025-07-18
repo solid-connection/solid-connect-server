@@ -5,7 +5,7 @@ import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 import com.example.solidconnection.common.exception.CustomAccessDeniedHandler;
 import com.example.solidconnection.common.exception.CustomAuthenticationEntryPoint;
 import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
-import com.example.solidconnection.security.filter.JwtAuthenticationFilter;
+import com.example.solidconnection.security.filter.TokenAuthenticationFilter;
 import com.example.solidconnection.security.filter.SignOutCheckFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +30,7 @@ public class SecurityConfiguration {
     private final CorsProperties corsProperties;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
     private final SignOutCheckFilter signOutCheckFilter;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -69,8 +69,8 @@ public class SecurityConfiguration {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
-                .addFilterBefore(signOutCheckFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(signOutCheckFilter, TokenAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, SignOutCheckFilter.class)
                 .build();
     }

@@ -1,4 +1,4 @@
-package com.example.solidconnection.security.filter;
+package com.example.solidconnection.security.infrastructure;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
