@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+@DisplayName("Authorization 해더 파서 테스트")
 @TestContainerSpringBootTest
 class AuthorizationHeaderParserTest {
 
