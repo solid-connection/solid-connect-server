@@ -5,7 +5,6 @@ import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAY
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
@@ -75,7 +74,7 @@ class MyPageServiceTest {
         int likedUnivApplyInfoCount = createLikedUnivApplyInfos(user);
 
         // when
-        MyPageResponse response = myPageService.getMyPageInfo(user);
+        MyPageResponse response = myPageService.getMyPageInfo(user.getId());
 
         // then
         Assertions.assertAll(
@@ -101,7 +100,7 @@ class MyPageServiceTest {
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
-            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user.getId(), imageFile, "newNickname");
 
             // then
             SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
@@ -116,10 +115,10 @@ class MyPageServiceTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(user, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(user.getId(), imageFile, "newNickname");
 
             // then
-            then(s3Service).should(never()).deleteExProfile(any());
+            then(s3Service).should(never()).deleteExProfile(user.getId());
         }
 
         @Test
@@ -131,10 +130,10 @@ class MyPageServiceTest {
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
-            myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
+            myPageService.updateMyPageInfo(커스텀_프로필_사용자.getId(), imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(argThat(userId -> userId.equals(커스텀_프로필_사용자.getId())));
+            then(s3Service).should().deleteExProfile(커스텀_프로필_사용자.getId());
         }
     }
 
@@ -154,7 +153,7 @@ class MyPageServiceTest {
             String newNickname = "newNickname";
 
             // when
-            myPageService.updateMyPageInfo(user, imageFile, newNickname);
+            myPageService.updateMyPageInfo(user.getId(), imageFile, newNickname);
 
             // then
             SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
@@ -171,7 +170,7 @@ class MyPageServiceTest {
             siteUserRepository.save(user);
 
             // when & then
-            assertThatCode(() -> myPageService.updateMyPageInfo(user, imageFile, "nickname12"))
+            assertThatCode(() -> myPageService.updateMyPageInfo(user.getId(), imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }

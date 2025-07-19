@@ -34,7 +34,9 @@ public class MyPageService {
      * 마이페이지 정보를 조회한다.
      * */
     @Transactional(readOnly = true)
-    public MyPageResponse getMyPageInfo(SiteUser siteUser) {
+    public MyPageResponse getMyPageInfo(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
         return MyPageResponse.of(siteUser, likedUnivApplyInfoCount);
     }
@@ -43,8 +45,8 @@ public class MyPageService {
      * 마이페이지 정보를 수정한다.
      * */
     @Transactional
-    public void updateMyPageInfo(SiteUser siteUser, MultipartFile imageFile, String nickname) {
-        SiteUser user = siteUserRepository.findById(siteUser.getId())
+    public void updateMyPageInfo(long siteUserId, MultipartFile imageFile, String nickname) {
+        SiteUser user = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         if (nickname != null) {
