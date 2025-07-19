@@ -80,7 +80,7 @@ class UnivApplyInfoRecommendServiceTest {
         interestedRegionRepository.save(new InterestedRegion(user, regionFixture.영미권()));
 
         // when
-        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user.getId());
 
         // then
         assertThat(response.recommendedUniversities())
@@ -99,7 +99,7 @@ class UnivApplyInfoRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user.getId());
 
         // then
         assertThat(response.recommendedUniversities())
@@ -117,7 +117,7 @@ class UnivApplyInfoRecommendServiceTest {
         interestedCountryRepository.save(new InterestedCountry(user, countryFixture.덴마크()));
 
         // when
-        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user.getId());
 
         // then
         assertThat(response.recommendedUniversities())
@@ -135,7 +135,7 @@ class UnivApplyInfoRecommendServiceTest {
     @Test
     void 관심사_미설정_사용자는_일반_추천_대학_지원_정보를_조회한다() {
         // when
-        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user);
+        UnivApplyInfoRecommendsResponse response = univApplyInfoRecommendService.getPersonalRecommends(user.getId());
 
         // then
         assertThat(response.recommendedUniversities())
