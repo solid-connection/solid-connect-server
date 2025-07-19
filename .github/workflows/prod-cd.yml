@@ -68,7 +68,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.PRIVATE_KEY }}
-        source: "./docs/config.alloy"
+        source: "./docs/infra-config/config.alloy"
         target: "/home/${{ secrets.USERNAME }}/solid-connect-server/"
 
     - name: Run docker compose
