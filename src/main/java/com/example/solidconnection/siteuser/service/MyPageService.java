@@ -57,7 +57,7 @@ public class MyPageService {
         if (imageFile != null && !imageFile.isEmpty()) {
             UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
             if (!isDefaultProfileImage(user.getProfileImageUrl())) {
-                s3Service.deleteExProfile(user);
+                s3Service.deleteExProfile(user.getId());
             }
             String profileImageUrl = uploadedFile.fileUrl();
             user.setProfileImageUrl(profileImageUrl);

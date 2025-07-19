@@ -134,8 +134,7 @@ class MyPageServiceTest {
             myPageService.updateMyPageInfo(커스텀_프로필_사용자, imageFile, "newNickname");
 
             // then
-            then(s3Service).should().deleteExProfile(argThat(user ->
-                                                                     user.getId().equals(커스텀_프로필_사용자.getId())));
+            then(s3Service).should().deleteExProfile(argThat(userId -> userId.equals(커스텀_프로필_사용자.getId())));
         }
     }
 

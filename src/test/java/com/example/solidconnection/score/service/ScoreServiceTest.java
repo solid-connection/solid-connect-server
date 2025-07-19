@@ -70,7 +70,7 @@ class ScoreServiceTest {
         );
 
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
         // then
         assertThat(response.gpaScoreStatusResponseList()).hasSize(scores.size());
@@ -79,7 +79,7 @@ class ScoreServiceTest {
     @Test
     void GPA_점수가_없는_경우_빈_리스트를_반환한다() {
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
         // then
         assertThat(response.gpaScoreStatusResponseList()).isEmpty();
@@ -94,7 +94,7 @@ class ScoreServiceTest {
         );
 
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user.getId());
 
         // then
         assertThat(response.languageTestScoreStatusResponseList()).hasSize(scores.size());
@@ -103,7 +103,7 @@ class ScoreServiceTest {
     @Test
     void 어학_시험_점수가_없는_경우_빈_리스트를_반환한다() {
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user.getId());
 
         // then
         assertThat(response.languageTestScoreStatusResponseList()).isEmpty();
@@ -118,7 +118,7 @@ class ScoreServiceTest {
         given(s3Service.uploadFile(file, ImgType.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitGpaScore(user, request, file);
+        long scoreId = scoreService.submitGpaScore(user.getId(), request, file);
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
@@ -134,7 +134,7 @@ class ScoreServiceTest {
         given(s3Service.uploadFile(file, ImgType.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitLanguageTestScore(user, request, file);
+        long scoreId = scoreService.submitLanguageTestScore(user.getId(), request, file);
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then
