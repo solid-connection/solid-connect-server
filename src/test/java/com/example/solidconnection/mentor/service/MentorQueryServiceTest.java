@@ -63,7 +63,7 @@ class MentorQueryServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor);
 
             // when
-            MentorDetailResponse response = mentorQueryService.getMentorDetails(mentor.getId(), siteUser);
+            MentorDetailResponse response = mentorQueryService.getMentorDetails(mentor.getId(), siteUser.getId());
 
             // then
             assertAll(
@@ -85,8 +85,8 @@ class MentorQueryServiceTest {
             mentoringFixture.대기중_멘토링(mentor.getId(), appliedUser.getId());
 
             // when
-            MentorDetailResponse notAppliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), notAppliedUser);
-            MentorDetailResponse appliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), appliedUser);
+            MentorDetailResponse notAppliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), notAppliedUser.getId());
+            MentorDetailResponse appliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), appliedUser.getId());
 
             // then
             assertAll(
@@ -105,7 +105,7 @@ class MentorQueryServiceTest {
             long notExistingMentorId = 999L;
 
             // when & then
-            assertThatCode(() -> mentorQueryService.getMentorDetails(notExistingMentorId, siteUserFixture.사용자()))
+            assertThatCode(() -> mentorQueryService.getMentorDetails(notExistingMentorId, siteUserFixture.사용자().getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(ErrorCode.MENTOR_NOT_FOUND.getMessage());
         }
@@ -135,7 +135,7 @@ class MentorQueryServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor2);
 
             // when
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
 
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
@@ -159,7 +159,7 @@ class MentorQueryServiceTest {
             mentoringFixture.대기중_멘토링(mentor1.getId(), currentUser.getId());
 
             // when
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
 
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
@@ -173,7 +173,7 @@ class MentorQueryServiceTest {
         @Test
         void 다음_페이지_번호를_응답한다() {
             // given
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 1));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 1));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(2);
@@ -182,7 +182,7 @@ class MentorQueryServiceTest {
         @Test
         void 다음_페이지가_없으면_페이지_없음을_의미하는_값을_응답한다() {
             // given
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser, PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(NO_NEXT_PAGE_NUMBER);

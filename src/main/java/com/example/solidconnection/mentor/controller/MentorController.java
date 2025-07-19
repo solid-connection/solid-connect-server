@@ -7,7 +7,6 @@ import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
 import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
 import com.example.solidconnection.mentor.service.MentorQueryService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,18 +29,18 @@ public class MentorController {
 
     @GetMapping("/{mentor-id}")
     public ResponseEntity<MentorDetailResponse> getMentorDetails(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("mentor-id") Long mentorId
     ) {
-        MentorDetailResponse response = mentorQueryService.getMentorDetails(mentorId, siteUser);
+        MentorDetailResponse response = mentorQueryService.getMentorDetails(mentorId, siteUserId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public ResponseEntity<SliceResponse<MentorPreviewResponse>> getMentorPreviews(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @RequestParam("region") String region,
-
+            
             @PageableDefault(size = 3, sort = "menteeCount", direction = DESC)
             @SortDefaults({
                     @SortDefault(sort = "menteeCount", direction = Sort.Direction.DESC),
@@ -49,7 +48,7 @@ public class MentorController {
             })
             Pageable pageable
     ) {
-        SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, siteUser, pageable);
+        SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, siteUserId, pageable);
         return ResponseEntity.ok(response);
     }
 }
