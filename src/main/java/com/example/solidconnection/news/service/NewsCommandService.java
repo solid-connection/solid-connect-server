@@ -2,6 +2,7 @@ package com.example.solidconnection.news.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_NEWS_ACCESS;
 import static com.example.solidconnection.common.exception.ErrorCode.NEWS_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.config.NewsProperties;
@@ -15,6 +16,7 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class NewsCommandService {
     private final S3Service s3Service;
     private final NewsProperties newsProperties;
     private final NewsRepository newsRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Transactional
     public NewsCommandResponse createNews(long siteUserId, NewsCreateRequest newsCreateRequest, MultipartFile imageFile) {
@@ -77,7 +80,9 @@ public class NewsCommandService {
     }
 
     @Transactional
-    public NewsCommandResponse deleteNewsById(SiteUser siteUser, Long newsId) {
+    public NewsCommandResponse deleteNewsById(long siteUserId, Long newsId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new CustomException(NEWS_NOT_FOUND));
         validatePermission(siteUser, news);
