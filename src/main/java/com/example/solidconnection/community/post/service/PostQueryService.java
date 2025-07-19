@@ -66,7 +66,7 @@ public class PostQueryService {
         PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(board);
         PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(postAuthor);
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
-        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser, postId);
+        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser.getId(), postId);
 
         // caching && 어뷰징 방지
         if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), postId))) {
