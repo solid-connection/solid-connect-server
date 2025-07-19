@@ -4,7 +4,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICAT
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -22,7 +21,8 @@ public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(AuthorizedUser.class)
-                && parameter.getParameterType().equals(SiteUser.class);
+                && (parameter.getParameterType().equals(long.class)
+                || parameter.getParameterType().equals(Long.class));
     }
 
     @Override
@@ -30,19 +30,18 @@ public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
-        SiteUser siteUser = extractSiteUserFromAuthentication();
-        if (parameter.getParameterAnnotation(AuthorizedUser.class).required() && siteUser == null) {
+        Long siteUserId = extractIdFromAuthentication();
+        if (parameter.getParameterAnnotation(AuthorizedUser.class).required() && siteUserId == null) {
             throw new CustomException(AUTHENTICATION_FAILED, "로그인 상태가 아닙니다.");
         }
-
-        return siteUser;
+        return siteUserId;
     }
 
-    private SiteUser extractSiteUserFromAuthentication() {
+    private Long extractIdFromAuthentication() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             SiteUserDetails principal = (SiteUserDetails) authentication.getPrincipal();
-            return principal.getSiteUser();
+            return principal.getSiteUser().getId();
         } catch (Exception e) {
             return null;
         }
