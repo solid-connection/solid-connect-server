@@ -31,7 +31,7 @@ public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
         Long siteUserId = extractIdFromAuthentication();
-        if (parameter.getParameterAnnotation(AuthorizedUser.class).required() && siteUserId == null) {
+        if (isRequired(parameter) && siteUserId == null) {
             throw new CustomException(AUTHENTICATION_FAILED, "로그인 상태가 아닙니다.");
         }
         return siteUserId;
@@ -45,5 +45,13 @@ public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private boolean isRequired(MethodParameter parameter) {
+        if (parameter.getParameterType().isPrimitive()) { // NPE 방지를 위해 required로 간주
+            return true;
+        }
+        AuthorizedUser authorizedUser = parameter.getParameterAnnotation(AuthorizedUser.class);
+        return authorizedUser != null && authorizedUser.required();
     }
 }
