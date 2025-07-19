@@ -132,7 +132,7 @@ class ApplicationQueryServiceTest {
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1,
+                    user1.getId(),
                     "",
                     ""
             );
@@ -184,7 +184,7 @@ class ApplicationQueryServiceTest {
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1,
+                    user1.getId(),
                     regionFixture.영미권().getCode(),
                     ""
             );
@@ -234,7 +234,7 @@ class ApplicationQueryServiceTest {
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1,
+                    user1.getId(),
                     null,
                     "괌"
             );
@@ -264,7 +264,7 @@ class ApplicationQueryServiceTest {
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1,
+                    user1.getId(),
                     "",
                     ""
             );
@@ -304,7 +304,7 @@ class ApplicationQueryServiceTest {
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1,
+                    user1.getId(),
                     "",
                     ""
             );
@@ -354,7 +354,7 @@ class ApplicationQueryServiceTest {
                     null
             );
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1);
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1.getId());
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
@@ -398,7 +398,7 @@ class ApplicationQueryServiceTest {
             );
 
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1);
+            ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1.getId());
 
             // then
             assertThat(response.firstChoice())

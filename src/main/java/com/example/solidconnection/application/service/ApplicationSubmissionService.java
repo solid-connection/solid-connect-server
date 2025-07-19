@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_N
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
@@ -18,6 +19,7 @@ import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ public class ApplicationSubmissionService {
     private final ApplicationRepository applicationRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
     private String term;
@@ -40,7 +43,9 @@ public class ApplicationSubmissionService {
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
-    public ApplicationSubmissionResponse apply(SiteUser siteUser, ApplyRequest applyRequest) {
+    public ApplicationSubmissionResponse apply(long siteUserId, ApplyRequest applyRequest) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());

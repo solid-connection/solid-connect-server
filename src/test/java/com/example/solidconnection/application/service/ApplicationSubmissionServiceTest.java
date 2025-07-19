@@ -81,7 +81,7 @@ class ApplicationSubmissionServiceTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when
-        ApplicationSubmissionResponse response = applicationSubmissionService.apply(user, request);
+        ApplicationSubmissionResponse response = applicationSubmissionService.apply(user.getId(), request);
 
         // then
         Application savedApplication = applicationRepository.findBySiteUserIdAndTerm(user.getId(), term).orElseThrow();
@@ -115,7 +115,7 @@ class ApplicationSubmissionServiceTest {
 
         // when & then
         assertThatCode(() ->
-                               applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_GPA_SCORE_STATUS.getMessage());
@@ -135,7 +135,7 @@ class ApplicationSubmissionServiceTest {
 
         // when & then
         assertThatCode(() ->
-                               applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_LANGUAGE_TEST_SCORE_STATUS.getMessage());
@@ -154,12 +154,12 @@ class ApplicationSubmissionServiceTest {
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT; i++) {
-            applicationSubmissionService.apply(user, request);
+            applicationSubmissionService.apply(user.getId(), request);
         }
 
         // when & then
         assertThatCode(() ->
-                               applicationSubmissionService.apply(user, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());
