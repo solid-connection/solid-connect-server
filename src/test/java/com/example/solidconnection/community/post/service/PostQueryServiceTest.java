@@ -153,7 +153,7 @@ class PostQueryServiceTest {
         String viewCountKey = redisUtils.getPostViewCountRedisKey(post.getId());
 
         // when
-        PostFindResponse response = postQueryService.findPostById(user, post.getId());
+        PostFindResponse response = postQueryService.findPostById(user.getId(), post.getId());
 
         // then
         assertAll(

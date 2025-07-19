@@ -71,7 +71,7 @@ class PostLikeServiceTest {
             long beforeLikeCount = post.getLikeCount();
 
             // when
-            PostLikeResponse response = postLikeService.likePost(user, post.getId());
+            PostLikeResponse response = postLikeService.likePost(user.getId(), post.getId());
 
             // then
             Post likedPost = postRepository.findById(post.getId()).orElseThrow();
@@ -86,12 +86,12 @@ class PostLikeServiceTest {
         @Test
         void 이미_좋아요한_게시글을_다시_좋아요하면_예외가_발생한다() {
             // given
-            postLikeService.likePost(user, post.getId());
+            postLikeService.likePost(user.getId(), post.getId());
 
             // when & then
             assertThatThrownBy(() ->
                                        postLikeService.likePost(
-                                               user,
+                                               user.getId(),
                                                post.getId()
                                        ))
                     .isInstanceOf(CustomException.class)
@@ -105,11 +105,11 @@ class PostLikeServiceTest {
         @Test
         void 게시글_좋아요를_성공적으로_취소한다() {
             // given
-            PostLikeResponse beforeResponse = postLikeService.likePost(user, post.getId());
+            PostLikeResponse beforeResponse = postLikeService.likePost(user.getId(), post.getId());
             long beforeLikeCount = beforeResponse.likeCount();
 
             // when
-            PostDislikeResponse response = postLikeService.dislikePost(user, post.getId());
+            PostDislikeResponse response = postLikeService.dislikePost(user.getId(), post.getId());
 
             // then
             Post unlikedPost = postRepository.findById(post.getId()).orElseThrow();
@@ -126,7 +126,7 @@ class PostLikeServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postLikeService.dislikePost(
-                                               user,
+                                               user.getId(),
                                                post.getId()
                                        ))
                     .isInstanceOf(CustomException.class)

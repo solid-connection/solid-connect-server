@@ -54,7 +54,9 @@ public class PostQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PostFindResponse findPostById(SiteUser siteUser, Long postId) {
+    public PostFindResponse findPostById(long siteUserId, Long postId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getByIdUsingEntityGraph(postId);
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);

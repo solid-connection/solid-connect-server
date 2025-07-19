@@ -4,6 +4,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DEL
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
@@ -21,6 +22,7 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
@@ -36,13 +38,16 @@ public class PostCommandService {
 
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
+    private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
 
     @Transactional
-    public PostCreateResponse createPost(SiteUser siteUser, PostCreateRequest postCreateRequest,
+    public PostCreateResponse createPost(long siteUserId, PostCreateRequest postCreateRequest,
                                          List<MultipartFile> imageFile) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         // 유효성 검증
         validatePostCategory(postCreateRequest.postCategory());
         validateFileSize(imageFile);
@@ -59,8 +64,10 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostUpdateResponse updatePost(SiteUser siteUser, Long postId, PostUpdateRequest postUpdateRequest,
+    public PostUpdateResponse updatePost(long siteUserId, Long postId, PostUpdateRequest postUpdateRequest,
                                          List<MultipartFile> imageFile) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         // 유효성 검증
         Post post = postRepository.getById(postId);
         validateOwnership(post, siteUser);
@@ -89,7 +96,9 @@ public class PostCommandService {
     }
 
     @Transactional
-    public PostDeleteResponse deletePostById(SiteUser siteUser, Long postId) {
+    public PostDeleteResponse deletePostById(long siteUserId, Long postId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getById(postId);
         validateOwnership(post, siteUser);
         validateQuestion(post);

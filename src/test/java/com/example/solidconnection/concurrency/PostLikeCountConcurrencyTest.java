@@ -74,8 +74,8 @@ class PostLikeCountConcurrencyTest {
             SiteUser tmpSiteUser = siteUserFixture.사용자(i, nickname);
             executorService.submit(() -> {
                 try {
-                    postLikeService.likePost(tmpSiteUser, post.getId());
-                    postLikeService.dislikePost(tmpSiteUser, post.getId());
+                    postLikeService.likePost(tmpSiteUser.getId(), post.getId());
+                    postLikeService.dislikePost(tmpSiteUser.getId(), post.getId());
                 } finally {
                     doneSignal.countDown();
                 }
