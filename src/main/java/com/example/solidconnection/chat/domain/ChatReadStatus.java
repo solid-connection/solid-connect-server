@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.domain;
 
 import com.example.solidconnection.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +27,9 @@ public class ChatReadStatus extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "chat_room_id")
     private long chatRoomId;
 
+    @Column(name = "chat_participant_id")
     private long chatParticipantId;
 }

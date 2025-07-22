@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.domain;
 
 import com.example.solidconnection.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class ChatParticipant extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "site_user_id")
     private long siteUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)
