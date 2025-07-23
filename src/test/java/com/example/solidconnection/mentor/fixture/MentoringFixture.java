@@ -33,7 +33,7 @@ public class MentoringFixture {
                 .create();
     }
 
-    public Mentoring 거절된_멘토링(long mentorId, long menteeId, String rejectedReason) {
+    public Mentoring 거절된_멘토링(long mentorId, long menteeId) {
         ZonedDateTime now = getCurrentTime();
         return mentoringFixtureBuilder.mentoring()
                 .mentorId(mentorId)
