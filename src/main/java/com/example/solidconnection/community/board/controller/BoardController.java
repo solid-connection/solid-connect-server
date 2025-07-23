@@ -4,7 +4,6 @@ import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.community.board.domain.BoardCode;
 import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.service.PostQueryService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class BoardController {
 
     @GetMapping("/{code}")
     public ResponseEntity<?> findPostsByCodeAndCategory(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable(value = "code") String code,
             @RequestParam(value = "category", defaultValue = "전체") String category) {
         List<PostListResponse> postsByCodeAndPostCategory = postQueryService
