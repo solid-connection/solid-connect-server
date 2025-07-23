@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {
         @UniqueConstraint(
-                name = "uk_chat_participant_chat_room_site_user",
+                name = "uk_chat_participant_chat_room_id_site_user_id",
                 columnNames = {"chat_room_id", "site_user_id"}
         )
 })

@@ -15,7 +15,7 @@ CREATE TABLE chat_participant
     updated_at DATETIME(6) NOT NULL,
     CONSTRAINT FK_CHAT_PARTICIPANT_CHAT_ROOM_ID FOREIGN KEY (chat_room_id) REFERENCES chat_room (id),
     CONSTRAINT FK_CHAT_PARTICIPANT_SITE_USER_ID FOREIGN KEY (site_user_id) REFERENCES site_user (id),
-    CONSTRAINT UK_CHAT_PARTICIPANT_CHAT_ROOM_SITE_USER UNIQUE (chat_room_id, site_user_id)
+    CONSTRAINT UK_CHAT_PARTICIPANT_CHAT_ROOM_ID_SITE_USER_ID UNIQUE (chat_room_id, site_user_id)
 );
 
 CREATE TABLE chat_message
@@ -52,5 +52,5 @@ CREATE TABLE chat_read_status
     updated_at DATETIME(6) NOT NULL,
     CONSTRAINT FK_CHAT_READ_STATUS_CHAT_ROOM_ID FOREIGN KEY (chat_room_id) REFERENCES chat_room (id),
     CONSTRAINT FK_CHAT_READ_STATUS_CHAT_PARTICIPANT_ID FOREIGN KEY (chat_participant_id) REFERENCES chat_participant (id),
-    CONSTRAINT UK_CHAT_READ_STATUS_CHAT_ROOM_PARTICIPANT UNIQUE (chat_room_id, chat_participant_id)
+    CONSTRAINT UK_CHAT_READ_STATUS_CHAT_ROOM_ID_CHAT_PARTICIPANT_ID UNIQUE (chat_room_id, chat_participant_id)
 );
