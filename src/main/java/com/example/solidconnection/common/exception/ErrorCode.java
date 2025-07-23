@@ -44,6 +44,7 @@ public enum ErrorCode {
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
     MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다."),
+    REPORT_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 신고 대상입니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -78,7 +79,7 @@ public enum ErrorCode {
     // community
     INVALID_POST_CATEGORY(HttpStatus.BAD_REQUEST.value(), "잘못된 카테고리명입니다."),
     INVALID_BOARD_CODE(HttpStatus.BAD_REQUEST.value(), "잘못된 게시판 코드입니다."),
-    INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글입니다."),
+    INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글입니다."), // todo: NOT_FOUND로 통일 필요
     INVALID_POST_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 게시글만 제어할 수 있습니다."),
     CAN_NOT_DELETE_OR_UPDATE_QUESTION(HttpStatus.BAD_REQUEST.value(), "질문글은 수정이나 삭제할 수 없습니다."),
     CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES(HttpStatus.BAD_REQUEST.value(), "5개 이상의 파일을 업로드할 수 없습니다."),
@@ -110,6 +111,9 @@ public enum ErrorCode {
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
+
+    // report
+    ALREADY_REPORTED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 신고한 상태입니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
