@@ -111,6 +111,9 @@ public enum ErrorCode {
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
 
+    // socket
+    UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
+
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
 

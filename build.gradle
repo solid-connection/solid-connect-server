@@ -64,6 +64,8 @@ dependencies {
     // Etc
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:stomp-websocket'
 }
 
 tasks.named('test', Test) {
