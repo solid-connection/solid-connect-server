@@ -2,7 +2,6 @@ package com.example.solidconnection.chat.domain;
 
 import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,8 +22,7 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Boolean isGroup;
+    private boolean isGroup = false;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatParticipant> chatParticipants = new ArrayList<>();

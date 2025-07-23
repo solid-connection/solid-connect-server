@@ -28,8 +28,7 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false)
-    private Boolean hasAttachment;
+    private boolean hasAttachment = false;
 
     private long senderId;
 
