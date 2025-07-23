@@ -46,9 +46,6 @@ public class Mentoring {
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
-    @Column(length = 500)
-    private String rejectedReason;
-
     @Column
     private long mentorId;
 
