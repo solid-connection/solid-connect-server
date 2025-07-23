@@ -2,7 +2,6 @@ package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -98,7 +97,7 @@ class MentoringCommandServiceTest {
         void 멘토링을_성공적으로_승인한다() {
             // given
             Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
+            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED);
             int beforeMenteeCount = mentor1.getMenteeCount();
 
             // when
@@ -120,8 +119,7 @@ class MentoringCommandServiceTest {
         void 멘토링을_성공적으로_거절한다() {
             // given
             Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            String rejectedReason = "멘토링 거절 사유";
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.REJECTED, rejectedReason);
+            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.REJECTED);
             int beforeMenteeCount = mentor1.getMenteeCount();
 
             // when
@@ -133,7 +131,6 @@ class MentoringCommandServiceTest {
 
             assertAll(
                     () -> assertThat(confirmedMentoring.getVerifyStatus()).isEqualTo(VerifyStatus.REJECTED),
-                    () -> assertThat(confirmedMentoring.getRejectedReason()).isEqualTo(rejectedReason),
                     () -> assertThat(confirmedMentoring.getConfirmedAt()).isNotNull(),
                     () -> assertThat(confirmedMentoring.getCheckedAt()).isNotNull(),
                     () -> assertThat(mentor.getMenteeCount()).isEqualTo(beforeMenteeCount)
@@ -141,23 +138,10 @@ class MentoringCommandServiceTest {
         }
 
         @Test
-        void 거절_시_사유가_없으면_예외가_발생한다() {
-            // given
-            Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.REJECTED, null);
-
-            // when & then
-            assertThatThrownBy(() ->
-                                       mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(REJECTED_REASON_REQUIRED.getMessage());
-        }
-
-        @Test
         void 다른_멘토의_멘토링을_승인할_수_없다() {
             // given
             Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
+            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED);
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser2.getId(), mentoring.getId(), request))
@@ -169,7 +153,7 @@ class MentoringCommandServiceTest {
         void 이미_처리된_멘토링은_다시_승인할_수_없다() {
             // given
             Mentoring mentoring = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
+            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED);
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request))
@@ -180,7 +164,7 @@ class MentoringCommandServiceTest {
         @Test
         void 존재하지_않는_멘토링_아이디로_요청시_예외가_발생한다() {
             // given
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED, null);
+            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED);
             long invalidMentoringId = 9999L;
 
             // when & then

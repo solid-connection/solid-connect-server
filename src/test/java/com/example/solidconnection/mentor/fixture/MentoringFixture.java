@@ -39,7 +39,6 @@ public class MentoringFixture {
                 .mentorId(mentorId)
                 .menteeId(menteeId)
                 .verifyStatus(VerifyStatus.REJECTED)
-                .rejectedReason(rejectedReason)
                 .confirmedAt(now)
                 .checkedAt(now)
                 .create();
