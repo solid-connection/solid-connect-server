@@ -72,19 +72,12 @@ tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
-tasks.named('build') {
-    dependsOn 'flywayValidate'
-}
-
-tasks.named('bootJar') {
-    dependsOn 'flywayValidate'
-}
-
 // To include QueryDLS classes in compile classpath
 sourceSets {
     main.java.srcDirs += ['build/generated/sources/annotationProcessor/java/main']
 }
 
+// build 단계에서 flyway 검증
 flyway {
     url = 'jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1'
     user = 'sa'
@@ -92,4 +85,12 @@ flyway {
     locations = ['filesystem:src/main/resources/db/migration']
     validateMigrationNaming = true
     ignoreMigrationPatterns = ['*:pending']
+}
+
+tasks.named('build') {
+    dependsOn 'flywayValidate'
+}
+
+tasks.named('bootJar') {
+    dependsOn 'flywayValidate'
 }
