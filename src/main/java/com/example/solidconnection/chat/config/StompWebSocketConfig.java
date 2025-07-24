@@ -17,25 +17,25 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
 
-    @Value("${websocket.thread-pool.inbound.core-pool-size}")
+    @Value("${websocket.thread-pool.inbound.core-pool-size:6}")
     private int inboundCorePoolSize;
 
-    @Value("${websocket.thread-pool.inbound.max-pool-size}")
+    @Value("${websocket.thread-pool.inbound.max-pool-size:12}")
     private int inboundMaxPoolSize;
 
-    @Value("${websocket.thread-pool.inbound.queue-capacity}")
+    @Value("${websocket.thread-pool.inbound.queue-capacity:1000}")
     private int inboundQueueCapacity;
 
-    @Value("${websocket.thread-pool.outbound.core-pool-size}")
+    @Value("${websocket.thread-pool.outbound.core-pool-size:6}")
     private int outboundCorePoolSize;
 
-    @Value("${websocket.thread-pool.outbound.max-pool-size}")
+    @Value("${websocket.thread-pool.outbound.max-pool-size:12}")
     private int outboundMaxPoolSize;
 
-    @Value("${websocket.heartbeat.server-interval}")
+    @Value("${websocket.heartbeat.server-interval:15000}")
     private long heartbeatServerInterval;
 
-    @Value("${websocket.heartbeat.client-interval}")
+    @Value("${websocket.heartbeat.client-interval:15000}")
     private long heartbeatClientInterval;
 
     @Override
