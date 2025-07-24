@@ -54,7 +54,7 @@ class MentoringQueryServiceTest {
             // given
             Mentoring mentoring1 = mentoringFixture.대기중_멘토링(mentor.getId(), menteeUser.getId());
             Mentoring mentoring2 = mentoringFixture.승인된_멘토링(mentor.getId(), menteeUser.getId());
-            Mentoring mentoring3 = mentoringFixture.거절된_멘토링(mentor.getId(), menteeUser.getId(), "거절 사유");
+            Mentoring mentoring3 = mentoringFixture.거절된_멘토링(mentor.getId(), menteeUser.getId());
 
             // when
             MentoringListResponse responses = mentoringQueryService.getMentorings(mentorUser.getId());

@@ -46,9 +46,6 @@ public class Mentoring {
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
-    @Column(length = 500)
-    private String rejectedReason;
-
     @Column
     private long mentorId;
 
@@ -66,9 +63,8 @@ public class Mentoring {
         this.createdAt = ZonedDateTime.now(UTC).truncatedTo(MICROS); // 나노초 6자리 까지만 저장
     }
 
-    public void confirm(VerifyStatus status, String rejectedReason) {
+    public void confirm(VerifyStatus status) {
         this.verifyStatus = status;
-        this.rejectedReason = rejectedReason;
         this.confirmedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
 
         if (this.checkedAt == null) {

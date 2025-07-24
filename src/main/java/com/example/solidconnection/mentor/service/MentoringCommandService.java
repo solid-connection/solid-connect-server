@@ -3,7 +3,6 @@ package com.example.solidconnection.mentor.service;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.REJECTED_REASON_REQUIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
 import com.example.solidconnection.common.VerifyStatus;
@@ -46,12 +45,7 @@ public class MentoringCommandService {
         validateMentoringOwnership(mentor, mentoring);
         validateMentoringNotConfirmed(mentoring);
 
-        if (mentoringConfirmRequest.status() == VerifyStatus.REJECTED
-                && (mentoringConfirmRequest.rejectedReason() == null || mentoringConfirmRequest.rejectedReason().isBlank())) {
-            throw new CustomException(REJECTED_REASON_REQUIRED);
-        }
-
-        mentoring.confirm(mentoringConfirmRequest.status(), mentoringConfirmRequest.rejectedReason());
+        mentoring.confirm(mentoringConfirmRequest.status());
 
         if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
             mentor.increaseMenteeCount();
