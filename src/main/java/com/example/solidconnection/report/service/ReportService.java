@@ -31,8 +31,9 @@ public class ReportService {
     }
 
     private void validateReporterExists(long reporterId) {
-        siteUserRepository.findById(reporterId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (!siteUserRepository.existsById(reporterId)) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     private void validateTargetExists(TargetType targetType, long targetId) {
