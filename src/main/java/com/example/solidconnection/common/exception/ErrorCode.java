@@ -113,6 +113,7 @@ public enum ErrorCode {
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
+    INVALID_ROOMID(HttpStatus.BAD_REQUEST.value(), "경로의 roomId가 잘못되었습니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
