@@ -9,7 +9,7 @@ import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.fixture.PostFixture;
-import com.example.solidconnection.report.domain.ReasonType;
+import com.example.solidconnection.report.domain.ReportType;
 import com.example.solidconnection.report.domain.TargetType;
 import com.example.solidconnection.report.dto.ReportRequest;
 import com.example.solidconnection.report.fixture.ReportFixture;
@@ -61,7 +61,7 @@ class ReportServiceTest {
         @Test
         void 정상적으로_신고한다() {
             // given
-            ReportRequest request = new ReportRequest(post.getId(), TargetType.POST, ReasonType.INSULT);
+            ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.POST, post.getId());
 
             // when
             reportService.createReport(siteUser.getId(), request);
@@ -76,7 +76,7 @@ class ReportServiceTest {
         void 신고_대상이_존재하지_않으면_예외가_발생한다() {
             // given
             long notExistingId = 999L;
-            ReportRequest request = new ReportRequest(notExistingId, TargetType.POST, ReasonType.INSULT);
+            ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.POST, notExistingId);
 
             // when & then
             assertThatCode(() -> reportService.createReport(siteUser.getId(), request))
@@ -88,7 +88,7 @@ class ReportServiceTest {
         void 이미_신고한_경우_예외가_발생한다() {
             // given
             reportFixture.신고(siteUser.getId(), TargetType.POST, post.getId());
-            ReportRequest request = new ReportRequest(post.getId(), TargetType.POST, ReasonType.INSULT);
+            ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.POST, post.getId());
 
             // when & then
             assertThatCode(() -> reportService.createReport(siteUser.getId(), request))

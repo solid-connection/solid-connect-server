@@ -26,7 +26,7 @@ public class ReportService {
         validateTargetExists(request.targetType(), request.targetId());
         validateFirstReportByUser(reporterId, request.targetType(), request.targetId());
 
-        Report report = new Report(reporterId, request.targetType(), request.targetId(), request.type());
+        Report report = new Report(reporterId, request.reportType(), request.targetType(), request.targetId());
         reportRepository.save(report);
     }
 

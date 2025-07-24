@@ -1,6 +1,6 @@
 package com.example.solidconnection.report.domain;
 
-public enum ReasonType {
+public enum ReportType {
 
     ADVERTISEMENT,          // 광고
     SPAM,                   // 낚시/도배

@@ -32,6 +32,10 @@ public class Report {
     @Column(name = "reporter_id")
     private long reporterId;
 
+    @Column(name = "report_type")
+    @Enumerated(value = EnumType.STRING)
+    private ReportType reportType;
+
     @Column(name = "target_type")
     @Enumerated(value = EnumType.STRING)
     private TargetType targetType;
@@ -39,14 +43,10 @@ public class Report {
     @Column(name = "target_id")
     private long targetId;
 
-    @Column(name = "reason_type")
-    @Enumerated(value = EnumType.STRING)
-    private ReasonType reasonType;
-
-    public Report(long reporterId, TargetType targetType, long targetId, ReasonType reasonType) {
+    public Report(long reporterId, ReportType reportType, TargetType targetType, long targetId) {
+        this.reportType = reportType;
         this.reporterId = reporterId;
         this.targetType = targetType;
         this.targetId = targetId;
-        this.reasonType = reasonType;
     }
 }

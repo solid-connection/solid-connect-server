@@ -1,7 +1,7 @@
 package com.example.solidconnection.report.fixture;
 
-import com.example.solidconnection.report.domain.ReasonType;
 import com.example.solidconnection.report.domain.Report;
+import com.example.solidconnection.report.domain.ReportType;
 import com.example.solidconnection.report.domain.TargetType;
 import com.example.solidconnection.report.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class ReportFixtureBuilder {
     private long reporterId;
     private TargetType targetType;
     private long targetId;
-    private ReasonType reasonType = ReasonType.ADVERTISEMENT;
+    private ReportType reportType = ReportType.ADVERTISEMENT;
 
     public ReportFixtureBuilder report() {
         return new ReportFixtureBuilder(reportRepository);
@@ -37,17 +37,17 @@ public class ReportFixtureBuilder {
         return this;
     }
 
-    public ReportFixtureBuilder reasonType(ReasonType reasonType) {
-        this.reasonType = reasonType;
+    public ReportFixtureBuilder reasonType(ReportType reportType) {
+        this.reportType = reportType;
         return this;
     }
 
     public Report create() {
         Report report = new Report(
                 reporterId,
+                reportType,
                 targetType,
-                targetId,
-                reasonType
+                targetId
         );
         return reportRepository.save(report);
     }
