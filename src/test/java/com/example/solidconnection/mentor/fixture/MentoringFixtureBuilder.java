@@ -17,7 +17,6 @@ public class MentoringFixtureBuilder {
     private ZonedDateTime confirmedAt;
     private ZonedDateTime checkedAt;
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
-    private String rejectedReason;
     private long mentorId;
     private long menteeId;
 
@@ -45,11 +44,6 @@ public class MentoringFixtureBuilder {
         return this;
     }
 
-    public MentoringFixtureBuilder rejectedReason(String rejectedReason) {
-        this.rejectedReason = rejectedReason;
-        return this;
-    }
-
     public MentoringFixtureBuilder mentorId(long mentorId) {
         this.mentorId = mentorId;
         return this;
@@ -67,7 +61,6 @@ public class MentoringFixtureBuilder {
                 confirmedAt,
                 checkedAt,
                 verifyStatus,
-                rejectedReason,
                 mentorId,
                 menteeId
         );

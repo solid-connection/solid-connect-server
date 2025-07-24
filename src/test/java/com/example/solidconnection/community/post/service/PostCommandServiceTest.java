@@ -113,7 +113,7 @@ class PostCommandServiceTest {
                     .willReturn(List.of(new UploadedFileUrlResponse(expectedImageUrl)));
 
             // when
-            PostCreateResponse response = postCommandService.createPost(user1, request, imageFiles);
+            PostCreateResponse response = postCommandService.createPost(user1.getId(), request, imageFiles);
 
             // then
             Post savedPost = postRepository.findById(response.id()).orElseThrow();
@@ -134,7 +134,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                                       postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1.getId(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -147,7 +147,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                                       postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1.getId(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(INVALID_POST_CATEGORY.getMessage());
         }
@@ -160,7 +160,7 @@ class PostCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() ->
-                                       postCommandService.createPost(user1, request, imageFiles))
+                                       postCommandService.createPost(user1.getId(), request, imageFiles))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES.getMessage());
         }
@@ -184,7 +184,7 @@ class PostCommandServiceTest {
 
             // when
             PostUpdateResponse response = postCommandService.updatePost(
-                    user1,
+                    user1.getId(),
                     post.getId(),
                     request,
                     imageFiles
@@ -212,7 +212,7 @@ class PostCommandServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postCommandService.updatePost(
-                                               user2,
+                                               user2.getId(),
                                                post.getId(),
                                                request,
                                                imageFiles
@@ -230,7 +230,7 @@ class PostCommandServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postCommandService.updatePost(
-                                               user1,
+                                               user1.getId(),
                                                questionPost.getId(),
                                                request,
                                                imageFiles
@@ -248,7 +248,7 @@ class PostCommandServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postCommandService.updatePost(
-                                               user1,
+                                               user1.getId(),
                                                post.getId(),
                                                request,
                                                imageFiles
@@ -270,7 +270,7 @@ class PostCommandServiceTest {
             redisService.increaseViewCount(viewCountKey);
 
             // when
-            PostDeleteResponse response = postCommandService.deletePostById(user1, post.getId());
+            PostDeleteResponse response = postCommandService.deletePostById(user1.getId(), post.getId());
 
             // then
             assertAll(
@@ -289,7 +289,7 @@ class PostCommandServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postCommandService.deletePostById(
-                                               user2,
+                                               user2.getId(),
                                                post.getId()
                                        ))
                     .isInstanceOf(CustomException.class)
@@ -301,7 +301,7 @@ class PostCommandServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        postCommandService.deletePostById(
-                                               user1,
+                                               user1.getId(),
                                                questionPost.getId()
                                        ))
                     .isInstanceOf(CustomException.class)

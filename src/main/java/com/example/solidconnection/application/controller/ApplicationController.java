@@ -8,7 +8,6 @@ import com.example.solidconnection.application.service.ApplicationSubmissionServ
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,10 +30,10 @@ public class ApplicationController {
     // 지원서 제출하기 api
     @PostMapping
     public ResponseEntity<ApplicationSubmissionResponse> apply(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestBody ApplyRequest applyRequest
     ) {
-        ApplicationSubmissionResponse applicationSubmissionResponse = applicationSubmissionService.apply(siteUser, applyRequest);
+        ApplicationSubmissionResponse applicationSubmissionResponse = applicationSubmissionService.apply(siteUserId, applyRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(applicationSubmissionResponse);
@@ -43,22 +42,22 @@ public class ApplicationController {
     @RequireRoleAccess(roles = {Role.ADMIN})
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @RequestParam(required = false, defaultValue = "") String region,
             @RequestParam(required = false, defaultValue = "") String keyword
     ) {
-        applicationQueryService.validateSiteUserCanViewApplicants(siteUser);
-        ApplicationsResponse result = applicationQueryService.getApplicants(siteUser, region, keyword);
+        applicationQueryService.validateSiteUserCanViewApplicants(siteUserId);
+        ApplicationsResponse result = applicationQueryService.getApplicants(siteUserId, region, keyword);
         return ResponseEntity
                 .ok(result);
     }
 
     @GetMapping("/competitors")
     public ResponseEntity<ApplicationsResponse> getApplicantsForUserCompetitors(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        applicationQueryService.validateSiteUserCanViewApplicants(siteUser);
-        ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(siteUser);
+        applicationQueryService.validateSiteUserCanViewApplicants(siteUserId);
+        ApplicationsResponse result = applicationQueryService.getApplicantsByUserApplications(siteUserId);
         return ResponseEntity
                 .ok(result);
     }

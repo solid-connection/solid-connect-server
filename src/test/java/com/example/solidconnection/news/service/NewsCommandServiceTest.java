@@ -302,7 +302,7 @@ class NewsCommandServiceTest {
             String expectedImageUrl = originNews.getThumbnailUrl();
 
             // when
-            NewsCommandResponse response = newsCommandService.deleteNewsById(user, originNews.getId());
+            NewsCommandResponse response = newsCommandService.deleteNewsById(user.getId(), originNews.getId());
 
             // then
             assertAll(

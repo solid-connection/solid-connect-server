@@ -57,7 +57,7 @@ class LikedUnivApplyInfoServiceTest {
         saveLikedUnivApplyInfo(user, 그라츠대학_지원_정보);
 
         // when
-        List<UnivApplyInfoPreviewResponse> response = likedUnivApplyInfoService.getLikedUnivApplyInfos(user);
+        List<UnivApplyInfoPreviewResponse> response = likedUnivApplyInfoService.getLikedUnivApplyInfos(user.getId());
 
         // then
         assertThat(response).extracting(UnivApplyInfoPreviewResponse::id)
@@ -70,7 +70,7 @@ class LikedUnivApplyInfoServiceTest {
         @Test
         void 성공적으로_좋아요를_등록한다() {
             // when
-            likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.addUnivApplyInfoLike(user.getId(), 괌대학_A_지원_정보.getId());
 
             // then
             assertThat(
@@ -84,7 +84,7 @@ class LikedUnivApplyInfoServiceTest {
             saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when & then
-            assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user.getId(), 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -99,7 +99,7 @@ class LikedUnivApplyInfoServiceTest {
             saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
             // when
-            likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId());
+            likedUnivApplyInfoService.cancelUnivApplyInfoLike(user.getId(), 괌대학_A_지원_정보.getId());
 
             // then
             assertThat(
@@ -110,7 +110,7 @@ class LikedUnivApplyInfoServiceTest {
         @Test
         void 좋아요하지_않았으면_예외가_발생한다() {
             // when & then
-            assertThatCode(() -> likedUnivApplyInfoService.cancelUnivApplyInfoLike(user, 괌대학_A_지원_정보.getId()))
+            assertThatCode(() -> likedUnivApplyInfoService.cancelUnivApplyInfoLike(user.getId(), 괌대학_A_지원_정보.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NOT_LIKED_UNIV_APPLY_INFO.getMessage());
         }
@@ -122,7 +122,7 @@ class LikedUnivApplyInfoServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user.getId(), invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }
@@ -133,7 +133,7 @@ class LikedUnivApplyInfoServiceTest {
         saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
 
         // when
-        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isTrue();
@@ -142,7 +142,7 @@ class LikedUnivApplyInfoServiceTest {
     @Test
     void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
         // when
-        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user, 괌대학_A_지원_정보.getId());
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
 
         // then
         assertThat(response.isLike()).isFalse();
@@ -154,7 +154,7 @@ class LikedUnivApplyInfoServiceTest {
         Long invalidUnivApplyInfoId = 9999L;
 
         // when & then
-        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user, invalidUnivApplyInfoId))
+        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), invalidUnivApplyInfoId))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
     }

@@ -67,7 +67,7 @@ class MentorMyPageServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor);
 
             // when
-            MentorMyPageResponse response = mentorMyPageService.getMentorMyPage(mentorUser);
+            MentorMyPageResponse response = mentorMyPageService.getMentorMyPage(mentorUser.getId());
 
             // then
             assertAll(
@@ -90,7 +90,7 @@ class MentorMyPageServiceTest {
             MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest(newIntroduction, newPassTip, List.of());
 
             // when
-            mentorMyPageService.updateMentorMyPage(mentorUser, request);
+            mentorMyPageService.updateMentorMyPage(mentorUser.getId(), request);
 
             // then
             Mentor updatedMentor = mentorRepository.findById(mentor.getId()).get();
@@ -110,7 +110,7 @@ class MentorMyPageServiceTest {
             MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest("introduction", "passTip", newChannels);
 
             // when
-            mentorMyPageService.updateMentorMyPage(mentorUser, request);
+            mentorMyPageService.updateMentorMyPage(mentorUser.getId(), request);
 
             // then
             List<Channel> updatedChannels = channelRepositoryForTest.findAllByMentorId(mentor.getId());

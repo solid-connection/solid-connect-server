@@ -1,12 +1,14 @@
 package com.example.solidconnection.auth.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class AuthService {
 
     private final AuthTokenProvider authTokenProvider;
     private final TokenBlackListService tokenBlackListService;
+    private final SiteUserRepository siteUserRepository;
 
     /*
      * 로그아웃한다.
@@ -37,7 +40,9 @@ public class AuthService {
      * - 로그아웃한다.
      * */
     @Transactional
-    public void quit(SiteUser siteUser, String token) { // todo: #299를 작업하며 인자를 (String token)만 받도록 수정해야 함
+    public void quit(long siteUserId, String token) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         siteUser.setQuitedAt(tomorrow);
         signOut(token);

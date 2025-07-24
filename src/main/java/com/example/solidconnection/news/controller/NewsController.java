@@ -11,7 +11,6 @@ import com.example.solidconnection.news.service.NewsLikeService;
 import com.example.solidconnection.news.service.NewsQueryService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -47,24 +46,24 @@ public class NewsController {
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PostMapping
     public ResponseEntity<NewsCommandResponse> createNews(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestPart("newsCreateRequest") NewsCreateRequest newsCreateRequest,
             @RequestParam(value = "file", required = false) MultipartFile imageFile
     ) {
-        NewsCommandResponse newsCommandResponse = newsCommandService.createNews(siteUser.getId(), newsCreateRequest, imageFile);
+        NewsCommandResponse newsCommandResponse = newsCommandService.createNews(siteUserId, newsCreateRequest, imageFile);
         return ResponseEntity.ok(newsCommandResponse);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PutMapping("/{news-id}")
     public ResponseEntity<NewsCommandResponse> updateNews(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("news-id") Long newsId,
             @Valid @RequestPart(value = "newsUpdateRequest") NewsUpdateRequest newsUpdateRequest,
             @RequestParam(value = "file", required = false) MultipartFile imageFile
     ) {
         NewsCommandResponse newsCommandResponse = newsCommandService.updateNews(
-                siteUser.getId(),
+                siteUserId,
                 newsId,
                 newsUpdateRequest,
                 imageFile);
@@ -74,37 +73,37 @@ public class NewsController {
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @DeleteMapping("/{news-id}")
     public ResponseEntity<NewsCommandResponse> deleteNewsById(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("news-id") Long newsId
     ) {
-        NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUser, newsId);
+        NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUserId, newsId);
         return ResponseEntity.ok(newsCommandResponse);
     }
 
     @GetMapping("/{news-id}/like")
     public ResponseEntity<LikedNewsResponse> isNewsLiked(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("news-id") Long newsId
     ) {
-        LikedNewsResponse likedNewsResponse = newsLikeService.isNewsLiked(siteUser.getId(), newsId);
+        LikedNewsResponse likedNewsResponse = newsLikeService.isNewsLiked(siteUserId, newsId);
         return ResponseEntity.ok(likedNewsResponse);
     }
 
     @PostMapping("/{news-id}/like")
     public ResponseEntity<Void> addNewsLike(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("news-id") Long newsId
     ) {
-        newsLikeService.addNewsLike(siteUser.getId(), newsId);
+        newsLikeService.addNewsLike(siteUserId, newsId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{news-id}/like")
     public ResponseEntity<Void> cancelNewsLike(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("news-id") Long newsId
     ) {
-        newsLikeService.cancelNewsLike(siteUser.getId(), newsId);
+        newsLikeService.cancelNewsLike(siteUserId, newsId);
         return ResponseEntity.ok().build();
     }
 }

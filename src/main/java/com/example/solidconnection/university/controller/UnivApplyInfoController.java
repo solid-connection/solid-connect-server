@@ -1,7 +1,6 @@
 package com.example.solidconnection.university.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
@@ -32,48 +31,48 @@ public class UnivApplyInfoController {
 
     @GetMapping("/recommend")
     public ResponseEntity<UnivApplyInfoRecommendsResponse> getUnivApplyInfoRecommends(
-            @AuthorizedUser(required = false) SiteUser siteUser
+            @AuthorizedUser(required = false) Long siteUserId
     ) {
-        if (siteUser == null) {
+        if (siteUserId == null) {
             return ResponseEntity.ok(univApplyInfoRecommendService.getGeneralRecommends());
         } else {
-            return ResponseEntity.ok(univApplyInfoRecommendService.getPersonalRecommends(siteUser));
+            return ResponseEntity.ok(univApplyInfoRecommendService.getPersonalRecommends(siteUserId));
         }
     }
 
     // todo: return 타입 UnivApplyInfoPreviewResponses 같이 객체로 묶어서 반환하는 것으로 변경 필요
     @GetMapping("/like")
     public ResponseEntity<List<UnivApplyInfoPreviewResponse>> getLikedUnivApplyInfos(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = likedUnivApplyInfoService.getLikedUnivApplyInfos(siteUser);
+        List<UnivApplyInfoPreviewResponse> likedUnivApplyInfos = likedUnivApplyInfoService.getLikedUnivApplyInfos(siteUserId);
         return ResponseEntity.ok(likedUnivApplyInfos);
     }
 
     @GetMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<IsLikeResponse> isUnivApplyInfoLiked(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        IsLikeResponse isLiked = likedUnivApplyInfoService.isUnivApplyInfoLiked(siteUser, univApplyInfoId);
+        IsLikeResponse isLiked = likedUnivApplyInfoService.isUnivApplyInfoLiked(siteUserId, univApplyInfoId);
         return ResponseEntity.ok(isLiked);
     }
 
     @PostMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<Void> addUnivApplyInfoLike(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        likedUnivApplyInfoService.addUnivApplyInfoLike(siteUser, univApplyInfoId);
+        likedUnivApplyInfoService.addUnivApplyInfoLike(siteUserId, univApplyInfoId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{univ-apply-info-id}/like")
     public ResponseEntity<Void> cancelUnivApplyInfoLike(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("univ-apply-info-id") Long univApplyInfoId
     ) {
-        likedUnivApplyInfoService.cancelUnivApplyInfoLike(siteUser, univApplyInfoId);
+        likedUnivApplyInfoService.cancelUnivApplyInfoLike(siteUserId, univApplyInfoId);
         return ResponseEntity.ok().build();
     }
 

@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FIL
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
@@ -15,6 +16,7 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -109,7 +111,10 @@ public class S3Service {
      * - 기존 파일의 key(S3파일명)를 찾는다.
      * - S3에서 파일을 삭제한다.
      * */
-    public void deleteExProfile(SiteUser siteUser) {
+    @Transactional
+    public void deleteExProfile(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         String key = siteUser.getProfileImageUrl();
         deleteFile(key);
     }

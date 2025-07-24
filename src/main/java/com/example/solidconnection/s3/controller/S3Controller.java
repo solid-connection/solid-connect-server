@@ -5,7 +5,6 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.dto.urlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -45,11 +44,11 @@ public class S3Controller {
 
     @PostMapping("/profile/post")
     public ResponseEntity<UploadedFileUrlResponse> uploadPostProfileImage(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @RequestParam("file") MultipartFile imageFile
     ) {
         UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.PROFILE);
-        s3Service.deleteExProfile(siteUser);
+        s3Service.deleteExProfile(siteUserId);
         return ResponseEntity.ok(profileImageUrl);
     }
 

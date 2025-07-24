@@ -54,7 +54,9 @@ public class PostQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PostFindResponse findPostById(SiteUser siteUser, Long postId) {
+    public PostFindResponse findPostById(long siteUserId, Long postId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getByIdUsingEntityGraph(postId);
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
@@ -66,7 +68,7 @@ public class PostQueryService {
         PostFindBoardResponse boardPostFindResultDTO = PostFindBoardResponse.from(board);
         PostFindSiteUserResponse siteUserPostFindResultDTO = PostFindSiteUserResponse.from(postAuthor);
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
-        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser, postId);
+        List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser.getId(), postId);
 
         // caching && 어뷰징 방지
         if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), postId))) {

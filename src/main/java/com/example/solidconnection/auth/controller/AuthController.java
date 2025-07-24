@@ -21,7 +21,6 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.AuthType;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -104,11 +103,11 @@ public class AuthController {
 
     @DeleteMapping("/quit")
     public ResponseEntity<Void> quit(
-            @AuthorizedUser SiteUser siteUser,
-            Authentication authentication // todo: #299를 작업하며 인자를 (Authentication authentication)만 받도록 수정해야 함
+            Authentication authentication,
+            @AuthorizedUser long siteUserId
     ) {
         String accessToken = getAccessToken(authentication);
-        authService.quit(siteUser, accessToken);
+        authService.quit(siteUserId, accessToken);
         return ResponseEntity.ok().build();
     }
 

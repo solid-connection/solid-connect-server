@@ -12,6 +12,7 @@ import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +40,9 @@ class AuthServiceTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
+    @Autowired
+    private SiteUserRepository siteUserRepository;
+
     @Test
     void 로그아웃한다() {
         // given
@@ -64,13 +68,14 @@ class AuthServiceTest {
         AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
 
         // when
-        authService.quit(user, accessToken.token());
+        authService.quit(user.getId(), accessToken.token());
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+        SiteUser actualSitUser = siteUserRepository.findById(user.getId()).orElseThrow();
         assertAll(
-                () -> assertThat(user.getQuitedAt()).isEqualTo(tomorrow),
+                () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );

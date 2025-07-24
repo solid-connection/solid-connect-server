@@ -1,7 +1,6 @@
 package com.example.solidconnection.concurrency;
 
 import com.example.solidconnection.application.service.ApplicationQueryService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.Arrays;
@@ -33,11 +32,11 @@ class ThunderingHerdTest {
     private int THREAD_NUMS = 1000;
     private int THREAD_POOL_SIZE = 200;
     private int TIMEOUT_SECONDS = 10;
-    private SiteUser user;
+    private long siteUserId;
 
     @BeforeEach
     public void setUp() {
-        user = siteUserFixture.사용자();
+        siteUserId = siteUserFixture.사용자().getId();
     }
 
     @Test
@@ -53,9 +52,9 @@ class ThunderingHerdTest {
             executorService.submit(() -> {
                 try {
                     List<Runnable> tasks = Arrays.asList(
-                            () -> applicationQueryService.getApplicants(user, "", ""),
-                            () -> applicationQueryService.getApplicants(user, "ASIA", ""),
-                            () -> applicationQueryService.getApplicants(user, "", "추오")
+                            () -> applicationQueryService.getApplicants(siteUserId, "", ""),
+                            () -> applicationQueryService.getApplicants(siteUserId, "ASIA", ""),
+                            () -> applicationQueryService.getApplicants(siteUserId, "", "추오")
                     );
                     Collections.shuffle(tasks);
                     tasks.forEach(Runnable::run);
