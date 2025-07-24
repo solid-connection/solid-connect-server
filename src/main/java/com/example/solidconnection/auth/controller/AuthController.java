@@ -9,6 +9,7 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
@@ -21,6 +22,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.AuthType;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,28 +46,39 @@ public class AuthController {
     private final EmailSignUpService emailSignUpService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
     private final CommonSignUpTokenProvider commonSignUpTokenProvider;
+    private final RefreshTokenCookieManager refreshTokenCookieManager;
 
     @PostMapping("/apple")
     public ResponseEntity<OAuthResponse> processAppleOAuth(
-            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
+            HttpServletResponse httpServletResponse
     ) {
         OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
+        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
+            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
+        }
         return ResponseEntity.ok(oAuthResponse);
     }
 
     @PostMapping("/kakao")
     public ResponseEntity<OAuthResponse> processKakaoOAuth(
-            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
+            HttpServletResponse httpServletResponse
     ) {
         OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
+        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
+            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
+        }
         return ResponseEntity.ok(oAuthResponse);
     }
 
     @PostMapping("/email/sign-in")
     public ResponseEntity<SignInResponse> signInWithEmail(
-            @Valid @RequestBody EmailSignInRequest signInRequest
+            @Valid @RequestBody EmailSignInRequest signInRequest,
+            HttpServletResponse httpServletResponse
     ) {
         SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
+        refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         return ResponseEntity.ok(signInResponse);
     }
 
@@ -94,20 +107,24 @@ public class AuthController {
 
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(
-            Authentication authentication
+            Authentication authentication,
+            HttpServletResponse httpServletResponse
     ) {
         String accessToken = getAccessToken(authentication);
         authService.signOut(accessToken);
+        refreshTokenCookieManager.deleteCookie(httpServletResponse);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/quit")
     public ResponseEntity<Void> quit(
+            @AuthorizedUser long siteUserId,
             Authentication authentication,
-            @AuthorizedUser long siteUserId
+            HttpServletResponse httpServletResponse
     ) {
         String accessToken = getAccessToken(authentication);
         authService.quit(siteUserId, accessToken);
+        refreshTokenCookieManager.deleteCookie(httpServletResponse);
         return ResponseEntity.ok().build();
     }
 
