@@ -28,8 +28,6 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    private boolean hasAttachment = false;
-
     private long senderId;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -22,7 +22,6 @@ CREATE TABLE chat_message
 (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(500) NOT NULL,
-    has_attachment BOOLEAN NOT NULL DEFAULT false,
     sender_id BIGINT NOT NULL,
     chat_room_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL,
