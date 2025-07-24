@@ -85,7 +85,7 @@ class CommentServiceTest {
             List<Comment> comments = List.of(parentComment, childComment);
 
             // when
-            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
@@ -122,7 +122,7 @@ class CommentServiceTest {
             commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
 
             // when
-            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
@@ -141,7 +141,7 @@ class CommentServiceTest {
             commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
 
             // when
-            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
@@ -171,7 +171,7 @@ class CommentServiceTest {
             commentRepository.saveAll(List.of(parentComment, childComment1, childComment2));
 
             // when
-            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1, post.getId());
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
@@ -198,7 +198,7 @@ class CommentServiceTest {
             CommentCreateRequest request = new CommentCreateRequest(post.getId(), "댓글", null);
 
             // when
-            CommentCreateResponse response = commentService.createComment(user1, request);
+            CommentCreateResponse response = commentService.createComment(user1.getId(), request);
 
             // then
             Comment savedComment = commentRepository.findById(response.id()).orElseThrow();
@@ -218,7 +218,7 @@ class CommentServiceTest {
             CommentCreateRequest request = new CommentCreateRequest(post.getId(), "자식 댓글", parentComment.getId());
 
             // when
-            CommentCreateResponse response = commentService.createComment(user2, request);
+            CommentCreateResponse response = commentService.createComment(user2.getId(), request);
 
             // then
             Comment savedComment = commentRepository.findById(response.id()).orElseThrow();
@@ -241,7 +241,7 @@ class CommentServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        commentService.createComment(
-                                               user1,
+                                               user1.getId(),
                                                request
                                        ))
                     .isInstanceOf(CustomException.class)
@@ -257,7 +257,7 @@ class CommentServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        commentService.createComment(
-                                               user1,
+                                               user1.getId(),
                                                request
                                        ))
                     .isInstanceOf(CustomException.class)
@@ -275,7 +275,7 @@ class CommentServiceTest {
             CommentUpdateRequest request = new CommentUpdateRequest("수정된 댓글");
 
             // when
-            CommentUpdateResponse response = commentService.updateComment(user1, comment.getId(), request);
+            CommentUpdateResponse response = commentService.updateComment(user1.getId(), comment.getId(), request);
 
             // then
             Comment updatedComment = commentRepository.findById(response.id()).orElseThrow();
@@ -297,7 +297,7 @@ class CommentServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        commentService.updateComment(
-                                               user2,
+                                               user2.getId(),
                                                comment.getId(),
                                                request
                                        ))
@@ -314,7 +314,7 @@ class CommentServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        commentService.updateComment(
-                                               user1,
+                                               user1.getId(),
                                                comment.getId(),
                                                request
                                        ))
@@ -335,7 +335,7 @@ class CommentServiceTest {
             int expectedCommentsCount = comments.size() - 1;
 
             // when
-            CommentDeleteResponse response = commentService.deleteCommentById(user1, comment.getId());
+            CommentDeleteResponse response = commentService.deleteCommentById(user1.getId(), comment.getId());
 
             // then
             assertAll(
@@ -355,7 +355,7 @@ class CommentServiceTest {
             List<Comment> childComments = parentComment.getCommentList();
 
             // when
-            CommentDeleteResponse response = commentService.deleteCommentById(user1, parentComment.getId());
+            CommentDeleteResponse response = commentService.deleteCommentById(user1.getId(), parentComment.getId());
 
             // then
             Comment deletedComment = commentRepository.findById(response.id()).orElseThrow();
@@ -381,7 +381,7 @@ class CommentServiceTest {
             int expectedChildCommentsCount = childComments.size() - 1;
 
             // when
-            CommentDeleteResponse response = commentService.deleteCommentById(user2, childComment1.getId());
+            CommentDeleteResponse response = commentService.deleteCommentById(user2.getId(), childComment1.getId());
 
             // then
             Comment remainingParentComment = commentRepository.findById(parentComment.getId()).orElseThrow();
@@ -404,7 +404,7 @@ class CommentServiceTest {
             // when & then
             assertThatThrownBy(() ->
                                        commentService.deleteCommentById(
-                                               user2,
+                                               user2.getId(),
                                                comment.getId()
                                        ))
                     .isInstanceOf(CustomException.class)

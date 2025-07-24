@@ -31,28 +31,28 @@ public class MentorQueryService {
     private final MentorBatchQueryRepository mentorBatchQueryRepository;
 
     @Transactional(readOnly = true)
-    public MentorDetailResponse getMentorDetails(long mentorId, SiteUser currentUser) {
+    public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUser.getId());
+        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUserId);
 
         return MentorDetailResponse.of(mentor, mentorUser, isApplied);
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, SiteUser siteUser, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
+    public SliceResponse<MentorPreviewResponse> getMentorPreviews(String region, long currentUserId, Pageable pageable) { // todo: 멘토의 '인증' 작업 후 region 필터링 추가
         Slice<Mentor> mentorSlice = mentorRepository.findAllBy(pageable);
         List<Mentor> mentors = mentorSlice.toList();
-        List<MentorPreviewResponse> content = getMentorPreviewResponses(mentors, siteUser);
+        List<MentorPreviewResponse> content = getMentorPreviewResponses(mentors, currentUserId);
 
         return SliceResponse.of(content, mentorSlice);
     }
 
-    private List<MentorPreviewResponse> getMentorPreviewResponses(List<Mentor> mentors, SiteUser siteUser) {
+    private List<MentorPreviewResponse> getMentorPreviewResponses(List<Mentor> mentors, long currentUserId) {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
-        Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, siteUser.getId());
+        Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
 
         List<MentorPreviewResponse> mentorPreviews = new ArrayList<>();
         for (Mentor mentor : mentors) {

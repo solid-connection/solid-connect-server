@@ -3,6 +3,7 @@ package com.example.solidconnection.community.comment.service;
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.comment.domain.Comment;
@@ -36,7 +37,9 @@ public class CommentService {
     private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
-    public List<PostFindCommentResponse> findCommentsByPostId(SiteUser siteUser, Long postId) {
+    public List<PostFindCommentResponse> findCommentsByPostId(long siteUserId, Long postId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
         List<Comment> filteredComments = filterCommentsByDeletionRules(allComments);
 
@@ -83,7 +86,9 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentCreateResponse createComment(SiteUser siteUser, CommentCreateRequest commentCreateRequest) {
+    public CommentCreateResponse createComment(long siteUserId, CommentCreateRequest commentCreateRequest) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getById(commentCreateRequest.postId());
 
         Comment parentComment = null;
@@ -105,7 +110,9 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentUpdateResponse updateComment(SiteUser siteUser, Long commentId, CommentUpdateRequest commentUpdateRequest) {
+    public CommentUpdateResponse updateComment(long siteUserId, Long commentId, CommentUpdateRequest commentUpdateRequest) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Comment comment = commentRepository.getById(commentId);
         validateDeprecated(comment);
         validateOwnership(comment, siteUser);
@@ -122,7 +129,9 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDeleteResponse deleteCommentById(SiteUser siteUser, Long commentId) {
+    public CommentDeleteResponse deleteCommentById(long siteUserId, Long commentId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Comment comment = commentRepository.getById(commentId);
         validateOwnership(comment, siteUser);
 

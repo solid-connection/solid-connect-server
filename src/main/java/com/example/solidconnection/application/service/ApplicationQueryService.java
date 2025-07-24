@@ -1,6 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
@@ -9,6 +10,7 @@ import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
@@ -32,14 +34,17 @@ public class ApplicationQueryService {
     private final ApplicationRepository applicationRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
     public String term;
 
     // todo: 캐싱 정책 변경 시 수정 필요
     @Transactional(readOnly = true)
-    public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
+    public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
         // 1. 대학 지원 정보 필터링 (regionCode, keyword)
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, List.of(keyword));
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
@@ -54,7 +59,9 @@ public class ApplicationQueryService {
     }
 
     @Transactional(readOnly = true)
-    public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
+    public ApplicationsResponse getApplicantsByUserApplications(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Application userLatestApplication = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term);
 
         List<Long> univApplyInfoIds = Stream.of(
@@ -118,7 +125,9 @@ public class ApplicationQueryService {
     }
 
     @Transactional(readOnly = true)
-    public void validateSiteUserCanViewApplicants(SiteUser siteUser) {
+    public void validateSiteUserCanViewApplicants(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);

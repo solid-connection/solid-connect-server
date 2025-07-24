@@ -7,7 +7,6 @@ import com.example.solidconnection.community.comment.dto.CommentDeleteResponse;
 import com.example.solidconnection.community.comment.dto.CommentUpdateRequest;
 import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
 import com.example.solidconnection.community.comment.service.CommentService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,29 +27,29 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<?> createComment(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestBody CommentCreateRequest commentCreateRequest
     ) {
-        CommentCreateResponse response = commentService.createComment(siteUser, commentCreateRequest);
+        CommentCreateResponse response = commentService.createComment(siteUserId, commentCreateRequest);
         return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/{comment_id}")
     public ResponseEntity<?> updateComment(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("comment_id") Long commentId,
             @Valid @RequestBody CommentUpdateRequest commentUpdateRequest
     ) {
-        CommentUpdateResponse response = commentService.updateComment(siteUser, commentId, commentUpdateRequest);
+        CommentUpdateResponse response = commentService.updateComment(siteUserId, commentId, commentUpdateRequest);
         return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/{comment_id}")
     public ResponseEntity<?> deleteCommentById(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("comment_id") Long commentId
     ) {
-        CommentDeleteResponse response = commentService.deleteCommentById(siteUser, commentId);
+        CommentDeleteResponse response = commentService.deleteCommentById(siteUserId, commentId);
         return ResponseEntity.ok().body(response);
     }
 }

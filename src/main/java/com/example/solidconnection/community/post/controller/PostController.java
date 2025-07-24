@@ -12,7 +12,6 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.service.PostCommandService;
 import com.example.solidconnection.community.post.service.PostLikeService;
 import com.example.solidconnection.community.post.service.PostQueryService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
@@ -40,20 +39,20 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<?> createPost(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,
             @RequestParam(value = "file", required = false) List<MultipartFile> imageFile
     ) {
         if (imageFile == null) {
             imageFile = Collections.emptyList();
         }
-        PostCreateResponse post = postCommandService.createPost(siteUser, postCreateRequest, imageFile);
+        PostCreateResponse post = postCommandService.createPost(siteUserId, postCreateRequest, imageFile);
         return ResponseEntity.ok().body(post);
     }
 
     @PatchMapping(value = "/{post_id}")
     public ResponseEntity<?> updatePost(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("post_id") Long postId,
             @Valid @RequestPart("postUpdateRequest") PostUpdateRequest postUpdateRequest,
             @RequestParam(value = "file", required = false) List<MultipartFile> imageFile
@@ -62,44 +61,44 @@ public class PostController {
             imageFile = Collections.emptyList();
         }
         PostUpdateResponse postUpdateResponse = postCommandService.updatePost(
-                siteUser, postId, postUpdateRequest, imageFile
+                siteUserId, postId, postUpdateRequest, imageFile
         );
         return ResponseEntity.ok().body(postUpdateResponse);
     }
 
     @GetMapping("/{post_id}")
     public ResponseEntity<?> findPostById(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("post_id") Long postId
     ) {
-        PostFindResponse postFindResponse = postQueryService.findPostById(siteUser, postId);
+        PostFindResponse postFindResponse = postQueryService.findPostById(siteUserId, postId);
         return ResponseEntity.ok().body(postFindResponse);
     }
 
     @DeleteMapping(value = "/{post_id}")
     public ResponseEntity<?> deletePostById(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("post_id") Long postId
     ) {
-        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(siteUser, postId);
+        PostDeleteResponse postDeleteResponse = postCommandService.deletePostById(siteUserId, postId);
         return ResponseEntity.ok().body(postDeleteResponse);
     }
 
     @PostMapping(value = "/{post_id}/like")
     public ResponseEntity<?> likePost(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("post_id") Long postId
     ) {
-        PostLikeResponse postLikeResponse = postLikeService.likePost(siteUser, postId);
+        PostLikeResponse postLikeResponse = postLikeService.likePost(siteUserId, postId);
         return ResponseEntity.ok().body(postLikeResponse);
     }
 
     @DeleteMapping(value = "/{post_id}/like")
     public ResponseEntity<?> dislikePost(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("post_id") Long postId
     ) {
-        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(siteUser, postId);
+        PostDislikeResponse postDislikeResponse = postLikeService.dislikePost(siteUserId, postId);
         return ResponseEntity.ok().body(postDislikeResponse);
     }
 }

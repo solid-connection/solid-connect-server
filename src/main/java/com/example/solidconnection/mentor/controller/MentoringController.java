@@ -12,7 +12,6 @@ import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,49 +34,49 @@ public class MentoringController {
     @RequireRoleAccess(roles = Role.MENTEE)
     @PostMapping("/apply")
     public ResponseEntity<MentoringApplyResponse> applyMentoring(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestBody MentoringApplyRequest mentoringApplyRequest
     ) {
-        MentoringApplyResponse response = mentoringCommandService.applyMentoring(siteUser.getId(), mentoringApplyRequest);
+        MentoringApplyResponse response = mentoringCommandService.applyMentoring(siteUserId, mentoringApplyRequest);
         return ResponseEntity.ok(response);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/apply")
     public ResponseEntity<MentoringListResponse> getMentorings(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        MentoringListResponse responses = mentoringQueryService.getMentorings(siteUser.getId());
+        MentoringListResponse responses = mentoringQueryService.getMentorings(siteUserId);
         return ResponseEntity.ok(responses);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PatchMapping("/{mentoring-id}/apply")
     public ResponseEntity<MentoringConfirmResponse> confirmMentoring(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("mentoring-id") Long mentoringId,
             @Valid @RequestBody MentoringConfirmRequest mentoringConfirmRequest
     ) {
-        MentoringConfirmResponse response = mentoringCommandService.confirmMentoring(siteUser.getId(), mentoringId, mentoringConfirmRequest);
+        MentoringConfirmResponse response = mentoringCommandService.confirmMentoring(siteUserId, mentoringId, mentoringConfirmRequest);
         return ResponseEntity.ok(response);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @PatchMapping("/{mentoring-id}/check")
     public ResponseEntity<MentoringCheckResponse> checkMentoring(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @PathVariable("mentoring-id") Long mentoringId
     ) {
-        MentoringCheckResponse response = mentoringCommandService.checkMentoring(siteUser.getId(), mentoringId);
+        MentoringCheckResponse response = mentoringCommandService.checkMentoring(siteUserId, mentoringId);
         return ResponseEntity.ok(response);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping("/check")
     public ResponseEntity<MentoringCountResponse> getUncheckedMentoringsCount(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(siteUser.getId());
+        MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(siteUserId);
         return ResponseEntity.ok(response);
     }
 }

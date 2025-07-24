@@ -2,7 +2,6 @@ package com.example.solidconnection.siteuser.controller;
 
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +22,19 @@ class MyPageController {
 
     @GetMapping
     public ResponseEntity<MyPageResponse> getMyPageInfo(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        MyPageResponse myPageResponse = myPageService.getMyPageInfo(siteUser);
+        MyPageResponse myPageResponse = myPageService.getMyPageInfo(siteUserId);
         return ResponseEntity.ok(myPageResponse);
     }
 
     @PatchMapping
     public ResponseEntity<Void> updateMyPageInfo(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @RequestParam(value = "file", required = false) MultipartFile imageFile,
             @RequestParam(value = "nickname", required = false) String nickname
     ) {
-        myPageService.updateMyPageInfo(siteUser, imageFile, nickname);
+        myPageService.updateMyPageInfo(siteUserId, imageFile, nickname);
         return ResponseEntity.ok().build();
     }
 }
