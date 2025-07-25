@@ -14,6 +14,21 @@ public class PostFixture {
     private final PostFixtureBuilder postFixtureBuilder;
 
     public Post 게시글(
+            Board board,
+            SiteUser siteUser
+    ) {
+        return postFixtureBuilder
+                .title("제목")
+                .content("내용")
+                .isQuestion(false)
+                .likeCount(0L)
+                .postCategory(PostCategory.자유)
+                .board(board)
+                .siteUser(siteUser)
+                .create();
+    }
+
+    public Post 게시글(
             String title,
             String content,
             Boolean isQuestion,
