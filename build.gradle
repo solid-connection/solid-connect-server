@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.5'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.flywaydb.flyway' version '9.16.3'
 }
 
 group = 'com.example'
@@ -31,6 +32,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'com.h2database:h2'
 
     // QueryDSL
     implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.11'
@@ -73,4 +75,22 @@ tasks.named('test', Test) {
 // To include QueryDLS classes in compile classpath
 sourceSets {
     main.java.srcDirs += ['build/generated/sources/annotationProcessor/java/main']
+}
+
+// build 단계에서 flyway 검증
+flyway {
+    url = 'jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1'
+    user = 'sa'
+    password = ''
+    locations = ['filesystem:src/main/resources/db/migration']
+    validateMigrationNaming = true
+    ignoreMigrationPatterns = ['*:pending']
+}
+
+tasks.named('build') {
+    dependsOn 'flywayValidate'
+}
+
+tasks.named('bootJar') {
+    dependsOn 'flywayValidate'
 }
