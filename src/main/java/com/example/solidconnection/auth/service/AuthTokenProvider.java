@@ -1,7 +1,9 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,12 +13,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthTokenProvider {
 
+    private static final String ROLE_CLAIM_KEY = "role";
+
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
 
-    public AccessToken generateAccessToken(Subject subject) {
-        String token = tokenProvider.generateToken(subject.value(), TokenType.ACCESS);
-        return new AccessToken(subject, token);
+    public AccessToken generateAccessToken(Subject subject, Role role) {
+        String token = tokenProvider.generateToken(
+                subject.value(), Map.of(ROLE_CLAIM_KEY, role.name()), TokenType.ACCESS
+        );
+        return new AccessToken(subject, role, token);
     }
 
     public RefreshToken generateAndSaveRefreshToken(Subject subject) {
@@ -50,9 +56,5 @@ public class AuthTokenProvider {
 
     public Subject toSubject(SiteUser siteUser) {
         return new Subject(siteUser.getId().toString());
-    }
-
-    public AccessToken toAccessToken(String token) {
-        return new AccessToken(parseSubject(token), token);
     }
 }

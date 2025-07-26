@@ -16,7 +16,7 @@ public class SignInService {
     public SignInResponse signIn(SiteUser siteUser) {
         resetQuitedAt(siteUser);
         Subject subject = authTokenProvider.toSubject(siteUser);
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject, siteUser.getRole());
         RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(subject);
         return SignInResponse.of(accessToken, refreshToken);
     }
