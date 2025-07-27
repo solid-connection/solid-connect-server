@@ -34,4 +34,12 @@ public class ChatParticipant extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
+
+    public ChatParticipant(long siteUserId, ChatRoom chatRoom) {
+        this.siteUserId = siteUserId;
+        this.chatRoom = chatRoom;
+        if (chatRoom != null) {
+            chatRoom.getChatParticipants().add(this);
+        }
+    }
 }

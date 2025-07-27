@@ -35,4 +35,13 @@ public class ChatMessage extends BaseEntity {
 
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL)
     private List<ChatAttachment> chatAttachments = new ArrayList<>();
+
+    public ChatMessage(String content, long senderId, ChatRoom chatRoom) {
+        this.content = content;
+        this.senderId = senderId;
+        this.chatRoom = chatRoom;
+        if (chatRoom != null) {
+            chatRoom.getChatMessages().add(this);
+        }
+    }
 }

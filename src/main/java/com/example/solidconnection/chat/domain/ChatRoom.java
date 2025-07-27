@@ -29,4 +29,8 @@ public class ChatRoom extends BaseEntity {
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatMessage> chatMessages = new ArrayList<>();
+
+    public ChatRoom(boolean isGroup) {
+        this.isGroup = isGroup;
+    }
 }
