@@ -27,20 +27,16 @@ public class StompHandler implements ChannelInterceptor {
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            log.info("CONNECT 요청 - 토큰 검증 시작");
             Claims claims = validateAndExtractClaims(accessor, AUTHENTICATION_FAILED);
-            log.info("토큰 검증 성공 - 사용자: {}", claims.getSubject());
         }
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-            log.info("SUBSCRIBE 요청 - 검증 시작");
             Claims claims = validateAndExtractClaims(accessor, AUTHENTICATION_FAILED);
 
             String email = claims.getSubject();
             String destination = accessor.getDestination();
 
             String roomId = extractRoomId(destination);
-            log.info("사용자 {}가 룸 {} 구독 시도", email, roomId);
 
             // todo: roomId 기반 실제 구독 권한 검사 로직 추가
         }
