@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +38,13 @@ public class ChatController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         SliceResponse<ChatMessageResponse> response = chatService.getChatMessages(siteUserId, roomId, pageable);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/rooms/{room-id}/read")
+    public ResponseEntity<Void> markChatMessagesAsRead(
+            @AuthorizedUser long siteUserId,
+            @PathVariable("room-id") Long roomId) {
+        chatService.markChatMessagesAsRead(siteUserId, roomId);
+        return ResponseEntity.ok().build();
     }
 }
