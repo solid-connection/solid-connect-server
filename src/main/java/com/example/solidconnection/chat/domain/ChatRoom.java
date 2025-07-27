@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -25,6 +26,7 @@ public class ChatRoom extends BaseEntity {
     private boolean isGroup = false;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @BatchSize(size = 10)
     private final List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
