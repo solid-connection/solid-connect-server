@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.example.solidconnection.chat.domain.ChatAttachment;
 import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatParticipant;
+import com.example.solidconnection.chat.domain.ChatReadStatus;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
@@ -18,11 +19,13 @@ import com.example.solidconnection.chat.fixture.ChatMessageFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatReadStatusFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
+import com.example.solidconnection.chat.repository.ChatReadStatusRepositoryForTest;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +41,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatService chatService;
+
+    @Autowired
+    private ChatReadStatusRepositoryForTest chatReadStatusRepositoryForTest;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -304,6 +310,70 @@ class ChatServiceTest {
 
             // when & then
             assertThatCode(() -> chatService.getChatMessages(user.getId(), nonExistentRoomId, pageable))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CHAT_ROOM_ACCESS_DENIED.getMessage());
+        }
+    }
+
+    @Nested
+    class 채팅_메시지_읽음을_처리한다 {
+
+        private ChatRoom chatRoom;
+        private ChatParticipant participant;
+
+        @BeforeEach
+        void setUp() {
+            chatRoom = chatRoomFixture.채팅방(false);
+            participant = chatParticipantFixture.참여자(user.getId(), chatRoom);
+            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+        }
+
+        @Test
+        void 처음_읽음_처리_시_새로운_읽음_상태를_생성한다() {
+            // given
+            chatMessageFixture.메시지("읽지 않은 메시지1", mentor1.getId(), chatRoom);
+            chatMessageFixture.메시지("읽지 않은 메시지2", mentor1.getId(), chatRoom);
+
+            // when
+            chatService.markChatMessagesAsRead(user.getId(), chatRoom.getId());
+
+            // then
+            ChatReadStatus afterStatus = chatReadStatusRepositoryForTest
+                    .findByChatRoomIdAndChatParticipantId(chatRoom.getId(), participant.getId())
+                    .orElseThrow();
+
+            assertThat(afterStatus.getChatRoomId()).isEqualTo(chatRoom.getId());
+        }
+
+        @Test
+        void 기존_읽음_상태가_있으면_updatedAt을_갱신한다() {
+            // given
+            ChatReadStatus chatReadStatus = chatReadStatusFixture.읽음상태(chatRoom.getId(), participant.getId());
+            ZonedDateTime updatedAt = chatReadStatus.getUpdatedAt();
+            chatMessageFixture.메시지("새로운 메시지", mentor1.getId(), chatRoom);
+
+            // when
+            chatService.markChatMessagesAsRead(user.getId(), chatRoom.getId());
+
+            // then
+            ChatReadStatus updatedStatus = chatReadStatusRepositoryForTest
+                    .findByChatRoomIdAndChatParticipantId(chatRoom.getId(), participant.getId())
+                    .orElseThrow();
+            assertAll(
+                    () -> assertThat(updatedStatus.getId()).isEqualTo(chatReadStatus.getId()),
+                    () -> assertThat(updatedStatus.getUpdatedAt()).isAfter(updatedAt)
+            );
+        }
+
+        @Test
+        void 채팅방_참여자가_아니면_예외가_발생한다() {
+            // given
+            ChatRoom chatRoom = chatRoomFixture.채팅방(false);
+            chatParticipantFixture.참여자(user.getId(), chatRoom);
+            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+
+            // when & then
+            assertThatCode(() -> chatService.markChatMessagesAsRead(mentor2.getId(), chatRoom.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_ROOM_ACCESS_DENIED.getMessage());
         }
