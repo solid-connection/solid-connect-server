@@ -1,5 +1,6 @@
 package com.example.solidconnection.chat.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTICIPANT_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNER_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_ROOM_ACCESS_DENIED;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_CHAT_ROOM_STATE;
@@ -15,6 +16,7 @@ import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatParticipantRepository;
+import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -38,6 +40,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
@@ -95,13 +98,6 @@ public class ChatService {
         return SliceResponse.of(content, chatMessages);
     }
 
-    private void validateChatRoomParticipant(long siteUserId, long roomId) {
-        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
-        if (!isParticipant) {
-            throw new CustomException(CHAT_ROOM_ACCESS_DENIED);
-        }
-    }
-
     private ChatMessageResponse toChatMessageResponse(ChatMessage message) {
         List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
                 .map(attachment -> ChatAttachmentResponse.of(
@@ -120,5 +116,22 @@ public class ChatService {
                 message.getCreatedAt(),
                 attachments
         );
+    }
+
+    @Transactional
+    public void markChatMessagesAsRead(long siteUserId, long roomId) {
+        validateChatRoomParticipant(siteUserId, roomId);
+
+        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
+
+        chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
+    }
+
+    private void validateChatRoomParticipant(long siteUserId, long roomId) {
+        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
+        if (!isParticipant) {
+            throw new CustomException(CHAT_ROOM_ACCESS_DENIED);
+        }
     }
 }
