@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -35,9 +36,9 @@ class RoleAuthorizationAspectTest {
 
         // when & then
         assertAll(
-                () -> assertThatCode(() -> testService.adminOnlyMethod(admin))
+                () -> assertThatCode(() -> testService.adminOnlyMethod(admin.getId()))
                         .doesNotThrowAnyException(),
-                () -> assertThatCode(() -> testService.mentorOrAdminMethod(mentor))
+                () -> assertThatCode(() -> testService.mentorOrAdminMethod(mentor.getId()))
                         .doesNotThrowAnyException()
         );
     }
@@ -48,7 +49,7 @@ class RoleAuthorizationAspectTest {
         SiteUser user = siteUserFixture.사용자();
 
         // when & then
-        assertThatCode(() -> testService.mentorOrAdminMethod(user))
+        assertThatCode(() -> testService.mentorOrAdminMethod(user.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ACCESS_DENIED.getMessage());
     }
@@ -62,11 +63,11 @@ class RoleAuthorizationAspectTest {
 
         // when & then
         assertAll(
-                () -> assertThatCode(() -> testService.publicMethod(admin))
+                () -> assertThatCode(() -> testService.publicMethod(admin.getId()))
                         .doesNotThrowAnyException(),
-                () -> assertThatCode(() -> testService.publicMethod(mentor))
+                () -> assertThatCode(() -> testService.publicMethod(mentor.getId()))
                         .doesNotThrowAnyException(),
-                () -> assertThatCode(() -> testService.publicMethod(user))
+                () -> assertThatCode(() -> testService.publicMethod(user.getId()))
                         .doesNotThrowAnyException()
         );
     }
@@ -84,16 +85,16 @@ class RoleAuthorizationAspectTest {
     static class TestService {
 
         @RequireRoleAccess(roles = {Role.ADMIN})
-        public boolean adminOnlyMethod(SiteUser siteUser) {
+        public boolean adminOnlyMethod(@AuthorizedUser long siteUserId) {
             return true;
         }
 
         @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
-        public boolean mentorOrAdminMethod(SiteUser siteUser) {
+        public boolean mentorOrAdminMethod(@AuthorizedUser long siteUserId) {
             return true;
         }
 
-        public boolean publicMethod(SiteUser siteUser) {
+        public boolean publicMethod(@AuthorizedUser long siteUserId) {
             return true;
         }
     }
