@@ -5,6 +5,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_N
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
+import com.example.solidconnection.chat.domain.ChatParticipant;
+import com.example.solidconnection.chat.domain.ChatRoom;
+import com.example.solidconnection.chat.repository.ChatParticipantRepository;
+import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
@@ -16,6 +20,8 @@ import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +32,8 @@ public class MentoringCommandService {
 
     private final MentoringRepository mentoringRepository;
     private final MentorRepository mentorRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatParticipantRepository chatParticipantRepository;
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
@@ -49,6 +57,8 @@ public class MentoringCommandService {
 
         if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
             mentor.increaseMenteeCount();
+            // todo : 예외 처리 관련 고려 필요
+            createChatRoomIfNotExists(mentor.getSiteUserId(), mentoring.getMenteeId());
         }
 
         return MentoringConfirmResponse.from(mentoring);
@@ -58,6 +68,21 @@ public class MentoringCommandService {
         if (mentoring.getVerifyStatus() != VerifyStatus.PENDING) {
             throw new CustomException(MENTORING_ALREADY_CONFIRMED);
         }
+    }
+
+    private void createChatRoomIfNotExists(long mentorUserId, long menteeUserId) {
+        Optional<ChatRoom> existingChatRoom = chatRoomRepository.findOneOnOneChatRoomByParticipants(mentorUserId, menteeUserId);
+        if (existingChatRoom.isPresent()) {
+            return;
+        }
+
+        ChatRoom newChatRoom = new ChatRoom(false);
+        ChatRoom savedChatRoom = chatRoomRepository.save(newChatRoom);
+
+        ChatParticipant mentorParticipant = new ChatParticipant(mentorUserId, savedChatRoom);
+        ChatParticipant menteeParticipant = new ChatParticipant(menteeUserId, savedChatRoom);
+
+        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
     }
 
     @Transactional
