@@ -115,6 +115,10 @@ public enum ErrorCode {
     // report
     ALREADY_REPORTED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 신고한 상태입니다."),
 
+    // chat
+    CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
+    INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
+
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
 
