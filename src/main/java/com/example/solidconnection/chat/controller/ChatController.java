@@ -1,11 +1,17 @@
 package com.example.solidconnection.chat.controller;
 
+import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.service.ChatService;
+import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,5 +28,14 @@ public class ChatController {
     ) {
         ChatRoomListResponse chatRoomListResponse = chatService.getChatRooms(siteUserId);
         return ResponseEntity.ok(chatRoomListResponse);
+    }
+
+    @GetMapping("/rooms/{room-id}")
+    public ResponseEntity<SliceResponse<ChatMessageResponse>> getChatMessages(
+            @AuthorizedUser long siteUserId,
+            @PathVariable("room-id") Long roomId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        SliceResponse<ChatMessageResponse> response = chatService.getChatMessages(siteUserId, roomId, pageable);
+        return ResponseEntity.ok(response);
     }
 }
