@@ -45,6 +45,7 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
+        // todo : n + 1 문제 해결 필요!
         List<ChatRoom> chatRooms = chatRoomRepository.findOneOnOneChatRoomsByUserId(siteUserId);
         List<ChatRoomResponse> chatRoomInfos = chatRooms.stream()
                 .map(chatRoom -> toChatRoomResponse(chatRoom, siteUserId))
