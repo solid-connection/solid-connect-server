@@ -1,9 +1,7 @@
 package com.example.solidconnection.chat.repository;
 
-import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,14 +19,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
            ) DESC NULLS LAST
            """)
     List<ChatRoom> findOneOnOneChatRoomsByUserId(@Param("userId") long userId);
-
-    @Query("""
-           SELECT cm FROM ChatMessage cm
-           WHERE cm.chatRoom.id = :chatRoomId
-           ORDER BY cm.createdAt DESC
-           LIMIT 1
-           """)
-    Optional<ChatMessage> findLatestMessageByChatRoomId(@Param("chatRoomId") long chatRoomId);
 
     @Query("""
            SELECT COUNT(cm) FROM ChatMessage cm

@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.repository;
 
 import com.example.solidconnection.chat.domain.ChatMessage;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,12 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
            ORDER BY cm.createdAt DESC
            """)
     Slice<ChatMessage> findByRoomIdWithPaging(@Param("roomId") long roomId, Pageable pageable);
+
+    @Query("""
+           SELECT cm FROM ChatMessage cm
+           WHERE cm.chatRoom.id = :chatRoomId
+           ORDER BY cm.createdAt DESC
+           LIMIT 1
+           """)
+    Optional<ChatMessage> findLatestMessageByChatRoomId(@Param("chatRoomId") long chatRoomId);
 }
