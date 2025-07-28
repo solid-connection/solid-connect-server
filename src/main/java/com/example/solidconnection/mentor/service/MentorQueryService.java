@@ -1,6 +1,7 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -12,6 +13,8 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.repository.UniversityRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +32,19 @@ public class MentorQueryService {
     private final MentoringRepository mentoringRepository;
     private final SiteUserRepository siteUserRepository;
     private final MentorBatchQueryRepository mentorBatchQueryRepository;
+    private final UniversityRepository universityRepository;
 
     @Transactional(readOnly = true)
     public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+        University university = universityRepository.findById(mentor.getUniversityId())
+                .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUserId);
 
-        return MentorDetailResponse.of(mentor, mentorUser, isApplied);
+        return MentorDetailResponse.of(mentor, mentorUser, university, isApplied);
     }
 
     @Transactional(readOnly = true)

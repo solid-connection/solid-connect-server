@@ -2,6 +2,7 @@ package com.example.solidconnection.mentor.dto;
 
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.university.domain.University;
 import java.util.List;
 
 public record MentorDetailResponse(
@@ -19,13 +20,14 @@ public record MentorDetailResponse(
         boolean isApplied
 ) {
 
-    public static MentorDetailResponse of(Mentor mentor, SiteUser mentorUser, boolean isApplied) {
+    public static MentorDetailResponse of(Mentor mentor, SiteUser mentorUser,
+                                          University university, boolean isApplied) {
         return new MentorDetailResponse(
                 mentor.getId(),
                 mentorUser.getNickname(),
                 mentorUser.getProfileImageUrl(),
-                "국가", // todo: 교환학생 기록이 인증되면 추가
-                "대학 이름",  // todo: 교환학생 기록이 인증되면 추가
+                university.getCountry().getKoreanName(),
+                university.getKoreanName(),
                 mentor.getTerm(),
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),

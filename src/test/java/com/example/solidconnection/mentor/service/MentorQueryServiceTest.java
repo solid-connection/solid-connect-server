@@ -18,6 +18,8 @@ import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,8 +49,16 @@ class MentorQueryServiceTest {
     @Autowired
     private ChannelFixture channelFixture;
 
-    private long universityId = 1L; // todo: 멘토 인증 기능 추가 변경 필요
+    @Autowired
+    private UniversityFixture universityFixture;
+
+    private University university;
     private String region = "아시아";
+
+    @BeforeEach
+    void setUp() {
+        university = universityFixture.그라츠_대학();
+    }
 
     @Nested
     class 멘토_단일_조회_성공 {
@@ -58,7 +68,7 @@ class MentorQueryServiceTest {
             // given
             SiteUser siteUser = siteUserFixture.사용자();
             SiteUser mentorUser = siteUserFixture.사용자(1, "멘토");
-            Mentor mentor = mentorFixture.멘토(mentorUser.getId(), universityId);
+            Mentor mentor = mentorFixture.멘토(mentorUser.getId(), university.getId());
             Channel channel1 = channelFixture.채널(1, mentor);
             Channel channel2 = channelFixture.채널(2, mentor);
 
@@ -69,6 +79,8 @@ class MentorQueryServiceTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(mentor.getId()),
                     () -> assertThat(response.nickname()).isEqualTo(mentorUser.getNickname()),
+                    () -> assertThat(response.universityName()).isEqualTo(university.getKoreanName()),
+                    () -> assertThat(response.country()).isEqualTo(university.getCountry().getKoreanName()),
                     () -> assertThat(response.channels()).extracting(ChannelResponse::url)
                             .containsExactly(channel1.getUrl(), channel2.getUrl())
             );
@@ -78,7 +90,7 @@ class MentorQueryServiceTest {
         void 멘토에_대한_나의_멘토링_신청_여부를_조회한다() {
             // given
             SiteUser mentorUser = siteUserFixture.사용자(1, "멘토");
-            Mentor mentor = mentorFixture.멘토(mentorUser.getId(), universityId);
+            Mentor mentor = mentorFixture.멘토(mentorUser.getId(), university.getId());
 
             SiteUser notAppliedUser = siteUserFixture.사용자(2, "멘토링 지원 안한 사용자");
             SiteUser appliedUser = siteUserFixture.사용자(3, "멘토링 지원한 사용자");
