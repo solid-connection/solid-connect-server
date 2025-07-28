@@ -44,6 +44,9 @@ public class Mentor {
     @Column
     private long universityId;
 
+    @Column(length = 50, nullable = false)
+    private String term;
+
     @BatchSize(size = 10)
     @OrderBy("sequence ASC")
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)

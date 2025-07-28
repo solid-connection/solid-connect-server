@@ -17,6 +17,7 @@ public class MentorFixtureBuilder {
     private String passTip;
     private long siteUserId;
     private long universityId;
+    private String term = "2025-1";
 
     public MentorFixtureBuilder mentor() {
         return new MentorFixtureBuilder(mentorRepository);
@@ -52,6 +53,11 @@ public class MentorFixtureBuilder {
         return this;
     }
 
+    public MentorFixtureBuilder term(String term) {
+        this.term = term;
+        return this;
+    }
+
     public Mentor create() {
         Mentor mentor = new Mentor(
                 null,
@@ -61,6 +67,7 @@ public class MentorFixtureBuilder {
                 passTip,
                 siteUserId,
                 universityId,
+                term,
                 null
         );
         return mentorRepository.save(mentor);
