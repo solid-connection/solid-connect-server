@@ -130,14 +130,17 @@ class MentorQueryServiceTest {
 
         private Mentor mentor1, mentor2;
         private SiteUser mentorUser1, mentorUser2, currentUser;
+        private University university1, university2;
 
         @BeforeEach
         void setUp() {
             currentUser = siteUserFixture.사용자(1, "사용자1");
             mentorUser1 = siteUserFixture.사용자(2, "멘토1");
             mentorUser2 = siteUserFixture.사용자(3, "멘토2");
-            mentor1 = mentorFixture.멘토(mentorUser1.getId(), universityId);
-            mentor2 = mentorFixture.멘토(mentorUser2.getId(), universityId);
+            university1 = universityFixture.괌_대학();
+            university2 = universityFixture.린츠_카톨릭_대학();
+            mentor1 = mentorFixture.멘토(mentorUser1.getId(), university1.getId());
+            mentor2 = mentorFixture.멘토(mentorUser2.getId(), university2.getId());
         }
 
         @Test
@@ -152,15 +155,19 @@ class MentorQueryServiceTest {
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
                     .collect(Collectors.toMap(MentorPreviewResponse::id, Function.identity()));
-
+            MentorPreviewResponse mentor1Response = mentorPreviewMap.get(mentor1.getId());
+            MentorPreviewResponse mentor2Response = mentorPreviewMap.get(mentor2.getId());
             assertAll(
-                    () -> assertThat(mentorPreviewMap.get(mentor1.getId())).extracting(MentorPreviewResponse::nickname)
-                            .isEqualTo(mentorUser1.getNickname()),
-                    () -> assertThat(mentorPreviewMap.get(mentor1.getId()).channels()).extracting(ChannelResponse::url)
+                    () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
+                    () -> assertThat(mentor1Response.universityName()).isEqualTo(university1.getKoreanName()),
+                    () -> assertThat(mentor1Response.country()).isEqualTo(university1.getCountry().getKoreanName()),
+                    () -> assertThat(mentor1Response.channels()).extracting(ChannelResponse::url)
                             .containsOnly(channel1.getUrl()),
-                    () -> assertThat(mentorPreviewMap.get(mentor2.getId())).extracting(MentorPreviewResponse::nickname)
-                            .isEqualTo(mentorUser2.getNickname()),
-                    () -> assertThat(mentorPreviewMap.get(mentor2.getId()).channels()).extracting(ChannelResponse::url)
+
+                    () -> assertThat(mentor2Response.nickname()).isEqualTo(mentorUser2.getNickname()),
+                    () -> assertThat(mentor2Response.universityName()).isEqualTo(university2.getKoreanName()),
+                    () -> assertThat(mentor2Response.country()).isEqualTo(university2.getCountry().getKoreanName()),
+                    () -> assertThat(mentor2Response.channels()).extracting(ChannelResponse::url)
                             .containsOnly(channel2.getUrl())
             );
         }

@@ -58,13 +58,15 @@ public class MentorQueryService {
 
     private List<MentorPreviewResponse> getMentorPreviewResponses(List<Mentor> mentors, long currentUserId) {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
+        Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
 
         List<MentorPreviewResponse> mentorPreviews = new ArrayList<>();
         for (Mentor mentor : mentors) {
             SiteUser mentorUser = mentorIdToSiteUser.get(mentor.getId());
+            University university = mentorIdToUniversity.get(mentor.getId());
             boolean isApplied = mentorIdToIsApplied.get(mentor.getId());
-            MentorPreviewResponse response = MentorPreviewResponse.of(mentor, mentorUser, isApplied);
+            MentorPreviewResponse response = MentorPreviewResponse.of(mentor, mentorUser, university, isApplied);
             mentorPreviews.add(response);
         }
         return mentorPreviews;

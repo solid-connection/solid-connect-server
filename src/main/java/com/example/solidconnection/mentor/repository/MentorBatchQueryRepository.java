@@ -7,6 +7,8 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.repository.UniversityRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +23,7 @@ public class MentorBatchQueryRepository { // 연관관계가 설정되지 않은
 
     private final SiteUserRepository siteUserRepository;
     private final MentoringRepository mentoringRepository;
+    private final UniversityRepository universityRepository;
 
     public Map<Long, SiteUser> getMentorIdToSiteUserMap(List<Mentor> mentors) {
         List<Long> mentorUserIds = mentors.stream().map(Mentor::getSiteUserId).toList();
@@ -36,6 +39,24 @@ public class MentorBatchQueryRepository { // 연관관계가 설정되지 않은
                         throw new CustomException(DATA_INTEGRITY_VIOLATION, "mentor에 해당하는 siteUser 존재하지 않음");
                     }
                     return mentorUser;
+                }
+        ));
+    }
+
+    public Map<Long, University> getMentorIdToUniversityMap(List<Mentor> mentors) {
+        List<Long> universityIds = mentors.stream().map(Mentor::getUniversityId).toList();
+        List<University> universities = universityRepository.findAllById(universityIds);
+        Map<Long, University> universityIdToUniversityMap = universities.stream()
+                .collect(Collectors.toMap(University::getId, Function.identity()));
+
+        return mentors.stream().collect(Collectors.toMap(
+                Mentor::getId,
+                mentor -> {
+                    University university = universityIdToUniversityMap.get(mentor.getUniversityId());
+                    if (university == null) { // mentor.university_id에 해당하는 대학이 없으면 정합성 문제가 발생한 것
+                        throw new CustomException(DATA_INTEGRITY_VIOLATION, "mentor.university_id 에 해당하는 university 존재하지 않음");
+                    }
+                    return university;
                 }
         ));
     }
