@@ -1,7 +1,6 @@
 package com.example.solidconnection.mentor.dto;
 
 import com.example.solidconnection.mentor.domain.Mentor;
-import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.util.List;
 
@@ -9,9 +8,9 @@ public record MentorMyPageResponse(
         long id,
         String profileImageUrl,
         String nickname,
-        ExchangeStatus exchangeStatus,
         String country,
         String universityName,
+        String term,
         int menteeCount,
         boolean hasBadge,
         String introduction,
@@ -23,9 +22,9 @@ public record MentorMyPageResponse(
                 mentor.getId(),
                 siteUser.getProfileImageUrl(),
                 siteUser.getNickname(),
-                siteUser.getExchangeStatus(),
                 "국가", // todo: 교환학생 기록이 인증되면 추가
                 "대학 이름",
+                mentor.getTerm(),
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),
