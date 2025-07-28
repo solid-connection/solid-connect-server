@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,11 +33,16 @@ class AuthTokenProviderTest {
     @Test
     void 액세스_토큰을_생성한다() {
         // when
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
+        Role expectedRole = Role.MENTEE;
+        AccessToken accessToken = authTokenProvider.generateAccessToken(subject, expectedRole);
 
         // then
         String actualSubject = authTokenProvider.parseSubject(accessToken.token()).value();
-        assertThat(actualSubject).isEqualTo(subject.value());
+        assertAll(
+                () -> assertThat(actualSubject).isEqualTo(subject.value()),
+                () -> assertThat(accessToken.role()).isEqualTo(expectedRole),
+                () -> assertThat(accessToken.token()).isNotNull()
+        );
     }
 
     @Nested
@@ -61,7 +67,7 @@ class AuthTokenProviderTest {
         void 유효한_리프레시_토큰인지_확인한다() {
             // given
             RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(subject);
-            AccessToken fakeRefreshToken = authTokenProvider.generateAccessToken(subject);
+            AccessToken fakeRefreshToken = authTokenProvider.generateAccessToken(subject, Role.MENTEE);
 
             // when, then
             assertAll(
@@ -74,7 +80,7 @@ class AuthTokenProviderTest {
         void 액세스_토큰에_해당하는_리프레시_토큰을_삭제한다() {
             // given
             authTokenProvider.generateAndSaveRefreshToken(subject);
-            AccessToken accessToken = authTokenProvider.generateAccessToken(subject);
+            AccessToken accessToken = authTokenProvider.generateAccessToken(subject, Role.MENTEE);
 
             // when
             authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
@@ -88,7 +94,7 @@ class AuthTokenProviderTest {
     @Test
     void 토큰으로부터_Subject_를_추출한다() {
         // given
-        String accessToken = authTokenProvider.generateAccessToken(subject).token();
+        String accessToken = authTokenProvider.generateAccessToken(subject, Role.MENTEE).token();
 
         // when
         Subject actualSubject = authTokenProvider.parseSubject(accessToken);
