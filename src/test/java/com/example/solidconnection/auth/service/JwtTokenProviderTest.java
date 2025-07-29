@@ -35,22 +35,46 @@ class JwtTokenProviderTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @Test
-    void 토큰을_생성한다() {
-        // given
-        String actualSubject = "subject123";
-        TokenType actualTokenType = TokenType.ACCESS;
+    @Nested
+    class 토큰을_생성한다 {
 
-        // when
-        String token = tokenProvider.generateToken(actualSubject, actualTokenType);
+        @Test
+        void subject_만_있는_토큰을_생성한다() {
+            // given
+            String actualSubject = "subject123";
+            TokenType actualTokenType = TokenType.ACCESS;
 
-        // then - subject와 만료 시간이 일치하는지 검증
-        Claims claims = tokenProvider.parseClaims(token);
-        long expectedExpireTime = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
-        assertAll(
-                () -> assertThat(claims.getSubject()).isEqualTo(actualSubject),
-                () -> assertThat(expectedExpireTime).isEqualTo(actualTokenType.getExpireTime())
-        );
+            // when
+            String token = tokenProvider.generateToken(actualSubject, actualTokenType);
+
+            // then - subject와 만료 시간이 일치하는지 검증
+            Claims claims = tokenProvider.parseClaims(token);
+            long expectedExpireTime = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+            assertAll(
+                    () -> assertThat(claims.getSubject()).isEqualTo(actualSubject),
+                    () -> assertThat(expectedExpireTime).isEqualTo(actualTokenType.getExpireTime())
+            );
+        }
+
+        @Test
+        void subject_와_claims_가_있는_토큰을_생성한다() {
+            // given
+            String actualSubject = "subject123";
+            Map<String, String> customClaims = Map.of("key1", "value1", "key2", "value2");
+            TokenType actualTokenType = TokenType.ACCESS;
+
+            // when
+            String token = tokenProvider.generateToken(actualSubject, customClaims, actualTokenType);
+
+            // then - subject와 커스텀 클레임이 일치하는지 검증
+            Claims claims = tokenProvider.parseClaims(token);
+            long expectedExpireTime = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+            assertAll(
+                    () -> assertThat(claims.getSubject()).isEqualTo(actualSubject),
+                    () -> assertThat(claims).containsAllEntriesOf(customClaims),
+                    () -> assertThat(expectedExpireTime).isEqualTo(actualTokenType.getExpireTime())
+            );
+        }
     }
 
     @Test
