@@ -1,5 +1,8 @@
 package com.example.solidconnection.chat.config;
 
+import com.example.solidconnection.chat.config.StompProperties.HeartbeatProperties;
+import com.example.solidconnection.chat.config.StompProperties.InboundProperties;
+import com.example.solidconnection.chat.config.StompProperties.OutboundProperties;
 import com.example.solidconnection.security.config.CorsProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,25 +27,19 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         List<String> strings = corsProperties.allowedOrigins();
         String[] allowedOrigins = strings.toArray(String[]::new);
-        registry.addEndpoint("/connect")
-                .setAllowedOrigins(allowedOrigins)
-                .withSockJS();
+        registry.addEndpoint("/connect").setAllowedOrigins(allowedOrigins).withSockJS();
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler)
-                .taskExecutor()
-                .corePoolSize(stompProperties.threadPool().inbound().corePoolSize())
-                .maxPoolSize(stompProperties.threadPool().inbound().maxPoolSize())
-                .queueCapacity(stompProperties.threadPool().inbound().queueCapacity());
+        InboundProperties inboundProperties = stompProperties.threadPool().inbound();
+        registration.interceptors(stompHandler).taskExecutor().corePoolSize(inboundProperties.corePoolSize()).maxPoolSize(inboundProperties.maxPoolSize()).queueCapacity(inboundProperties.queueCapacity());
     }
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.taskExecutor()
-                .corePoolSize(stompProperties.threadPool().outbound().corePoolSize())
-                .maxPoolSize(stompProperties.threadPool().outbound().maxPoolSize());
+        OutboundProperties outboundProperties = stompProperties.threadPool().outbound();
+        registration.taskExecutor().corePoolSize(outboundProperties.corePoolSize()).maxPoolSize(outboundProperties.maxPoolSize());
     }
 
     @Override
@@ -51,13 +48,8 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         scheduler.setPoolSize(1);
         scheduler.setThreadNamePrefix("wss-heartbeat-");
         scheduler.initialize();
-
+        HeartbeatProperties heartbeatProperties = stompProperties.heartbeat();
         registry.setApplicationDestinationPrefixes("/publish");
-        registry.enableSimpleBroker("/topic")
-                .setHeartbeatValue(new long[]{
-                        stompProperties.heartbeat().serverInterval(),
-                        stompProperties.heartbeat().clientInterval()
-                })
-                .setTaskScheduler(scheduler);
+        registry.enableSimpleBroker("/topic").setHeartbeatValue(new long[]{heartbeatProperties.serverInterval(), heartbeatProperties.clientInterval()}).setTaskScheduler(scheduler);
     }
 }

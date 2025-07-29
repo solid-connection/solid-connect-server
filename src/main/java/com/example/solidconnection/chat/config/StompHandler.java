@@ -7,7 +7,6 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -55,11 +53,11 @@ public class StompHandler implements ChannelInterceptor {
 
     private String extractRoomId(String destination) {
         if (destination == null) {
-            throw new CustomException(ErrorCode.INVALID_ROOMID);
+            throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
         String[] parts = destination.split("/");
         if (parts.length < 3 || !parts[1].equals("topic")) {
-            throw new CustomException(ErrorCode.INVALID_ROOMID);
+            throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
         return parts[2];
     }

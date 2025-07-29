@@ -114,7 +114,7 @@ public enum ErrorCode {
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
-    INVALID_ROOMID(HttpStatus.BAD_REQUEST.value(), "경로의 roomId가 잘못되었습니다."),
+    INVALID_ROOM_ID(HttpStatus.BAD_REQUEST.value(), "경로의 roomId가 잘못되었습니다."),
 
     // report
     ALREADY_REPORTED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 신고한 상태입니다."),
