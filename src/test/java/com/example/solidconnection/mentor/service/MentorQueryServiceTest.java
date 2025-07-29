@@ -53,7 +53,6 @@ class MentorQueryServiceTest {
     private UniversityFixture universityFixture;
 
     private University university;
-    private String region = "아시아";
 
     @BeforeEach
     void setUp() {
@@ -124,7 +123,7 @@ class MentorQueryServiceTest {
     }
 
     @Nested
-    class 멘토_미리보기_목록_조회 {
+    class 멘토_미리보기_목록_정보_조회 {
 
         private static final int NO_NEXT_PAGE_NUMBER = -1;
 
@@ -150,7 +149,7 @@ class MentorQueryServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor2);
 
             // when
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews("", currentUser.getId(), PageRequest.of(0, 10));
 
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
@@ -173,26 +172,9 @@ class MentorQueryServiceTest {
         }
 
         @Test
-        void 멘토들에_대한_나의_멘토링_지원_여부를_조회한다() {
-            // given
-            mentoringFixture.대기중_멘토링(mentor1.getId(), currentUser.getId());
-
-            // when
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
-
-            // then
-            Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
-                    .collect(Collectors.toMap(MentorPreviewResponse::id, Function.identity()));
-            assertAll(
-                    () -> assertThat(mentorPreviewMap.get(mentor1.getId()).isApplied()).isTrue(),
-                    () -> assertThat(mentorPreviewMap.get(mentor2.getId()).isApplied()).isFalse()
-            );
-        }
-
-        @Test
         void 다음_페이지_번호를_응답한다() {
             // given
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 1));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews("", currentUser.getId(), PageRequest.of(0, 1));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(2);
@@ -201,10 +183,59 @@ class MentorQueryServiceTest {
         @Test
         void 다음_페이지가_없으면_페이지_없음을_의미하는_값을_응답한다() {
             // given
-            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews(region, currentUser.getId(), PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews("", currentUser.getId(), PageRequest.of(0, 10));
 
             // then
             assertThat(response.nextPageNumber()).isEqualTo(NO_NEXT_PAGE_NUMBER);
+        }
+    }
+
+    @Nested
+    class 멘토_미리보기_목록_필터링 {
+
+        private Mentor asiaMentor, europeMentor;
+        private SiteUser currentUser;
+        private University asiaUniversity, europeUniversity;
+
+        @BeforeEach
+        void setUp() {
+            currentUser = siteUserFixture.사용자(1, "사용자1");
+            SiteUser mentorUser1 = siteUserFixture.사용자(2, "멘토1");
+            SiteUser mentorUser2 = siteUserFixture.사용자(3, "멘토2");
+            asiaUniversity = universityFixture.메이지_대학();
+            europeUniversity = universityFixture.린츠_카톨릭_대학();
+            asiaMentor = mentorFixture.멘토(mentorUser1.getId(), asiaUniversity.getId());
+            europeMentor = mentorFixture.멘토(mentorUser2.getId(), europeUniversity.getId());
+        }
+
+        @Test
+        void 권역으로_멘토_목록을_필터링한다() {
+            // when
+            SliceResponse<MentorPreviewResponse> asiaFilteredResponse = mentorQueryService.getMentorPreviews(
+                    asiaUniversity.getRegion().getKoreanName(), currentUser.getId(), PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> europeFilteredResponse = mentorQueryService.getMentorPreviews(
+                    europeUniversity.getRegion().getKoreanName(), currentUser.getId(), PageRequest.of(0, 10));
+
+            // then
+            assertAll(
+                    () -> assertThat(asiaFilteredResponse.content()).hasSize(1)
+                            .extracting(MentorPreviewResponse::id)
+                            .containsExactly(asiaMentor.getId()),
+                    () -> assertThat(europeFilteredResponse.content()).hasSize(1)
+                            .extracting(MentorPreviewResponse::id)
+                            .containsExactly(europeMentor.getId())
+            );
+        }
+
+        @Test
+        void 권역을_지정하지_않으면_전체_멘토_목록을_조회한다() {
+            // when
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews("", currentUser.getId(), PageRequest.of(0, 10));
+
+            // then
+            assertThat(response.content()).hasSize(2)
+                    .extracting(MentorPreviewResponse::id)
+                    .containsExactlyInAnyOrder(asiaMentor.getId(), europeMentor.getId());
         }
     }
 }
