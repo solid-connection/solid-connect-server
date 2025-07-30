@@ -107,8 +107,8 @@ class ChatServiceTest {
                     () -> assertThat(response.chatRooms().get(0).partner().partnerId()).isEqualTo(mentor2.getId()),
                     () -> assertThat(response.chatRooms().get(0).lastChatMessage()).isEqualTo(newMessage.getContent()),
                     () -> assertThat(response.chatRooms().get(1).partner().partnerId()).isEqualTo(mentor1.getId()),
-                    () -> assertThat(response.chatRooms().get(1).lastChatMessage()).isEqualTo(oldMessage.getContent()
-                    ));
+                    () -> assertThat(response.chatRooms().get(1).lastChatMessage()).isEqualTo(oldMessage.getContent())
+            );
         }
 
         @Test
