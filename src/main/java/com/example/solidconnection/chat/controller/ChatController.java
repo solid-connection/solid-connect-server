@@ -35,7 +35,8 @@ public class ChatController {
     public ResponseEntity<SliceResponse<ChatMessageResponse>> getChatMessages(
             @AuthorizedUser long siteUserId,
             @PathVariable("room-id") Long roomId,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         SliceResponse<ChatMessageResponse> response = chatService.getChatMessages(siteUserId, roomId, pageable);
         return ResponseEntity.ok(response);
     }
@@ -43,7 +44,8 @@ public class ChatController {
     @PutMapping("/rooms/{room-id}/read")
     public ResponseEntity<Void> markChatMessagesAsRead(
             @AuthorizedUser long siteUserId,
-            @PathVariable("room-id") Long roomId) {
+            @PathVariable("room-id") Long roomId
+    ) {
         chatService.markChatMessagesAsRead(siteUserId, roomId);
         return ResponseEntity.ok().build();
     }
