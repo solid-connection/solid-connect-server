@@ -10,6 +10,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,11 +25,21 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public final String generateToken(String string, TokenType tokenType) {
-        Claims claims = Jwts.claims().setSubject(string);
+        return generateJwtTokenValue(string, Map.of(), tokenType.getExpireTime());
+    }
+
+    @Override
+    public String generateToken(String string, Map<String, String> customClaims, TokenType tokenType) {
+        return generateJwtTokenValue(string, customClaims, tokenType.getExpireTime());
+    }
+
+    private String generateJwtTokenValue(String subject, Map<String, String> claims, long expireTime) {
+        Claims jwtClaims = Jwts.claims().setSubject(subject);
+        jwtClaims.putAll(claims);
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + tokenType.getExpireTime());
+        Date expiredDate = new Date(now.getTime() + expireTime);
         return Jwts.builder()
-                .setClaims(claims)
+                .setClaims(jwtClaims)
                 .setIssuedAt(now)
                 .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.secret())
