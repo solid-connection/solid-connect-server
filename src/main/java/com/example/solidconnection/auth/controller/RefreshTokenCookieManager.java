@@ -17,14 +17,14 @@ public class RefreshTokenCookieManager {
                 .httpOnly(true)
                 .secure(true)
                 .path(PATH)
-                .maxAge(changeMicroSecondToSecond(TokenType.REFRESH.getExpireTime()))  // 초단위
+                .maxAge(changeMilliSecondToSecond(TokenType.REFRESH.getExpireTime()))  // 초단위
                 .sameSite(SAME_SITE)
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    private long changeMicroSecondToSecond(long microSeconds) {
-        return microSeconds / 1000;
+    private long changeMilliSecondToSecond(long milliSeconds) {
+        return milliSeconds / 1000;
     }
 
     public void deleteCookie(HttpServletResponse response) {
