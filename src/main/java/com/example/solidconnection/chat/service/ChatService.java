@@ -70,20 +70,13 @@ public class ChatService {
     }
 
     private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
-        List<ChatParticipant> partners = chatRoom.getChatParticipants().stream()
-                .filter(participant -> participant.getSiteUserId() != siteUserId)
-                .toList();
-        validateOneOnOneChat(partners);
-        return partners.get(0);
-    }
-
-    private void validateOneOnOneChat(List<ChatParticipant> partners) {
-        if (partners.isEmpty()) {
-            throw new CustomException(CHAT_PARTNER_NOT_FOUND);
-        }
-        if (partners.size() > CHAT_PARTNER_LIMIT) {
+        if (chatRoom.isGroup()) {
             throw new CustomException(INVALID_CHAT_ROOM_STATE);
         }
+        return chatRoom.getChatParticipants().stream()
+                .filter(participant -> participant.getSiteUserId() != siteUserId)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(CHAT_PARTNER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

@@ -145,20 +145,6 @@ class ChatServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTNER_NOT_FOUND.getMessage());
         }
-
-        @Test
-        void 일대일_채팅방에_참여자가_3명_이상이면_예외가_발생한다() {
-            // given
-            ChatRoom chatRoom = chatRoomFixture.채팅방(false);
-            chatParticipantFixture.참여자(user.getId(), chatRoom);
-            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
-            chatParticipantFixture.참여자(mentor2.getId(), chatRoom);
-
-            // when & then
-            assertThatCode(() -> chatService.getChatRooms(user.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(INVALID_CHAT_ROOM_STATE.getMessage());
-        }
     }
 
     @Nested
