@@ -2,7 +2,6 @@ package com.example.solidconnection.chat.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTICIPANT_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNER_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.CHAT_ROOM_ACCESS_DENIED;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_CHAT_ROOM_STATE;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -122,7 +121,7 @@ public class ChatService {
     private void validateChatRoomParticipant(long siteUserId, long roomId) {
         boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
         if (!isParticipant) {
-            throw new CustomException(CHAT_ROOM_ACCESS_DENIED);
+            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
         }
     }
 }

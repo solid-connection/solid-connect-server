@@ -119,7 +119,6 @@ public enum ErrorCode {
 
     // chat
     INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
-    CHAT_ROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "채팅방 접근이 거부되었습니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

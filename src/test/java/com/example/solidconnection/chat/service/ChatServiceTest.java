@@ -2,7 +2,6 @@ package com.example.solidconnection.chat.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTICIPANT_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNER_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.CHAT_ROOM_ACCESS_DENIED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -286,7 +285,7 @@ class ChatServiceTest {
             // when & then
             assertThatCode(() -> chatService.getChatMessages(mentor2.getId(), chatRoom.getId(), pageable))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(CHAT_ROOM_ACCESS_DENIED.getMessage());
+                    .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -297,7 +296,7 @@ class ChatServiceTest {
             // when & then
             assertThatCode(() -> chatService.getChatMessages(user.getId(), nonExistentRoomId, pageable))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(CHAT_ROOM_ACCESS_DENIED.getMessage());
+                    .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
         }
     }
 
