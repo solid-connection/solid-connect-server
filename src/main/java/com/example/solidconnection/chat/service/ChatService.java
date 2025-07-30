@@ -35,8 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ChatService {
 
-    public static final int CHAT_PARTNER_LIMIT = 1;
-
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatParticipantRepository chatParticipantRepository;
@@ -114,9 +112,8 @@ public class ChatService {
 
     @Transactional
     public void markChatMessagesAsRead(long siteUserId, long roomId) {
-        validateChatRoomParticipant(siteUserId, roomId);
-
-        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+        ChatParticipant participant = chatParticipantRepository
+                .findByChatRoomIdAndSiteUserId(roomId, siteUserId)
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
 
         chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
