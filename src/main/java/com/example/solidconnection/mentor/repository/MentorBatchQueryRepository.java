@@ -44,7 +44,7 @@ public class MentorBatchQueryRepository { // 연관관계가 설정되지 않은
     }
 
     public Map<Long, University> getMentorIdToUniversityMap(List<Mentor> mentors) {
-        List<Long> universityIds = mentors.stream().map(Mentor::getUniversityId).toList();
+        List<Long> universityIds = mentors.stream().map(Mentor::getUniversityId).distinct().toList();
         List<University> universities = universityRepository.findAllById(universityIds);
         Map<Long, University> universityIdToUniversityMap = universities.stream()
                 .collect(Collectors.toMap(University::getId, Function.identity()));
