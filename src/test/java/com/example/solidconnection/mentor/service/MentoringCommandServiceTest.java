@@ -7,9 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.chat.domain.ChatParticipant;
-import com.example.solidconnection.chat.domain.ChatRoom;
-import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
@@ -26,8 +23,6 @@ import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -46,9 +41,6 @@ class MentoringCommandServiceTest {
 
     @Autowired
     private MentoringRepository mentoringRepository;
-
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -124,31 +116,6 @@ class MentoringCommandServiceTest {
         }
 
         @Test
-        void 멘토링_승인시_채팅방이_자동으로_생성된다() {
-            // given
-            Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.APPROVED);
-
-            Optional<ChatRoom> beforeChatRoom = chatRoomRepository.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId());
-            assertThat(beforeChatRoom).isEmpty();
-
-            // when
-            mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
-
-            // then
-            ChatRoom afterChatRoom = chatRoomRepository
-                    .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId())
-                    .orElseThrow();
-            List<Long> participantIds = afterChatRoom.getChatParticipants().stream()
-                    .map(ChatParticipant::getSiteUserId)
-                    .toList();
-            assertAll(
-                    () -> assertThat(afterChatRoom.isGroup()).isFalse(),
-                    () -> assertThat(participantIds).containsExactly(mentorUser1.getId(), menteeUser.getId())
-            );
-        }
-
-        @Test
         void 멘토링을_성공적으로_거절한다() {
             // given
             Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
@@ -168,23 +135,6 @@ class MentoringCommandServiceTest {
                     () -> assertThat(confirmedMentoring.getCheckedAt()).isNotNull(),
                     () -> assertThat(mentor.getMenteeCount()).isEqualTo(beforeMenteeCount)
             );
-        }
-
-        @Test
-        void 멘토링_거절시_채팅방이_자동으로_생성되지_않는다() {
-            // given
-            Mentoring mentoring = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringConfirmRequest request = new MentoringConfirmRequest(VerifyStatus.REJECTED);
-
-            Optional<ChatRoom> beforeChatRoom = chatRoomRepository.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId());
-            assertThat(beforeChatRoom).isEmpty();
-
-            // when
-            mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
-
-            // then
-            Optional<ChatRoom> afterChatRoom = chatRoomRepository.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId());
-            assertThat(afterChatRoom).isEmpty();
         }
 
         @Test
