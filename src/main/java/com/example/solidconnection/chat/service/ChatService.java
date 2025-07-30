@@ -109,6 +109,13 @@ public class ChatService {
         );
     }
 
+    private void validateChatRoomParticipant(long siteUserId, long roomId) {
+        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
+        if (!isParticipant) {
+            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+        }
+    }
+
     @Transactional
     public void markChatMessagesAsRead(long siteUserId, long roomId) {
         ChatParticipant participant = chatParticipantRepository
@@ -116,12 +123,5 @@ public class ChatService {
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
 
         chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
-    }
-
-    private void validateChatRoomParticipant(long siteUserId, long roomId) {
-        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
-        if (!isParticipant) {
-            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
-        }
     }
 }
