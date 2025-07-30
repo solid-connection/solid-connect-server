@@ -54,7 +54,7 @@ public class ChatService {
     }
 
     private ChatRoomResponse toChatRoomResponse(ChatRoom chatRoom, long siteUserId) {
-        Optional<ChatMessage> latestMessage = chatMessageRepository.findLatestMessageByChatRoomId(chatRoom.getId());
+        Optional<ChatMessage> latestMessage = chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId());
         String lastChatMessage = latestMessage.map(ChatMessage::getContent).orElse("");
         ZonedDateTime lastReceivedTime = latestMessage.map(ChatMessage::getCreatedAt).orElse(null);
 
