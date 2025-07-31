@@ -13,7 +13,6 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
-import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
@@ -169,46 +168,6 @@ class MentoringCommandServiceTest {
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.confirmMentoring(mentorUser1.getId(), invalidMentoringId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTORING_NOT_FOUND.getMessage());
-        }
-    }
-
-    @Nested
-    class 멘토링_확인_테스트 {
-
-        @Test
-        void 멘토링을_성공적으로_확인_처리한다() {
-            // given
-            Mentoring mentoring = mentoringFixture.확인되지_않은_멘토링(mentor1.getId(), menteeUser.getId());
-
-            // when
-            MentoringCheckResponse response = mentoringCommandService.checkMentoring(mentorUser1.getId(), mentoring.getId());
-
-            // then
-            Mentoring checked = mentoringRepository.findById(response.mentoringId()).orElseThrow();
-
-            assertThat(checked.getCheckedAt()).isNotNull();
-        }
-
-        @Test
-        void 다른_멘토의_멘토링은_확인할_수_없다() {
-            // given
-            Mentoring mentoring = mentoringFixture.확인되지_않은_멘토링(mentor1.getId(), menteeUser.getId());
-
-            // when & then
-            assertThatThrownBy(() -> mentoringCommandService.checkMentoring(mentorUser2.getId(), mentoring.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(UNAUTHORIZED_MENTORING.getMessage());
-        }
-
-        @Test
-        void 존재하지_않는_멘토링_아이디로_요청시_예외가_발생한다() {
-            // given
-            long invalidMentoringId = 9999L;
-
-            // when & then
-            assertThatThrownBy(() -> mentoringCommandService.checkMentoring(mentorUser1.getId(), invalidMentoringId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MENTORING_NOT_FOUND.getMessage());
         }

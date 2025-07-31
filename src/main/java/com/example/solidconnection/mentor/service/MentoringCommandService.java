@@ -11,7 +11,6 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
-import com.example.solidconnection.mentor.dto.MentoringCheckResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
@@ -58,21 +57,6 @@ public class MentoringCommandService {
         if (mentoring.getVerifyStatus() != VerifyStatus.PENDING) {
             throw new CustomException(MENTORING_ALREADY_CONFIRMED);
         }
-    }
-
-    @Transactional
-    public MentoringCheckResponse checkMentoring(long siteUserId, long mentoringId) {
-        Mentoring mentoring = mentoringRepository.findById(mentoringId)
-                .orElseThrow(() -> new CustomException(MENTORING_NOT_FOUND));
-
-        Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
-                .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-
-        validateMentoringOwnership(mentor, mentoring);
-
-        mentoring.check();
-
-        return MentoringCheckResponse.from(mentoring.getId());
     }
 
     // 멘토는 본인의 멘토링에 대해 confirm 및 check해야 한다.

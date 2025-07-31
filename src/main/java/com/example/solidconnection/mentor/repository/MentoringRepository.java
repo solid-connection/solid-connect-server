@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface MentoringRepository extends JpaRepository<Mentoring, Long> {
 
-    int countByMentorIdAndCheckedAtIsNull(long mentorId);
+    int countByMentorIdAndCheckedAtByMentorIsNull(long mentorId);
 
     boolean existsByMentorIdAndMenteeId(long mentorId, long menteeId);
 

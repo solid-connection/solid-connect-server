@@ -6,11 +6,9 @@ import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
-import com.example.solidconnection.mentor.dto.MentoringCountResponse;
 import com.example.solidconnection.mentor.dto.MentoringResponse;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
-import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -37,9 +35,6 @@ class MentoringQueryServiceTest {
 
     @Autowired
     private MentoringFixture mentoringFixture;
-
-    @Autowired
-    private MentoringRepository mentoringRepository;
 
     private SiteUser mentorUser1, mentorUser2;
     private SiteUser menteeUser1, menteeUser2, menteeUser3;
@@ -175,36 +170,6 @@ class MentoringQueryServiceTest {
 
             // then
             assertThat(response.content()).isEmpty();
-        }
-    }
-
-    @Nested
-    class 새_멘토링_개수_조회_테스트 {
-
-        @Test
-        void 확인되지_않은_멘토링_개수를_반환한다() {
-            // given
-            mentoringFixture.확인되지_않은_멘토링(mentor1.getId(), menteeUser1.getId());
-            mentoringFixture.확인되지_않은_멘토링(mentor1.getId(), menteeUser2.getId());
-            mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser3.getId());
-
-            // when
-            MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(mentorUser1.getId());
-
-            // then
-            assertThat(response.uncheckedCount()).isEqualTo(2);
-        }
-
-        @Test
-        void 확인되지_않은_멘토링이_없으면_0을_반환한다() {
-            // given
-            mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser1.getId());
-
-            // when
-            MentoringCountResponse response = mentoringQueryService.getNewMentoringsCount(mentorUser1.getId());
-
-            // then
-            assertThat(response.uncheckedCount()).isZero();
         }
     }
 }
