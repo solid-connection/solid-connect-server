@@ -9,6 +9,8 @@ import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +34,10 @@ class MentorBatchQueryRepositoryTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    private long universityId = 1L; // todo: 멘토 인증 기능 추가 변경 필요
+    @Autowired
+    private UniversityFixture universityFixture;
+
+    private University university1, university2;
     private Mentor mentor1, mentor2;
     private SiteUser mentorUser1, mentorUser2, currentUser;
 
@@ -41,8 +46,10 @@ class MentorBatchQueryRepositoryTest {
         currentUser = siteUserFixture.사용자(1, "사용자");
         mentorUser1 = siteUserFixture.사용자(2, "멘토1");
         mentorUser2 = siteUserFixture.사용자(3, "멘토2");
-        mentor1 = mentorFixture.멘토(mentorUser1.getId(), universityId);
-        mentor2 = mentorFixture.멘토(mentorUser2.getId(), universityId);
+        university1 = universityFixture.코펜하겐IT_대학();
+        university2 = universityFixture.메모리얼_대학_세인트존스();
+        mentor1 = mentorFixture.멘토(mentorUser1.getId(), university1.getId());
+        mentor2 = mentorFixture.멘토(mentorUser2.getId(), university2.getId());
     }
 
     @Test
@@ -57,6 +64,21 @@ class MentorBatchQueryRepositoryTest {
         assertAll(
                 () -> assertThat(mentorIdToSiteUser.get(mentor1.getId()).getId()).isEqualTo(mentorUser1.getId()),
                 () -> assertThat(mentorIdToSiteUser.get(mentor2.getId()).getId()).isEqualTo(mentorUser2.getId())
+        );
+    }
+
+    @Test
+    void 멘토_ID_와_멘토의_파견_대학교를_매핑한다() {
+        // given
+        List<Mentor> mentors = List.of(mentor1, mentor2);
+
+        // when
+        Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
+
+        // then
+        assertAll(
+                () -> assertThat(mentorIdToUniversity.get(mentor1.getId()).getId()).isEqualTo(university1.getId()),
+                () -> assertThat(mentorIdToUniversity.get(mentor2.getId()).getId()).isEqualTo(university2.getId())
         );
     }
 

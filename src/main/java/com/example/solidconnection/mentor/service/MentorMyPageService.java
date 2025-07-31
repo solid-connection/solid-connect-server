@@ -2,6 +2,7 @@ package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
@@ -13,6 +14,8 @@ import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.repository.UniversityRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class MentorMyPageService {
 
     private final MentorRepository mentorRepository;
     private final SiteUserRepository siteUserRepository;
+    private final UniversityRepository universityRepository;
 
     @Transactional(readOnly = true)
     public MentorMyPageResponse getMentorMyPage(long siteUserId) {
@@ -35,7 +39,9 @@ public class MentorMyPageService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-        return MentorMyPageResponse.of(mentor, siteUser);
+        University university = universityRepository.findById(mentor.getUniversityId())
+                .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
+        return MentorMyPageResponse.of(mentor, siteUser, university);
     }
 
     @Transactional
