@@ -55,7 +55,7 @@ public class MentorQueryService {
     public SliceResponse<MentorPreviewResponse> getMentorPreviews(String regionKoreanName, long currentUserId, Pageable pageable) {
         Slice<Mentor> mentorSlice = filterMentorsByRegion(regionKoreanName, pageable);
         List<Mentor> mentors = mentorSlice.toList();
-        List<MentorPreviewResponse> content = getMentorPreviewResponses(mentors, currentUserId);
+        List<MentorPreviewResponse> content = buildMentorPreviewsWithBatchQuery(mentors, currentUserId);
 
         return SliceResponse.of(content, mentorSlice);
     }
@@ -69,7 +69,7 @@ public class MentorQueryService {
         return mentorRepository.findAllByRegion(region, pageable);
     }
 
-    private List<MentorPreviewResponse> getMentorPreviewResponses(List<Mentor> mentors, long currentUserId) { // todo: 이름 변경?
+    private List<MentorPreviewResponse> buildMentorPreviewsWithBatchQuery(List<Mentor> mentors, long currentUserId) {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
         Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
