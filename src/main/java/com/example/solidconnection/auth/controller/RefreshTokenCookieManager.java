@@ -2,6 +2,7 @@ package com.example.solidconnection.auth.controller;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,6 @@ public class RefreshTokenCookieManager {
                 .maxAge(maxAge)
                 .sameSite(SAME_SITE)
                 .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }
