@@ -14,11 +14,12 @@ public class RefreshTokenCookieManager {
     private static final String SAME_SITE = "Strict";
 
     public void setCookie(HttpServletResponse response, String refreshToken) {
-        long maxAge = changeMilliSecondToSecond(TokenType.REFRESH.getExpireTime());
+        long maxAge = convertExpireTimeToCookieMaxAge(TokenType.REFRESH.getExpireTime());
         setRefreshTokenCookie(response, refreshToken, maxAge);
     }
 
-    private long changeMilliSecondToSecond(long milliSeconds) {
+    private long convertExpireTimeToCookieMaxAge(long milliSeconds) {
+        // jwt의 expireTime: millisecond, cookie의 maxAge: second
         return milliSeconds / 1000;
     }
 
