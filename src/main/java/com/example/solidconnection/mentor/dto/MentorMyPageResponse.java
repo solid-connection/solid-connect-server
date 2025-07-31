@@ -15,6 +15,7 @@ public record MentorMyPageResponse(
         int menteeCount,
         boolean hasBadge,
         String introduction,
+        String passTip,
         List<ChannelResponse> channels
 ) {
 
@@ -29,6 +30,7 @@ public record MentorMyPageResponse(
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),
+                mentor.getPassTip(),
                 mentor.getChannels().stream()
                         .map(ChannelResponse::from)
                         .toList()
