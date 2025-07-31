@@ -1,7 +1,5 @@
 package com.example.solidconnection.mentor.controller;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
@@ -41,7 +39,7 @@ public class MentorController {
             @AuthorizedUser long siteUserId,
             @RequestParam("region") String region,
             
-            @PageableDefault(size = 3, sort = "menteeCount", direction = DESC)
+            @PageableDefault(size = 3)
             @SortDefaults({
                     @SortDefault(sort = "menteeCount", direction = Sort.Direction.DESC),
                     @SortDefault(sort = "id", direction = Sort.Direction.ASC)
