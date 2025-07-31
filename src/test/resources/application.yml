@@ -42,6 +42,18 @@ view:
   count:
     scheduling:
       delay: 3000
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 8
+      max-pool-size: 16
+      queue-capacity: 1000
+    outbound:
+      core-pool-size: 8
+      max-pool-size: 16
+  heartbeat:
+    server-interval: 15000
+    client-interval: 15000
 oauth:
   apple:
     token-url: "https://appleid.apple.com/auth/token"
