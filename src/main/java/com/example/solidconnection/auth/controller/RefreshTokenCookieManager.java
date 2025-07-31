@@ -13,14 +13,8 @@ public class RefreshTokenCookieManager {
     private static final String SAME_SITE = "Strict";
 
     public void setCookie(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path(PATH)
-                .maxAge(changeMilliSecondToSecond(TokenType.REFRESH.getExpireTime()))  // 초단위
-                .sameSite(SAME_SITE)
-                .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        long maxAge = changeMilliSecondToSecond(TokenType.REFRESH.getExpireTime());
+        setRefreshTokenCookie(response, refreshToken, maxAge);
     }
 
     private long changeMilliSecondToSecond(long milliSeconds) {
@@ -28,11 +22,17 @@ public class RefreshTokenCookieManager {
     }
 
     public void deleteCookie(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
+        setRefreshTokenCookie(response, "", 0); // 쿠키 삭제를 위해 maxAge를 0으로 설정
+    }
+
+    private void setRefreshTokenCookie(
+            HttpServletResponse response, String refreshToken, long maxAge
+    ) {
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path(PATH)
-                .maxAge(0) // 쿠키 삭제를 위해 maxAge를 0으로 설정
+                .maxAge(maxAge)
                 .sameSite(SAME_SITE)
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
