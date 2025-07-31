@@ -12,11 +12,11 @@ public record MentoringResponse(
         ZonedDateTime createdAt
 ) {
 
-    public static MentoringResponse from(Mentoring mentoring, SiteUser mentee) {
+    public static MentoringResponse from(Mentoring mentoring, SiteUser partner) {
         return new MentoringResponse(
                 mentoring.getId(),
-                mentee.getProfileImageUrl(),
-                mentee.getNickname(),
+                partner.getProfileImageUrl(),
+                partner.getNickname(),
                 mentoring.getCheckedAt() != null,
                 mentoring.getCreatedAt()
         );

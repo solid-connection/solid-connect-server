@@ -58,7 +58,8 @@ public class MentoringForMenteeController {
             })
             Pageable pageable
     ) {
-        return ResponseEntity.ok().build();
+        SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentee(siteUserId, verifyStatus, pageable);
+        return ResponseEntity.ok(response);
     }
 
     @RequireRoleAccess(roles = {Role.MENTEE})
