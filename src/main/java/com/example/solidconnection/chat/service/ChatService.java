@@ -10,6 +10,7 @@ import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatAttachmentResponse;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
+import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,8 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
@@ -109,13 +113,6 @@ public class ChatService {
         );
     }
 
-    private void validateChatRoomParticipant(long siteUserId, long roomId) {
-        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
-        if (!isParticipant) {
-            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
-        }
-    }
-
     @Transactional
     public void markChatMessagesAsRead(long siteUserId, long roomId) {
         ChatParticipant participant = chatParticipantRepository
@@ -123,5 +120,28 @@ public class ChatService {
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
 
         chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
+    }
+
+    @Transactional
+    public void sendChatMessage(ChatMessageSendRequest chatMessageSendRequest, long roomId) {
+        validateChatRoomParticipant(chatMessageSendRequest.senderId(), roomId);
+
+        ChatMessage chatMessage = new ChatMessage(
+                chatMessageSendRequest.content(),
+                chatMessageSendRequest.senderId(),
+                chatRoomRepository.findById(roomId)
+                        .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE))
+        );
+
+        chatMessageRepository.save(chatMessage);
+
+        simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessage);
+    }
+
+    private void validateChatRoomParticipant(long siteUserId, long roomId) {
+        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
+        if (!isParticipant) {
+            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+        }
     }
 }
