@@ -1,6 +1,7 @@
 package com.example.solidconnection.mentor.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
@@ -10,6 +11,7 @@ import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
+import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -36,6 +38,9 @@ class MentoringQueryServiceTest {
 
     @Autowired
     private MentoringFixture mentoringFixture;
+
+    @Autowired
+    private MentoringRepository mentoringRepository;
 
     private SiteUser mentorUser1, mentorUser2;
     private SiteUser menteeUser1, menteeUser2, menteeUser3;
@@ -92,6 +97,23 @@ class MentoringQueryServiceTest {
                     .containsExactlyInAnyOrder(
                             menteeUser1.getNickname(),
                             menteeUser2.getNickname()
+                    );
+        }
+
+        @Test
+        void 멘토링_확인_여부를_포함한다() {
+            // given
+            Mentoring mentoring1 = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser1.getId());
+            Mentoring mentoring2 = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser2.getId());
+            // when
+            SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
+
+            // then
+            assertThat(response.content())
+                    .extracting(MentoringForMentorResponse::mentoringId, MentoringForMentorResponse::isChecked)
+                    .containsExactlyInAnyOrder(
+                            tuple(mentoring1.getId(), false),
+                            tuple(mentoring2.getId(), true)
                     );
         }
 
@@ -161,6 +183,27 @@ class MentoringQueryServiceTest {
                     .containsExactlyInAnyOrder(
                             mentorUser1.getNickname(),
                             mentorUser2.getNickname()
+                    );
+        }
+
+        @Test
+        void 멘토링_확인_여부를_포함한다() {
+            // given
+            Mentoring mentoring1 = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser1.getId());
+            Mentoring mentoring2 = mentoringFixture.대기중_멘토링(mentor2.getId(), menteeUser1.getId());
+            mentoring1.checkByMentee();
+            mentoringRepository.save(mentoring1);
+
+            // when
+            SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(
+                    menteeUser1.getId(), VerifyStatus.PENDING, pageable);
+
+            // then
+            assertThat(response.content())
+                    .extracting(MentoringForMenteeResponse::mentoringId, MentoringForMenteeResponse::isChecked)
+                    .containsExactlyInAnyOrder(
+                            tuple(mentoring1.getId(), true),
+                            tuple(mentoring2.getId(), false)
                     );
         }
 
