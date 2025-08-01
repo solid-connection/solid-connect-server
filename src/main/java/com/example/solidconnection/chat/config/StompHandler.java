@@ -56,9 +56,9 @@ public class StompHandler implements ChannelInterceptor {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
         String[] parts = destination.split("/");
-        if (parts.length < 3 || !parts[1].equals("topic")) {
+        if (parts.length < 4 || !parts[1].equals("topic") || !parts[2].equals("chat")) {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
-        return parts[2];
+        return parts[3];
     }
 }
