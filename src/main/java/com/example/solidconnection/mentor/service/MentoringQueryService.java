@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
@@ -37,6 +38,9 @@ public class MentoringQueryService {
     public SliceResponse<MentoringForMenteeResponse> getMentoringsForMentee(
             long siteUserId, VerifyStatus verifyStatus, Pageable pageable
     ) {
+        if (verifyStatus == VerifyStatus.REJECTED) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MENTORING, "거절된 멘토링은 조회할 수 없습니다.");
+        }
         Slice<Mentoring> mentoringSlice = mentoringRepository.findAllByMenteeIdAndVerifyStatus(siteUserId, verifyStatus, pageable);
         List<Mentoring> mentorings = mentoringSlice.toList();
 

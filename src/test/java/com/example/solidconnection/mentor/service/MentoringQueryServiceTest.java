@@ -1,10 +1,13 @@
 package com.example.solidconnection.mentor.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
@@ -105,6 +108,7 @@ class MentoringQueryServiceTest {
             // given
             Mentoring mentoring1 = mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser1.getId());
             Mentoring mentoring2 = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser2.getId());
+
             // when
             SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
 
@@ -129,6 +133,17 @@ class MentoringQueryServiceTest {
 
     @Nested
     class 멘티의_멘토링_목록_조회_테스트 {
+
+        @Test
+        void 거절된_멘토링_목록을_조회하면_예외가_발생한다() {
+            // given
+            mentoringFixture.거절된_멘토링(mentor1.getId(), menteeUser1.getId());
+
+            // when & then
+            assertThatCode(() -> mentoringQueryService.getMentoringsForMentee(menteeUser1.getId(), VerifyStatus.REJECTED, pageable))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(ErrorCode.UNAUTHORIZED_MENTORING.getMessage());
+        }
 
         @Test
         void 승인된_멘토링_목록을_조회한다() {
