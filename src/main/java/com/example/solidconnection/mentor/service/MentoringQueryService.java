@@ -7,7 +7,8 @@ import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
-import com.example.solidconnection.mentor.dto.MentoringResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -15,6 +16,7 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -32,34 +34,45 @@ public class MentoringQueryService {
     private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
-    public SliceResponse<MentoringResponse> getMentoringsForMentee(
+    public SliceResponse<MentoringForMenteeResponse> getMentoringsForMentee(
             long siteUserId, VerifyStatus verifyStatus, Pageable pageable
     ) {
         Slice<Mentoring> mentoringSlice = mentoringRepository.findAllByMenteeIdAndVerifyStatus(siteUserId, verifyStatus, pageable);
+        List<Mentoring> mentorings = mentoringSlice.toList();
 
-        List<MentoringResponse> content = buildMentoringResponsesWithBatchQuery(
-                mentoringSlice.toList(),
-                Mentoring::getMentorId
+        Map<Mentoring, SiteUser> mentoringToPartnerUser = mapMentoringToPartnerUserWithBatchQuery(
+                mentorings, Mentoring::getMentorId
         );
+
+        List<MentoringForMenteeResponse> content = new ArrayList<>();
+        for (Entry<Mentoring, SiteUser> entry : mentoringToPartnerUser.entrySet()) {
+            content.add(MentoringForMenteeResponse.of(entry.getKey(), entry.getValue()));
+        }
 
         return SliceResponse.of(content, mentoringSlice);
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<MentoringResponse> getMentoringsForMentor(long siteUserId, Pageable pageable) {
+    public SliceResponse<MentoringForMentorResponse> getMentoringsForMentor(long siteUserId, Pageable pageable) {
         Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         Slice<Mentoring> mentoringSlice = mentoringRepository.findAllByMentorId(mentor.getId(), pageable);
 
-        List<MentoringResponse> content = buildMentoringResponsesWithBatchQuery(
+        Map<Mentoring, SiteUser> mentoringToPartnerUser = mapMentoringToPartnerUserWithBatchQuery(
                 mentoringSlice.toList(),
                 Mentoring::getMenteeId
         );
 
+        List<MentoringForMentorResponse> content = new ArrayList<>();
+        for (Entry<Mentoring, SiteUser> entry : mentoringToPartnerUser.entrySet()) {
+            content.add(MentoringForMentorResponse.of(entry.getKey(), entry.getValue()));
+        }
+
         return SliceResponse.of(content, mentoringSlice);
     }
 
-    private List<MentoringResponse> buildMentoringResponsesWithBatchQuery( // N+1 을 해결하면서 멘토링 상대방의 정보를 조회
+    // N+1 을 해결하면서 멘토링 상대방의 정보를 조회
+    private Map<Mentoring, SiteUser> mapMentoringToPartnerUserWithBatchQuery(
             List<Mentoring> mentorings, Function<Mentoring, Long> getPartnerId
     ) {
         List<Long> partnerUserId = mentorings.stream()
@@ -67,15 +80,12 @@ public class MentoringQueryService {
                 .distinct()
                 .toList();
         List<SiteUser> partnerUsers = siteUserRepository.findAllById(partnerUserId);
-        Map<Long, SiteUser> partnerUserMap = partnerUsers.stream()
+        Map<Long, SiteUser> partnerIdToPartnerUsermap = partnerUsers.stream()
                 .collect(Collectors.toMap(SiteUser::getId, Function.identity()));
 
-        List<MentoringResponse> mentoringResponses = new ArrayList<>();
-        for (Mentoring mentoring : mentorings) {
-            long partnerId = getPartnerId.apply(mentoring);
-            SiteUser partnerUser = partnerUserMap.get(partnerId);
-            mentoringResponses.add(MentoringResponse.from(mentoring, partnerUser));
-        }
-        return mentoringResponses;
+        return mentorings.stream().collect(Collectors.toMap(
+                Function.identity(),
+                mentoring -> partnerIdToPartnerUsermap.get(getPartnerId.apply(mentoring))
+        ));
     }
 }

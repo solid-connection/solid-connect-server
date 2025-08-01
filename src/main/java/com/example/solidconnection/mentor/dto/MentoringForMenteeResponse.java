@@ -4,7 +4,7 @@ import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.time.ZonedDateTime;
 
-public record MentoringResponse(
+public record MentoringForMenteeResponse(
         long mentoringId,
         String profileImageUrl,
         String nickname,
@@ -12,12 +12,12 @@ public record MentoringResponse(
         ZonedDateTime createdAt
 ) {
 
-    public static MentoringResponse from(Mentoring mentoring, SiteUser partner) {
-        return new MentoringResponse(
+    public static MentoringForMenteeResponse of(Mentoring mentoring, SiteUser partner) {
+        return new MentoringForMenteeResponse(
                 mentoring.getId(),
                 partner.getProfileImageUrl(),
                 partner.getNickname(),
-                mentoring.getCheckedAt() != null,
+                mentoring.getCheckedAtByMentee() != null,
                 mentoring.getCreatedAt()
         );
     }

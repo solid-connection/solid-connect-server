@@ -7,7 +7,7 @@ import com.example.solidconnection.mentor.dto.CheckedMentoringsResponse;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.dto.MentoringCountResponse;
-import com.example.solidconnection.mentor.dto.MentoringResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
 import com.example.solidconnection.mentor.service.MentoringCheckService;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
@@ -39,7 +39,7 @@ public class MentoringForMentorController {
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})
     @GetMapping
-    public ResponseEntity<SliceResponse<MentoringResponse>> getMentorings(
+    public ResponseEntity<SliceResponse<MentoringForMentorResponse>> getMentorings(
             @AuthorizedUser long siteUserId,
             @PageableDefault(size = 3)
             @SortDefaults({
@@ -48,7 +48,7 @@ public class MentoringForMentorController {
             })
             Pageable pageable
     ) {
-        SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentor(siteUserId, pageable);
+        SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(siteUserId, pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -69,7 +69,8 @@ public class MentoringForMentorController {
             @AuthorizedUser long siteUserId,
             @RequestBody CheckMentoringRequest mentoringCheckRequest
     ) {
-        return ResponseEntity.ok().build();
+        CheckedMentoringsResponse response = mentoringCheckService.checkMentoringsForMentor(siteUserId, mentoringCheckRequest);
+        return ResponseEntity.ok(response);
     }
 
     @RequireRoleAccess(roles = {Role.ADMIN, Role.MENTOR})

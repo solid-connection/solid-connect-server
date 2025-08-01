@@ -7,7 +7,8 @@ import com.example.solidconnection.mentor.dto.CheckMentoringRequest;
 import com.example.solidconnection.mentor.dto.CheckedMentoringsResponse;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
-import com.example.solidconnection.mentor.dto.MentoringResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
+import com.example.solidconnection.mentor.service.MentoringCheckService;
 import com.example.solidconnection.mentor.service.MentoringCommandService;
 import com.example.solidconnection.mentor.service.MentoringQueryService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
@@ -35,6 +36,7 @@ public class MentoringForMenteeController {
 
     private final MentoringCommandService mentoringCommandService;
     private final MentoringQueryService mentoringQueryService;
+    private final MentoringCheckService mentoringCheckService;
 
     @RequireRoleAccess(roles = Role.MENTEE)
     @PostMapping
@@ -48,7 +50,7 @@ public class MentoringForMenteeController {
 
     @RequireRoleAccess(roles = Role.MENTEE)
     @GetMapping
-    public ResponseEntity<SliceResponse<MentoringResponse>> getMentorings(
+    public ResponseEntity<SliceResponse<MentoringForMenteeResponse>> getMentorings(
             @AuthorizedUser long siteUserId,
             @RequestParam("verify-status") VerifyStatus verifyStatus,
             @PageableDefault(size = 3)
@@ -58,7 +60,7 @@ public class MentoringForMenteeController {
             })
             Pageable pageable
     ) {
-        SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentee(siteUserId, verifyStatus, pageable);
+        SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(siteUserId, verifyStatus, pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -68,6 +70,7 @@ public class MentoringForMenteeController {
             @AuthorizedUser long siteUserId,
             @Valid @RequestBody CheckMentoringRequest checkMentoringRequest
     ) {
-        return ResponseEntity.ok().build();
+        CheckedMentoringsResponse response = mentoringCheckService.checkMentoringsForMentee(siteUserId, checkMentoringRequest);
+        return ResponseEntity.ok(response);
     }
 }

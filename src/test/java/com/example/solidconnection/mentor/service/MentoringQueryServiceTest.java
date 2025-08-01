@@ -6,7 +6,8 @@ import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
-import com.example.solidconnection.mentor.dto.MentoringResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
+import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -66,10 +67,10 @@ class MentoringQueryServiceTest {
             Mentoring mentoring3 = mentoringFixture.거절된_멘토링(mentor1.getId(), menteeUser3.getId());
 
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
+            SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringResponse::mentoringId)
+            assertThat(response.content()).extracting(MentoringForMentorResponse::mentoringId)
                     .containsExactlyInAnyOrder(
                             mentoring1.getId(),
                             mentoring2.getId(),
@@ -84,10 +85,10 @@ class MentoringQueryServiceTest {
             mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser2.getId());
 
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
+            SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringResponse::nickname)
+            assertThat(response.content()).extracting(MentoringForMentorResponse::nickname)
                     .containsExactlyInAnyOrder(
                             menteeUser1.getNickname(),
                             menteeUser2.getNickname()
@@ -97,7 +98,7 @@ class MentoringQueryServiceTest {
         @Test
         void 멘토링이_없는_경우_빈_리스트를_반환한다() {
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
+            SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
 
             // then
             assertThat(response.content()).isEmpty();
@@ -115,11 +116,11 @@ class MentoringQueryServiceTest {
             mentoringFixture.대기중_멘토링(mentor3.getId(), menteeUser1.getId());
 
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentee(
+            SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(
                     menteeUser1.getId(), VerifyStatus.APPROVED, pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringResponse::mentoringId)
+            assertThat(response.content()).extracting(MentoringForMenteeResponse::mentoringId)
                     .containsExactlyInAnyOrder(
                             mentoring1.getId(),
                             mentoring2.getId()
@@ -134,11 +135,11 @@ class MentoringQueryServiceTest {
             mentoringFixture.승인된_멘토링(mentor3.getId(), menteeUser1.getId());
 
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentee(
+            SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(
                     menteeUser1.getId(), VerifyStatus.PENDING, pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringResponse::mentoringId)
+            assertThat(response.content()).extracting(MentoringForMenteeResponse::mentoringId)
                     .containsExactlyInAnyOrder(
                             mentoring1.getId(),
                             mentoring2.getId()
@@ -152,11 +153,11 @@ class MentoringQueryServiceTest {
             mentoringFixture.승인된_멘토링(mentor2.getId(), menteeUser1.getId());
 
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentee(
+            SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(
                     menteeUser1.getId(), VerifyStatus.APPROVED, pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringResponse::nickname)
+            assertThat(response.content()).extracting(MentoringForMenteeResponse::nickname)
                     .containsExactlyInAnyOrder(
                             mentorUser1.getNickname(),
                             mentorUser2.getNickname()
@@ -166,7 +167,8 @@ class MentoringQueryServiceTest {
         @Test
         void 멘토링이_없는_경우_빈_리스트를_반환한다() {
             // when
-            SliceResponse<MentoringResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
+            SliceResponse<MentoringForMenteeResponse> response = mentoringQueryService.getMentoringsForMentee(
+                    mentorUser1.getId(), VerifyStatus.APPROVED, pageable);
 
             // then
             assertThat(response.content()).isEmpty();
