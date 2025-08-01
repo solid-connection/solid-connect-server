@@ -110,6 +110,7 @@ class MentoringCommandServiceTest {
                     () -> assertThat(confirmedMentoring.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
                     () -> assertThat(confirmedMentoring.getConfirmedAt()).isNotNull(),
                     () -> assertThat(confirmedMentoring.getCheckedAtByMentor()).isNotNull(),
+                    () -> assertThat(confirmedMentoring.getCheckedAtByMentee()).isNull(),
                     () -> assertThat(mentor.getMenteeCount()).isEqualTo(beforeMenteeCount + 1)
             );
         }

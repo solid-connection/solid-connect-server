@@ -73,6 +73,9 @@ public class Mentoring {
         if (this.checkedAtByMentor == null) {
             this.checkedAtByMentor = this.confirmedAt;
         }
+        if (this.checkedAtByMentee != null) {
+            this.checkedAtByMentee = null;
+        }
     }
 
     public void checkByMentor() {
