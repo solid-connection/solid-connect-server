@@ -109,7 +109,7 @@ class MentoringCommandServiceTest {
             assertAll(
                     () -> assertThat(confirmedMentoring.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
                     () -> assertThat(confirmedMentoring.getConfirmedAt()).isNotNull(),
-                    () -> assertThat(confirmedMentoring.getCheckedAt()).isNotNull(),
+                    () -> assertThat(confirmedMentoring.getCheckedAtByMentor()).isNotNull(),
                     () -> assertThat(mentor.getMenteeCount()).isEqualTo(beforeMenteeCount + 1)
             );
         }
@@ -131,7 +131,7 @@ class MentoringCommandServiceTest {
             assertAll(
                     () -> assertThat(confirmedMentoring.getVerifyStatus()).isEqualTo(VerifyStatus.REJECTED),
                     () -> assertThat(confirmedMentoring.getConfirmedAt()).isNotNull(),
-                    () -> assertThat(confirmedMentoring.getCheckedAt()).isNotNull(),
+                    () -> assertThat(confirmedMentoring.getCheckedAtByMentor()).isNotNull(),
                     () -> assertThat(mentor.getMenteeCount()).isEqualTo(beforeMenteeCount)
             );
         }

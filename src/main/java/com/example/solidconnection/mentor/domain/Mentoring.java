@@ -40,7 +40,10 @@ public class Mentoring {
     private ZonedDateTime confirmedAt;
 
     @Column
-    private ZonedDateTime checkedAt;
+    private ZonedDateTime checkedAtByMentor;
+
+    @Column
+    private ZonedDateTime checkedAtByMentee;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -67,12 +70,16 @@ public class Mentoring {
         this.verifyStatus = status;
         this.confirmedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
 
-        if (this.checkedAt == null) {
-            this.checkedAt = this.confirmedAt;
+        if (this.checkedAtByMentor == null) {
+            this.checkedAtByMentor = this.confirmedAt;
         }
     }
 
-    public void check() {
-        this.checkedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+    public void checkByMentor() {
+        this.checkedAtByMentor = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+    }
+
+    public void checkByMentee() {
+        this.checkedAtByMentee = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
 }
