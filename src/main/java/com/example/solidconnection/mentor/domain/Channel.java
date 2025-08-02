@@ -54,4 +54,10 @@ public class Channel {
     public void updateMentor(Mentor mentor) {
         this.mentor = mentor;
     }
+
+    public void update(Channel channel) {
+        this.sequence = channel.sequence;
+        this.type = channel.type;
+        this.url = channel.url;
+    }
 }
