@@ -22,12 +22,17 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompHandler stompHandler;
     private final StompProperties stompProperties;
     private final CorsProperties corsProperties;
+    private final WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
+    private final CustomHandshakeHandler customHandshakeHandler;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         List<String> strings = corsProperties.allowedOrigins();
         String[] allowedOrigins = strings.toArray(String[]::new);
-        registry.addEndpoint("/connect").setAllowedOrigins(allowedOrigins).withSockJS();
+        registry.addEndpoint("/connect")
+                .setAllowedOrigins(allowedOrigins) // postman 테스트를 위해 sockJS 비활성화
+                .addInterceptors(webSocketHandshakeInterceptor)
+                .setHandshakeHandler(customHandshakeHandler);
     }
 
     @Override

@@ -123,12 +123,12 @@ public class ChatService {
     }
 
     @Transactional
-    public void sendChatMessage(ChatMessageSendRequest chatMessageSendRequest, long roomId) {
-        validateChatRoomParticipant(chatMessageSendRequest.senderId(), roomId);
+    public void sendChatMessage(ChatMessageSendRequest chatMessageSendRequest, long siteUserId, long roomId) {
+        validateChatRoomParticipant(siteUserId, roomId);
 
         ChatMessage chatMessage = new ChatMessage(
                 chatMessageSendRequest.content(),
-                chatMessageSendRequest.senderId(),
+                siteUserId,
                 chatRoomRepository.findById(roomId)
                         .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE))
         );
