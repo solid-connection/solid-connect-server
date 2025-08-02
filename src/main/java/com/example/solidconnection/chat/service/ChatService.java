@@ -26,14 +26,13 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
 public class ChatService {
 
@@ -44,6 +43,20 @@ public class ChatService {
     private final SiteUserRepository siteUserRepository;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public ChatService(ChatRoomRepository chatRoomRepository,
+                       ChatMessageRepository chatMessageRepository,
+                       ChatParticipantRepository chatParticipantRepository,
+                       ChatReadStatusRepository chatReadStatusRepository,
+                       SiteUserRepository siteUserRepository,
+                       @Lazy SimpMessagingTemplate simpMessagingTemplate) {
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatMessageRepository = chatMessageRepository;
+        this.chatParticipantRepository = chatParticipantRepository;
+        this.chatReadStatusRepository = chatReadStatusRepository;
+        this.siteUserRepository = siteUserRepository;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
 
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
@@ -141,7 +154,7 @@ public class ChatService {
         simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
 
-    private void validateChatRoomParticipant(long siteUserId, long roomId) {
+    public void validateChatRoomParticipant(long siteUserId, long roomId) {
         boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
         if (!isParticipant) {
             throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);

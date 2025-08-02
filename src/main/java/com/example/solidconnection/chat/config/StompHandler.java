@@ -2,9 +2,13 @@ package com.example.solidconnection.chat.config;
 
 import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 
+import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import java.security.Principal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -13,7 +17,10 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
+
+    private final ChatService chatService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -27,15 +34,18 @@ public class StompHandler implements ChannelInterceptor {
         }
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-            SiteUserPrincipal user = (SiteUserPrincipal) accessor.getUser();
+            Principal user = accessor.getUser();
             if (user == null) {
                 throw new CustomException(AUTHENTICATION_FAILED);
             }
 
-            String destination = accessor.getDestination();
-            String roomId = extractRoomId(destination);
+            TokenAuthentication tokenAuthentication = (TokenAuthentication) user;
+            SiteUserDetails siteUserDetails = (SiteUserDetails) tokenAuthentication.getPrincipal();
 
-            // todo: roomId와 user.getId() 기반으로 실제 구독 권한 검사 로직
+            String destination = accessor.getDestination();
+            long roomId = Long.parseLong(extractRoomId(destination));
+
+            chatService.validateChatRoomParticipant(siteUserDetails.getSiteUser().getId(), roomId);
         }
 
         return message;
