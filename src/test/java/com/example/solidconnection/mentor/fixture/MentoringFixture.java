@@ -29,7 +29,7 @@ public class MentoringFixture {
                 .menteeId(menteeId)
                 .verifyStatus(VerifyStatus.APPROVED)
                 .confirmedAt(now)
-                .checkedAt(now)
+                .checkedAtByMentor(now)
                 .create();
     }
 
@@ -40,7 +40,7 @@ public class MentoringFixture {
                 .menteeId(menteeId)
                 .verifyStatus(VerifyStatus.REJECTED)
                 .confirmedAt(now)
-                .checkedAt(now)
+                .checkedAtByMentor(now)
                 .create();
     }
 
@@ -48,7 +48,7 @@ public class MentoringFixture {
         return mentoringFixtureBuilder.mentoring()
                 .mentorId(mentorId)
                 .menteeId(menteeId)
-                .checkedAt(null)
+                .checkedAtByMentor(null)
                 .create();
     }
 

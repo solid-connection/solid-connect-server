@@ -15,7 +15,8 @@ public class MentoringFixtureBuilder {
 
     private ZonedDateTime createdAt;
     private ZonedDateTime confirmedAt;
-    private ZonedDateTime checkedAt;
+    private ZonedDateTime checkedAtByMentor;
+    private ZonedDateTime checkedAtByMentee;
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
     private long mentorId;
     private long menteeId;
@@ -34,8 +35,13 @@ public class MentoringFixtureBuilder {
         return this;
     }
 
-    public MentoringFixtureBuilder checkedAt(ZonedDateTime checkedAt) {
-        this.checkedAt = checkedAt;
+    public MentoringFixtureBuilder checkedAtByMentor(ZonedDateTime checkedAtByMentor) {
+        this.checkedAtByMentor = checkedAtByMentor;
+        return this;
+    }
+
+    public MentoringFixtureBuilder checkedAtByMentee(ZonedDateTime checkedAtByMentor) {
+        this.checkedAtByMentor = checkedAtByMentor;
         return this;
     }
 
@@ -59,7 +65,8 @@ public class MentoringFixtureBuilder {
                 null,
                 createdAt,
                 confirmedAt,
-                checkedAt,
+                checkedAtByMentor,
+                checkedAtByMentee,
                 verifyStatus,
                 mentorId,
                 menteeId
