@@ -2,7 +2,9 @@ package com.example.solidconnection.chat.controller;
 
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.service.ChatService;
-import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,8 +21,11 @@ public class ChatMessageController {
     public void sendChatMessage(
             @DestinationVariable Long roomId,
             @Payload ChatMessageSendRequest chatMessageSendRequest,
-            @AuthorizedUser Long siteUserId
+            Principal principal
     ) {
-        chatService.sendChatMessage(chatMessageSendRequest, siteUserId, roomId);
+        TokenAuthentication tokenAuthentication = (TokenAuthentication) principal;
+        SiteUserDetails siteUserDetails = (SiteUserDetails) tokenAuthentication.getPrincipal();
+
+        chatService.sendChatMessage(chatMessageSendRequest, siteUserDetails.getSiteUser().getId(), roomId);
     }
 }
