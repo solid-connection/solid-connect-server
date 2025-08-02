@@ -11,6 +11,7 @@ import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatAttachmentResponse;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
+import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
@@ -135,7 +136,9 @@ public class ChatService {
 
         chatMessageRepository.save(chatMessage);
 
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessage);
+        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
+
+        simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
 
     private void validateChatRoomParticipant(long siteUserId, long roomId) {
