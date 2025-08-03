@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.service;
 import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
 import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.mentor.domain.Channel;
@@ -109,8 +110,28 @@ class MentorMyPageServiceTest {
         }
 
         @Test
-        void 채널_정보를_수정한다() {
+        void 기존보다_적게_채널_정보를_수정한다() {
             // given
+            channelFixture.채널(1, mentor);
+            channelFixture.채널(2, mentor);
+            channelFixture.채널(3, mentor);
+            channelFixture.채널(4, mentor);
+            List<ChannelRequest> newChannels = List.of(new ChannelRequest(BLOG, "https://blog.com"));
+            MentorMyPageUpdateRequest request = new MentorMyPageUpdateRequest("introduction", "passTip", newChannels);
+
+            // when
+            mentorMyPageService.updateMentorMyPage(mentorUser.getId(), request);
+
+            // then
+            List<Channel> updatedChannels = channelRepositoryForTest.findAllByMentorId(mentor.getId());
+            assertThat(updatedChannels).extracting(Channel::getSequence, Channel::getType, Channel::getUrl)
+                    .containsExactlyInAnyOrder(tuple(1, BLOG, "https://blog.com"));
+        }
+
+        @Test
+        void 기존보다_많게_채널_정보를_수정한다() {
+            // given
+            channelFixture.채널(1, mentor);
             List<ChannelRequest> newChannels = List.of(
                     new ChannelRequest(BLOG, "https://blog.com"),
                     new ChannelRequest(INSTAGRAM, "https://instagram.com")
@@ -122,12 +143,11 @@ class MentorMyPageServiceTest {
 
             // then
             List<Channel> updatedChannels = channelRepositoryForTest.findAllByMentorId(mentor.getId());
-            assertAll(
-                    () -> assertThat(updatedChannels).extracting(Channel::getType)
-                            .containsExactly(BLOG, INSTAGRAM),
-                    () -> assertThat(updatedChannels).extracting(Channel::getUrl)
-                            .containsExactly("https://blog.com", "https://instagram.com")
-            );
+            assertThat(updatedChannels).extracting(Channel::getSequence, Channel::getType, Channel::getUrl)
+                    .containsExactlyInAnyOrder(
+                            tuple(1, BLOG, "https://blog.com"),
+                            tuple(2, INSTAGRAM, "https://instagram.com")
+                    );
         }
     }
 }

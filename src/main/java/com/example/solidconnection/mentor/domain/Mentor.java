@@ -65,13 +65,20 @@ public class Mentor {
     }
 
     public void updateChannels(List<Channel> channels) {
-        this.channels.clear();
-        if (channels == null || channels.isEmpty()) {
-            return;
-        }
-        for (Channel channel : channels) {
-            channel.updateMentor(this);
-            this.channels.add(channel);
+        int newChannelSize = Math.max(channels.size(), this.channels.size());
+        int originalChannelSize = this.channels.size();
+        for (int i = 0; i < newChannelSize; i++) {
+            if (i < channels.size() && i < this.channels.size()) { // 기존 채널 수정
+                Channel existing = this.channels.get(i);
+                Channel newChannel = channels.get(i);
+                existing.update(newChannel);
+            } else if (i < channels.size()) { // 채널 갯수 늘어남 - 새로운 채널 추가
+                Channel newChannel = channels.get(i);
+                newChannel.updateMentor(this);
+                this.channels.add(newChannel);
+            } else if (i < originalChannelSize) { // 채널 갯수 줄어듦 - 기존 채널 삭제
+                this.channels.remove(this.channels.size() - 1);
+            }
         }
     }
 }
