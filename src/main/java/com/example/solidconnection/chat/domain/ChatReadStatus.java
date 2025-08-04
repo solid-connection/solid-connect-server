@@ -32,4 +32,9 @@ public class ChatReadStatus extends BaseEntity {
 
     @Column(name = "chat_participant_id")
     private long chatParticipantId;
+
+    public ChatReadStatus(long chatRoomId, long chatParticipantId) {
+        this.chatRoomId = chatRoomId;
+        this.chatParticipantId = chatParticipantId;
+    }
 }

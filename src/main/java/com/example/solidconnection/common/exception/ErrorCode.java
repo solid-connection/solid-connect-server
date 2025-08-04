@@ -45,6 +45,8 @@ public enum ErrorCode {
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 소식지입니다."),
     MENTOR_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 멘토입니다."),
     REPORT_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 신고 대상입니다."),
+    CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
+    CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅 참여자를 찾을 수 없습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -118,6 +120,9 @@ public enum ErrorCode {
 
     // report
     ALREADY_REPORTED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 신고한 상태입니다."),
+
+    // chat
+    INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

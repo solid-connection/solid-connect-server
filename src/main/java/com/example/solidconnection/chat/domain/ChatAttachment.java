@@ -32,4 +32,14 @@ public class ChatAttachment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatMessage chatMessage;
+
+    public ChatAttachment(boolean isImage, String url, String thumbnailUrl, ChatMessage chatMessage) {
+        this.isImage = isImage;
+        this.url = url;
+        this.thumbnailUrl = thumbnailUrl;
+        this.chatMessage = chatMessage;
+        if (chatMessage != null) {
+            chatMessage.getChatAttachments().add(this);
+        }
+    }
 }
