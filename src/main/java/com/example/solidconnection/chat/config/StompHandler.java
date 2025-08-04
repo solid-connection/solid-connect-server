@@ -8,6 +8,8 @@ import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import java.security.Principal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
+    private static final Pattern ROOM_ID_PATTERN = Pattern.compile("^/topic/chat/(\\d+)$");
     private final ChatService chatService;
 
     @Override
@@ -55,10 +58,12 @@ public class StompHandler implements ChannelInterceptor {
         if (destination == null) {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
-        String[] parts = destination.split("/");
-        if (parts.length < 4 || !parts[1].equals("topic") || !parts[2].equals("chat")) {
+
+        Matcher matcher = ROOM_ID_PATTERN.matcher(destination);
+        if (!matcher.matches()) {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
-        return parts[3];
+
+        return matcher.group(1);
     }
 }

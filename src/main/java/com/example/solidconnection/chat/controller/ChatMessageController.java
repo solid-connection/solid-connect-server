@@ -4,6 +4,7 @@ import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.userdetails.SiteUserDetails;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -20,7 +21,7 @@ public class ChatMessageController {
     @MessageMapping("/chat/{roomId}")
     public void sendChatMessage(
             @DestinationVariable Long roomId,
-            @Payload ChatMessageSendRequest chatMessageSendRequest,
+            @Valid @Payload ChatMessageSendRequest chatMessageSendRequest,
             Principal principal
     ) {
         TokenAuthentication tokenAuthentication = (TokenAuthentication) principal;

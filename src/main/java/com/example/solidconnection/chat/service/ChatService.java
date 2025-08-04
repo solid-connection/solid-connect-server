@@ -29,7 +29,7 @@ import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,20 +42,20 @@ public class ChatService {
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpMessageSendingOperations simpMessageSendingOperations;
 
     public ChatService(ChatRoomRepository chatRoomRepository,
                        ChatMessageRepository chatMessageRepository,
                        ChatParticipantRepository chatParticipantRepository,
                        ChatReadStatusRepository chatReadStatusRepository,
                        SiteUserRepository siteUserRepository,
-                       @Lazy SimpMessagingTemplate simpMessagingTemplate) {
+                       @Lazy SimpMessageSendingOperations simpMessageSendingOperations) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.chatReadStatusRepository = chatReadStatusRepository;
         this.siteUserRepository = siteUserRepository;
-        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.simpMessageSendingOperations = simpMessageSendingOperations;
     }
 
     @Transactional(readOnly = true)
@@ -107,6 +107,13 @@ public class ChatService {
         return SliceResponse.of(content, chatMessages);
     }
 
+    public void validateChatRoomParticipant(long siteUserId, long roomId) {
+        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
+        if (!isParticipant) {
+            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+        }
+    }
+
     private ChatMessageResponse toChatMessageResponse(ChatMessage message) {
         List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
                 .map(attachment -> ChatAttachmentResponse.of(
@@ -138,11 +145,13 @@ public class ChatService {
 
     @Transactional
     public void sendChatMessage(ChatMessageSendRequest chatMessageSendRequest, long siteUserId, long roomId) {
-        validateChatRoomParticipant(siteUserId, roomId);
+        long senderId = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND))
+                .getId();
 
         ChatMessage chatMessage = new ChatMessage(
                 chatMessageSendRequest.content(),
-                siteUserId,
+                senderId,
                 chatRoomRepository.findById(roomId)
                         .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE))
         );
@@ -151,13 +160,6 @@ public class ChatService {
 
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
 
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
-    }
-
-    public void validateChatRoomParticipant(long siteUserId, long roomId) {
-        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
-        if (!isParticipant) {
-            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
-        }
+        simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
 }
