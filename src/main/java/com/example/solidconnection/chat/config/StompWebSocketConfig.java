@@ -30,9 +30,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         List<String> strings = corsProperties.allowedOrigins();
         String[] allowedOrigins = strings.toArray(String[]::new);
         registry.addEndpoint("/connect")
-                .setAllowedOrigins(allowedOrigins) // postman 테스트를 위해 sockJS 비활성화
+                .setAllowedOrigins(allowedOrigins)
                 .addInterceptors(webSocketHandshakeInterceptor)
-                .setHandshakeHandler(customHandshakeHandler);
+                .setHandshakeHandler(customHandshakeHandler)
+                .withSockJS();
     }
 
     @Override
