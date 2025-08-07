@@ -90,8 +90,8 @@ class WebSocketStompIntegrationTest {
 
             // then
             assertAll(
-                () -> assertThat(stompSession).isNotNull(),
-                () -> assertThat(transportErrorQueue).isEmpty()
+                    () -> assertThat(stompSession).isNotNull(),
+                    () -> assertThat(transportErrorQueue).isEmpty()
             );
         }
 
