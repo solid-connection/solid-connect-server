@@ -15,8 +15,7 @@ import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
 import com.example.solidconnection.auth.service.EmailSignUpService;
 import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
-import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
-import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
+import com.example.solidconnection.auth.service.oauth.OAuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
@@ -40,8 +39,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final OAuthSignUpService oAuthSignUpService;
-    private final AppleOAuthService appleOAuthService;
-    private final KakaoOAuthService kakaoOAuthService;
+    private final OAuthService oAuthService;
     private final EmailSignInService emailSignInService;
     private final EmailSignUpService emailSignUpService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
@@ -53,7 +51,7 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.APPLE, oAuthCodeRequest);
         if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
             refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         }
@@ -65,7 +63,7 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.KAKAO, oAuthCodeRequest);
         if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
             refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         }
