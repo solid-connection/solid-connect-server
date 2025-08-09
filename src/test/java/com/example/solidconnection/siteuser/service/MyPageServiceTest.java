@@ -12,6 +12,11 @@ import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.then;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.domain.Country;
+import com.example.solidconnection.location.country.domain.InterestedCountry;
+import com.example.solidconnection.location.country.fixture.CountryFixture;
+import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -24,6 +29,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
+import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
@@ -53,7 +59,16 @@ class MyPageServiceTest {
     private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
+    private InterestedCountryRepository interestedCountryRepository;
+
+    @Autowired
     private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private MentorFixture mentorFixture;
+
+    @Autowired
+    private CountryFixture countryFixture;
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
@@ -69,9 +84,12 @@ class MyPageServiceTest {
     }
 
     @Test
-    void 마이페이지_정보를_조회한다() {
+    void 멘티의_마이페이지_정보를_조회한다() {
         // given
         int likedUnivApplyInfoCount = createLikedUnivApplyInfos(user);
+        Country country = countryFixture.미국();
+        InterestedCountry interestedCountry = new InterestedCountry(user, country);
+        interestedCountryRepository.save(interestedCountry);
 
         // when
         MyPageResponse response = myPageService.getMyPageInfo(user.getId());
@@ -84,8 +102,74 @@ class MyPageServiceTest {
                 () -> assertThat(response.email()).isEqualTo(user.getEmail()),
                 // () -> assertThat(response.likedPostCount()).isEqualTo(user.getLikedPostList().size()),
                 // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
-                () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount)
+                () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount),
+                () -> assertThat(response.interestedCountries().get(0)).isEqualTo(country.getKoreanName()),
+                () -> assertThat(response.attendedUniversity()).isNull()
         );
+    }
+
+    @Test
+    void 멘토의_마이페이지_정보를_조회한다() {
+        // given
+        SiteUser mentorUser = siteUserFixture.멘토(1, "mentor");
+        University university = univApplyInfoFixture.괌대학_A_지원_정보().getUniversity();
+        mentorFixture.멘토(mentorUser.getId(), university.getId());
+        int likedUnivApplyInfoCount = createLikedUnivApplyInfos(mentorUser);
+
+        // when
+        MyPageResponse response = myPageService.getMyPageInfo(mentorUser.getId());
+
+        // then
+        Assertions.assertAll(
+                () -> assertThat(response.nickname()).isEqualTo(mentorUser.getNickname()),
+                () -> assertThat(response.profileImageUrl()).isEqualTo(mentorUser.getProfileImageUrl()),
+                () -> assertThat(response.role()).isEqualTo(mentorUser.getRole()),
+                () -> assertThat(response.email()).isEqualTo(mentorUser.getEmail()),
+                // () -> assertThat(response.likedPostCount()).isEqualTo(user.getLikedPostList().size()),
+                // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
+                () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount),
+                () -> assertThat(response.attendedUniversity()).isEqualTo(university.getKoreanName()),
+                () -> assertThat(response.interestedCountries()).isNull()
+        );
+    }
+
+    private int createLikedUnivApplyInfos(SiteUser testUser) {
+        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
+
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
+        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
+    }
+
+    private MockMultipartFile createValidImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
+    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
+        String formatLastModifiedAt = String.format(
+                "(마지막 수정 시간 : %s)",
+                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
+        );
+        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
+    }
+
+    private SiteUser createSiteUserWithCustomProfile() {
+        return siteUserFixtureBuilder.siteUser()
+                .email("customProfile@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname("커스텀프로필")
+                .profileImageUrl("profile/profileImageUrl")
+                .role(Role.MENTEE)
+                .password("customPassword123")
+                .create();
     }
 
     @Nested
@@ -174,44 +258,5 @@ class MyPageServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }
-    }
-
-    private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
-
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
-        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
-    }
-
-    private MockMultipartFile createValidImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
-    }
-
-    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
-        String formatLastModifiedAt = String.format(
-                "(마지막 수정 시간 : %s)",
-                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
-        );
-        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
-    }
-
-    private SiteUser createSiteUserWithCustomProfile() {
-        return siteUserFixtureBuilder.siteUser()
-                .email("customProfile@example.com")
-                .authType(AuthType.EMAIL)
-                .nickname("커스텀프로필")
-                .profileImageUrl("profile/profileImageUrl")
-                .role(Role.MENTEE)
-                .password("customPassword123")
-                .create();
     }
 }
