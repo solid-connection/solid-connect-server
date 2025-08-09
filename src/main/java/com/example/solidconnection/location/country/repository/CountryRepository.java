@@ -10,4 +10,15 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     @Query("SELECT c FROM Country c WHERE c.koreanName IN :names")
     List<Country> findByKoreanNames(@Param(value = "names") List<String> names);
+
+    @Query("""
+           SELECT DISTINCT c.koreanName
+           FROM Country c
+           WHERE c.code IN (
+               SELECT ic.countryCode
+               FROM InterestedCountry ic
+               WHERE ic.siteUserId = :siteUserId
+           )
+           """)
+    List<String> findKoreanNamesBySiteUserId(@Param("siteUserId") long siteUserId);
 }

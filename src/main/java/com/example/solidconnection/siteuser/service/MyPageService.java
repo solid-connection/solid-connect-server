@@ -1,19 +1,28 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.repository.CountryRepository;
+import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
+import com.example.solidconnection.university.repository.UniversityRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +37,9 @@ public class MyPageService {
 
     private final SiteUserRepository siteUserRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
+    private final CountryRepository countryRepository;
+    private final MentorRepository mentorRepository;
+    private final UniversityRepository universityRepository;
     private final S3Service s3Service;
 
     /*
@@ -38,7 +50,20 @@ public class MyPageService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
-        return MyPageResponse.of(siteUser, likedUnivApplyInfoCount);
+
+        MyPageResponse myPageResponse = null;
+        if (siteUser.getRole() == Role.MENTEE) {
+            List<String> interestedCountries = countryRepository.findKoreanNamesBySiteUserId(siteUser.getId());
+            myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, interestedCountries, null);
+        }
+        else if (siteUser.getRole() == Role.MENTOR) {
+            Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
+                    .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+            University university = universityRepository.findById(mentor.getUniversityId())
+                    .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
+            myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, null, university.getKoreanName());
+        }
+        return myPageResponse;
     }
 
     /*
