@@ -51,7 +51,7 @@ public class MyPageService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
 
-        MyPageResponse myPageResponse = null;
+        MyPageResponse myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, null, null);
         if (siteUser.getRole() == Role.MENTEE) {
             List<String> interestedCountries = countryRepository.findKoreanNamesBySiteUserId(siteUser.getId());
             myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, interestedCountries, null);
