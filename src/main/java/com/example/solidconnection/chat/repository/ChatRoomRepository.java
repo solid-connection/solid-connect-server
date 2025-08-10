@@ -2,6 +2,7 @@ package com.example.solidconnection.chat.repository;
 
 import com.example.solidconnection.chat.domain.ChatRoom;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +34,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
            AND (crs.updatedAt IS NULL OR cm.createdAt > crs.updatedAt)
            """)
     long countUnreadMessages(@Param("chatRoomId") long chatRoomId, @Param("userId") long userId);
+
+    Optional<ChatRoom> findByMentoringId(long mentoringId);
 }

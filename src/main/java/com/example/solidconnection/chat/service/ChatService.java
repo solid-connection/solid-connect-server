@@ -124,4 +124,18 @@ public class ChatService {
 
         chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
     }
+
+    @Transactional
+    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        Optional<ChatRoom> existingChatRoom = chatRoomRepository.findByMentoringId(mentoringId);
+        if (existingChatRoom.isPresent()) {
+            return;
+        }
+
+        ChatRoom chatRoom = new ChatRoom(mentoringId, false);
+        chatRoom = chatRoomRepository.save(chatRoom);
+        ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
+        ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
+        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
+    }
 }
