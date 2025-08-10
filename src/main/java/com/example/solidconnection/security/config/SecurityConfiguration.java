@@ -5,8 +5,8 @@ import static com.example.solidconnection.siteuser.domain.Role.ADMIN;
 import com.example.solidconnection.common.exception.CustomAccessDeniedHandler;
 import com.example.solidconnection.common.exception.CustomAuthenticationEntryPoint;
 import com.example.solidconnection.security.filter.ExceptionHandlerFilter;
-import com.example.solidconnection.security.filter.TokenAuthenticationFilter;
 import com.example.solidconnection.security.filter.SignOutCheckFilter;
+import com.example.solidconnection.security.filter.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,6 +62,7 @@ public class SecurityConfiguration {
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/connect/**").authenticated()
                         .requestMatchers("/admin/**").hasRole(ADMIN.name())
                         .anyRequest().permitAll()
                 )
