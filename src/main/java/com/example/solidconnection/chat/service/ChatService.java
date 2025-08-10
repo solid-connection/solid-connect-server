@@ -10,6 +10,8 @@ import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatAttachmentResponse;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
+import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
+import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
@@ -24,13 +26,13 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
 public class ChatService {
 
@@ -39,6 +41,22 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
+
+    private final SimpMessageSendingOperations simpMessageSendingOperations;
+
+    public ChatService(ChatRoomRepository chatRoomRepository,
+                       ChatMessageRepository chatMessageRepository,
+                       ChatParticipantRepository chatParticipantRepository,
+                       ChatReadStatusRepository chatReadStatusRepository,
+                       SiteUserRepository siteUserRepository,
+                       @Lazy SimpMessageSendingOperations simpMessageSendingOperations) {
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatMessageRepository = chatMessageRepository;
+        this.chatParticipantRepository = chatParticipantRepository;
+        this.chatReadStatusRepository = chatReadStatusRepository;
+        this.siteUserRepository = siteUserRepository;
+        this.simpMessageSendingOperations = simpMessageSendingOperations;
+    }
 
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
@@ -89,6 +107,13 @@ public class ChatService {
         return SliceResponse.of(content, chatMessages);
     }
 
+    public void validateChatRoomParticipant(long siteUserId, long roomId) {
+        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
+        if (!isParticipant) {
+            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+        }
+    }
+
     private ChatMessageResponse toChatMessageResponse(ChatMessage message) {
         List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
                 .map(attachment -> ChatAttachmentResponse.of(
@@ -109,13 +134,6 @@ public class ChatService {
         );
     }
 
-    private void validateChatRoomParticipant(long siteUserId, long roomId) {
-        boolean isParticipant = chatParticipantRepository.existsByChatRoomIdAndSiteUserId(roomId, siteUserId);
-        if (!isParticipant) {
-            throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
-        }
-    }
-
     @Transactional
     public void markChatMessagesAsRead(long siteUserId, long roomId) {
         ChatParticipant participant = chatParticipantRepository
@@ -123,5 +141,25 @@ public class ChatService {
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
 
         chatReadStatusRepository.upsertReadStatus(roomId, participant.getId());
+    }
+
+    @Transactional
+    public void sendChatMessage(ChatMessageSendRequest chatMessageSendRequest, long siteUserId, long roomId) {
+        long senderId = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND))
+                .getId();
+
+        ChatMessage chatMessage = new ChatMessage(
+                chatMessageSendRequest.content(),
+                senderId,
+                chatRoomRepository.findById(roomId)
+                        .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE))
+        );
+
+        chatMessageRepository.save(chatMessage);
+
+        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
+
+        simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
 }
