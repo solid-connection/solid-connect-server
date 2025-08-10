@@ -32,7 +32,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
@@ -400,7 +400,7 @@ class ChatServiceTest {
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
 
-            Mockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
 
             assertAll(
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
