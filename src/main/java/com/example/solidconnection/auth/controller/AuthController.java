@@ -85,8 +85,7 @@ public class AuthController {
     public ResponseEntity<EmailSignUpTokenResponse> signUpWithEmail(
             @Valid @RequestBody EmailSignUpTokenRequest signUpRequest
     ) {
-        emailSignUpService.validateUniqueEmail(signUpRequest.email());
-        String signUpToken = emailSignUpTokenProvider.generateAndSaveSignUpToken(signUpRequest);
+        String signUpToken = emailSignUpTokenProvider.issueEmailSignUpToken(signUpRequest);
         return ResponseEntity.ok(new EmailSignUpTokenResponse(signUpToken));
     }
 
