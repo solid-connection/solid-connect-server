@@ -1,0 +1,5 @@
+ALTER TABLE mentor
+    MODIFY introduction VARCHAR(1000) NOT NULL;
+
+ALTER TABLE mentor
+    MODIFY pass_tip VARCHAR(1000) NOT NULL;
