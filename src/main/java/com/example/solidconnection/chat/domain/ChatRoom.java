@@ -8,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -20,12 +18,6 @@ import org.hibernate.annotations.BatchSize;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uk_chat_room_mentoring_id",
-                columnNames = {"mentoring_id"}
-        )
-})
 public class ChatRoom extends BaseEntity {
 
     @Id
@@ -34,7 +26,7 @@ public class ChatRoom extends BaseEntity {
 
     private boolean isGroup = false;
 
-    @Column(name = "mentoring_id")
+    @Column(name = "mentoring_id", unique = true)
     private Long mentoringId;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
