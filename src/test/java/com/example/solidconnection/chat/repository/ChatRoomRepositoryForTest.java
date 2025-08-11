@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 public interface ChatRoomRepositoryForTest extends JpaRepository<ChatRoom, Long> {
 
     @Query("""
-           SELECT cr FROM ChatRoom cr
+           SELECT DISTINCT cr FROM ChatRoom cr
            LEFT JOIN FETCH cr.chatParticipants cp
            WHERE cr.isGroup = false
            AND EXISTS (
