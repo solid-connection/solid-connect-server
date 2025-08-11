@@ -1,5 +1,7 @@
 package com.example.solidconnection.siteuser.dto;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
+
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -19,10 +21,10 @@ public record MyPageResponse(
         @JsonProperty("likedUniversityCount")
         int likedUnivApplyInfoCount,
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonInclude(NON_NULL)
         List<String> interestedCountries,
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonInclude(NON_NULL)
         String attendedUniversity) {
 
     public static MyPageResponse of(SiteUser siteUser, int likedUnivApplyInfoCount, List<String> interestedCountries, String attendedUniversity) {
