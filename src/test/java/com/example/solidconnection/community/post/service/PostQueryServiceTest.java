@@ -182,19 +182,28 @@ class PostQueryServiceTest {
         );
 
         // then
-        PostListResponse post1Response = actualResponses.stream()
+        PostListResponse postResponse = actualResponses.stream()
                 .filter(p -> p.id().equals(post1.getId()))
                 .findFirst()
                 .orElseThrow();
 
-        PostListResponse post3Response = actualResponses.stream()
+        assertThat(postResponse.postThumbnailUrl()).isEqualTo(firstImageUrl);
+    }
+
+    @Test
+    void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
+        );
+
+        // then
+        PostListResponse postResponse = actualResponses.stream()
                 .filter(p -> p.id().equals(post3.getId()))
                 .findFirst()
                 .orElseThrow();
 
-        assertAll(
-                () -> assertThat(post1Response.postThumbnailUrl()).isEqualTo(firstImageUrl),
-                () -> assertThat(post3Response.postThumbnailUrl()).isNull()
-        );
+        assertThat(postResponse.postThumbnailUrl()).isNull();
     }
 }
