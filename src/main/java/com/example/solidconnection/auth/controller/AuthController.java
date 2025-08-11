@@ -11,12 +11,10 @@ import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
-import com.example.solidconnection.auth.service.EmailSignUpService;
 import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
+import com.example.solidconnection.auth.service.SignUpService;
 import com.example.solidconnection.auth.service.oauth.OAuthService;
-import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
@@ -38,12 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final OAuthSignUpService oAuthSignUpService;
     private final OAuthService oAuthService;
+    private final SignUpService signUpService;
     private final EmailSignInService emailSignInService;
-    private final EmailSignUpService emailSignUpService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
-    private final CommonSignUpTokenProvider commonSignUpTokenProvider;
     private final RefreshTokenCookieManager refreshTokenCookieManager;
 
     @PostMapping("/apple")
@@ -93,12 +89,7 @@ public class AuthController {
     public ResponseEntity<SignInResponse> signUp(
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
-        AuthType authType = commonSignUpTokenProvider.parseAuthType(signUpRequest.signUpToken());
-        if (AuthType.isEmail(authType)) {
-            SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
-            return ResponseEntity.ok(signInResponse);
-        }
-        SignInResponse signInResponse = oAuthSignUpService.signUp(signUpRequest);
+        SignInResponse signInResponse = signUpService.signUp(signUpRequest);
         return ResponseEntity.ok(signInResponse);
     }
 
