@@ -1,10 +1,10 @@
 package com.example.solidconnection.chat.repository;
 
 import com.example.solidconnection.chat.domain.ChatRoom;
-import io.lettuce.core.dynamic.annotation.Param;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ChatRoomRepositoryForTest extends JpaRepository<ChatRoom, Long> {
 
