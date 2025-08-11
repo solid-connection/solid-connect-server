@@ -42,10 +42,10 @@ public class MentoringQueryService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_MENTORING, "거절된 멘토링은 조회할 수 없습니다.");
         }
         Slice<Mentoring> mentoringSlice = mentoringRepository.findAllByMenteeIdAndVerifyStatus(siteUserId, verifyStatus, pageable);
-        List<Mentoring> mentorings = mentoringSlice.toList();
 
         Map<Mentoring, SiteUser> mentoringToPartnerUser = mapMentoringToPartnerUserWithBatchQuery(
-                mentorings, Mentoring::getMentorId
+                mentoringSlice.toList(),
+                Mentoring::getMentorId
         );
 
         List<MentoringForMenteeResponse> content = new ArrayList<>();
