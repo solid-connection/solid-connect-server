@@ -6,7 +6,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_APP
 import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.AppleTokenDto;
 import com.example.solidconnection.auth.dto.oauth.AppleUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
+import com.example.solidconnection.auth.service.oauth.OAuthClient;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Jwts;
 import java.security.PublicKey;
 import java.util.Objects;
@@ -27,20 +30,26 @@ import org.springframework.web.client.RestTemplate;
  * */
 @Component
 @RequiredArgsConstructor
-public class AppleOAuthClient {
+public class AppleOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate;
     private final AppleOAuthClientProperties properties;
     private final AppleOAuthClientSecretProvider clientSecretProvider;
     private final ApplePublicKeyProvider publicKeyProvider;
 
-    public AppleUserInfoDto processOAuth(String code) {
+    @Override
+    public AuthType getAuthType() {
+        return AuthType.APPLE;
+    }
+
+    @Override
+    public OAuthUserInfoDto getUserInfo(String code) {
         String idToken = requestIdToken(code);
         PublicKey applePublicKey = publicKeyProvider.getApplePublicKey(idToken);
         return new AppleUserInfoDto(parseEmailFromToken(applePublicKey, idToken));
     }
 
-    public String requestIdToken(String code) {
+    private String requestIdToken(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> formData = buildFormData(code);
