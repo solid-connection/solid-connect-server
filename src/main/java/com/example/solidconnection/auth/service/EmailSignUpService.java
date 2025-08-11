@@ -5,9 +5,9 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREAD
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.repository.CountryRepository;
-import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
-import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.location.country.service.InterestedCountryService;
 import com.example.solidconnection.location.region.repository.RegionRepository;
+import com.example.solidconnection.location.region.service.InterestedRegionService;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -19,10 +19,10 @@ public class EmailSignUpService extends SignUpService {
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
 
     public EmailSignUpService(SignInService signInService, SiteUserRepository siteUserRepository,
-                              RegionRepository regionRepository, InterestedRegionRepository interestedRegionRepository,
-                              CountryRepository countryRepository, InterestedCountryRepository interestedCountryRepository,
+                              RegionRepository regionRepository, InterestedRegionService interestedRegionService,
+                              CountryRepository countryRepository, InterestedCountryService interestedCountryService,
                               EmailSignUpTokenProvider emailSignUpTokenProvider) {
-        super(signInService, siteUserRepository, regionRepository, interestedRegionRepository, countryRepository, interestedCountryRepository);
+        super(signInService, siteUserRepository, regionRepository, interestedRegionService, countryRepository, interestedCountryService);
         this.emailSignUpTokenProvider = emailSignUpTokenProvider;
     }
 

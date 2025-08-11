@@ -5,15 +5,12 @@ import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_AL
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.repository.CountryRepository;
-import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
-import com.example.solidconnection.location.region.domain.InterestedRegion;
-import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.location.country.service.InterestedCountryService;
 import com.example.solidconnection.location.region.repository.RegionRepository;
+import com.example.solidconnection.location.region.service.InterestedRegionService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -28,19 +25,19 @@ public abstract class SignUpService {
     protected final SignInService signInService;
     protected final SiteUserRepository siteUserRepository;
     protected final RegionRepository regionRepository;
-    protected final InterestedRegionRepository interestedRegionRepository;
+    protected final InterestedRegionService interestedRegionService;
     protected final CountryRepository countryRepository;
-    protected final InterestedCountryRepository interestedCountryRepository;
+    protected final InterestedCountryService interestedCountryService;
 
     protected SignUpService(SignInService signInService, SiteUserRepository siteUserRepository,
-                            RegionRepository regionRepository, InterestedRegionRepository interestedRegionRepository,
-                            CountryRepository countryRepository, InterestedCountryRepository interestedCountryRepository) {
+                            RegionRepository regionRepository, InterestedRegionService interestedRegionService,
+                            CountryRepository countryRepository, InterestedCountryService interestedCountryService) {
         this.signInService = signInService;
         this.siteUserRepository = siteUserRepository;
         this.regionRepository = regionRepository;
-        this.interestedRegionRepository = interestedRegionRepository;
+        this.interestedRegionService = interestedRegionService;
         this.countryRepository = countryRepository;
-        this.interestedCountryRepository = interestedCountryRepository;
+        this.interestedCountryService = interestedCountryService;
     }
 
     @Transactional
@@ -54,8 +51,8 @@ public abstract class SignUpService {
         SiteUser siteUser = siteUserRepository.save(createSiteUser(signUpRequest));
 
         // 관심 지역, 국가 저장
-        saveInterestedRegion(signUpRequest, siteUser);
-        saveInterestedCountry(signUpRequest, siteUser);
+        interestedRegionService.saveInterestedRegion(siteUser, signUpRequest.interestedRegions());
+        interestedCountryService.saveInterestedCountry(siteUser, signUpRequest.interestedCountries());
 
         // 로그인
         return signInService.signIn(siteUser);
@@ -65,22 +62,6 @@ public abstract class SignUpService {
         if (siteUserRepository.existsByNickname(nickname)) {
             throw new CustomException(NICKNAME_ALREADY_EXISTED);
         }
-    }
-
-    private void saveInterestedRegion(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
-        List<String> interestedRegionNames = signUpRequest.interestedRegions();
-        List<InterestedRegion> interestedRegions = regionRepository.findByKoreanNames(interestedRegionNames).stream()
-                .map(region -> new InterestedRegion(savedSiteUser, region))
-                .toList();
-        interestedRegionRepository.saveAll(interestedRegions);
-    }
-
-    private void saveInterestedCountry(SignUpRequest signUpRequest, SiteUser savedSiteUser) {
-        List<String> interestedCountryNames = signUpRequest.interestedCountries();
-        List<InterestedCountry> interestedCountries = countryRepository.findByKoreanNames(interestedCountryNames).stream()
-                .map(country -> new InterestedCountry(savedSiteUser, country))
-                .toList();
-        interestedCountryRepository.saveAll(interestedCountries);
     }
 
     protected abstract void validateSignUpToken(SignUpRequest signUpRequest);
