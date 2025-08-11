@@ -51,19 +51,18 @@ public class MyPageService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         int likedUnivApplyInfoCount = likedUnivApplyInfoRepository.countBySiteUserId(siteUser.getId());
 
-        MyPageResponse myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, null, null);
+        List<String> interestedCountries = null;
+        String universityKoreanName = null;
         if (siteUser.getRole() == Role.MENTEE) {
-            List<String> interestedCountries = countryRepository.findKoreanNamesBySiteUserId(siteUser.getId());
-            myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, interestedCountries, null);
-        }
-        else if (siteUser.getRole() == Role.MENTOR) {
+            interestedCountries = countryRepository.findKoreanNamesBySiteUserId(siteUser.getId());
+        } else if (siteUser.getRole() == Role.MENTOR) {
             Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                     .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
             University university = universityRepository.findById(mentor.getUniversityId())
                     .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
-            myPageResponse = MyPageResponse.of(siteUser, likedUnivApplyInfoCount, null, university.getKoreanName());
+            universityKoreanName = university.getKoreanName();
         }
-        return myPageResponse;
+        return MyPageResponse.of(siteUser, likedUnivApplyInfoCount, interestedCountries, universityKoreanName);
     }
 
     /*
