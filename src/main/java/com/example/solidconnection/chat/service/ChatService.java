@@ -165,8 +165,7 @@ public class ChatService {
 
     @Transactional
     public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
-        Optional<ChatRoom> existingChatRoom = chatRoomRepository.findByMentoringId(mentoringId);
-        if (existingChatRoom.isPresent()) {
+        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
             return;
         }
 
