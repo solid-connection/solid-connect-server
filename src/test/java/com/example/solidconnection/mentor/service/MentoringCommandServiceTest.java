@@ -6,6 +6,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZE
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
@@ -25,6 +26,7 @@ import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,9 +138,14 @@ class MentoringCommandServiceTest {
             mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
 
             // then
-            ChatRoom afterChatRoom = chatRoomRepositoryForTest
-                    .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId())
+            ChatRoom afterChatRoom = await()
+                    .atMost(Duration.ofSeconds(3))
+                    .pollInterval(Duration.ofMillis(100))
+                    .until(() -> chatRoomRepositoryForTest
+                                   .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId()),
+                           Optional::isPresent)
                     .orElseThrow();
+
             List<Long> participantIds = afterChatRoom.getChatParticipants().stream()
                     .map(ChatParticipant::getSiteUserId)
                     .toList();
