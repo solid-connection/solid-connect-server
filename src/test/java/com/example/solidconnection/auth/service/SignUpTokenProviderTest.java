@@ -63,6 +63,21 @@ class SignUpTokenProviderTest {
         );
     }
 
+    @Test
+    void 회원가입_토큰을_삭제한다() {
+        // given
+        String email = "email";
+        AuthType authType = AuthType.KAKAO;
+        signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+
+        // when
+        signUpTokenProvider.deleteByEmail(email);
+
+        // then
+        String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
+        assertThat(redisTemplate.opsForValue().get(signUpTokenKey)).isNull();
+    }
+
     @Nested
     class 주어진_회원가입_토큰을_검증한다 {
 

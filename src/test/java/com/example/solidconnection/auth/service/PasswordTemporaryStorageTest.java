@@ -1,7 +1,6 @@
 package com.example.solidconnection.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.Optional;
@@ -35,18 +34,15 @@ class PasswordTemporaryStorageTest {
     }
 
     @Test
-    void 비밀번호는_한_번_조회된_후_삭제된다() {
+    void 임시_저장된_비밀번호를_삭제한다() {
         // given
         passwordTemporaryStorage.save(email, rawPassword);
 
         // when
-        Optional<String> foundPassword1 = passwordTemporaryStorage.findByEmail(email);
-        Optional<String> foundPassword2 = passwordTemporaryStorage.findByEmail(email);
+        passwordTemporaryStorage.deleteByEmail(email);
+        Optional<String> foundPassword = passwordTemporaryStorage.findByEmail(email);
 
         // then
-        assertAll(
-                () -> assertThat(foundPassword1).isPresent(),
-                () -> assertThat(foundPassword2).isEmpty()
-        );
+        assertThat(foundPassword).isEmpty();
     }
 }
