@@ -3,6 +3,7 @@ package com.example.solidconnection.siteuser.dto.validation;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_NOT_CHANGED;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_NOT_CONFIRMED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import jakarta.validation.ConstraintViolation;
@@ -50,10 +51,15 @@ class PasswordConfirmationValidatorTest {
             Set<ConstraintViolation<PasswordUpdateRequest>> violations = validator.validate(request);
 
             // then
-            assertThat(violations).hasSize(1);
-            ConstraintViolation<PasswordUpdateRequest> violation = violations.iterator().next();
-            assertThat(violation.getMessage()).isEqualTo(PASSWORD_NOT_CONFIRMED.getMessage());
-            assertThat(violation.getPropertyPath().toString()).isEqualTo("confirmNewPassword");
+            assertAll(
+                    () -> assertThat(violations)
+                            .isNotEmpty()
+                            .extracting("message")
+                            .contains(PASSWORD_NOT_CONFIRMED.getMessage()),
+                    () -> assertThat(violations)
+                            .extracting(v -> v.getPropertyPath().toString())
+                            .containsExactly("confirmNewPassword")
+            );
         }
 
         @Test
@@ -65,10 +71,15 @@ class PasswordConfirmationValidatorTest {
             Set<ConstraintViolation<PasswordUpdateRequest>> violations = validator.validate(request);
 
             // then
-            assertThat(violations).hasSize(1);
-            ConstraintViolation<PasswordUpdateRequest> violation = violations.iterator().next();
-            assertThat(violation.getMessage()).isEqualTo(PASSWORD_NOT_CHANGED.getMessage());
-            assertThat(violation.getPropertyPath().toString()).isEqualTo("newPassword");
+            assertAll(
+                    () -> assertThat(violations)
+                            .isNotEmpty()
+                            .extracting("message")
+                            .contains(PASSWORD_NOT_CHANGED.getMessage()),
+                    () -> assertThat(violations)
+                            .extracting(v -> v.getPropertyPath().toString())
+                            .containsExactly("newPassword")
+            );
         }
     }
 }
