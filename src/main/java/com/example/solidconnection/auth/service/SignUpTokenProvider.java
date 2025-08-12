@@ -43,6 +43,11 @@ public class SignUpTokenProvider {
         return tokenProvider.saveToken(signUpToken, TokenType.SIGN_UP);
     }
 
+    public void deleteByEmail(String email) {
+        String key = TokenType.SIGN_UP.addPrefix(email);
+        redisTemplate.delete(key);
+    }
+
     public void validateSignUpToken(String token) {
         validateFormatAndExpiration(token);
         String email = parseEmail(token);

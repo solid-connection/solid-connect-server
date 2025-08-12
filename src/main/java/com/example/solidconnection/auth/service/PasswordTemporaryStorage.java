@@ -28,11 +28,16 @@ public class PasswordTemporaryStorage {
     }
 
     public Optional<String> findByEmail(String email) {
-        String encodedPassword = redisTemplate.opsForValue().getAndDelete(convertToKey(email));
+        String encodedPassword = redisTemplate.opsForValue().get(convertToKey(email));
         if (encodedPassword == null) {
             return Optional.empty();
         }
         return Optional.of(encodedPassword);
+    }
+
+    public void deleteByEmail(String email) {
+        String key = convertToKey(email);
+        redisTemplate.delete(key);
     }
 
     private String convertToKey(String email) {

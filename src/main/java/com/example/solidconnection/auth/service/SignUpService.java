@@ -64,7 +64,12 @@ public class SignUpService {
         interestedCountryService.saveInterestedCountry(siteUser, signUpRequest.interestedCountries());
 
         // 로그인
-        return signInService.signIn(siteUser);
+        SignInResponse response = signInService.signIn(siteUser);
+
+        // 회원가입을 위해 저장한 데이터(SignUpToken, 비밀번호) 삭제
+        clearSignUpData(email, authType);
+
+        return response;
     }
 
     private void validateNicknameNotDuplicated(String nickname) {
@@ -85,5 +90,12 @@ public class SignUpService {
                     .orElseThrow(() -> new CustomException(SIGN_UP_TOKEN_INVALID));
         }
         return null;
+    }
+
+    private void clearSignUpData(String email, AuthType authType) {
+        if (authType == AuthType.EMAIL) {
+            passwordTemporaryStorage.deleteByEmail(email);
+        }
+        signUpTokenProvider.deleteByEmail(email);
     }
 }
