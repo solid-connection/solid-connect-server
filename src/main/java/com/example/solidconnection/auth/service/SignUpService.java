@@ -1,6 +1,7 @@
 package com.example.solidconnection.auth.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_EXISTED;
 
 import com.example.solidconnection.auth.dto.SignInResponse;
@@ -33,6 +34,7 @@ public class SignUpService {
     private final InterestedCountryService interestedCountryService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
     private final SignUpTokenProvider signUpTokenProvider;
+    private final PasswordTemporaryStorage passwordTemporaryStorage;
 
     @Transactional
     public SignInResponse signUp(SignUpRequest signUpRequest) {
@@ -79,7 +81,8 @@ public class SignUpService {
 
     private String getTemporarySavedPassword(String email, AuthType authType) {
         if (authType == AuthType.EMAIL) {
-            return emailSignUpTokenProvider.getTemporarySavedPassword(email);
+            return passwordTemporaryStorage.findByEmail(email)
+                    .orElseThrow(() -> new CustomException(SIGN_UP_TOKEN_INVALID));
         }
         return null;
     }

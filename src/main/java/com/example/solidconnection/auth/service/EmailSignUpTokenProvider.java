@@ -29,9 +29,4 @@ public class EmailSignUpTokenProvider {
         passwordTemporaryStorage.save(email, password);
         return signUpTokenProvider.generateAndSaveSignUpToken(email, AuthType.EMAIL);
     }
-
-    public String getTemporarySavedPassword(String email) {
-        return passwordTemporaryStorage.findByEmail(email) // 임시 저장된 비밀번호가 없다면 signUpToken에 문제가 있는 것
-                .orElseThrow(() -> new CustomException(ErrorCode.SIGN_UP_TOKEN_INVALID));
-    }
 }
