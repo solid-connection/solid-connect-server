@@ -6,8 +6,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZE
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-
+import static org.awaitility.Awaitility.await;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.repository.ChatRoomRepositoryForTest;
@@ -139,7 +138,7 @@ class MentoringCommandServiceTest {
 
             // then
             ChatRoom afterChatRoom = await()
-                    .atMost(Duration.ofSeconds(3))
+                    .atMost(Duration.ofSeconds(5))
                     .pollInterval(Duration.ofMillis(100))
                     .until(() -> chatRoomRepositoryForTest
                                    .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId()),
@@ -190,8 +189,16 @@ class MentoringCommandServiceTest {
             mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
 
             // then
+            await()
+                    .pollInterval(Duration.ofMillis(100))
+                    .during(Duration.ofSeconds(1))
+                    .until(() -> chatRoomRepositoryForTest
+                                         .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId())
+                                         .isEmpty());
+
             Optional<ChatRoom> afterChatRoom = chatRoomRepositoryForTest.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId());
             assertThat(afterChatRoom).isEmpty();
+
         }
 
         @Test

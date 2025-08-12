@@ -62,6 +62,7 @@ dependencies {
     testImplementation 'org.testcontainers:mysql'
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
 
     // Etc
     implementation 'org.hibernate.validator:hibernate-validator'
