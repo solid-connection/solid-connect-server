@@ -7,6 +7,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class InterestedRegionService {
     private final RegionRepository regionRepository;
     private final InterestedRegionRepository interestedRegionRepository;
 
+    @Transactional
     public void saveInterestedRegion(SiteUser siteUser, List<String> koreanNames) {
         List<InterestedRegion> interestedRegions = regionRepository.findAllByKoreanNameIn(koreanNames)
                 .stream()
