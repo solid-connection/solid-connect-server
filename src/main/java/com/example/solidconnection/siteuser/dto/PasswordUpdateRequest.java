@@ -1,7 +1,9 @@
 package com.example.solidconnection.siteuser.dto;
 
+import com.example.solidconnection.siteuser.dto.validation.PasswordConfirmation;
 import jakarta.validation.constraints.NotBlank;
 
+@PasswordConfirmation
 public record PasswordUpdateRequest(
         @NotBlank(message = "현재 비밀번호를 입력해주세요.")
         String currentPassword,
