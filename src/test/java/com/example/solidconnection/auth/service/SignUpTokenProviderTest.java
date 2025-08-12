@@ -41,13 +41,11 @@ class SignUpTokenProviderTest {
     private JwtProperties jwtProperties;
 
     private final String authTypeClaimKey = "authType";
+    private final String email = "test@email.com";
+    private final AuthType authType = AuthType.KAKAO;
 
     @Test
     void 회원가입_토큰을_생성하고_저장한다() {
-        // given
-        String email = "email";
-        AuthType authType = AuthType.KAKAO;
-
         // when
         String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
 
@@ -66,8 +64,6 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰을_삭제한다() {
         // given
-        String email = "email";
-        AuthType authType = AuthType.KAKAO;
         signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
 
         // when
@@ -84,8 +80,7 @@ class SignUpTokenProviderTest {
         @Test
         void 검증_성공한다() {
             // given
-            String email = "email@test.com";
-            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, AuthType.APPLE));
+            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, authType));
             String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
             redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
 
@@ -118,11 +113,12 @@ class SignUpTokenProviderTest {
         @Test
         void 정해진_형식에_맞지_않으면_예외가_발생한다_authType_클래스_불일치() {
             // given
-            Map<String, Object> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, "카카오"));
-            String wrongAuthType = createBaseJwtBuilder().addClaims(wrongClaim).compact();
+            String wrongAuthType = "카카오";
+            Map<String, Object> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, wrongAuthType));
+            String wrongAuthTypeClaim = createBaseJwtBuilder().addClaims(wrongClaim).compact();
 
             // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthType))
+            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthTypeClaim))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
         }
@@ -130,7 +126,7 @@ class SignUpTokenProviderTest {
         @Test
         void 정해진_형식에_맞지_않으면_예외가_발생한다_subject_누락() {
             // given
-            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, AuthType.APPLE));
+            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, authType));
             String noSubject = createBaseJwtBuilder().addClaims(claim).compact();
 
             // when & then
@@ -142,8 +138,8 @@ class SignUpTokenProviderTest {
         @Test
         void 우리_서버에_발급된_토큰이_아니면_예외가_발생한다() {
             // given
-            Map<String, Object> validClaim = new HashMap<>(Map.of(authTypeClaimKey, AuthType.APPLE));
-            String signUpToken = createBaseJwtBuilder().addClaims(validClaim).setSubject("email").compact();
+            Map<String, Object> validClaim = new HashMap<>(Map.of(authTypeClaimKey, authType));
+            String signUpToken = createBaseJwtBuilder().addClaims(validClaim).setSubject(email).compact();
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(signUpToken))
@@ -155,8 +151,7 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_이메일을_추출한다() {
         // given
-        String email = "email@test.com";
-        Map<String, Object> claim = Map.of(authTypeClaimKey, AuthType.APPLE);
+        Map<String, Object> claim = Map.of(authTypeClaimKey, authType);
         String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
         redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
 
@@ -170,9 +165,8 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_인증_타입을_추출한다() {
         // given
-        AuthType authType = AuthType.APPLE;
         Map<String, Object> claim = Map.of(authTypeClaimKey, authType);
-        String validToken = createBaseJwtBuilder().setSubject("email").addClaims(claim).compact();
+        String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
 
         // when
         AuthType extractedAuthType = signUpTokenProvider.parseAuthType(validToken);
@@ -183,7 +177,7 @@ class SignUpTokenProviderTest {
 
     private String createExpiredToken() {
         return Jwts.builder()
-                .setSubject("subject")
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() - 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
