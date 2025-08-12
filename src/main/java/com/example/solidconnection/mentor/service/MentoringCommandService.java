@@ -11,11 +11,13 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
+import com.example.solidconnection.mentor.dto.MentoringApprovedEvent;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class MentoringCommandService {
 
     private final MentoringRepository mentoringRepository;
     private final MentorRepository mentorRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
@@ -48,6 +51,7 @@ public class MentoringCommandService {
 
         if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
             mentor.increaseMenteeCount();
+            eventPublisher.publishEvent(MentoringApprovedEvent.of(mentoringId, mentor.getSiteUserId(), mentoring.getMenteeId()));
         }
 
         return MentoringConfirmResponse.from(mentoring);
