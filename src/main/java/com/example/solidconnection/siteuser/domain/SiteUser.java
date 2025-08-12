@@ -115,4 +115,8 @@ public class SiteUser {
         this.authType = authType;
         this.password = password;
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
