@@ -32,7 +32,6 @@ public class SignUpService {
     private final SiteUserRepository siteUserRepository;
     private final InterestedRegionService interestedRegionService;
     private final InterestedCountryService interestedCountryService;
-    private final EmailSignUpTokenProvider emailSignUpTokenProvider;
     private final SignUpTokenProvider signUpTokenProvider;
     private final PasswordTemporaryStorage passwordTemporaryStorage;
 
