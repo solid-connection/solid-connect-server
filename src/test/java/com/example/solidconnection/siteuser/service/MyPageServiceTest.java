@@ -1,10 +1,13 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
@@ -19,6 +22,7 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -27,7 +31,6 @@ import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @TestContainerSpringBootTest
 @DisplayName("마이페이지 서비스 테스트")
@@ -61,6 +65,9 @@ class MyPageServiceTest {
     @Autowired
     private SiteUserFixtureBuilder siteUserFixtureBuilder;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private SiteUser user;
 
     @BeforeEach
@@ -77,7 +84,7 @@ class MyPageServiceTest {
         MyPageResponse response = myPageService.getMyPageInfo(user.getId());
 
         // then
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(user.getRole()),
@@ -173,6 +180,47 @@ class MyPageServiceTest {
             assertThatCode(() -> myPageService.updateMyPageInfo(user.getId(), imageFile, "nickname12"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
+        }
+    }
+
+    @Nested
+    class 비밀번호_변경_테스트 {
+
+        private String currentPassword;
+        private String newPassword;
+
+        @BeforeEach
+        void setUp() {
+            currentPassword = passwordEncoder.encode(user.getPassword());
+            newPassword = "newPassword123";
+        }
+
+        @Test
+        void 비밀번호를_성공적으로_변경한다() {
+            // given
+            PasswordUpdateRequest request = new PasswordUpdateRequest(currentPassword, newPassword, newPassword);
+
+            // when
+            myPageService.updatePassword(user.getId(), request);
+
+            // then
+            SiteUser updatedUser = siteUserRepository.findById(user.getId()).get();
+            assertAll(
+                    () -> assertThat(passwordEncoder.matches(newPassword, updatedUser.getPassword())).isTrue(),
+                    () -> assertThat(passwordEncoder.matches(currentPassword, updatedUser.getPassword())).isFalse()
+            );
+        }
+
+        @Test
+        void 현재_비밀번호가_일치하지_않으면_예외가_발생한다() {
+            // given
+            String wrongPassword = "wrongPassword";
+            PasswordUpdateRequest request = new PasswordUpdateRequest(wrongPassword, newPassword, newPassword);
+
+            // when & then
+            assertThatThrownBy(() -> myPageService.updatePassword(user.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(PASSWORD_MISMATCH.getMessage());
         }
     }
 
