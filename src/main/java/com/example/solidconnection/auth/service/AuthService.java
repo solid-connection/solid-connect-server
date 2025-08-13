@@ -27,12 +27,8 @@ public class AuthService {
      * - 리프레시 토큰을 삭제한다.
      * */
     public void signOut(String token) {
-        Subject subject = authTokenProvider.parseSubject(token);
-        long siteUserId = Long.parseLong(subject.value());
-        SiteUser siteUser = siteUserRepository.findById(siteUserId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        AccessToken accessToken = authTokenProvider.generateAccessToken(subject, siteUser.getRole());
+        SiteUser siteUser = authTokenProvider.parseSiteUser(token);
+        AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
         authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
         tokenBlackListService.addToBlacklist(accessToken);
     }
@@ -62,13 +58,9 @@ public class AuthService {
         if (!authTokenProvider.isValidRefreshToken(requestedRefreshToken)) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
-        Subject subject = authTokenProvider.parseSubject(requestedRefreshToken);
-        long siteUserId = Long.parseLong(subject.value());
-
         // 액세스 토큰 재발급
-        SiteUser siteUser = siteUserRepository.findById(siteUserId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        AccessToken newAccessToken = authTokenProvider.generateAccessToken(subject, siteUser.getRole());
+        SiteUser siteUser = authTokenProvider.parseSiteUser(requestedRefreshToken);
+        AccessToken newAccessToken = authTokenProvider.generateAccessToken(siteUser);
         return ReissueResponse.from(newAccessToken);
     }
 }

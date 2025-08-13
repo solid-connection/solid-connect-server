@@ -1,8 +1,12 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +21,21 @@ public class AuthTokenProvider {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
+    private final SiteUserRepository siteUserRepository;
 
-    public AccessToken generateAccessToken(Subject subject, Role role) {
+    public AccessToken generateAccessToken(SiteUser siteUser) {
+        Subject subject = toSubject(siteUser);
+        Role role = siteUser.getRole();
         String token = tokenProvider.generateToken(
-                subject.value(), Map.of(ROLE_CLAIM_KEY, role.name()), TokenType.ACCESS
+                subject.value(),
+                Map.of(ROLE_CLAIM_KEY, role.name()),
+                TokenType.ACCESS
         );
         return new AccessToken(subject, role, token);
     }
 
-    public RefreshToken generateAndSaveRefreshToken(Subject subject) {
+    public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
+        Subject subject = toSubject(siteUser);
         String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
         tokenProvider.saveToken(token, TokenType.REFRESH);
         return new RefreshToken(subject, token);
@@ -49,9 +59,11 @@ public class AuthTokenProvider {
         redisTemplate.delete(refreshTokenKey);
     }
 
-    public Subject parseSubject(String token) {
+    public SiteUser parseSiteUser(String token) {
         String subject = tokenProvider.parseSubject(token);
-        return new Subject(subject);
+        long siteUserId = Long.parseLong(subject);
+        return siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     public Subject toSubject(SiteUser siteUser) {
