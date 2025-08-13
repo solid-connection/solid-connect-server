@@ -191,10 +191,10 @@ class MyPageServiceTest {
 
         @BeforeEach
         void setUp() {
-            currentPassword = passwordEncoder.encode("currentPassword123");
+            currentPassword = "currentPassword123";
             newPassword = "newPassword123";
 
-            user.updatePassword(currentPassword);
+            user.updatePassword(passwordEncoder.encode(currentPassword));
             siteUserRepository.save(user);
         }
 
