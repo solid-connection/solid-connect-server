@@ -80,7 +80,7 @@ class WebSocketStompIntegrationTest {
         void 인증된_사용자는_핸드셰이크를_성공한다() throws Exception {
             // given
             SiteUser user = siteUserFixture.사용자();
-            AccessToken accessToken = authTokenProvider.generateAccessToken(authTokenProvider.toSubject(user), user.getRole());
+            AccessToken accessToken = authTokenProvider.generateAccessToken(user);
 
             WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
             handshakeHeaders.add("Authorization", "Bearer " + accessToken.token());
