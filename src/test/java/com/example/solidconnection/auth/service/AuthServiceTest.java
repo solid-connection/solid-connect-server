@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -90,11 +89,10 @@ class AuthServiceTest {
         @Test
         void 요청의_리프레시_토큰이_저장되어_있으면_액세스_토큰을_재발급한다() {
             // given
-            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(new Subject("subject"));
-            ReissueRequest reissueRequest = new ReissueRequest(refreshToken.token());
+            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(new Subject("1"));
 
             // when
-            ReissueResponse reissuedAccessToken = authService.reissue(siteUser.getId(), reissueRequest);
+            ReissueResponse reissuedAccessToken = authService.reissue(refreshToken.token());
 
             // then - 요청의 리프레시 토큰과 재발급한 액세스 토큰의 subject 가 동일해야 한다.
             Subject expectedSubject = authTokenProvider.parseSubject(refreshToken.token());
@@ -106,10 +104,9 @@ class AuthServiceTest {
         void 요청의_리프레시_토큰이_저장되어있지_않다면_예외가_발생한다() {
             // given
             String invalidRefreshToken = accessToken.token();
-            ReissueRequest reissueRequest = new ReissueRequest(invalidRefreshToken);
 
             // when, then
-            assertThatCode(() -> authService.reissue(siteUser.getId(), reissueRequest))
+            assertThatCode(() -> authService.reissue(invalidRefreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(REFRESH_TOKEN_EXPIRED.getMessage());
         }

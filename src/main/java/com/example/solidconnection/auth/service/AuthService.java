@@ -3,7 +3,6 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
-import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -58,16 +57,17 @@ public class AuthService {
      * - 유효한 리프레시토큰이면, 액세스 토큰을 재발급한다.
      * - 그렇지 않으면 예외를 발생시킨다.
      * */
-    public ReissueResponse reissue(long siteUserId, ReissueRequest reissueRequest) {
+    public ReissueResponse reissue(String requestedRefreshToken) {
         // 리프레시 토큰 확인
-        String requestedRefreshToken = reissueRequest.refreshToken();
         if (!authTokenProvider.isValidRefreshToken(requestedRefreshToken)) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
+        Subject subject = authTokenProvider.parseSubject(requestedRefreshToken);
+        long siteUserId = Long.parseLong(subject.value());
+
         // 액세스 토큰 재발급
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        Subject subject = authTokenProvider.parseSubject(requestedRefreshToken);
         AccessToken newAccessToken = authTokenProvider.generateAccessToken(subject, siteUser.getRole());
         return ReissueResponse.from(newAccessToken);
     }
