@@ -18,6 +18,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 @TestContainerSpringBootTest
 class RefreshTokenCookieManagerTest {
 
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+
     @Autowired
     private RefreshTokenCookieManager cookieManager;
 
@@ -46,7 +48,7 @@ class RefreshTokenCookieManagerTest {
         String header = response.getHeader("Set-Cookie");
         assertAll(
                 () -> assertThat(header).isNotNull(),
-                () -> assertThat(header).contains("refreshToken=" + refreshToken),
+                () -> assertThat(header).contains(REFRESH_TOKEN_COOKIE_NAME + "=" + refreshToken),
                 () -> assertThat(header).contains("HttpOnly"),
                 () -> assertThat(header).contains("Secure"),
                 () -> assertThat(header).contains("Path=/"),
@@ -68,12 +70,11 @@ class RefreshTokenCookieManagerTest {
         String header = response.getHeader("Set-Cookie");
         assertAll(
                 () -> assertThat(header).isNotNull(),
-                () -> assertThat(header).contains("refreshToken="),
+                () -> assertThat(header).contains(REFRESH_TOKEN_COOKIE_NAME + "="),
                 () -> assertThat(header).contains("HttpOnly"),
                 () -> assertThat(header).contains("Secure"),
                 () -> assertThat(header).contains("Path=/"),
                 () -> assertThat(header).contains("Max-Age=0"),
-                () -> assertThat(header).contains("SameSite=Strict"),
                 () -> assertThat(header).contains("Domain=" + domain),
                 () -> assertThat(header).contains("SameSite=" + sameSite)
         );
