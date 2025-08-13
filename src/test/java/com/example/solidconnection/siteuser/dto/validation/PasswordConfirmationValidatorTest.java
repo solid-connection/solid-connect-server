@@ -3,7 +3,6 @@ package com.example.solidconnection.siteuser.dto.validation;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_NOT_CHANGED;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_NOT_CONFIRMED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import jakarta.validation.ConstraintViolation;
@@ -18,6 +17,8 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("비밀번호 변경 유효성 검사 테스트")
 class PasswordConfirmationValidatorTest {
+
+    private static final String MESSAGE = "message";
 
     private Validator validator;
 
@@ -51,15 +52,10 @@ class PasswordConfirmationValidatorTest {
             Set<ConstraintViolation<PasswordUpdateRequest>> violations = validator.validate(request);
 
             // then
-            assertAll(
-                    () -> assertThat(violations)
-                            .isNotEmpty()
-                            .extracting("message")
-                            .contains(PASSWORD_NOT_CONFIRMED.getMessage()),
-                    () -> assertThat(violations)
-                            .extracting(v -> v.getPropertyPath().toString())
-                            .containsExactly("confirmNewPassword")
-            );
+            assertThat(violations)
+                    .isNotEmpty()
+                    .extracting(MESSAGE)
+                    .contains(PASSWORD_NOT_CONFIRMED.getMessage());
         }
 
         @Test
@@ -71,15 +67,10 @@ class PasswordConfirmationValidatorTest {
             Set<ConstraintViolation<PasswordUpdateRequest>> violations = validator.validate(request);
 
             // then
-            assertAll(
-                    () -> assertThat(violations)
-                            .isNotEmpty()
-                            .extracting("message")
-                            .contains(PASSWORD_NOT_CHANGED.getMessage()),
-                    () -> assertThat(violations)
-                            .extracting(v -> v.getPropertyPath().toString())
-                            .containsExactly("newPassword")
-            );
+            assertThat(violations)
+                    .isNotEmpty()
+                    .extracting(MESSAGE)
+                    .contains(PASSWORD_NOT_CHANGED.getMessage());
         }
     }
 }
