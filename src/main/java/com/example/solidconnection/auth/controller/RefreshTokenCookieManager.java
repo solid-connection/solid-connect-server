@@ -1,9 +1,15 @@
 package com.example.solidconnection.auth.controller;
 
 import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
+import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_NOT_EXISTS;
+
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.common.exception.CustomException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -44,4 +50,18 @@ public class RefreshTokenCookieManager {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+
+    public String getRefreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            throw new CustomException(REFRESH_TOKEN_NOT_EXISTS);
+        }
+
+        return Arrays.stream(cookies)
+                .filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(REFRESH_TOKEN_NOT_EXISTS))
+                .getValue();
+    }
 }
+
