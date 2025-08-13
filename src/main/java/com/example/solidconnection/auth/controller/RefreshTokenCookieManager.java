@@ -19,7 +19,7 @@ public class RefreshTokenCookieManager {
     }
 
     private long convertExpireTimeToCookieMaxAge(long milliSeconds) {
-        // jwt의 expireTime: millisecond, cookie의 maxAge: second
+        // jwt의 expireTime 단위인 millisecond를 cookie의 maxAge 단위인 second로 변환
         return milliSeconds / 1000;
     }
 
