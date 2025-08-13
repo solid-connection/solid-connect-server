@@ -1,5 +1,6 @@
 package com.example.solidconnection.siteuser.dto;
 
+import com.example.solidconnection.auth.dto.validation.Password;
 import com.example.solidconnection.siteuser.dto.validation.PasswordConfirmation;
 import jakarta.validation.constraints.NotBlank;
 
