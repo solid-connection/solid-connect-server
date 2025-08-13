@@ -116,7 +116,7 @@ public class SiteUser {
         this.password = password;
     }
 
-    public void updatePassword(String newPassword) {
-        this.password = newPassword;
+    public void updatePassword(String newEncodedPassword) {
+        this.password = newEncodedPassword;
     }
 }

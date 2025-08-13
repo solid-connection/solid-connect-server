@@ -15,7 +15,7 @@ public class PasswordConfirmationValidator implements ConstraintValidator<Passwo
         context.disableDefaultConstraintViolation();
 
         if (isNewPasswordNotConfirmed(request)) {
-            addConstraintViolation(context, PASSWORD_NOT_CONFIRMED.getMessage(), "confirmNewPassword");
+            addConstraintViolation(context, PASSWORD_NOT_CONFIRMED.getMessage(), "newPasswordConfirmation");
 
             return false;
         }
@@ -30,7 +30,7 @@ public class PasswordConfirmationValidator implements ConstraintValidator<Passwo
     }
 
     private boolean isNewPasswordNotConfirmed(PasswordUpdateRequest request) {
-        return !Objects.equals(request.newPassword(), request.confirmNewPassword());
+        return !Objects.equals(request.newPassword(), request.newPasswordConfirmation());
     }
 
     private boolean isPasswordUnchanged(PasswordUpdateRequest request) {
