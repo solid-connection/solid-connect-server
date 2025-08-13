@@ -162,4 +162,17 @@ public class ChatService {
 
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
+
+    @Transactional
+    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
+            return;
+        }
+
+        ChatRoom chatRoom = new ChatRoom(mentoringId, false);
+        chatRoom = chatRoomRepository.save(chatRoom);
+        ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
+        ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
+        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
+    }
 }

@@ -9,6 +9,7 @@ public record MentoringForMentorResponse(
         String profileImageUrl,
         String nickname,
         boolean isChecked,
+        boolean isConfirmed,
         ZonedDateTime createdAt
 ) {
 
@@ -18,6 +19,7 @@ public record MentoringForMentorResponse(
                 partner.getProfileImageUrl(),
                 partner.getNickname(),
                 mentoring.getCheckedAtByMentor() != null,
+                mentoring.getConfirmedAt() != null,
                 mentoring.getCreatedAt()
         );
     }

@@ -32,10 +32,10 @@ public class Mentor {
     @Column
     private boolean hasBadge = false;
 
-    @Column(length = 1000)
+    @Column(length = 1000, nullable = false)
     private String introduction;
 
-    @Column(length = 1000)
+    @Column(length = 1000, nullable = false)
     private String passTip;
 
     @Column
