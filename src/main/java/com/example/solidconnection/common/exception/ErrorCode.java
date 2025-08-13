@@ -56,6 +56,7 @@ public enum ErrorCode {
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(), "액세스 토큰이 만료되었습니다. 재발급 api를 호출해주세요."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(), "리프레시 토큰이 만료되었습니다. 다시 로그인을 진행해주세요."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다."),
+    SIGN_IN_FAILED(HttpStatus.UNAUTHORIZED.value(), "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."),
 
     // s3
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),
