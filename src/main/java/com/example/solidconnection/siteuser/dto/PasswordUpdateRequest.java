@@ -9,7 +9,7 @@ public record PasswordUpdateRequest(
         String currentPassword,
 
         @NotBlank(message = "새 비밀번호를 입력해주세요.")
-        // @Password // todo: #435 merge 후
+        @Password
         String newPassword,
 
         @NotBlank(message = "새 비밀번호를 다시 한번 입력해주세요.")
