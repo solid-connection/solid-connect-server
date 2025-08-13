@@ -85,3 +85,6 @@ cors:
     - "http://localhost:8080"
 news:
   default-thumbnail-url: "default-thumbnail-url"
+token:
+  refresh:
+    cookie-domain: "test.domain.com"
