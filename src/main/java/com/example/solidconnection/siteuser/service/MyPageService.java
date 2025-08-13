@@ -98,13 +98,13 @@ public class MyPageService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         // 사용자의 비밀번호와 request의 currentPassword가 동일한지 검증
-        validateCurrentPasswordSame(user.getPassword(), request.currentPassword());
+        validateCurrentPasswordSame(request.currentPassword(), user.getPassword());
 
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
     }
 
-    private void validateCurrentPasswordSame(String userPassword, String currentPassword) {
-        if (!passwordEncoder.matches(userPassword, currentPassword)) {
+    private void validateCurrentPasswordSame(String currentPassword, String userPassword) {
+        if (!passwordEncoder.matches(currentPassword, userPassword)) {
             throw new CustomException(PASSWORD_MISMATCH);
         }
     }
