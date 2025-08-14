@@ -7,7 +7,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.KAKAO_USER_
 import com.example.solidconnection.auth.client.config.KakaoOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
+import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
+import com.example.solidconnection.auth.service.oauth.OAuthClient;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -27,12 +30,18 @@ import org.springframework.web.util.UriComponentsBuilder;
  * */
 @Component
 @RequiredArgsConstructor
-public class KakaoOAuthClient {
+public class KakaoOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate;
     private final KakaoOAuthClientProperties kakaoOAuthClientProperties;
 
-    public KakaoUserInfoDto getUserInfo(String code) {
+    @Override
+    public AuthType getAuthType() {
+        return AuthType.KAKAO;
+    }
+
+    @Override
+    public OAuthUserInfoDto getUserInfo(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);
     }

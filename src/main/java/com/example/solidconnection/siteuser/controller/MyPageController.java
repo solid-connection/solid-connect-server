@@ -3,11 +3,14 @@ package com.example.solidconnection.siteuser.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.service.MyPageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +38,15 @@ class MyPageController {
             @RequestParam(value = "nickname", required = false) String nickname
     ) {
         myPageService.updateMyPageInfo(siteUserId, imageFile, nickname);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> updatePassword(
+            @AuthorizedUser long siteUserId,
+            @RequestBody @Valid PasswordUpdateRequest request
+    ) {
+        myPageService.updatePassword(siteUserId, request);
         return ResponseEntity.ok().build();
     }
 }

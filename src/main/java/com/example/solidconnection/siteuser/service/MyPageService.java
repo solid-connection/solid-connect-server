@@ -7,15 +7,15 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
-import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.mentor.repository.MentorRepository;
+import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;

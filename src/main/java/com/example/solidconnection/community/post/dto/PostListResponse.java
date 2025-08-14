@@ -15,7 +15,7 @@ public record PostListResponse(
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt,
         String postCategory,
-        String url
+        String postThumbnailUrl
 ) {
 
     public static PostListResponse from(Post post) {

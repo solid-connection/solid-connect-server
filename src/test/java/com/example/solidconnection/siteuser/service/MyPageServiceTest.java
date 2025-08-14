@@ -29,7 +29,6 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
@@ -133,45 +132,6 @@ class MyPageServiceTest {
         );
     }
 
-    private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
-
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
-        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
-    }
-
-    private MockMultipartFile createValidImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
-    }
-
-    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
-        String formatLastModifiedAt = String.format(
-                "(마지막 수정 시간 : %s)",
-                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
-        );
-        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
-    }
-
-    private SiteUser createSiteUserWithCustomProfile() {
-        return siteUserFixtureBuilder.siteUser()
-                .email("customProfile@example.com")
-                .authType(AuthType.EMAIL)
-                .nickname("커스텀프로필")
-                .profileImageUrl("profile/profileImageUrl")
-                .role(Role.MENTEE)
-                .password("customPassword123")
-                .create();
-    }
-
     @Nested
     class 프로필_이미지_수정_테스트 {
 
@@ -258,5 +218,44 @@ class MyPageServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(createExpectedErrorMessage(modifiedAt));
         }
+    }
+
+    private int createLikedUnivApplyInfos(SiteUser testUser) {
+        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
+
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
+        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
+    }
+
+    private MockMultipartFile createValidImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
+    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
+        String formatLastModifiedAt = String.format(
+                "(마지막 수정 시간 : %s)",
+                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
+        );
+        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
+    }
+
+    private SiteUser createSiteUserWithCustomProfile() {
+        return siteUserFixtureBuilder.siteUser()
+                .email("customProfile@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname("커스텀프로필")
+                .profileImageUrl("profile/profileImageUrl")
+                .role(Role.MENTEE)
+                .password("customPassword123")
+                .create();
     }
 }

@@ -166,4 +166,44 @@ class PostQueryServiceTest {
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
     }
+
+    @Test
+    void 게시글_목록_조회시_첫번째_이미지를_썸네일로_반환한다() {
+        // given
+        String firstImageUrl = "first-thumbnail-url";
+        String secondImageUrl = "second-thumbnail-url";
+        postImageFixture.게시글_이미지(firstImageUrl, post1);
+        postImageFixture.게시글_이미지(secondImageUrl, post1);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
+        );
+
+        // then
+        PostListResponse postResponse = actualResponses.stream()
+                .filter(p -> p.id().equals(post1.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(postResponse.postThumbnailUrl()).isEqualTo(firstImageUrl);
+    }
+
+    @Test
+    void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
+        );
+
+        // then
+        PostListResponse postResponse = actualResponses.stream()
+                .filter(p -> p.id().equals(post3.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(postResponse.postThumbnailUrl()).isNull();
+    }
 }

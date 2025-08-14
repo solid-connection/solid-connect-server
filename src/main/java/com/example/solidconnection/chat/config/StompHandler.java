@@ -2,10 +2,14 @@ package com.example.solidconnection.chat.config;
 
 import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
 
-import com.example.solidconnection.auth.token.JwtTokenProvider;
+import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
-import io.jsonwebtoken.Claims;
+import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
+import java.security.Principal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -18,47 +22,48 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private static final Pattern ROOM_ID_PATTERN = Pattern.compile("^/topic/chat/(\\d+)$");
+    private final ChatService chatService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            Claims claims = validateAndExtractClaims(accessor, AUTHENTICATION_FAILED);
+            Principal user = accessor.getUser();
+            if (user == null) {
+                throw new CustomException(AUTHENTICATION_FAILED);
+            }
         }
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-            Claims claims = validateAndExtractClaims(accessor, AUTHENTICATION_FAILED);
+            Principal user = accessor.getUser();
+            if (user == null) {
+                throw new CustomException(AUTHENTICATION_FAILED);
+            }
 
-            String email = claims.getSubject();
+            TokenAuthentication tokenAuthentication = (TokenAuthentication) user;
+            SiteUserDetails siteUserDetails = (SiteUserDetails) tokenAuthentication.getPrincipal();
+
             String destination = accessor.getDestination();
+            long roomId = Long.parseLong(extractRoomId(destination));
 
-            String roomId = extractRoomId(destination);
-
-            // todo: roomId 기반 실제 구독 권한 검사 로직 추가
+            chatService.validateChatRoomParticipant(siteUserDetails.getSiteUser().getId(), roomId);
         }
 
         return message;
-    }
-
-    private Claims validateAndExtractClaims(StompHeaderAccessor accessor, ErrorCode errorCode) {
-        String bearerToken = accessor.getFirstNativeHeader("Authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            throw new CustomException(errorCode);
-        }
-        String token = bearerToken.substring(7);
-        return jwtTokenProvider.parseClaims(token);
     }
 
     private String extractRoomId(String destination) {
         if (destination == null) {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
-        String[] parts = destination.split("/");
-        if (parts.length < 3 || !parts[1].equals("topic")) {
+
+        Matcher matcher = ROOM_ID_PATTERN.matcher(destination);
+        if (!matcher.matches()) {
             throw new CustomException(ErrorCode.INVALID_ROOM_ID);
         }
-        return parts[2];
+
+        return matcher.group(1);
     }
 }
