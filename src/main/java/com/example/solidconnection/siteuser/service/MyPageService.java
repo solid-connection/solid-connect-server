@@ -3,19 +3,21 @@ package com.example.solidconnection.siteuser.service;
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
-import com.example.solidconnection.mentor.repository.MentorRepository;
-import com.example.solidconnection.location.country.repository.CountryRepository;
+import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +38,7 @@ public class MyPageService {
     public static final int MIN_DAYS_BETWEEN_NICKNAME_CHANGES = 7;
     public static final DateTimeFormatter NICKNAME_LAST_CHANGE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    private final PasswordEncoder passwordEncoder;
     private final SiteUserRepository siteUserRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
     private final CountryRepository countryRepository;
@@ -110,5 +114,22 @@ public class MyPageService {
     private boolean isDefaultProfileImage(String profileImageUrl) {
         String prefix = "profile/";
         return profileImageUrl == null || !profileImageUrl.startsWith(prefix);
+    }
+
+    @Transactional
+    public void updatePassword(long siteUserId, PasswordUpdateRequest request) {
+        SiteUser user = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        // 사용자의 비밀번호와 request의 currentPassword가 동일한지 검증
+        validatePasswordMatch(request.currentPassword(), user.getPassword());
+
+        user.updatePassword(passwordEncoder.encode(request.newPassword()));
+    }
+
+    private void validatePasswordMatch(String currentPassword, String userPassword) {
+        if (!passwordEncoder.matches(currentPassword, userPassword)) {
+            throw new CustomException(PASSWORD_MISMATCH);
+        }
     }
 }
