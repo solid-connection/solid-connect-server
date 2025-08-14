@@ -24,4 +24,15 @@ public class InterestedCountryService {
                 .toList();
         interestedCountryRepository.saveAll(interestedCountries);
     }
+
+    @Transactional
+    public void updateInterestedCountry(SiteUser siteUser, List<String> koreanNames) {
+        interestedCountryRepository.deleteBySiteUser(siteUser);
+
+        List<InterestedCountry> interestedCountries = countryRepository.findAllByKoreanNameIn(koreanNames)
+                .stream()
+                .map(country -> new InterestedCountry(siteUser, country))
+                .toList();
+        interestedCountryRepository.saveAll(interestedCountries);
+    }
 }
