@@ -286,7 +286,7 @@ class MyPageServiceTest {
 
             List<String> newCountries = List.of(캐나다.getKoreanName(), 일본.getKoreanName());
             List<String> newRegions = List.of(아시아.getKoreanName());
-            LocationUpdateRequest request = new LocationUpdateRequest(newCountries, newRegions);
+            LocationUpdateRequest request = new LocationUpdateRequest(newRegions, newCountries);
 
             // when
             myPageService.updateLocation(user.getId(), request);
@@ -310,7 +310,7 @@ class MyPageServiceTest {
             // given
             List<String> newCountries = List.of(미국.getKoreanName());
             List<String> newRegions = List.of(영미권.getKoreanName());
-            LocationUpdateRequest request = new LocationUpdateRequest(newCountries, newRegions);
+            LocationUpdateRequest request = new LocationUpdateRequest(newRegions, newCountries);
 
             // when
             myPageService.updateLocation(user.getId(), request);
