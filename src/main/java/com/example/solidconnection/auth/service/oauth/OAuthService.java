@@ -7,6 +7,7 @@ import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
 import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
 import com.example.solidconnection.auth.service.SignInService;
+import com.example.solidconnection.auth.service.SignUpTokenProvider;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OAuthService {
 
-    private final OAuthSignUpTokenProvider OAuthSignUpTokenProvider;
+    private final SignUpTokenProvider signUpTokenProvider;
     private final SignInService signInService;
     private final SiteUserRepository siteUserRepository;
     private final OAuthClientMap oauthClientMap;
@@ -49,7 +50,7 @@ public class OAuthService {
     }
 
     private SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto, AuthType authType) {
-        String signUpToken = OAuthSignUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), authType);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), authType);
         return SignUpPrepareResponse.of(userInfoDto, signUpToken);
     }
 }

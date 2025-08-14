@@ -55,7 +55,7 @@ class EmailSignInServiceTest {
             // when & then
             assertThatCode(() -> emailSignInService.signIn(signInRequest))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+                    .hasMessageContaining(ErrorCode.SIGN_IN_FAILED.getMessage());
         }
 
         @Test
@@ -68,7 +68,7 @@ class EmailSignInServiceTest {
             // when & then
             assertThatCode(() -> emailSignInService.signIn(signInRequest))
                     .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
+                    .hasMessageContaining(ErrorCode.SIGN_IN_FAILED.getMessage());
         }
     }
 }
