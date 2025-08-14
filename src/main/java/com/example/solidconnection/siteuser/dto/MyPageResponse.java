@@ -1,9 +1,13 @@
 package com.example.solidconnection.siteuser.dto;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
+
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 public record MyPageResponse(
         String nickname,
@@ -15,9 +19,15 @@ public record MyPageResponse(
         int likedMentorCount,
 
         @JsonProperty("likedUniversityCount")
-        int likedUnivApplyInfoCount) {
+        int likedUnivApplyInfoCount,
 
-    public static MyPageResponse of(SiteUser siteUser, int likedUnivApplyInfoCount) {
+        @JsonInclude(NON_NULL)
+        List<String> interestedCountries,
+
+        @JsonInclude(NON_NULL)
+        String attendedUniversity) {
+
+    public static MyPageResponse of(SiteUser siteUser, int likedUnivApplyInfoCount, List<String> interestedCountries, String attendedUniversity) {
         return new MyPageResponse(
                 siteUser.getNickname(),
                 siteUser.getProfileImageUrl(),
@@ -26,7 +36,9 @@ public record MyPageResponse(
                 siteUser.getEmail(),
                 0, // TODO: 커뮤니티 기능 생기면 업데이트 필요
                 0, // TODO: 멘토 기능 생기면 업데이트 필요
-                likedUnivApplyInfoCount
+                likedUnivApplyInfoCount,
+                interestedCountries,
+                attendedUniversity
         );
     }
 }
