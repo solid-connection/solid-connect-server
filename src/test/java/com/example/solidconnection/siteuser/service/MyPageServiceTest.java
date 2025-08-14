@@ -15,12 +15,23 @@ import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.then;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.domain.Country;
+import com.example.solidconnection.location.country.domain.InterestedCountry;
+import com.example.solidconnection.location.country.fixture.CountryFixture;
+import com.example.solidconnection.location.country.repository.CountryRepository;
+import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
+import com.example.solidconnection.location.region.domain.InterestedRegion;
+import com.example.solidconnection.location.region.domain.Region;
+import com.example.solidconnection.location.region.fixture.RegionFixture;
+import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
+import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -31,6 +42,7 @@ import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,10 +69,28 @@ class MyPageServiceTest {
     private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
 
     @Autowired
+    private InterestedCountryRepository interestedCountryRepository;
+
+    @Autowired
+    private InterestedRegionRepository interestedRegionRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
+
+    @Autowired
     private SiteUserFixture siteUserFixture;
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
+
+    @Autowired
+    private CountryFixture countryFixture;
+
+    @Autowired
+    private RegionFixture regionFixture;
 
     @Autowired
     private SiteUserFixtureBuilder siteUserFixtureBuilder;
@@ -224,6 +254,100 @@ class MyPageServiceTest {
             assertThatThrownBy(() -> myPageService.updatePassword(user.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PASSWORD_MISMATCH.getMessage());
+        }
+    }
+
+    @Nested
+    class 관심_지역_및_국가_변경_테스트 {
+
+        private Country 미국;
+        private Country 캐나다;
+        private Country 일본;
+        private Region 영미권;
+        private Region 아시아;
+
+        @BeforeEach
+        void setUp() {
+            미국 = countryFixture.미국();
+            캐나다 = countryFixture.캐나다();
+            일본 = countryFixture.일본();
+            영미권 = regionFixture.영미권();
+            아시아 = regionFixture.아시아();
+
+            countryRepository.saveAll(List.of(미국, 캐나다, 일본));
+            regionRepository.saveAll(List.of(영미권, 아시아));
+        }
+
+        @Test
+        void 관심_지역과_국가를_성공적으로_수정한다() {
+            // given
+            interestedCountryRepository.save(new InterestedCountry(user, 미국));
+            interestedRegionRepository.save(new InterestedRegion(user, 영미권));
+
+            List<String> newCountries = List.of(캐나다.getKoreanName(), 일본.getKoreanName());
+            List<String> newRegions = List.of(아시아.getKoreanName());
+            LocationUpdateRequest request = new LocationUpdateRequest(newCountries, newRegions);
+
+            // when
+            myPageService.updateLocation(user.getId(), request);
+
+            // then
+            List<InterestedCountry> updatedCountries = interestedCountryRepository.findAllBySiteUserId(user.getId());
+            List<InterestedRegion> updatedRegions = interestedRegionRepository.findAllBySiteUserId(user.getId());
+
+            assertAll(
+                    () -> assertThat(updatedCountries).hasSize(2)
+                            .extracting(InterestedCountry::getCountryCode)
+                            .containsExactlyInAnyOrder(캐나다.getCode(), 일본.getCode()),
+                    () -> assertThat(updatedRegions).hasSize(1)
+                            .extracting(InterestedRegion::getRegionCode)
+                            .containsExactly(아시아.getCode())
+            );
+        }
+
+        @Test
+        void 기존에_관심_지역과_국가가_없어도_성공적으로_추가된다() {
+            // given
+            List<String> newCountries = List.of(미국.getKoreanName());
+            List<String> newRegions = List.of(영미권.getKoreanName());
+            LocationUpdateRequest request = new LocationUpdateRequest(newCountries, newRegions);
+
+            // when
+            myPageService.updateLocation(user.getId(), request);
+
+            // then
+            List<InterestedCountry> updatedCountries = interestedCountryRepository.findAllBySiteUserId(user.getId());
+            List<InterestedRegion> updatedRegions = interestedRegionRepository.findAllBySiteUserId(user.getId());
+
+            assertAll(
+                    () -> assertThat(updatedCountries).hasSize(1)
+                            .extracting(InterestedCountry::getCountryCode)
+                            .containsExactly(미국.getCode()),
+                    () -> assertThat(updatedRegions).hasSize(1)
+                            .extracting(InterestedRegion::getRegionCode)
+                            .containsExactly(영미권.getCode())
+            );
+        }
+
+        @Test
+        void 빈_리스트를_전달하면_모든_관심_지역과_국가가_삭제된다() {
+            // given
+            interestedCountryRepository.save(new InterestedCountry(user, 미국));
+            interestedRegionRepository.save(new InterestedRegion(user, 영미권));
+
+            LocationUpdateRequest request = new LocationUpdateRequest(List.of(), List.of());
+
+            // when
+            myPageService.updateLocation(user.getId(), request);
+
+            // then
+            List<InterestedCountry> updatedCountries = interestedCountryRepository.findAllBySiteUserId(user.getId());
+            List<InterestedRegion> updatedRegions = interestedRegionRepository.findAllBySiteUserId(user.getId());
+
+            assertAll(
+                    () -> assertThat(updatedCountries).isEmpty(),
+                    () -> assertThat(updatedRegions).isEmpty()
+            );
         }
     }
 
