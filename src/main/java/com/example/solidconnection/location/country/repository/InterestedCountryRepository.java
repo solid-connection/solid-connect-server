@@ -9,6 +9,6 @@ public interface InterestedCountryRepository extends JpaRepository<InterestedCou
 
     List<InterestedCountry> findAllBySiteUserId(long siteUserId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteBySiteUserId(long siteUserId);
 }

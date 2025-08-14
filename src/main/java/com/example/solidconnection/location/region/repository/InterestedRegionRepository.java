@@ -9,6 +9,6 @@ public interface InterestedRegionRepository extends JpaRepository<InterestedRegi
 
     List<InterestedRegion> findAllBySiteUserId(long siteUserId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteBySiteUserId(long siteUserId);
 }
