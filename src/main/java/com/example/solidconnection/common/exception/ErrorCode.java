@@ -56,6 +56,7 @@ public enum ErrorCode {
     ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(), "액세스 토큰이 만료되었습니다. 재발급 api를 호출해주세요."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED.value(), "리프레시 토큰이 만료되었습니다. 다시 로그인을 진행해주세요."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "접근 권한이 없습니다."),
+    REFRESH_TOKEN_NOT_EXISTS(HttpStatus.BAD_REQUEST.value(), "리프레시 토큰이 존재하지 않습니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     PASSWORD_NOT_CHANGED(HttpStatus.BAD_REQUEST.value(), "현재 비밀번호와 새 비밀번호가 동일합니다."),
     PASSWORD_NOT_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "새 비밀번호가 일치하지 않습니다."),
