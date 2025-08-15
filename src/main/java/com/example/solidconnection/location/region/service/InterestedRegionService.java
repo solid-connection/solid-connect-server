@@ -27,7 +27,7 @@ public class InterestedRegionService {
 
     @Transactional
     public void updateInterestedRegion(SiteUser siteUser, List<String> koreanNames) {
-        interestedRegionRepository.deleteBySiteUserId(siteUser.getId());
+        interestedRegionRepository.deleteAllBySiteUserId(siteUser.getId());
 
         List<InterestedRegion> interestedRegions = regionRepository.findAllByKoreanNameIn(koreanNames)
                 .stream()

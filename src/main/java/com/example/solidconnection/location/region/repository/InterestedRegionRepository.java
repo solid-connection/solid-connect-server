@@ -8,5 +8,5 @@ public interface InterestedRegionRepository extends JpaRepository<InterestedRegi
 
     List<InterestedRegion> findAllBySiteUserId(long siteUserId);
 
-    void deleteBySiteUserId(long siteUserId);
+    void deleteAllBySiteUserId(long siteUserId);
 }

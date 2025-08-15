@@ -27,7 +27,7 @@ public class InterestedCountryService {
 
     @Transactional
     public void updateInterestedCountry(SiteUser siteUser, List<String> koreanNames) {
-        interestedCountryRepository.deleteBySiteUserId(siteUser.getId());
+        interestedCountryRepository.deleteAllBySiteUserId(siteUser.getId());
 
         List<InterestedCountry> interestedCountries = countryRepository.findAllByKoreanNameIn(koreanNames)
                 .stream()

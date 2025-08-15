@@ -8,5 +8,5 @@ public interface InterestedCountryRepository extends JpaRepository<InterestedCou
 
     List<InterestedCountry> findAllBySiteUserId(long siteUserId);
 
-    void deleteBySiteUserId(long siteUserId);
+    void deleteAllBySiteUserId(long siteUserId);
 }
