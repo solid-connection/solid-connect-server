@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.controller;
 
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
+import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.common.dto.SliceResponse;
@@ -38,6 +39,15 @@ public class ChatController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         SliceResponse<ChatMessageResponse> response = chatService.getChatMessages(siteUserId, roomId, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("rooms/{room-id}/partner")
+    public ResponseEntity<ChatParticipantResponse> getChatPartner(
+            @AuthorizedUser long siteUserId,
+            @PathVariable("room-id") Long roomId
+    ) {
+        ChatParticipantResponse response = chatService.getChatPartner(siteUserId, roomId);
         return ResponseEntity.ok(response);
     }
 
