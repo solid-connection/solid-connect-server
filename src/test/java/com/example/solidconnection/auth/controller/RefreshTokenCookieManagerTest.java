@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -115,10 +117,23 @@ class RefreshTokenCookieManagerTest {
         }
 
         @Test
-        void 리프레시_토큰에_해당하는_쿠키가_없으면_예외가_발생한다() {
+        void 리프레시_토큰_쿠키가_없으면_예외가_발생한다() {
             // given
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.setCookies(new Cookie("otherCookie", "some-value"));
+
+            // when & then
+            assertThatCode(() -> cookieManager.getRefreshToken(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(ErrorCode.REFRESH_TOKEN_NOT_EXISTS.getMessage());
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"", " "})
+        void 리프레시_토큰_쿠키가_비어있으면_예외가_발생한다(String token) {
+            // given
+            MockHttpServletRequest request = new MockHttpServletRequest();
+            request.setCookies(new Cookie(REFRESH_TOKEN_COOKIE_NAME, token));
 
             // when & then
             assertThatCode(() -> cookieManager.getRefreshToken(request))
