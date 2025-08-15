@@ -1,15 +1,15 @@
 package com.example.solidconnection.auth.controller;
 
-import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_NOT_EXISTS;
 
+import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
