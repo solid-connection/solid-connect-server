@@ -37,9 +37,10 @@ public class NewsController {
     // todo: 추후 Slice 적용
     @GetMapping
     public ResponseEntity<NewsListResponse> findNewsBySiteUserId(
-            @RequestParam(value = "site-user-id") Long siteUserId
+            @AuthorizedUser(required = false) Long siteUserId,
+            @RequestParam(value = "author-id") Long authorId
     ) {
-        NewsListResponse newsListResponse = newsQueryService.findNewsBySiteUserId(siteUserId);
+        NewsListResponse newsListResponse = newsQueryService.findNewsByAuthorId(siteUserId, authorId);
         return ResponseEntity.ok(newsListResponse);
     }
 
