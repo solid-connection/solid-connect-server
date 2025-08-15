@@ -18,13 +18,11 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.domain.InterestedCountry;
 import com.example.solidconnection.location.country.fixture.CountryFixture;
-import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.country.repository.InterestedCountryRepository;
 import com.example.solidconnection.location.region.domain.InterestedRegion;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
-import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -73,12 +71,6 @@ class MyPageServiceTest {
 
     @Autowired
     private InterestedRegionRepository interestedRegionRepository;
-
-    @Autowired
-    private CountryRepository countryRepository;
-
-    @Autowired
-    private RegionRepository regionRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -273,9 +265,6 @@ class MyPageServiceTest {
             일본 = countryFixture.일본();
             영미권 = regionFixture.영미권();
             아시아 = regionFixture.아시아();
-
-            countryRepository.saveAll(List.of(미국, 캐나다, 일본));
-            regionRepository.saveAll(List.of(영미권, 아시아));
         }
 
         @Test
@@ -296,10 +285,10 @@ class MyPageServiceTest {
             List<InterestedRegion> updatedRegions = interestedRegionRepository.findAllBySiteUserId(user.getId());
 
             assertAll(
-                    () -> assertThat(updatedCountries).hasSize(2)
+                    () -> assertThat(updatedCountries)
                             .extracting(InterestedCountry::getCountryCode)
                             .containsExactlyInAnyOrder(캐나다.getCode(), 일본.getCode()),
-                    () -> assertThat(updatedRegions).hasSize(1)
+                    () -> assertThat(updatedRegions)
                             .extracting(InterestedRegion::getRegionCode)
                             .containsExactly(아시아.getCode())
             );
@@ -320,10 +309,10 @@ class MyPageServiceTest {
             List<InterestedRegion> updatedRegions = interestedRegionRepository.findAllBySiteUserId(user.getId());
 
             assertAll(
-                    () -> assertThat(updatedCountries).hasSize(1)
+                    () -> assertThat(updatedCountries)
                             .extracting(InterestedCountry::getCountryCode)
                             .containsExactly(미국.getCode()),
-                    () -> assertThat(updatedRegions).hasSize(1)
+                    () -> assertThat(updatedRegions)
                             .extracting(InterestedRegion::getRegionCode)
                             .containsExactly(영미권.getCode())
             );
