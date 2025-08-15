@@ -1,7 +1,6 @@
 package com.example.solidconnection.news.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.news.dto.LikedNewsResponse;
 import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsListResponse;
@@ -79,15 +78,6 @@ public class NewsController {
     ) {
         NewsCommandResponse newsCommandResponse = newsCommandService.deleteNewsById(siteUserId, newsId);
         return ResponseEntity.ok(newsCommandResponse);
-    }
-
-    @GetMapping("/{news-id}/like")
-    public ResponseEntity<LikedNewsResponse> isNewsLiked(
-            @AuthorizedUser long siteUserId,
-            @PathVariable("news-id") Long newsId
-    ) {
-        LikedNewsResponse likedNewsResponse = newsLikeService.isNewsLiked(siteUserId, newsId);
-        return ResponseEntity.ok(likedNewsResponse);
     }
 
     @PostMapping("/{news-id}/like")
