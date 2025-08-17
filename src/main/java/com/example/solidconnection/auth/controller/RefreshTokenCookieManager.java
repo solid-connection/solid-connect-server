@@ -72,4 +72,3 @@ public class RefreshTokenCookieManager {
         return refreshToken;
     }
 }
-
