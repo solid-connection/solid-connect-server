@@ -19,7 +19,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +52,7 @@ public class MentoringQueryService {
         Map<Long, Long> mentoringIdToChatRoomId = mapMentoringIdToChatRoomIdWithBatchQuery(mentoringSlice.getContent());
 
         List<MentoringForMenteeResponse> content = new ArrayList<>();
-        for (Mentoring mentoring : mentoringToPartnerUser.keySet()) {
+        for (Mentoring mentoring : mentoringSlice) {
             content.add(MentoringForMenteeResponse.of(
                     mentoring,
                     mentoringToPartnerUser.get(mentoring),
@@ -86,8 +85,8 @@ public class MentoringQueryService {
         );
 
         List<MentoringForMentorResponse> content = new ArrayList<>();
-        for (Entry<Mentoring, SiteUser> entry : mentoringToPartnerUser.entrySet()) {
-            content.add(MentoringForMentorResponse.of(entry.getKey(), entry.getValue()));
+        for (Mentoring mentoring : mentoringSlice) {
+            content.add(MentoringForMentorResponse.of(mentoring, mentoringToPartnerUser.get(mentoring)));
         }
 
         return SliceResponse.of(content, mentoringSlice);
