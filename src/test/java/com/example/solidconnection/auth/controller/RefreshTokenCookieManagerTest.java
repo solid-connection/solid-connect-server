@@ -19,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -34,13 +35,11 @@ class RefreshTokenCookieManagerTest {
     @MockBean
     private RefreshTokenCookieProperties refreshTokenCookieProperties;
 
-    private final String sameSite = "Strict";
     private final String domain = "example.com";
 
     @BeforeEach
     void setUp() {
         given(refreshTokenCookieProperties.cookieDomain()).willReturn(domain);
-        given(refreshTokenCookieProperties.sameSite()).willReturn(sameSite);
     }
 
     @Test
@@ -62,7 +61,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("Path=/"),
                 () -> assertThat(header).contains("Max-Age=" + TokenType.REFRESH.getExpireTime() / 1000),
                 () -> assertThat(header).contains("Domain=" + domain),
-                () -> assertThat(header).contains("SameSite=" + sameSite)
+                () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
         );
     }
 
@@ -84,7 +83,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("Path=/"),
                 () -> assertThat(header).contains("Max-Age=0"),
                 () -> assertThat(header).contains("Domain=" + domain),
-                () -> assertThat(header).contains("SameSite=" + sameSite)
+                () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
         );
     }
 

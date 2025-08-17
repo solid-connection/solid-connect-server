@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public class RefreshTokenCookieManager {
                 .path(PATH)
                 .maxAge(maxAge)
                 .domain(properties.cookieDomain())
-                .sameSite(properties.sameSite())
+                .sameSite(SameSite.LAX.attributeValue())
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
