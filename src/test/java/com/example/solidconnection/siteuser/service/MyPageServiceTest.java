@@ -1,10 +1,13 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
@@ -29,6 +32,7 @@ import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
+import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -39,7 +43,6 @@ import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -84,9 +87,6 @@ class MyPageServiceTest {
     private UnivApplyInfoFixture univApplyInfoFixture;
 
     @Autowired
-    private CountryFixture countryFixture;
-
-    @Autowired
     private RegionFixture regionFixture;
 
     @Autowired
@@ -114,7 +114,7 @@ class MyPageServiceTest {
         MyPageResponse response = myPageService.getMyPageInfo(user.getId());
 
         // then
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(user.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(user.getRole()),
@@ -139,7 +139,7 @@ class MyPageServiceTest {
         MyPageResponse response = myPageService.getMyPageInfo(mentorUser.getId());
 
         // then
-        Assertions.assertAll(
+        assertAll(
                 () -> assertThat(response.nickname()).isEqualTo(mentorUser.getNickname()),
                 () -> assertThat(response.profileImageUrl()).isEqualTo(mentorUser.getProfileImageUrl()),
                 () -> assertThat(response.role()).isEqualTo(mentorUser.getRole()),
@@ -412,44 +412,5 @@ class MyPageServiceTest {
                     () -> assertThat(updatedRegions).isEmpty()
             );
         }
-    }
-
-    private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
-
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo3);
-        return likedUnivApplyInfoRepository.countBySiteUserId(testUser.getId());
-    }
-
-    private MockMultipartFile createValidImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
-    }
-
-    private String createExpectedErrorMessage(LocalDateTime modifiedAt) {
-        String formatLastModifiedAt = String.format(
-                "(마지막 수정 시간 : %s)",
-                NICKNAME_LAST_CHANGE_DATE_FORMAT.format(modifiedAt)
-        );
-        return CAN_NOT_CHANGE_NICKNAME_YET.getMessage() + " : " + formatLastModifiedAt;
-    }
-
-    private SiteUser createSiteUserWithCustomProfile() {
-        return siteUserFixtureBuilder.siteUser()
-                .email("customProfile@example.com")
-                .authType(AuthType.EMAIL)
-                .nickname("커스텀프로필")
-                .profileImageUrl("profile/profileImageUrl")
-                .role(Role.MENTEE)
-                .password("customPassword123")
-                .create();
     }
 }
