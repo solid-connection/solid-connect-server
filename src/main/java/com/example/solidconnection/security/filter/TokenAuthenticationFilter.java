@@ -28,7 +28,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
-        Optional<String> token = authorizationHeaderParser.parseToken(request);
+        Optional<String> token = resolveToken(request);
         if (token.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
@@ -39,5 +39,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);
+    }
+
+    private Optional<String> resolveToken(HttpServletRequest request) {
+        if (request.getRequestURI().startsWith("/connect")) {
+            return Optional.ofNullable(request.getParameter("token"));
+        }
+        return authorizationHeaderParser.parseToken(request);
     }
 }
