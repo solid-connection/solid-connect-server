@@ -3,7 +3,6 @@ package com.example.solidconnection.auth.controller;
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenResponse;
-import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
@@ -19,6 +18,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.AuthType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -118,10 +118,10 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            @AuthorizedUser long siteUserId,
-            @Valid @RequestBody ReissueRequest reissueRequest
+            HttpServletRequest request
     ) {
-        ReissueResponse reissueResponse = authService.reissue(siteUserId, reissueRequest);
+        String refreshToken = refreshTokenCookieManager.getRefreshToken(request);
+        ReissueResponse reissueResponse = authService.reissue(refreshToken);
         return ResponseEntity.ok(reissueResponse);
     }
 

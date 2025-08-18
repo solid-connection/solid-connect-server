@@ -14,6 +14,7 @@ import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
+import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.fixture.ChatAttachmentFixture;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
@@ -306,6 +307,28 @@ class ChatServiceTest {
             assertThatCode(() -> chatService.getChatMessages(user.getId(), nonExistentRoomId, pageable))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 채팅방_파트너_정보를_조회한다 {
+
+        @Test
+        void 채팅방_파트너를_정상_조회한다() {
+            // given
+            ChatRoom chatRoom = chatRoomFixture.채팅방(false);
+            chatParticipantFixture.참여자(user.getId(), chatRoom);
+            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+
+            // when
+            ChatParticipantResponse response = chatService.getChatPartner(user.getId(), chatRoom.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response.partnerId()).isEqualTo(mentor1.getId()),
+                    () -> assertThat(response.nickname()).isEqualTo(mentor1.getNickname()),
+                    () -> assertThat(response.profileUrl()).isEqualTo(mentor1.getProfileImageUrl())
+            );
         }
     }
 
