@@ -51,7 +51,7 @@ class MyPageController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/location")
+    @PatchMapping("/interested-location")
     public ResponseEntity<Void> updateLocation(
             @AuthorizedUser long siteUserId,
             @RequestBody @Valid LocationUpdateRequest request
