@@ -28,15 +28,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
-        Optional<String> token = resolveToken(request);
-        if (token.isEmpty()) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        Optional<String> resolvedToken = resolveToken(request);
 
-        TokenAuthentication authToken = new TokenAuthentication(token.get());
-        Authentication auth = authenticationManager.authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        resolvedToken.filter(token -> !token.isBlank()).ifPresent(token -> {
+            TokenAuthentication authToken = new TokenAuthentication(token);
+            Authentication auth = authenticationManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        });
 
         filterChain.doFilter(request, response);
     }
