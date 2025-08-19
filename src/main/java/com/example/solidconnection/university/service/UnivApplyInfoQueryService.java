@@ -8,7 +8,6 @@ import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
-    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository; // todo: 구현체 숨기고 univApplyInfoRepository만 사용하도록
 
     @Value("${university.term}")
     public String term;
@@ -49,12 +47,13 @@ public class UnivApplyInfoQueryService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "univApplyInfo:{0}:{1}:{2}:{3}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoPreviewResponses searchUnivApplyInfo(
-            String regionCode, List<String> keywords, LanguageTestType testType, String testScore) {
-
-        return new UnivApplyInfoPreviewResponses(universityFilterRepository
-                                                         .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
-                                                         .stream()
-                                                         .map(UnivApplyInfoPreviewResponse::from)
-                                                         .toList());
+            String regionCode, List<String> keywords, LanguageTestType testType, String testScore
+    ) {
+        List<UnivApplyInfoPreviewResponse> res = univApplyInfoRepository
+                .findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(regionCode, keywords, testType, testScore, term)
+                .stream()
+                .map(UnivApplyInfoPreviewResponse::from)
+                .toList();
+        return new UnivApplyInfoPreviewResponses(res);
     }
 }
