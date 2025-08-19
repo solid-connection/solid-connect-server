@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface InterestedCountryRepository extends JpaRepository<InterestedCountry, Long> {
 
     List<InterestedCountry> findAllBySiteUserId(long siteUserId);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

@@ -3,7 +3,6 @@ package com.example.solidconnection.auth.controller;
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenResponse;
-import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
@@ -11,17 +10,15 @@ import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
-import com.example.solidconnection.auth.service.EmailSignUpService;
 import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
-import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
-import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
-import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
+import com.example.solidconnection.auth.service.SignUpService;
+import com.example.solidconnection.auth.service.oauth.OAuthService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.AuthType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final OAuthSignUpService oAuthSignUpService;
-    private final AppleOAuthService appleOAuthService;
-    private final KakaoOAuthService kakaoOAuthService;
+    private final OAuthService oAuthService;
+    private final SignUpService signUpService;
     private final EmailSignInService emailSignInService;
-    private final EmailSignUpService emailSignUpService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
-    private final CommonSignUpTokenProvider commonSignUpTokenProvider;
     private final RefreshTokenCookieManager refreshTokenCookieManager;
 
     @PostMapping("/apple")
@@ -53,7 +47,7 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.APPLE, oAuthCodeRequest);
         if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
             refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         }
@@ -65,7 +59,7 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.KAKAO, oAuthCodeRequest);
         if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
             refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         }
@@ -87,8 +81,7 @@ public class AuthController {
     public ResponseEntity<EmailSignUpTokenResponse> signUpWithEmail(
             @Valid @RequestBody EmailSignUpTokenRequest signUpRequest
     ) {
-        emailSignUpService.validateUniqueEmail(signUpRequest.email());
-        String signUpToken = emailSignUpTokenProvider.generateAndSaveSignUpToken(signUpRequest);
+        String signUpToken = emailSignUpTokenProvider.issueEmailSignUpToken(signUpRequest);
         return ResponseEntity.ok(new EmailSignUpTokenResponse(signUpToken));
     }
 
@@ -96,12 +89,7 @@ public class AuthController {
     public ResponseEntity<SignInResponse> signUp(
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
-        AuthType authType = commonSignUpTokenProvider.parseAuthType(signUpRequest.signUpToken());
-        if (AuthType.isEmail(authType)) {
-            SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
-            return ResponseEntity.ok(signInResponse);
-        }
-        SignInResponse signInResponse = oAuthSignUpService.signUp(signUpRequest);
+        SignInResponse signInResponse = signUpService.signUp(signUpRequest);
         return ResponseEntity.ok(signInResponse);
     }
 
@@ -130,10 +118,10 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            @AuthorizedUser long siteUserId,
-            @Valid @RequestBody ReissueRequest reissueRequest
+            HttpServletRequest request
     ) {
-        ReissueResponse reissueResponse = authService.reissue(siteUserId, reissueRequest);
+        String refreshToken = refreshTokenCookieManager.getRefreshToken(request);
+        ReissueResponse reissueResponse = authService.reissue(refreshToken);
         return ResponseEntity.ok(reissueResponse);
     }
 

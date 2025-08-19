@@ -12,6 +12,9 @@ import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatReadStatus;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
+import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
+import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
+import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.fixture.ChatAttachmentFixture;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
@@ -29,10 +32,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @TestContainerSpringBootTest
 @DisplayName("채팅 서비스 테스트")
@@ -61,6 +68,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatAttachmentFixture chatAttachmentFixture;
+
+    @MockBean
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     private SiteUser user;
     private SiteUser mentor1;
@@ -301,6 +311,28 @@ class ChatServiceTest {
     }
 
     @Nested
+    class 채팅방_파트너_정보를_조회한다 {
+
+        @Test
+        void 채팅방_파트너를_정상_조회한다() {
+            // given
+            ChatRoom chatRoom = chatRoomFixture.채팅방(false);
+            chatParticipantFixture.참여자(user.getId(), chatRoom);
+            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+
+            // when
+            ChatParticipantResponse response = chatService.getChatPartner(user.getId(), chatRoom.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response.partnerId()).isEqualTo(mentor1.getId()),
+                    () -> assertThat(response.nickname()).isEqualTo(mentor1.getNickname()),
+                    () -> assertThat(response.profileUrl()).isEqualTo(mentor1.getProfileImageUrl())
+            );
+        }
+    }
+
+    @Nested
     class 채팅_메시지_읽음을_처리한다 {
 
         private ChatRoom chatRoom;
@@ -359,6 +391,55 @@ class ChatServiceTest {
 
             // when & then
             assertThatCode(() -> chatService.markChatMessagesAsRead(mentor2.getId(), chatRoom.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 채팅_메시지를_전송한다 {
+
+        private SiteUser sender;
+        private ChatParticipant senderParticipant;
+        private ChatRoom chatRoom;
+
+        @BeforeEach
+        void setUp() {
+            sender = siteUserFixture.사용자(111, "sender");
+            chatRoom = chatRoomFixture.채팅방(false);
+            senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+        }
+
+        @Test
+        void 채팅방_참여자는_메시지를_전송할_수_있다() {
+            // given
+            final String content = "안녕하세요";
+            ChatMessageSendRequest request = new ChatMessageSendRequest(content);
+
+            // when
+            chatService.sendChatMessage(request, sender.getId(), chatRoom.getId());
+
+            // then
+            ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
+
+            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+
+            assertAll(
+                    () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
+                    () -> assertThat(payloadCaptor.getValue().content()).isEqualTo(content),
+                    () -> assertThat(payloadCaptor.getValue().senderId()).isEqualTo(senderParticipant.getId())
+            );
+        }
+
+        @Test
+        void 채팅_참여자가_아니면_메시지를_전송할_수_없다() {
+            // given
+            SiteUser nonParticipant = siteUserFixture.사용자(333, "nonParticipant");
+            ChatMessageSendRequest request = new ChatMessageSendRequest("안녕하세요");
+
+            // when & then
+            assertThatCode(() -> chatService.sendChatMessage(request, nonParticipant.getId(), chatRoom.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
         }

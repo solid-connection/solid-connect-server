@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.dto.ReissueRequest;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -45,14 +44,12 @@ class AuthServiceTest {
     private SiteUserRepository siteUserRepository;
 
     private SiteUser siteUser;
-    private Subject subject;
     private AccessToken accessToken;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
-        subject = authTokenProvider.toSubject(siteUser);
-        accessToken = authTokenProvider.generateAccessToken(subject, siteUser.getRole());
+        accessToken = authTokenProvider.generateAccessToken(siteUser);
     }
 
     @Test
@@ -61,7 +58,7 @@ class AuthServiceTest {
         authService.signOut(accessToken.token());
 
         // then
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
         assertAll(
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
@@ -75,7 +72,7 @@ class AuthServiceTest {
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject.value());
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
         SiteUser actualSitUser = siteUserRepository.findById(siteUser.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),
@@ -90,26 +87,24 @@ class AuthServiceTest {
         @Test
         void 요청의_리프레시_토큰이_저장되어_있으면_액세스_토큰을_재발급한다() {
             // given
-            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(new Subject("subject"));
-            ReissueRequest reissueRequest = new ReissueRequest(refreshToken.token());
+            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
 
             // when
-            ReissueResponse reissuedAccessToken = authService.reissue(siteUser.getId(), reissueRequest);
+            ReissueResponse reissuedAccessToken = authService.reissue(refreshToken.token());
 
-            // then - 요청의 리프레시 토큰과 재발급한 액세스 토큰의 subject 가 동일해야 한다.
-            Subject expectedSubject = authTokenProvider.parseSubject(refreshToken.token());
-            Subject actualSubject = authTokenProvider.parseSubject(reissuedAccessToken.accessToken());
-            assertThat(actualSubject).isEqualTo(expectedSubject);
+            // then - 요청의 리프레시 토큰과 재발급한 액세스 토큰의 주체가 동일해야 한다.
+            SiteUser actualSiteUser = authTokenProvider.parseSiteUser(refreshToken.token());
+            SiteUser expectedSiteUser = authTokenProvider.parseSiteUser(reissuedAccessToken.accessToken());
+            assertThat(actualSiteUser.getId()).isEqualTo(expectedSiteUser.getId());
         }
 
         @Test
         void 요청의_리프레시_토큰이_저장되어있지_않다면_예외가_발생한다() {
             // given
             String invalidRefreshToken = accessToken.token();
-            ReissueRequest reissueRequest = new ReissueRequest(invalidRefreshToken);
 
             // when, then
-            assertThatCode(() -> authService.reissue(siteUser.getId(), reissueRequest))
+            assertThatCode(() -> authService.reissue(invalidRefreshToken))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(REFRESH_TOKEN_EXPIRED.getMessage());
         }

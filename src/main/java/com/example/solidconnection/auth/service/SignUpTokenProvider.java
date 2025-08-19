@@ -1,10 +1,9 @@
-package com.example.solidconnection.auth.service.oauth;
+package com.example.solidconnection.auth.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class OAuthSignUpTokenProvider {
+public class SignUpTokenProvider {
 
-    static final String AUTH_TYPE_CLAIM_KEY = "authType";
+    private static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
     private final JwtProperties jwtProperties;
     private final RedisTemplate<String, String> redisTemplate;
@@ -44,13 +43,18 @@ public class OAuthSignUpTokenProvider {
         return tokenProvider.saveToken(signUpToken, TokenType.SIGN_UP);
     }
 
+    public void deleteByEmail(String email) {
+        String key = TokenType.SIGN_UP.addPrefix(email);
+        redisTemplate.delete(key);
+    }
+
     public void validateSignUpToken(String token) {
         validateFormatAndExpiration(token);
         String email = parseEmail(token);
         validateIssuedByServer(email);
     }
 
-    private void validateFormatAndExpiration(String token) {
+    private void validateFormatAndExpiration(String token) { // 파싱되는지, AuthType이 포함되어있는지 검증
         try {
             Claims claims = tokenProvider.parseClaims(token);
             Objects.requireNonNull(claims.getSubject());

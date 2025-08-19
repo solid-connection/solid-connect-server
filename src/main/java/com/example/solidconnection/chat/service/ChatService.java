@@ -84,16 +84,6 @@ public class ChatService {
         return ChatRoomResponse.of(chatRoom.getId(), lastChatMessage, lastReceivedTime, partner, unReadCount);
     }
 
-    private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
-        if (chatRoom.isGroup()) {
-            throw new CustomException(INVALID_CHAT_ROOM_STATE);
-        }
-        return chatRoom.getChatParticipants().stream()
-                .filter(participant -> participant.getSiteUserId() != siteUserId)
-                .findFirst()
-                .orElseThrow(() -> new CustomException(CHAT_PARTNER_NOT_FOUND));
-    }
-
     @Transactional(readOnly = true)
     public SliceResponse<ChatMessageResponse> getChatMessages(long siteUserId, long roomId, Pageable pageable) {
         validateChatRoomParticipant(siteUserId, roomId);
@@ -105,6 +95,26 @@ public class ChatService {
                 .toList();
 
         return SliceResponse.of(content, chatMessages);
+    }
+
+    @Transactional(readOnly = true)
+    public ChatParticipantResponse getChatPartner(long siteUserId, Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE));
+        ChatParticipant partnerParticipant = findPartner(chatRoom, siteUserId);
+        SiteUser siteUser = siteUserRepository.findById(partnerParticipant.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        return ChatParticipantResponse.of(siteUser.getId(), siteUser.getNickname(), siteUser.getProfileImageUrl());
+    }
+
+    private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
+        if (chatRoom.isGroup()) {
+            throw new CustomException(INVALID_CHAT_ROOM_STATE);
+        }
+        return chatRoom.getChatParticipants().stream()
+                .filter(participant -> participant.getSiteUserId() != siteUserId)
+                .findFirst()
+                .orElseThrow(() -> new CustomException(CHAT_PARTNER_NOT_FOUND));
     }
 
     public void validateChatRoomParticipant(long siteUserId, long roomId) {
@@ -161,5 +171,18 @@ public class ChatService {
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
 
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
+    }
+
+    @Transactional
+    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
+            return;
+        }
+
+        ChatRoom chatRoom = new ChatRoom(mentoringId, false);
+        chatRoom = chatRoomRepository.save(chatRoom);
+        ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
+        ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
+        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
     }
 }
