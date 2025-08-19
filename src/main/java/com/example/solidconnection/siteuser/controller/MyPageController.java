@@ -2,6 +2,7 @@ package com.example.solidconnection.siteuser.controller;
 
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.service.MyPageService;
@@ -47,6 +48,15 @@ class MyPageController {
             @RequestBody @Valid PasswordUpdateRequest request
     ) {
         myPageService.updatePassword(siteUserId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/interested-location")
+    public ResponseEntity<Void> updateLocation(
+            @AuthorizedUser long siteUserId,
+            @RequestBody @Valid LocationUpdateRequest request
+    ) {
+        myPageService.updateLocation(siteUserId, request);
         return ResponseEntity.ok().build();
     }
 }

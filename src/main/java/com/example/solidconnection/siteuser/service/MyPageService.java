@@ -8,6 +8,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.service.InterestedCountryService;
+import com.example.solidconnection.location.region.service.InterestedRegionService;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.repository.MentorRepository;
@@ -16,6 +18,7 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -45,6 +48,8 @@ public class MyPageService {
     private final MentorRepository mentorRepository;
     private final UniversityRepository universityRepository;
     private final S3Service s3Service;
+    private final InterestedCountryService interestedCountryService;
+    private final InterestedRegionService interestedRegionService;
 
     /*
      * 마이페이지 정보를 조회한다.
@@ -131,5 +136,14 @@ public class MyPageService {
         if (!passwordEncoder.matches(currentPassword, userPassword)) {
             throw new CustomException(PASSWORD_MISMATCH);
         }
+    }
+
+    @Transactional
+    public void updateLocation(long siteUserId, LocationUpdateRequest request) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        interestedCountryService.updateInterestedCountry(siteUser, request.interestedCountries());
+        interestedRegionService.updateInterestedRegion(siteUser, request.interestedRegions());
     }
 }

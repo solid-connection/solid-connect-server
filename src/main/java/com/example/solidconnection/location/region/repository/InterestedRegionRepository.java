@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface InterestedRegionRepository extends JpaRepository<InterestedRegion, Long> {
 
     List<InterestedRegion> findAllBySiteUserId(long siteUserId);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }
