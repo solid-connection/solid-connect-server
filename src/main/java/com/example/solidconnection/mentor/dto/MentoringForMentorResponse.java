@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.dto;
 
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.time.ZonedDateTime;
@@ -9,7 +10,7 @@ public record MentoringForMentorResponse(
         String profileImageUrl,
         String nickname,
         boolean isChecked,
-        boolean isConfirmed,
+        VerifyStatus verifyStatus,
         ZonedDateTime createdAt
 ) {
 
@@ -19,7 +20,7 @@ public record MentoringForMentorResponse(
                 partner.getProfileImageUrl(),
                 partner.getNickname(),
                 mentoring.getCheckedAtByMentor() != null,
-                mentoring.getConfirmedAt() != null,
+                mentoring.getVerifyStatus(),
                 mentoring.getCreatedAt()
         );
     }
