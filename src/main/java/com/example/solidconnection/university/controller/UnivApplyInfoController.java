@@ -1,19 +1,22 @@
 package com.example.solidconnection.university.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoFilterSearchRequest;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.service.LikedUnivApplyInfoService;
 import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
 import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,16 +87,19 @@ public class UnivApplyInfoController {
         return ResponseEntity.ok(univApplyInfoDetailResponse);
     }
 
-    // todo: return타입 UniversityInfoForApplyPreviewResponses로 추후 수정 필요
-    @GetMapping("/search")
-    public ResponseEntity<List<UnivApplyInfoPreviewResponse>> searchUnivApplyInfo(
-            @RequestParam(required = false, defaultValue = "") String region,
-            @RequestParam(required = false, defaultValue = "") List<String> keyword,
-            @RequestParam(required = false, defaultValue = "") LanguageTestType testType,
-            @RequestParam(required = false, defaultValue = "") String testScore
+    @GetMapping("/search/filter")
+    public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByFilter(
+            @Valid @ModelAttribute UnivApplyInfoFilterSearchRequest request
     ) {
-        List<UnivApplyInfoPreviewResponse> univApplyInfoPreviewResponse
-                = univApplyInfoQueryService.searchUnivApplyInfo(region, keyword, testType, testScore).univApplyInfoPreviews();
-        return ResponseEntity.ok(univApplyInfoPreviewResponse);
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search/text")
+    public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByText(
+            @RequestParam(required = false) String text
+    ) {
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+        return ResponseEntity.ok(response);
     }
 }
