@@ -5,8 +5,10 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoFilterSearchRequest;
+import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,8 +39,12 @@ public class UnivApplyInfoQueryService {
 
     @Transactional(readOnly = true)
     public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request) {
-        // todo: 구현
-        return null;
+        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository
+                .findAllByFilter(request.languageTestType(), request.testScore(), term, request.countryCode())
+                .stream()
+                .map(UnivApplyInfoPreviewResponse::from)
+                .toList();
+        return new UnivApplyInfoPreviewResponses(responses);
     }
 
     @Transactional(readOnly = true)
