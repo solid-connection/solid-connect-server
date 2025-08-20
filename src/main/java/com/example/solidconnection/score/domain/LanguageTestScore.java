@@ -31,9 +31,9 @@ public class LanguageTestScore extends BaseEntity {
     private LanguageTest languageTest;
 
     @Setter
-    @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private VerifyStatus verifyStatus;
+    private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
     private String rejectedReason;
 

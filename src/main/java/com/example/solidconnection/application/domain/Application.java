@@ -48,9 +48,9 @@ public class Application {
     private LanguageTest languageTest;
 
     @Setter
-    @Column(columnDefinition = "varchar(50) not null default 'PENDING'", name = "verify_status")
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private VerifyStatus verifyStatus;
+    private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
     @Column(length = 100, name = "nickname_for_apply")
     private String nicknameForApply;
