@@ -71,7 +71,8 @@ class WebSocketStompIntegrationTest {
             String tokenUrl = url + "?token=" + accessToken.token();
 
             // when
-            stompSession = stompClient.connectAsync(tokenUrl, new StompSessionHandlerAdapter() {}).get(5, SECONDS);
+            stompSession = stompClient.connectAsync(tokenUrl, new StompSessionHandlerAdapter() {
+            }).get(5, SECONDS);
 
             // then
             assertThat(stompSession.isConnected()).isTrue();
