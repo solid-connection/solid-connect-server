@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 public enum LanguageTestType {
 
-    CEFR((s1, s2) -> s1.compareTo(s2)),
-    JLPT((s1, s2) -> s2.compareTo(s1)),
+    CEFR(String::compareTo),
+    JLPT(Comparator.reverseOrder()),
     DALF(LanguageTestType::compareIntegerScores),
     DELF(LanguageTestType::compareIntegerScores),
     DUOLINGO(LanguageTestType::compareIntegerScores),
