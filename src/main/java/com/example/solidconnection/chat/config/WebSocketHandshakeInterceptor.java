@@ -19,10 +19,9 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
         if (principal != null) {
             attributes.put("user", principal);
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     @Override
