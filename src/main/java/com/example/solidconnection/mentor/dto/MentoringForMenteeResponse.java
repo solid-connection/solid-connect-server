@@ -9,16 +9,18 @@ public record MentoringForMenteeResponse(
         String profileImageUrl,
         String nickname,
         boolean isChecked,
-        ZonedDateTime createdAt
+        ZonedDateTime createdAt,
+        Long chatRoomId
 ) {
 
-    public static MentoringForMenteeResponse of(Mentoring mentoring, SiteUser partner) {
+    public static MentoringForMenteeResponse of(Mentoring mentoring, SiteUser partner, Long chatRoomId) {
         return new MentoringForMenteeResponse(
                 mentoring.getId(),
                 partner.getProfileImageUrl(),
                 partner.getNickname(),
                 mentoring.getCheckedAtByMentee() != null,
-                mentoring.getCreatedAt()
+                mentoring.getCreatedAt(),
+                chatRoomId
         );
     }
 }

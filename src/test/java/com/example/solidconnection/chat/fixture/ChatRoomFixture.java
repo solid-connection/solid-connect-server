@@ -15,4 +15,11 @@ public class ChatRoomFixture {
                 .isGroup(isGroup)
                 .create();
     }
+
+    public ChatRoom 멘토링_채팅방(long mentoringId) {
+        return chatRoomFixtureBuilder.chatRoom()
+                .mentoringId(mentoringId)
+                .isGroup(false)
+                .create();
+    }
 }
