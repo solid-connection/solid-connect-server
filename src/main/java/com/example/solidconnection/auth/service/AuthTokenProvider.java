@@ -34,14 +34,14 @@ public class AuthTokenProvider {
                 Map.of(ROLE_CLAIM_KEY, role.name()),
                 TokenType.ACCESS
         );
-        return new AccessToken(subject, role, token);
+        return new AccessToken(token);
     }
 
     public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
         String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
         tokenProvider.saveToken(token, TokenType.REFRESH);
-        return new RefreshToken(subject, token);
+        return new RefreshToken(token);
     }
 
     /*
@@ -57,7 +57,7 @@ public class AuthTokenProvider {
     }
 
     public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
-        String subject = accessToken.subject().value();
+        String subject = tokenProvider.parseSubject(accessToken.token());
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
         redisTemplate.delete(refreshTokenKey);
     }
