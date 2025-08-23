@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
+import com.example.solidconnection.chat.domain.ChatRoom;
+import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -44,6 +46,9 @@ class MentoringQueryServiceTest {
 
     @Autowired
     private MentoringRepository mentoringRepository;
+
+    @Autowired
+    private ChatRoomFixture chatRoomFixture;
 
     private SiteUser mentorUser1, mentorUser2;
     private SiteUser menteeUser1, menteeUser2, menteeUser3;
@@ -146,10 +151,12 @@ class MentoringQueryServiceTest {
         }
 
         @Test
-        void 승인된_멘토링_목록을_조회한다() {
+        void 승인된_멘토링_목록과_대응하는_채팅방을_조회한다() {
             // given
             Mentoring mentoring1 = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser1.getId());
             Mentoring mentoring2 = mentoringFixture.승인된_멘토링(mentor2.getId(), menteeUser1.getId());
+            ChatRoom mentoringChatRoom1 = chatRoomFixture.멘토링_채팅방(mentoring1.getId());
+            ChatRoom mentoringChatRoom2 = chatRoomFixture.멘토링_채팅방(mentoring2.getId());
             mentoringFixture.대기중_멘토링(mentor3.getId(), menteeUser1.getId());
 
             // when
@@ -157,10 +164,10 @@ class MentoringQueryServiceTest {
                     menteeUser1.getId(), VerifyStatus.APPROVED, pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringForMenteeResponse::mentoringId)
+            assertThat(response.content()).extracting(MentoringForMenteeResponse::mentoringId, MentoringForMenteeResponse::chatRoomId)
                     .containsExactlyInAnyOrder(
-                            mentoring1.getId(),
-                            mentoring2.getId()
+                            tuple(mentoring1.getId(), mentoringChatRoom1.getId()),
+                            tuple(mentoring2.getId(), mentoringChatRoom2.getId())
                     );
         }
 

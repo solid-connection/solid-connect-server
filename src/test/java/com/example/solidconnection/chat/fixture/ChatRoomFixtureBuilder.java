@@ -12,6 +12,7 @@ public class ChatRoomFixtureBuilder {
     private final ChatRoomRepository chatRoomRepository;
 
     private boolean isGroup;
+    private Long mentoringId;
 
     public ChatRoomFixtureBuilder chatRoom() {
         return new ChatRoomFixtureBuilder(chatRoomRepository);
@@ -22,8 +23,13 @@ public class ChatRoomFixtureBuilder {
         return this;
     }
 
+    public ChatRoomFixtureBuilder mentoringId(long mentoringId) {
+        this.mentoringId = mentoringId;
+        return this;
+    }
+
     public ChatRoom create() {
-        ChatRoom chatRoom = new ChatRoom(isGroup);
+        ChatRoom chatRoom = new ChatRoom(mentoringId, isGroup);
         return chatRoomRepository.save(chatRoom);
     }
 }
