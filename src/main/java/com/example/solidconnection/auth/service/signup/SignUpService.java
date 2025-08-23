@@ -6,7 +6,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREAD
 
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
-import com.example.solidconnection.auth.service.SignInService;
+import com.example.solidconnection.auth.service.signin.SignInService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.service.InterestedCountryService;
 import com.example.solidconnection.location.region.service.InterestedRegionService;

@@ -1,10 +1,12 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;

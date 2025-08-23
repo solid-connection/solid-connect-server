@@ -1,8 +1,9 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signin;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

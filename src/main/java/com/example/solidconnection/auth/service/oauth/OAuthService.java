@@ -7,7 +7,7 @@ import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
 import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
-import com.example.solidconnection.auth.service.SignInService;
+import com.example.solidconnection.auth.service.signin.SignInService;
 import com.example.solidconnection.auth.service.signup.SignUpTokenProvider;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;

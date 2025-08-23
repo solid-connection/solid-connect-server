@@ -10,7 +10,7 @@ import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.EmailSignInService;
+import com.example.solidconnection.auth.service.signin.EmailSignInService;
 import com.example.solidconnection.auth.service.signup.EmailSignUpTokenProvider;
 import com.example.solidconnection.auth.service.signup.SignUpService;
 import com.example.solidconnection.auth.service.oauth.OAuthService;
