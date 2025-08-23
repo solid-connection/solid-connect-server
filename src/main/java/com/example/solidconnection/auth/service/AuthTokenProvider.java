@@ -6,6 +6,7 @@ import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -24,21 +25,25 @@ public class AuthTokenProvider {
     private final TokenProvider tokenProvider;
     private final TokenStorage tokenStorage;
     private final SiteUserRepository siteUserRepository;
+    private final TokenProperties tokenProperties;
 
     public AccessToken generateAccessToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
         Role role = siteUser.getRole();
         String token = tokenProvider.generateToken(
-                subject.value(),
+                subject,
                 Map.of(ROLE_CLAIM_KEY, role.name()),
-                TokenType.ACCESS
+                tokenProperties.access().expireTime()
         );
         return new AccessToken(token);
     }
 
     public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
-        String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
+        String token = tokenProvider.generateToken(
+                subject,
+                tokenProperties.refresh().expireTime()
+        );
         tokenStorage.saveToken(token, TokenType.REFRESH);
         return new RefreshToken(token);
     }

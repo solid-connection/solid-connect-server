@@ -4,9 +4,11 @@ import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOK
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 
 import com.example.solidconnection.auth.domain.SignUpToken;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.service.TokenStorage;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import java.util.Map;
@@ -21,12 +23,13 @@ public class SignUpTokenProvider {
 
     private final TokenProvider tokenProvider;
     private final TokenStorage tokenStorage;
+    private final TokenProperties tokenProperties;
 
     public SignUpToken generateAndSaveSignUpToken(String email, AuthType authType) {
         String token = tokenProvider.generateToken(
-                email,
+                new Subject(email),
                 Map.of(AUTH_TYPE_CLAIM_KEY, authType.toString()),
-                TokenType.SIGN_UP
+                tokenProperties.signUp().expireTime()
         );
         tokenStorage.saveToken(token, TokenType.SIGN_UP);
         return new SignUpToken(token);

@@ -1,13 +1,13 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import java.util.Map;
 
 public interface TokenProvider {
 
-    String generateToken(String string, TokenType tokenType);
+    String generateToken(Subject subject, long expiration);
 
-    String generateToken(String string, Map<String, String> claims, TokenType tokenType);
+    String generateToken(Subject subject, Map<String, String> claims, long expiration);
 
     String parseSubject(String token);
 

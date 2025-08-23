@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.token;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
@@ -21,13 +21,13 @@ public class JwtTokenProvider implements TokenProvider {
     private final JwtProperties jwtProperties;
 
     @Override
-    public final String generateToken(String string, TokenType tokenType) {
-        return generateJwtTokenValue(string, Map.of(), tokenType.getExpireTime());
+    public String generateToken(Subject subject, long expireTime) {
+        return generateJwtTokenValue(subject.value(), Map.of(), expireTime);
     }
 
     @Override
-    public String generateToken(String string, Map<String, String> customClaims, TokenType tokenType) {
-        return generateJwtTokenValue(string, customClaims, tokenType.getExpireTime());
+    public String generateToken(Subject subject, Map<String, String> customClaims, long expireTime) {
+        return generateJwtTokenValue(subject.value(), customClaims, expireTime);
     }
 
     private String generateJwtTokenValue(String subject, Map<String, String> claims, long expireTime) {
