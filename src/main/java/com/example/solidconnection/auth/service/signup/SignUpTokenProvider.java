@@ -60,7 +60,7 @@ public class SignUpTokenProvider {
     }
 
     public String parseEmail(String token) {
-        return tokenProvider.parseSubject(token);
+        return tokenProvider.parseSubject(token).value();
     }
 
     public AuthType parseAuthType(String token) {

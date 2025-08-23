@@ -9,7 +9,7 @@ public interface TokenProvider {
 
     String generateToken(Subject subject, Map<String, String> claims, long expiration);
 
-    String parseSubject(String token);
+    Subject parseSubject(String token);
 
     <T> T parseClaims(String token, String claimName, Class<T> claimType);
 }

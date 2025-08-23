@@ -44,8 +44,8 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public String parseSubject(String token) {
-        return parseJwtClaims(token).getSubject();
+    public Subject parseSubject(String token) {
+        return new Subject(parseJwtClaims(token).getSubject());
     }
 
     @Override
