@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

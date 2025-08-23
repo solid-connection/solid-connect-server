@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -48,7 +50,7 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰을_생성하고_저장한다() {
         // when
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // then
         String actualSubject = tokenProvider.parseSubject(signUpToken);
@@ -79,7 +81,7 @@ class SignUpTokenProviderTest {
         @Test
         void 검증_성공한다() {
             // given
-            String validToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+            String validToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(validToken)).doesNotThrowAnyException();
@@ -123,7 +125,7 @@ class SignUpTokenProviderTest {
         @Test
         void 우리_서버에_발급된_토큰이_아니면_예외가_발생한다() {
             // given
-            String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+            String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
             given(tokenStorage.findToken(email, TokenType.SIGN_UP)).willReturn(empty());
 
             // when & then
@@ -136,7 +138,7 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_이메일을_추출한다() {
         // given
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // when
         String extractedEmail = signUpTokenProvider.parseEmail(signUpToken);
@@ -148,7 +150,7 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_인증_타입을_추출한다() {
         // given
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // when
         AuthType extractedAuthType = signUpTokenProvider.parseAuthType(signUpToken);

@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import com.example.solidconnection.auth.domain.TokenType;
 import java.util.Optional;

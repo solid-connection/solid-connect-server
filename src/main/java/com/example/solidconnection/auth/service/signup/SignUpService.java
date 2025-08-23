@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
@@ -6,6 +6,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREAD
 
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
+import com.example.solidconnection.auth.service.SignInService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.service.InterestedCountryService;
 import com.example.solidconnection.location.region.service.InterestedRegionService;

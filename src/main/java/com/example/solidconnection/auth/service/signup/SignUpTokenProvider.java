@@ -1,10 +1,12 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 
 import com.example.solidconnection.auth.domain.SignUpToken;
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import java.util.Map;
