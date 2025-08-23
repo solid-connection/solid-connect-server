@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 
+import com.example.solidconnection.auth.domain.SignUpToken;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -19,13 +20,14 @@ public class SignUpTokenProvider {
     private final TokenProvider tokenProvider;
     private final TokenStorage tokenStorage;
 
-    public String generateAndSaveSignUpToken(String email, AuthType authType) {
+    public SignUpToken generateAndSaveSignUpToken(String email, AuthType authType) {
         String token = tokenProvider.generateToken(
                 email,
                 Map.of(AUTH_TYPE_CLAIM_KEY, authType.toString()),
                 TokenType.SIGN_UP
         );
-        return tokenStorage.saveToken(token, TokenType.SIGN_UP);
+        tokenStorage.saveToken(token, TokenType.SIGN_UP);
+        return new SignUpToken(token);
     }
 
     public void deleteByEmail(String email) {
