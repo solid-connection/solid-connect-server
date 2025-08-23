@@ -29,6 +29,9 @@ class AuthTokenProviderTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     private SiteUser siteUser;
     private String expectedSubject;
 
@@ -44,10 +47,13 @@ class AuthTokenProviderTest {
         AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
 
         // then
+        String accessTokenValue = accessToken.token();
+        String actualSubject = tokenProvider.parseSubject(accessTokenValue);
+        String actualRole = tokenProvider.parseClaims(accessTokenValue).get("role", String.class);
         assertAll(
-                () -> assertThat(accessToken.subject().value()).isEqualTo(expectedSubject),
-                () -> assertThat(accessToken.role()).isEqualTo(siteUser.getRole()),
-                () -> assertThat(accessToken.token()).isNotNull()
+                () -> assertThat(accessTokenValue).isNotNull(),
+                () -> assertThat(actualSubject).isEqualTo(expectedSubject),
+                () -> assertThat(actualRole).isEqualTo(siteUser.getRole().toString())
         );
     }
 
@@ -61,9 +67,10 @@ class AuthTokenProviderTest {
 
             // then
             String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
+            String actualSubject = tokenProvider.parseSubject(actualRefreshToken.token());
             String expectedRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
             assertAll(
-                    () -> assertThat(actualRefreshToken.subject().value()).isEqualTo(expectedSubject),
+                    () -> assertThat(actualSubject).isEqualTo(expectedSubject),
                     () -> assertThat(actualRefreshToken.token()).isEqualTo(expectedRefreshToken)
             );
         }

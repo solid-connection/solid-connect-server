@@ -45,13 +45,18 @@ class AuthServiceTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     private SiteUser siteUser;
     private AccessToken accessToken;
+    private String expectedSubject;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
         accessToken = authTokenProvider.generateAccessToken(siteUser);
+        expectedSubject = tokenProvider.parseSubject(accessToken.token());
     }
 
     @Test
@@ -60,7 +65,7 @@ class AuthServiceTest {
         authService.signOut(accessToken.token());
 
         // then
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
         assertAll(
                 () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
@@ -74,7 +79,7 @@ class AuthServiceTest {
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
         SiteUser actualSitUser = siteUserRepository.findById(siteUser.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),

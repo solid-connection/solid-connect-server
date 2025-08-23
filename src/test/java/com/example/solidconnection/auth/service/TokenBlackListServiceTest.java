@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.token.TokenBlackListService;
-import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,9 +27,8 @@ class TokenBlackListServiceTest {
 
     @BeforeEach
     void setUp() {
-        accessToken = new AccessToken("subject", Role.MENTEE, "token");
+        accessToken = new AccessToken("tokenValue");
     }
-
 
     @Test
     void 액세스_토큰을_블랙리스트에_추가한다() {
