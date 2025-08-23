@@ -9,11 +9,11 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @DisplayName("로그인 서비스 테스트")
 @TestContainerSpringBootTest
@@ -26,7 +26,7 @@ class SignInServiceTest {
     private TokenProvider tokenProvider;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private TokenStorage tokenStorage;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -48,11 +48,11 @@ class SignInServiceTest {
         // then
         String accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
         String refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
-        String savedRefreshToken = redisTemplate.opsForValue().get(TokenType.REFRESH.addPrefix(refreshTokenSubject));
+        Optional<String> savedRefreshToken = tokenStorage.findToken(subject, TokenType.REFRESH);
         assertAll(
                 () -> assertThat(accessTokenSubject).isEqualTo(subject),
                 () -> assertThat(refreshTokenSubject).isEqualTo(subject),
-                () -> assertThat(savedRefreshToken).isEqualTo(signInResponse.refreshToken()));
+                () -> assertThat(savedRefreshToken).hasValue(signInResponse.refreshToken()));
     }
 
     @Test

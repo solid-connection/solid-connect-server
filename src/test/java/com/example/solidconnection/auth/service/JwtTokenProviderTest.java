@@ -20,7 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @DisplayName("토큰 제공자 테스트")
 @TestContainerSpringBootTest
@@ -32,68 +31,59 @@ class JwtTokenProviderTest {
     @Autowired
     private JwtProperties jwtProperties;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
     @Nested
     class 토큰을_생성한다 {
 
         @Test
         void subject_만_있는_토큰을_생성한다() {
             // given
-            String actualSubject = "subject123";
-            TokenType actualTokenType = TokenType.ACCESS;
+            String expectedSubject = "subject123";
+            TokenType expectedTokenType = TokenType.ACCESS;
 
             // when
-            String token = tokenProvider.generateToken(actualSubject, actualTokenType);
+            String token = tokenProvider.generateToken(expectedSubject, expectedTokenType);
 
             // then - subject와 만료 시간이 일치하는지 검증
-            Claims claims = tokenProvider.parseClaims(token);
-            long expectedExpireTime = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+            String actualSubject = tokenProvider.parseSubject(token);
+            long actualExpireTime = getActualExpireTime(token);
             assertAll(
-                    () -> assertThat(claims.getSubject()).isEqualTo(actualSubject),
-                    () -> assertThat(expectedExpireTime).isEqualTo(actualTokenType.getExpireTime())
+                    () -> assertThat(actualSubject).isEqualTo(expectedSubject),
+                    () -> assertThat(actualExpireTime).isEqualTo(expectedTokenType.getExpireTime())
             );
         }
 
         @Test
         void subject_와_claims_가_있는_토큰을_생성한다() {
             // given
-            String actualSubject = "subject123";
-            Map<String, String> customClaims = Map.of("key1", "value1", "key2", "value2");
-            TokenType actualTokenType = TokenType.ACCESS;
+            String expectedSubject = "subject123";
+            String key1 = "key1";
+            String value1 = "value1";
+            String key2 = "key2";
+            String value2 = "value2";
+            Map<String, String> customClaims = Map.of(key1, value1, key2, value2);
+            TokenType expectedTokenType = TokenType.ACCESS;
 
             // when
-            String token = tokenProvider.generateToken(actualSubject, customClaims, actualTokenType);
+            String token = tokenProvider.generateToken(expectedSubject, customClaims, expectedTokenType);
 
             // then - subject와 커스텀 클레임이 일치하는지 검증
-            Claims claims = tokenProvider.parseClaims(token);
-            long expectedExpireTime = claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+            String actualSubject = tokenProvider.parseSubject(token);
+            long actualExpireTime = getActualExpireTime(token);
             assertAll(
-                    () -> assertThat(claims.getSubject()).isEqualTo(actualSubject),
-                    () -> assertThat(claims).containsAllEntriesOf(customClaims),
-                    () -> assertThat(expectedExpireTime).isEqualTo(actualTokenType.getExpireTime())
+                    () -> assertThat(actualSubject).isEqualTo(expectedSubject),
+                    () -> assertThat(actualExpireTime).isEqualTo(expectedTokenType.getExpireTime()),
+                    () -> assertThat(tokenProvider.parseClaims(token, key1, String.class)).isEqualTo(value1),
+                    () -> assertThat(tokenProvider.parseClaims(token, key2, String.class)).isEqualTo(value2)
             );
         }
-    }
 
-    @Test
-    void 토큰을_저장한다() {
-        // given
-        String subject = "subject123";
-        TokenType tokenType = TokenType.ACCESS;
-        String token = tokenProvider.generateToken(subject, tokenType);
-
-        // when
-        String savedToken = tokenProvider.saveToken(token, tokenType);
-
-        // then - key: "{TokenType.Prefix}:subject", value: {token} 로 저장되어있는지 검증, 반환하는 값이 value와 같은지 검증
-        String key = tokenType.addPrefix(subject);
-        String value = redisTemplate.opsForValue().get(key);
-        assertAll(
-                () -> assertThat(value).isEqualTo(token),
-                () -> assertThat(savedToken).isEqualTo(value)
-        );
+        private long getActualExpireTime(String token) {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtProperties.secret())
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+        }
     }
 
     @Nested
@@ -103,7 +93,7 @@ class JwtTokenProviderTest {
         void 유효한_토큰의_subject_를_추출한다() {
             // given
             String subject = "subject000";
-            String token = createValidToken(subject);
+            String token = tokenProvider.generateToken(subject, TokenType.SIGN_UP);
 
             // when
             String extractedSubject = tokenProvider.parseSubject(token);
@@ -128,55 +118,46 @@ class JwtTokenProviderTest {
     @Nested
     class 토큰으로부터_claim_을_추출한다 {
 
+        private final String subject = "subject";
+        private final String claimKey = "key";
+        private final String claimValue = "value";
+
         @Test
         void 유효한_토큰의_claim_을_추출한다() {
             // given
-            String subject = "subject";
-            String claimKey = "key";
-            String claimValue = "value";
-            Claims expectedClaims = Jwts.claims(new HashMap<>(Map.of(claimKey, claimValue))).setSubject(subject);
-            String token = createValidToken(expectedClaims);
+            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), TokenType.SIGN_UP);
 
             // when
-            Claims actualClaims = tokenProvider.parseClaims(token);
+            String actualClaimValue = tokenProvider.parseClaims(token, claimKey, String.class);
 
             // then
-            assertAll(
-                    () -> assertThat(actualClaims.getSubject()).isEqualTo(subject),
-                    () -> assertThat(actualClaims.get(claimKey)).isEqualTo(claimValue)
-            );
+            assertThat(actualClaimValue).isEqualTo(claimValue);
         }
 
         @Test
         void 유효하지_않은_토큰의_claim_을_추출하면_예외가_발생한다() {
             // given
-            String subject = "subject";
-            Claims expectedClaims = Jwts.claims().setSubject(subject);
+            Claims expectedClaims = Jwts.claims(new HashMap<>(Map.of(claimKey, claimValue)));
             String token = createExpiredToken(expectedClaims);
 
             // when
-            assertThatCode(() -> tokenProvider.parseClaims(token))
+            assertThatCode(() -> tokenProvider.parseClaims(token, claimKey, String.class))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INVALID_TOKEN.getMessage());
         }
-    }
 
-    private String createValidToken(String subject) {
-        return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
-                .compact();
-    }
+        @Test
+        void 존재하지_않는_claim_을_추출하면_null을_반환한다() {
+            // given
+            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), TokenType.SIGN_UP);
+            String nonExistentClaimKey = "nonExistentKey";
 
-    private String createValidToken(Claims claims) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
-                .compact();
+            // when
+            String actualClaimValue = tokenProvider.parseClaims(token, nonExistentClaimKey, String.class);
+
+            // then
+            assertThat(actualClaimValue).isNull();
+        }
     }
 
     private String createExpiredToken(String subject) {

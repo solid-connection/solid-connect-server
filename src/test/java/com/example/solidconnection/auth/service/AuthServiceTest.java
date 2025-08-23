@@ -21,7 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @DisplayName("인증 서비스 테스트")
 @TestContainerSpringBootTest
@@ -37,7 +36,7 @@ class AuthServiceTest {
     private TokenBlackListService tokenBlackListService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private TokenStorage tokenStorage;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -65,9 +64,8 @@ class AuthServiceTest {
         authService.signOut(accessToken.token());
 
         // then
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
         assertAll(
-                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
@@ -83,7 +81,7 @@ class AuthServiceTest {
         SiteUser actualSitUser = siteUserRepository.findById(siteUser.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),
-                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }

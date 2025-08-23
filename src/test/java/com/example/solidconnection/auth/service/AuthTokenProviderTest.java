@@ -6,15 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @TestContainerSpringBootTest
 @DisplayName("인증 토큰 제공자 테스트")
@@ -24,13 +25,13 @@ class AuthTokenProviderTest {
     private AuthTokenProvider authTokenProvider;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private TokenProvider tokenProvider;
+
+    @Autowired
+    private TokenStorage tokenStorage;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
-
-    @Autowired
-    private TokenProvider tokenProvider;
 
     private SiteUser siteUser;
     private String expectedSubject;
@@ -49,11 +50,11 @@ class AuthTokenProviderTest {
         // then
         String accessTokenValue = accessToken.token();
         String actualSubject = tokenProvider.parseSubject(accessTokenValue);
-        String actualRole = tokenProvider.parseClaims(accessTokenValue).get("role", String.class);
+        Role actualRole = authTokenProvider.parseSiteUser(accessTokenValue).getRole();
         assertAll(
                 () -> assertThat(accessTokenValue).isNotNull(),
                 () -> assertThat(actualSubject).isEqualTo(expectedSubject),
-                () -> assertThat(actualRole).isEqualTo(siteUser.getRole().toString())
+                () -> assertThat(actualRole).isEqualTo(siteUser.getRole())
         );
     }
 
@@ -63,15 +64,14 @@ class AuthTokenProviderTest {
         @Test
         void 리프레시_토큰을_생성하고_저장한다() {
             // when
-            RefreshToken actualRefreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
+            RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
 
             // then
-            String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
-            String actualSubject = tokenProvider.parseSubject(actualRefreshToken.token());
-            String expectedRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
+            String actualSubject = tokenProvider.parseSubject(refreshToken.token());
+            Optional<String> savedRefreshToken = tokenStorage.findToken(expectedSubject, TokenType.REFRESH);
             assertAll(
-                    () -> assertThat(actualSubject).isEqualTo(expectedSubject),
-                    () -> assertThat(actualRefreshToken.token()).isEqualTo(expectedRefreshToken)
+                    () -> assertThat(savedRefreshToken).hasValue(refreshToken.token()),
+                    () -> assertThat(actualSubject).isEqualTo(expectedSubject)
             );
         }
 
@@ -98,8 +98,7 @@ class AuthTokenProviderTest {
             authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
 
             // then
-            String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
-            assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull();
+            assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty();
         }
     }
 
