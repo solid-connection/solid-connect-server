@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.support.TestContainerSpringBootTest;

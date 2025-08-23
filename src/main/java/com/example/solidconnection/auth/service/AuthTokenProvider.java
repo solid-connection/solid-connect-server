@@ -2,6 +2,9 @@ package com.example.solidconnection.auth.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.RefreshToken;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;

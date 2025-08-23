@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;

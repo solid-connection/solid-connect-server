@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.token;
 
 import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 
-import com.example.solidconnection.auth.service.AccessToken;
+import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.security.filter.BlacklistChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
