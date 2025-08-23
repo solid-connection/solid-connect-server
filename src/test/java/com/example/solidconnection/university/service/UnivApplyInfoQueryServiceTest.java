@@ -118,7 +118,7 @@ class UnivApplyInfoQueryServiceTest {
 
             // then
             assertThat(response.univApplyInfoPreviews())
-                    .containsExactlyInAnyOrder(UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보));
+                    .containsExactly(UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보));
         }
 
         @Test
