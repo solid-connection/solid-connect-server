@@ -10,8 +10,6 @@ public interface TokenProvider {
 
     String generateToken(String string, Map<String, String> claims, TokenType tokenType);
 
-    String saveToken(String token, TokenType tokenType);
-
     String parseSubject(String token);
 
     Claims parseClaims(String token);

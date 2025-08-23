@@ -13,7 +13,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,8 +21,8 @@ public class AuthTokenProvider {
 
     private static final String ROLE_CLAIM_KEY = "role";
 
-    private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
+    private final TokenStorage tokenStorage;
     private final SiteUserRepository siteUserRepository;
 
     public AccessToken generateAccessToken(SiteUser siteUser) {
@@ -40,7 +39,7 @@ public class AuthTokenProvider {
     public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
         String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
-        tokenProvider.saveToken(token, TokenType.REFRESH);
+        tokenStorage.saveToken(token, TokenType.REFRESH);
         return new RefreshToken(token);
     }
 
@@ -51,15 +50,14 @@ public class AuthTokenProvider {
      * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
         String subject = tokenProvider.parseSubject(requestedRefreshToken);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
-        String foundRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
-        return Objects.equals(requestedRefreshToken, foundRefreshToken);
+        return tokenStorage.findToken(subject, TokenType.REFRESH)
+                .map(foundRefreshToken -> Objects.equals(foundRefreshToken, requestedRefreshToken))
+                .orElse(false);
     }
 
     public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
         String subject = tokenProvider.parseSubject(accessToken.token());
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
-        redisTemplate.delete(refreshTokenKey);
+        tokenStorage.deleteToken(subject, TokenType.REFRESH);
     }
 
     public SiteUser parseSiteUser(String token) {

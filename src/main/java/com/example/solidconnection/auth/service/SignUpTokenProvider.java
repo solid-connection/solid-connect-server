@@ -4,18 +4,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOK
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,28 +16,20 @@ public class SignUpTokenProvider {
 
     private static final String AUTH_TYPE_CLAIM_KEY = "authType";
 
-    private final JwtProperties jwtProperties;
-    private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
+    private final TokenStorage tokenStorage;
 
     public String generateAndSaveSignUpToken(String email, AuthType authType) {
-        Map<String, Object> authTypeClaim = new HashMap<>(Map.of(AUTH_TYPE_CLAIM_KEY, authType));
-        Claims claims = Jwts.claims(authTypeClaim).setSubject(email);
-        Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + TokenType.SIGN_UP.getExpireTime());
-
-        String signUpToken = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiredDate)
-                .signWith(SignatureAlgorithm.HS512, jwtProperties.secret())
-                .compact();
-        return tokenProvider.saveToken(signUpToken, TokenType.SIGN_UP);
+        String token = tokenProvider.generateToken(
+                email,
+                Map.of(AUTH_TYPE_CLAIM_KEY, authType.toString()),
+                TokenType.SIGN_UP
+        );
+        return tokenStorage.saveToken(token, TokenType.SIGN_UP);
     }
 
     public void deleteByEmail(String email) {
-        String key = TokenType.SIGN_UP.addPrefix(email);
-        redisTemplate.delete(key);
+        tokenStorage.deleteToken(email, TokenType.SIGN_UP);
     }
 
     public void validateSignUpToken(String token) {
@@ -66,10 +50,8 @@ public class SignUpTokenProvider {
     }
 
     private void validateIssuedByServer(String email) {
-        String key = TokenType.SIGN_UP.addPrefix(email);
-        if (redisTemplate.opsForValue().get(key) == null) {
-            throw new CustomException(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER);
-        }
+        tokenStorage.findToken(email, TokenType.SIGN_UP)
+                .orElseThrow(() -> new CustomException(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER));
     }
 
     public String parseEmail(String token) {
