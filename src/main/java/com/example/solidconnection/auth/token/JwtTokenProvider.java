@@ -44,24 +44,16 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public final String saveToken(String token, TokenType tokenType) {
-        String subject = parseSubject(token);
-        redisTemplate.opsForValue().set(
-                tokenType.addPrefix(subject),
-                token,
-                tokenType.getExpireTime(),
-                TimeUnit.MILLISECONDS
-        );
-        return token;
-    }
-
-    @Override
     public String parseSubject(String token) {
-        return parseClaims(token).getSubject();
+        return parseJwtClaims(token).getSubject();
     }
 
     @Override
-    public Claims parseClaims(String token) {
+    public <T> T parseClaims(String token, String claimName, Class<T> claimType) {
+        return parseJwtClaims(token).get(claimName, claimType);
+    }
+
+    private Claims parseJwtClaims(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(jwtProperties.secret())

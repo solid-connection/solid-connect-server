@@ -1,7 +1,6 @@
 package com.example.solidconnection.auth.service;
 
 import com.example.solidconnection.auth.domain.TokenType;
-import io.jsonwebtoken.Claims;
 import java.util.Map;
 
 public interface TokenProvider {
@@ -12,5 +11,5 @@ public interface TokenProvider {
 
     String parseSubject(String token);
 
-    Claims parseClaims(String token);
+    <T> T parseClaims(String token, String claimName, Class<T> claimType);
 }

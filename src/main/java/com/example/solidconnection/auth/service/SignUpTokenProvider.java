@@ -40,9 +40,7 @@ public class SignUpTokenProvider {
 
     private void validateFormatAndExpiration(String token) { // 파싱되는지, AuthType이 포함되어있는지 검증
         try {
-            Claims claims = tokenProvider.parseClaims(token);
-            Objects.requireNonNull(claims.getSubject());
-            String serializedAuthType = claims.get(AUTH_TYPE_CLAIM_KEY, String.class);
+            String serializedAuthType = tokenProvider.parseClaims(token, AUTH_TYPE_CLAIM_KEY, String.class);
             AuthType.valueOf(serializedAuthType);
         } catch (Exception e) {
             throw new CustomException(SIGN_UP_TOKEN_INVALID);
@@ -59,8 +57,7 @@ public class SignUpTokenProvider {
     }
 
     public AuthType parseAuthType(String token) {
-        Claims claims = tokenProvider.parseClaims(token);
-        String authTypeStr = claims.get(AUTH_TYPE_CLAIM_KEY, String.class);
-        return AuthType.valueOf(authTypeStr);
+        String serializedAuthType = tokenProvider.parseClaims(token, AUTH_TYPE_CLAIM_KEY, String.class);
+        return AuthType.valueOf(serializedAuthType);
     }
 }
