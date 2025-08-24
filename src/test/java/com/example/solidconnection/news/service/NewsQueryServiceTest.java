@@ -51,7 +51,9 @@ class NewsQueryServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.newsResponseList()).hasSize(newsList.size()),
+                () -> assertThat(response.newsResponseList())
+                        .extracting(NewsResponse::id)
+                        .containsExactlyInAnyOrder(news1.getId(), news2.getId()),
                 () -> assertThat(response.newsResponseList())
                         .extracting(NewsResponse::updatedAt)
                         .isSortedAccordingTo(Comparator.reverseOrder()),
@@ -81,7 +83,9 @@ class NewsQueryServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(response.newsResponseList()).hasSize(newsList.size()),
+                () -> assertThat(response.newsResponseList())
+                        .extracting(NewsResponse::id)
+                        .containsExactlyInAnyOrder(news1.getId(), news2.getId(), news3.getId()),
                 () -> assertThat(response.newsResponseList())
                         .extracting(NewsResponse::updatedAt)
                         .isSortedAccordingTo(Comparator.reverseOrder()),
