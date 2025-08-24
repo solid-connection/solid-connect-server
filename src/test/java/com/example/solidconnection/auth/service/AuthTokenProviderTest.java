@@ -95,7 +95,7 @@ class AuthTokenProviderTest {
             AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
 
             // when
-            authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
+            authTokenProvider.deleteRefreshTokenByAccessToken(accessToken.token());
 
             // then
             assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty();

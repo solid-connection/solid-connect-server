@@ -59,8 +59,8 @@ public class AuthTokenProvider {
                 .orElse(false);
     }
 
-    public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
-        Subject subject = tokenProvider.parseSubject(accessToken.token());
+    public void deleteRefreshTokenByAccessToken(String accessToken) {
+        Subject subject = tokenProvider.parseSubject(accessToken);
         tokenStorage.deleteToken(subject, RefreshToken.class);
     }
 

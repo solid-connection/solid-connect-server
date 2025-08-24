@@ -1,6 +1,5 @@
 package com.example.solidconnection.auth.token;
 
-import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.security.filter.BlacklistChecker;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ public class TokenBlackListService implements BlacklistChecker {
      * - key = BLACKLIST:{accessToken}
      * - value = {SIGN_OUT_VALUE} -> key 의 존재만 확인하므로, value 에는 무슨 값이 들어가도 상관없다.
      * */
-    public void addToBlacklist(AccessToken accessToken) {
-        String blackListKey = createKey(accessToken.token());
+    public void addToBlacklist(String accessToken) {
+        String blackListKey = createKey(accessToken);
         redisTemplate.opsForValue().set(blackListKey, SIGN_OUT_VALUE);
     }
 

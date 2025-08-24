@@ -2,7 +2,6 @@ package com.example.solidconnection.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -26,11 +25,11 @@ class TokenBlackListServiceTest {
     @Autowired
     private TokenProperties tokenProperties;
 
-    private AccessToken accessToken;
+    private String accessToken;
 
     @BeforeEach
     void setUp() {
-        accessToken = new AccessToken("tokenValue");
+        accessToken = "accessToken";
     }
 
     @Test
@@ -53,13 +52,13 @@ class TokenBlackListServiceTest {
             tokenBlackListService.addToBlacklist(accessToken);
 
             // when, then
-            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue();
+            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken)).isTrue();
         }
 
         @Test
         void 블랙리스트에_토큰이_없는_경우() {
             // when, then
-            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isFalse();
+            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken)).isFalse();
         }
     }
 }
