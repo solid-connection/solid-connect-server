@@ -1,10 +1,10 @@
 package com.example.solidconnection.auth.service;
 
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.token.TokenBlackListService;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +23,9 @@ class TokenBlackListServiceTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
+    private TokenProperties tokenProperties;
+
     private AccessToken accessToken;
 
     @BeforeEach
@@ -36,7 +39,7 @@ class TokenBlackListServiceTest {
         tokenBlackListService.addToBlacklist(accessToken);
 
         // then
-        String blackListTokenKey = BLACKLIST.addPrefix(accessToken.token());
+        String blackListTokenKey = tokenProperties.blackList().storageKeyPrefix() + ":" + accessToken;
         String foundBlackListToken = redisTemplate.opsForValue().get(blackListTokenKey);
         assertThat(foundBlackListToken).isNotNull();
     }

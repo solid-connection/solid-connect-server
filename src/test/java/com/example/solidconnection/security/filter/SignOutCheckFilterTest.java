@@ -1,12 +1,12 @@
 package com.example.solidconnection.security.filter;
 
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_SIGN_OUT;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
 
 import com.example.solidconnection.auth.token.config.JwtProperties;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
@@ -37,6 +37,9 @@ class SignOutCheckFilterTest {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private TokenProperties tokenProperties;
+
     private HttpServletRequest request;
     private HttpServletResponse response;
     private FilterChain filterChain;
@@ -58,7 +61,7 @@ class SignOutCheckFilterTest {
         // given
         String token = createToken(subject);
         request = createRequest(token);
-        String refreshTokenKey = BLACKLIST.addPrefix(token);
+        String refreshTokenKey = tokenProperties.blackList().storageKeyPrefix() + ":" + token;
         redisTemplate.opsForValue().set(refreshTokenKey, token);
 
         // when & then

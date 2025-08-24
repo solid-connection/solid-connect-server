@@ -1,8 +1,7 @@
 package com.example.solidconnection.auth.token;
 
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
-
 import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.security.filter.BlacklistChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,6 +13,7 @@ public class TokenBlackListService implements BlacklistChecker {
 
     private static final String SIGN_OUT_VALUE = "signOut";
 
+    private final TokenProperties tokenProperties;
     private final RedisTemplate<String, String> redisTemplate;
 
     /*
@@ -22,13 +22,17 @@ public class TokenBlackListService implements BlacklistChecker {
      * - value = {SIGN_OUT_VALUE} -> key 의 존재만 확인하므로, value 에는 무슨 값이 들어가도 상관없다.
      * */
     public void addToBlacklist(AccessToken accessToken) {
-        String blackListKey = BLACKLIST.addPrefix(accessToken.token());
+        String blackListKey = createKey(accessToken.token());
         redisTemplate.opsForValue().set(blackListKey, SIGN_OUT_VALUE);
     }
 
     @Override
     public boolean isTokenBlacklisted(String accessToken) {
-        String blackListTokenKey = BLACKLIST.addPrefix(accessToken);
-        return redisTemplate.hasKey(blackListTokenKey);
+        String blackListKey = createKey(accessToken);
+        return redisTemplate.hasKey(blackListKey);
+    }
+
+    private String createKey(String accessToken) {
+        return tokenProperties.blackList().storageKeyPrefix() + ":" + accessToken;
     }
 }

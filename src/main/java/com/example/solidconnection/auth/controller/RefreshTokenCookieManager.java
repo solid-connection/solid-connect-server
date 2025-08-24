@@ -3,7 +3,7 @@ package com.example.solidconnection.auth.controller;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_NOT_EXISTS;
 
 import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,10 +23,12 @@ public class RefreshTokenCookieManager {
     private static final String PATH = "/";
 
     private final RefreshTokenCookieProperties properties;
+    private final TokenProperties tokenProperties;
 
     public void setCookie(HttpServletResponse response, String refreshToken) {
-        long maxAge = convertExpireTimeToCookieMaxAge(TokenType.REFRESH.getExpireTime());
-        setRefreshTokenCookie(response, refreshToken, maxAge);
+        long tokenExpireTime = tokenProperties.refresh().expireTime();
+        long cookieMaxAge = convertExpireTimeToCookieMaxAge(tokenExpireTime);
+        setRefreshTokenCookie(response, refreshToken, cookieMaxAge);
     }
 
     private long convertExpireTimeToCookieMaxAge(long milliSeconds) {
