@@ -1,5 +1,6 @@
 package com.example.solidconnection.chat.controller;
 
+import com.example.solidconnection.chat.dto.ChatImageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.security.authentication.TokenAuthentication;
@@ -28,5 +29,17 @@ public class ChatMessageController {
         SiteUserDetails siteUserDetails = (SiteUserDetails) tokenAuthentication.getPrincipal();
 
         chatService.sendChatMessage(chatMessageSendRequest, siteUserDetails.getSiteUser().getId(), roomId);
+    }
+
+    @MessageMapping("/chat/{roomId}/image")
+    public void sendChatImage(
+            @DestinationVariable Long roomId,
+            @Valid @Payload ChatImageSendRequest chatImageSendRequest,
+            Principal principal
+    ) {
+        TokenAuthentication tokenAuthentication = (TokenAuthentication) principal;
+        SiteUserDetails siteUserDetails = (SiteUserDetails) tokenAuthentication.getPrincipal();
+
+        chatService.sendChatImage(chatImageSendRequest, siteUserDetails.getSiteUser().getId(), roomId);
     }
 }
