@@ -31,15 +31,14 @@ class JwtTokenProviderTest {
     @Autowired
     private JwtProperties jwtProperties;
 
+    private final Subject expectedSubject = new Subject("subject123");
+    private final long expectedExpireTime = 10000L;
+
     @Nested
     class 토큰을_생성한다 {
 
         @Test
         void subject_만_있는_토큰을_생성한다() {
-            // given
-            Subject expectedSubject = new Subject("subject123");
-            long expectedExpireTime = 10000L;
-
             // when
             String token = tokenProvider.generateToken(expectedSubject, expectedExpireTime);
 
@@ -55,13 +54,11 @@ class JwtTokenProviderTest {
         @Test
         void subject_와_claims_가_있는_토큰을_생성한다() {
             // given
-            Subject expectedSubject = new Subject("subject123");
             String key1 = "key1";
             String value1 = "value1";
             String key2 = "key2";
             String value2 = "value2";
             Map<String, String> customClaims = Map.of(key1, value1, key2, value2);
-            long expectedExpireTime = 10000L;
 
             // when
             String token = tokenProvider.generateToken(expectedSubject, customClaims, expectedExpireTime);
@@ -92,15 +89,13 @@ class JwtTokenProviderTest {
         @Test
         void 유효한_토큰의_subject_를_추출한다() {
             // given
-            Subject subject = new Subject("subject000");
-            long expireTime = 10000L;
-            String token = tokenProvider.generateToken(subject, expireTime);
+            String token = tokenProvider.generateToken(expectedSubject, expectedExpireTime);
 
             // when
-            Subject extractedSubject = tokenProvider.parseSubject(token);
+            Subject actualSubject = tokenProvider.parseSubject(token);
 
             // then
-            assertThat(extractedSubject).isEqualTo(subject);
+            assertThat(actualSubject).isEqualTo(expectedSubject);
         }
 
         @Test
@@ -119,15 +114,17 @@ class JwtTokenProviderTest {
     @Nested
     class 토큰으로부터_claim_을_추출한다 {
 
-        private final Subject subject = new Subject("subject");
         private final String claimKey = "key";
         private final String claimValue = "value";
-        private final long expireTime = 10000L;
 
         @Test
         void 유효한_토큰의_claim_을_추출한다() {
             // given
-            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), expireTime);
+            String token = tokenProvider.generateToken(
+                    expectedSubject,
+                    Map.of(claimKey, claimValue),
+                    expectedExpireTime
+            );
 
             // when
             String actualClaimValue = tokenProvider.parseClaims(token, claimKey, String.class);
@@ -151,7 +148,11 @@ class JwtTokenProviderTest {
         @Test
         void 존재하지_않는_claim_을_추출하면_null을_반환한다() {
             // given
-            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), expireTime);
+            String token = tokenProvider.generateToken(
+                    expectedSubject,
+                    Map.of(claimKey, claimValue),
+                    expectedExpireTime
+            );
             String nonExistentClaimKey = "nonExistentKey";
 
             // when
