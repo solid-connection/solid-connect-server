@@ -15,19 +15,17 @@ import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
-import com.example.solidconnection.chat.dto.UnreadCountDto;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatParticipantRepository;
 import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.chat.dto.ChatRoomData;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -63,70 +61,49 @@ public class ChatService {
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findOneOnOneChatRoomsByUserIdWithParticipants(siteUserId);
-        List<Long> chatRoomIds = chatRooms.stream()
-                .map(ChatRoom::getId)
+
+        if (chatRooms.isEmpty()) {
+            return ChatRoomListResponse.of(Collections.emptyList());
+        }
+
+        ChatRoomData chatRoomData = getChatRoomData(chatRooms, siteUserId);
+
+        List<ChatRoomResponse> responses = chatRooms.stream()
+                .map(chatRoom -> createChatRoomResponse(chatRoom, siteUserId, chatRoomData))
                 .toList();
 
-        List<ChatMessage> latestMessages = chatMessageRepository.findLatestMessagesByChatRoomIds(chatRoomIds);
-        List<UnreadCountDto> unreadCounts = chatMessageRepository.countUnreadMessagesBatch(chatRoomIds, siteUserId);
+        return ChatRoomListResponse.of(responses);
+    }
+
+    private ChatRoomData getChatRoomData(List<ChatRoom> chatRooms, long siteUserId) {
+        List<Long> chatRoomIds = chatRooms.stream().map(ChatRoom::getId).toList();
         List<Long> partnerUserIds = chatRooms.stream()
                 .map(chatRoom -> findPartner(chatRoom, siteUserId).getSiteUserId())
                 .toList();
-        List<SiteUser> partnerUsers = siteUserRepository.findAllByIdIn(partnerUserIds);
 
-        Map<Long, ChatMessage> latestMessageMap = latestMessages.stream()
-                .collect(Collectors.toMap(
-                        msg -> msg.getChatRoom().getId(),
-                        msg -> msg
-                ));
-        Map<Long, Long> unreadCountMap = unreadCounts.stream()
-                .collect(Collectors.toMap(
-                        UnreadCountDto::chatRoomId,
-                        UnreadCountDto::count
-                ));
-        Map<Long, SiteUser> partnerUserMap = partnerUsers.stream()
-                .collect(Collectors.toMap(SiteUser::getId, user -> user));
-
-        List<ChatRoomResponse> chatRoomResponses = chatRooms.stream()
-                .map(chatRoom -> toChatRoomResponse(
-                        chatRoom,
-                        siteUserId,
-                        latestMessageMap,
-                        unreadCountMap,
-                        partnerUserMap
-                ))
-                .toList();
-
-        return ChatRoomListResponse.of(chatRoomResponses);
+        return ChatRoomData.from(
+                chatMessageRepository.findLatestMessagesByChatRoomIds(chatRoomIds),
+                chatMessageRepository.countUnreadMessagesBatch(chatRoomIds, siteUserId),
+                siteUserRepository.findAllByIdIn(partnerUserIds)
+        );
     }
 
-    private ChatRoomResponse toChatRoomResponse(
-            ChatRoom chatRoom,
-            long siteUserId,
-            Map<Long, ChatMessage> latestMessageMap,
-            Map<Long, Long> unreadCountMap,
-            Map<Long, SiteUser> partnerUserMap) {
-
-        ChatMessage latestMessage = latestMessageMap.get(chatRoom.getId());
-        String lastChatMessage = latestMessage != null ? latestMessage.getContent() : "";
-        ZonedDateTime lastReceivedTime = latestMessage != null ? latestMessage.getCreatedAt() : null;
-
-        ChatParticipant partnerParticipant = findPartner(chatRoom, siteUserId);
-        SiteUser partnerUser = partnerUserMap.get(partnerParticipant.getSiteUserId());
+    private ChatRoomResponse createChatRoomResponse(ChatRoom chatRoom, long siteUserId, ChatRoomData chatRoomData) {
+        ChatMessage latestMessage = chatRoomData.latestMessages().get(chatRoom.getId());
+        ChatParticipant partner = findPartner(chatRoom, siteUserId);
+        SiteUser partnerUser = chatRoomData.partnerUsers().get(partner.getSiteUserId());
 
         if (partnerUser == null) {
             throw new CustomException(USER_NOT_FOUND);
         }
 
-        ChatParticipantResponse partner = ChatParticipantResponse.of(
-                partnerUser.getId(),
-                partnerUser.getNickname(),
-                partnerUser.getProfileImageUrl()
+        return ChatRoomResponse.of(
+                chatRoom.getId(),
+                latestMessage != null ? latestMessage.getContent() : "",
+                latestMessage != null ? latestMessage.getCreatedAt() : null,
+                ChatParticipantResponse.of(partnerUser.getId(), partnerUser.getNickname(), partnerUser.getProfileImageUrl()),
+                chatRoomData.unreadCounts().getOrDefault(chatRoom.getId(), 0L)
         );
-
-        long unreadCount = unreadCountMap.getOrDefault(chatRoom.getId(), 0L);
-
-        return ChatRoomResponse.of(chatRoom.getId(), lastChatMessage, lastReceivedTime, partner, unreadCount);
     }
 
     private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
