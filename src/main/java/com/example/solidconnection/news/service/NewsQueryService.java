@@ -20,7 +20,7 @@ public class NewsQueryService {
         if (siteUserId == null) {
             List<NewsResponse> newsResponseList = newsRepository.findAllBySiteUserIdOrderByUpdatedAtDesc(authorId)
                     .stream()
-                    .map(news -> NewsResponse.from(news, null))
+                    .map(news -> NewsResponse.of(news, null))
                     .toList();
             return NewsListResponse.from(newsResponseList);
         }

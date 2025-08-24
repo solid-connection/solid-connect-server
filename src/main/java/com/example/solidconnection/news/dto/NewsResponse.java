@@ -19,7 +19,7 @@ public record NewsResponse(
         ZonedDateTime updatedAt
 ) {
 
-    public static NewsResponse from(News news, Boolean isLiked) {
+    public static NewsResponse of(News news, Boolean isLiked) {
         return new NewsResponse(
                 news.getId(),
                 news.getTitle(),
