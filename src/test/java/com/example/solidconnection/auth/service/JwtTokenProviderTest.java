@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.token.JwtTokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
@@ -37,41 +37,41 @@ class JwtTokenProviderTest {
         @Test
         void subject_만_있는_토큰을_생성한다() {
             // given
-            String expectedSubject = "subject123";
-            TokenType expectedTokenType = TokenType.ACCESS;
+            Subject expectedSubject = new Subject("subject123");
+            long expectedExpireTime = 10000L;
 
             // when
-            String token = tokenProvider.generateToken(expectedSubject, expectedTokenType);
+            String token = tokenProvider.generateToken(expectedSubject, expectedExpireTime);
 
             // then - subject와 만료 시간이 일치하는지 검증
-            String actualSubject = tokenProvider.parseSubject(token);
+            Subject actualSubject = tokenProvider.parseSubject(token);
             long actualExpireTime = getActualExpireTime(token);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(expectedSubject),
-                    () -> assertThat(actualExpireTime).isEqualTo(expectedTokenType.getExpireTime())
+                    () -> assertThat(actualExpireTime).isEqualTo(expectedExpireTime)
             );
         }
 
         @Test
         void subject_와_claims_가_있는_토큰을_생성한다() {
             // given
-            String expectedSubject = "subject123";
+            Subject expectedSubject = new Subject("subject123");
             String key1 = "key1";
             String value1 = "value1";
             String key2 = "key2";
             String value2 = "value2";
             Map<String, String> customClaims = Map.of(key1, value1, key2, value2);
-            TokenType expectedTokenType = TokenType.ACCESS;
+            long expectedExpireTime = 10000L;
 
             // when
-            String token = tokenProvider.generateToken(expectedSubject, customClaims, expectedTokenType);
+            String token = tokenProvider.generateToken(expectedSubject, customClaims, expectedExpireTime);
 
             // then - subject와 커스텀 클레임이 일치하는지 검증
-            String actualSubject = tokenProvider.parseSubject(token);
+            Subject actualSubject = tokenProvider.parseSubject(token);
             long actualExpireTime = getActualExpireTime(token);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(expectedSubject),
-                    () -> assertThat(actualExpireTime).isEqualTo(expectedTokenType.getExpireTime()),
+                    () -> assertThat(actualExpireTime).isEqualTo(expectedExpireTime),
                     () -> assertThat(tokenProvider.parseClaims(token, key1, String.class)).isEqualTo(value1),
                     () -> assertThat(tokenProvider.parseClaims(token, key2, String.class)).isEqualTo(value2)
             );
@@ -92,11 +92,12 @@ class JwtTokenProviderTest {
         @Test
         void 유효한_토큰의_subject_를_추출한다() {
             // given
-            String subject = "subject000";
-            String token = tokenProvider.generateToken(subject, TokenType.SIGN_UP);
+            Subject subject = new Subject("subject000");
+            long expireTime = 10000L;
+            String token = tokenProvider.generateToken(subject, expireTime);
 
             // when
-            String extractedSubject = tokenProvider.parseSubject(token);
+            Subject extractedSubject = tokenProvider.parseSubject(token);
 
             // then
             assertThat(extractedSubject).isEqualTo(subject);
@@ -118,14 +119,15 @@ class JwtTokenProviderTest {
     @Nested
     class 토큰으로부터_claim_을_추출한다 {
 
-        private final String subject = "subject";
+        private final Subject subject = new Subject("subject");
         private final String claimKey = "key";
         private final String claimValue = "value";
+        private final long expireTime = 10000L;
 
         @Test
         void 유효한_토큰의_claim_을_추출한다() {
             // given
-            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), TokenType.SIGN_UP);
+            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), expireTime);
 
             // when
             String actualClaimValue = tokenProvider.parseClaims(token, claimKey, String.class);
@@ -149,7 +151,7 @@ class JwtTokenProviderTest {
         @Test
         void 존재하지_않는_claim_을_추출하면_null을_반환한다() {
             // given
-            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), TokenType.SIGN_UP);
+            String token = tokenProvider.generateToken(subject, Map.of(claimKey, claimValue), expireTime);
             String nonExistentClaimKey = "nonExistentKey";
 
             // when

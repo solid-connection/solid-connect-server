@@ -3,10 +3,13 @@ package com.example.solidconnection.auth.token;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.Subject;
+import com.example.solidconnection.auth.domain.Token;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,21 +25,26 @@ class RedisTokenStorageTest {
     @Autowired
     private TokenProvider tokenProvider;
 
-    private final String subject = "subject123";
-    private final TokenType tokenType = TokenType.ACCESS;
+    private Subject subject;
+    private Token expectedToken;
+    private Class<? extends Token> tokenClass;
+
+    @BeforeEach
+    void setUp() {
+        subject = new Subject("subject123");
+        expectedToken = new AccessToken(tokenProvider.generateToken(subject, 100000L));
+        tokenClass = expectedToken.getClass();
+    }
 
     @Test
     void 토큰을_저장한다() {
-        // given
-        String expectedToken = tokenProvider.generateToken(subject, tokenType);
-
         // when
-        String savedToken = redisTokenStorage.saveToken(expectedToken, tokenType);
+        Token savedToken = redisTokenStorage.saveToken(subject, expectedToken);
 
         // then
-        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenType);
+        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenClass);
         assertAll(
-                () -> assertThat(foundToken).hasValue(expectedToken),
+                () -> assertThat(foundToken).hasValue(expectedToken.token()),
                 () -> assertThat(savedToken).isEqualTo(expectedToken)
         );
     }
@@ -47,20 +55,19 @@ class RedisTokenStorageTest {
         @Test
         void 저장된_토큰이_있으면_Optional에_담아_반한다() {
             // given
-            String expectedToken = tokenProvider.generateToken(subject, tokenType);
-            redisTokenStorage.saveToken(expectedToken, tokenType);
+            redisTokenStorage.saveToken(subject, expectedToken);
 
             // when
-            Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenType);
+            Optional<String> actualToken = redisTokenStorage.findToken(subject, tokenClass);
 
             // then
-            assertThat(foundToken).hasValue(expectedToken);
+            assertThat(actualToken).hasValue(expectedToken.token());
         }
 
         @Test
         void 저장된_토큰이_없으면_빈_Optional을_반환한다() {
             // when
-            Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenType);
+            Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenClass);
 
             // then
             assertThat(foundToken).isEmpty();
@@ -70,14 +77,13 @@ class RedisTokenStorageTest {
     @Test
     void 토큰을_삭제한다() {
         // given
-        String expectedToken = tokenProvider.generateToken(subject, tokenType);
-        redisTokenStorage.saveToken(expectedToken, tokenType);
+        redisTokenStorage.saveToken(subject, expectedToken);
 
         // when
-        redisTokenStorage.deleteToken(subject, tokenType);
+        redisTokenStorage.deleteToken(subject, tokenClass);
 
         // then
-        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenType);
+        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenClass);
         assertThat(foundToken).isEmpty();
     }
 }

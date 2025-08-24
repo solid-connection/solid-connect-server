@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -34,12 +34,12 @@ class AuthTokenProviderTest {
     private SiteUserFixture siteUserFixture;
 
     private SiteUser siteUser;
-    private String expectedSubject;
+    private Subject expectedSubject;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
-        expectedSubject = siteUser.getId().toString();
+        expectedSubject = new Subject(siteUser.getId().toString());
     }
 
     @Test
@@ -49,7 +49,7 @@ class AuthTokenProviderTest {
 
         // then
         String accessTokenValue = accessToken.token();
-        String actualSubject = tokenProvider.parseSubject(accessTokenValue);
+        Subject actualSubject = tokenProvider.parseSubject(accessTokenValue);
         Role actualRole = authTokenProvider.parseSiteUser(accessTokenValue).getRole();
         assertAll(
                 () -> assertThat(accessTokenValue).isNotNull(),
@@ -67,8 +67,8 @@ class AuthTokenProviderTest {
             RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
 
             // then
-            String actualSubject = tokenProvider.parseSubject(refreshToken.token());
-            Optional<String> savedRefreshToken = tokenStorage.findToken(expectedSubject, TokenType.REFRESH);
+            Subject actualSubject = tokenProvider.parseSubject(refreshToken.token());
+            Optional<String> savedRefreshToken = tokenStorage.findToken(expectedSubject, RefreshToken.class);
             assertAll(
                     () -> assertThat(savedRefreshToken).hasValue(refreshToken.token()),
                     () -> assertThat(actualSubject).isEqualTo(expectedSubject)
@@ -98,7 +98,7 @@ class AuthTokenProviderTest {
             authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
 
             // then
-            assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty();
+            assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty();
         }
     }
 

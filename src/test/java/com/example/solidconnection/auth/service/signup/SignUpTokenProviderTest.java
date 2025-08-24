@@ -8,7 +8,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.SignUpToken;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.auth.token.config.JwtProperties;
@@ -45,6 +46,7 @@ class SignUpTokenProviderTest {
 
     private final String authTypeClaimKey = "authType";
     private final String email = "test@email.com";
+    private final Subject subject = new Subject(email);
     private final AuthType authType = AuthType.KAKAO;
 
     @Test
@@ -53,11 +55,11 @@ class SignUpTokenProviderTest {
         String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // then
-        String actualSubject = tokenProvider.parseSubject(signUpToken);
+        Subject actualSubject = tokenProvider.parseSubject(signUpToken);
         String actualAuthType = tokenProvider.parseClaims(signUpToken, authTypeClaimKey, String.class);
-        Optional<String> actualSavedToken = tokenStorage.findToken(email, TokenType.SIGN_UP);
+        Optional<String> actualSavedToken = tokenStorage.findToken(actualSubject, SignUpToken.class);
         assertAll(
-                () -> assertThat(actualSubject).isEqualTo(email),
+                () -> assertThat(actualSubject.value()).isEqualTo(email),
                 () -> assertThat(actualAuthType).isEqualTo(authType.toString()),
                 () -> assertThat(actualSavedToken).hasValue(signUpToken)
         );
@@ -72,7 +74,7 @@ class SignUpTokenProviderTest {
         signUpTokenProvider.deleteByEmail(email);
 
         // then
-        assertThat(tokenStorage.findToken(email, TokenType.SIGN_UP)).isEmpty();
+        assertThat(tokenStorage.findToken(subject, SignUpToken.class)).isEmpty();
     }
 
     @Nested
@@ -114,7 +116,7 @@ class SignUpTokenProviderTest {
             // given
             String wrongAuthType = "카카오";
             Map<String, String> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, wrongAuthType));
-            String wrongAuthTypeClaim = tokenProvider.generateToken(email, wrongClaim, TokenType.SIGN_UP);
+            String wrongAuthTypeClaim = tokenProvider.generateToken(subject, wrongClaim, 10000L);
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthTypeClaim))
@@ -126,7 +128,7 @@ class SignUpTokenProviderTest {
         void 우리_서버에_발급된_토큰이_아니면_예외가_발생한다() {
             // given
             String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
-            given(tokenStorage.findToken(email, TokenType.SIGN_UP)).willReturn(empty());
+            given(tokenStorage.findToken(subject, SignUpToken.class)).willReturn(empty());
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(signUpToken))

@@ -3,7 +3,8 @@ package com.example.solidconnection.auth.service.signin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.RefreshToken;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.service.TokenStorage;
@@ -34,12 +35,12 @@ class SignInServiceTest {
     private SiteUserFixture siteUserFixture;
 
     private SiteUser user;
-    private String subject;
+    private Subject subject;
 
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
-        subject = user.getId().toString();
+        subject = new Subject(user.getId().toString());
     }
 
     @Test
@@ -48,9 +49,9 @@ class SignInServiceTest {
         SignInResponse signInResponse = signInService.signIn(user);
 
         // then
-        String accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
-        String refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
-        Optional<String> savedRefreshToken = tokenStorage.findToken(subject, TokenType.REFRESH);
+        Subject accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
+        Subject refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
+        Optional<String> savedRefreshToken = tokenStorage.findToken(subject, RefreshToken.class);
         assertAll(
                 () -> assertThat(accessTokenSubject).isEqualTo(subject),
                 () -> assertThat(refreshTokenSubject).isEqualTo(subject),

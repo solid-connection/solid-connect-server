@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -49,7 +49,7 @@ class AuthServiceTest {
 
     private SiteUser siteUser;
     private AccessToken accessToken;
-    private String expectedSubject;
+    private Subject expectedSubject;
 
     @BeforeEach
     void setUp() {
@@ -65,7 +65,7 @@ class AuthServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
@@ -77,11 +77,10 @@ class AuthServiceTest {
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(expectedSubject);
         SiteUser actualSitUser = siteUserRepository.findById(siteUser.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),
-                () -> assertThat(tokenStorage.findToken(expectedSubject, TokenType.REFRESH)).isEmpty(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
