@@ -1,13 +1,14 @@
 package com.example.solidconnection.auth.service;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
+import com.example.solidconnection.auth.domain.Token;
 import java.util.Optional;
 
 public interface TokenStorage {
 
-    String saveToken(String token, TokenType tokenType);
+    <T extends Token> T saveToken(Subject subject, T token);
 
-    Optional<String> findToken(String subject, TokenType tokenType);
+    <T extends Token> Optional<String> findToken(Subject subject, Class<T> tokenClass);
 
-    void deleteToken(String subject, TokenType tokenType);
+    <T extends Token> void deleteToken(Subject subject, Class<T> tokenClass);
 }

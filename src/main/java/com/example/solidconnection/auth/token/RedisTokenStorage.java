@@ -1,8 +1,9 @@
 package com.example.solidconnection.auth.token;
 
-import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.domain.Subject;
+import com.example.solidconnection.auth.domain.Token;
 import com.example.solidconnection.auth.service.TokenStorage;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -13,24 +14,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisTokenStorage implements TokenStorage {
 
-    private final TokenProvider tokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public String saveToken(String token, TokenType tokenType) {
-        String subject = tokenProvider.parseSubject(token);
+    public <T extends Token> T saveToken(Subject subject, T token) {
         redisTemplate.opsForValue().set(
-                createKey(subject, tokenType),
-                token,
-                tokenType.getExpireTime(),
+                createKey(subject, token.getClass()),
+                token.token(),
+                TokenProperties.getExpireTime(token.getClass()),
                 TimeUnit.MILLISECONDS
         );
         return token;
     }
 
     @Override
-    public Optional<String> findToken(String subject, TokenType tokenType) {
-        String key = createKey(subject, tokenType);
+    public <T extends Token> Optional<String> findToken(Subject subject, Class<T> tokenClass) {
+        String key = createKey(subject, tokenClass);
         String foundTokenValue = redisTemplate.opsForValue().get(key);
         if (foundTokenValue == null || foundTokenValue.isBlank()) {
             return Optional.empty();
@@ -39,12 +38,12 @@ public class RedisTokenStorage implements TokenStorage {
     }
 
     @Override
-    public void deleteToken(String subject, TokenType tokenType) {
-        String key = createKey(subject, tokenType);
+    public <T extends Token> void deleteToken(Subject subject, Class<T> tokenClass) {
+        String key = createKey(subject, tokenClass);
         redisTemplate.delete(key);
     }
 
-    private String createKey(String subject, TokenType tokenType) {
-        return tokenType.addPrefix(subject);
+    private <T extends Token> String createKey(Subject subject, Class<T> tokenClass) {
+        return TokenProperties.getStorageKeyPrefix(tokenClass) + ":" + subject.value();
     }
 }

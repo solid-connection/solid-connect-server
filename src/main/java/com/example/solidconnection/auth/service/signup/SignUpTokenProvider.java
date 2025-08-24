@@ -5,7 +5,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOK
 
 import com.example.solidconnection.auth.domain.SignUpToken;
 import com.example.solidconnection.auth.domain.Subject;
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.auth.token.config.TokenProperties;
@@ -26,17 +25,18 @@ public class SignUpTokenProvider {
     private final TokenProperties tokenProperties;
 
     public SignUpToken generateAndSaveSignUpToken(String email, AuthType authType) {
+        Subject subject = new Subject(email);
         String token = tokenProvider.generateToken(
-                new Subject(email),
+                subject,
                 Map.of(AUTH_TYPE_CLAIM_KEY, authType.toString()),
                 tokenProperties.signUp().expireTime()
         );
-        tokenStorage.saveToken(token, TokenType.SIGN_UP);
-        return new SignUpToken(token);
+        SignUpToken signUpToken = new SignUpToken(token);
+        return tokenStorage.saveToken(subject, signUpToken);
     }
 
     public void deleteByEmail(String email) {
-        tokenStorage.deleteToken(email, TokenType.SIGN_UP);
+        tokenStorage.deleteToken(new Subject(email), SignUpToken.class);
     }
 
     public void validateSignUpToken(String token) {
@@ -55,7 +55,7 @@ public class SignUpTokenProvider {
     }
 
     private void validateIssuedByServer(String email) {
-        tokenStorage.findToken(email, TokenType.SIGN_UP)
+        tokenStorage.findToken(new Subject(email), SignUpToken.class)
                 .orElseThrow(() -> new CustomException(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER));
     }
 

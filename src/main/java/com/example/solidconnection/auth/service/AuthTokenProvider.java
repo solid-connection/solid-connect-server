@@ -5,7 +5,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.Subject;
-import com.example.solidconnection.auth.domain.TokenType;
 import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -44,8 +43,8 @@ public class AuthTokenProvider {
                 subject,
                 tokenProperties.refresh().expireTime()
         );
-        tokenStorage.saveToken(token, TokenType.REFRESH);
-        return new RefreshToken(token);
+        RefreshToken refreshToken = new RefreshToken(token);
+        return tokenStorage.saveToken(subject, refreshToken);
     }
 
     /*
@@ -55,14 +54,14 @@ public class AuthTokenProvider {
      * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
         Subject subject = tokenProvider.parseSubject(requestedRefreshToken);
-        return tokenStorage.findToken(subject, TokenType.REFRESH)
+        return tokenStorage.findToken(subject, RefreshToken.class)
                 .map(foundRefreshToken -> Objects.equals(foundRefreshToken, requestedRefreshToken))
                 .orElse(false);
     }
 
     public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
         Subject subject = tokenProvider.parseSubject(accessToken.token());
-        tokenStorage.deleteToken(subject, TokenType.REFRESH);
+        tokenStorage.deleteToken(subject, RefreshToken.class);
     }
 
     public SiteUser parseSiteUser(String token) {
