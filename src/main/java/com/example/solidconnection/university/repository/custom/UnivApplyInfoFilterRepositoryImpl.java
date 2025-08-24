@@ -1,7 +1,6 @@
 package com.example.solidconnection.university.repository.custom;
 
 import com.example.solidconnection.location.country.domain.QCountry;
-import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
@@ -70,43 +69,71 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
-            String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term) {
+    public List<UnivApplyInfo> findAllByFilter(
+            LanguageTestType testType, String testScore, String term, List<String> countryCodes
+    ) {
         QUniversity university = QUniversity.university;
-        QCountry country = QCountry.country;
-        QRegion region = QRegion.region;
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
+        QCountry country = QCountry.country;
+        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
-        List<UnivApplyInfo> filteredUnivApplyInfo = queryFactory
-                .selectFrom(univApplyInfo)
+        List<UnivApplyInfo> filteredUnivApplyInfo = queryFactory.selectFrom(univApplyInfo)
                 .join(univApplyInfo.university, university)
                 .join(university.country, country)
-                .join(university.region, region)
-                .where(regionCodeEq(country, regionCode)
-                               .and(countryOrUniversityContainsKeyword(country, university, keywords))
-                               .and(univApplyInfo.term.eq(term)))
+                .join(univApplyInfo.languageRequirements, languageRequirement)
+                .fetchJoin()
+                .where(
+                        languageTestTypeEq(languageRequirement, testType),
+                        termEq(univApplyInfo, term),
+                        countryCodesIn(country, countryCodes)
+                )
+                .distinct()
                 .fetch();
 
-        if (testScore == null || testScore.isEmpty()) {
-            if (testType != null) {
-                return filteredUnivApplyInfo.stream()
-                        .filter(uai -> uai.getLanguageRequirements().stream()
-                                .anyMatch(lr -> lr.getLanguageTestType().equals(testType)))
-                        .toList();
-            }
+        if (testScore == null || testScore.isBlank()) {
             return filteredUnivApplyInfo;
         }
 
+        /*
+         * 시험 유형에 따라 성적 비교 방식이 다르다.
+         * 입력된 점수가 대학에서 요구하는 최소 점수보다 높은지를 '쿼리로' 비교하기엔 쿼리가 지나치게 복잡해진다.
+         * 따라서 이 부분만 자바 코드로 필터링한다.
+         * */
         return filteredUnivApplyInfo.stream()
-                .filter(uai -> compareMyTestScoreToMinPassScore(uai, testType, testScore) >= 0)
+                .filter(uai -> isGivenScoreOverMinPassScore(uai, testType, testScore))
                 .toList();
     }
 
-    private int compareMyTestScoreToMinPassScore(UnivApplyInfo univApplyInfo, LanguageTestType testType, String testScore) {
+    private BooleanExpression languageTestTypeEq(
+            QLanguageRequirement languageRequirement, LanguageTestType givenTestType
+    ) {
+        if (givenTestType == null) {
+            return null;
+        }
+        return languageRequirement.languageTestType.eq(givenTestType);
+    }
+
+    private BooleanExpression termEq(QUnivApplyInfo univApplyInfo, String givenTerm) {
+        if (givenTerm == null || givenTerm.isBlank()) {
+            return null;
+        }
+        return univApplyInfo.term.eq(givenTerm);
+    }
+
+    private BooleanExpression countryCodesIn(QCountry country, List<String> givenCountryCodes) {
+        if (givenCountryCodes == null || givenCountryCodes.isEmpty()) {
+            return null;
+        }
+        return country.code.in(givenCountryCodes);
+    }
+
+    private boolean isGivenScoreOverMinPassScore(
+            UnivApplyInfo univApplyInfo, LanguageTestType givenTestType, String givenTestScore
+    ) {
         return univApplyInfo.getLanguageRequirements().stream()
-                .filter(languageRequirement -> languageRequirement.getLanguageTestType().equals(testType))
+                .filter(languageRequirement -> languageRequirement.getLanguageTestType().equals(givenTestType))
                 .findFirst()
-                .map(requirement -> testType.compare(testScore, requirement.getMinScore()))
-                .orElse(-1);
+                .map(requirement -> givenTestType.compare(givenTestScore, requirement.getMinScore()))
+                .orElse(-1) >= 0;
     }
 }
