@@ -14,19 +14,19 @@ public record NewsResponse(
         String url,
 
         @JsonInclude(NON_NULL)
-        Boolean isLike,
+        Boolean isLiked,
 
         ZonedDateTime updatedAt
 ) {
 
-    public static NewsResponse from(News news, Boolean isLike) {
+    public static NewsResponse from(News news, Boolean isLiked) {
         return new NewsResponse(
                 news.getId(),
                 news.getTitle(),
                 news.getDescription(),
                 news.getThumbnailUrl(),
                 news.getUrl(),
-                isLike,
+                isLiked,
                 news.getUpdatedAt()
         );
     }

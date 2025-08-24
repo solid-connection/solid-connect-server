@@ -56,7 +56,7 @@ class NewsQueryServiceTest {
                         .extracting(NewsResponse::updatedAt)
                         .isSortedAccordingTo(Comparator.reverseOrder()),
                 () -> assertThat(response.newsResponseList())
-                        .extracting(NewsResponse::isLike)
+                        .extracting(NewsResponse::isLiked)
                         .containsOnly((Boolean) null)
         );
     }
@@ -87,7 +87,7 @@ class NewsQueryServiceTest {
                         .isSortedAccordingTo(Comparator.reverseOrder()),
                 () -> {
                     Map<Long, Boolean> likeStatusMap = response.newsResponseList().stream()
-                            .collect(Collectors.toMap(NewsResponse::id, NewsResponse::isLike));
+                            .collect(Collectors.toMap(NewsResponse::id, NewsResponse::isLiked));
                     assertThat(likeStatusMap.get(news1.getId())).isTrue();
                     assertThat(likeStatusMap.get(news2.getId())).isFalse();
                     assertThat(likeStatusMap.get(news3.getId())).isTrue();
