@@ -44,8 +44,9 @@ public class SignUpTokenProvider {
         validateIssuedByServer(token);
     }
 
-    private void validateFormatAndExpiration(String token) { // 파싱되는지, AuthType이 포함되어있는지 검증
+    private void validateFormatAndExpiration(String token) { // subject와 claims가 파싱되는지, AuthType이 포함되어있는지 검증
         try {
+            tokenProvider.parseSubject(token);
             String serializedAuthType = tokenProvider.parseClaims(token, AUTH_TYPE_CLAIM_KEY, String.class);
             AuthType.valueOf(serializedAuthType);
         } catch (Exception e) {
