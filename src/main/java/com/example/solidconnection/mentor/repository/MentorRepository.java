@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.repository;
 
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.mentor.domain.Mentor;
 import java.util.Optional;
@@ -23,4 +24,14 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
            WHERE u.region = :region
            """)
     Slice<Mentor> findAllByRegion(@Param("region") Region region, Pageable pageable);
+
+    @Query("""
+           SELECT m FROM Mentor m
+           WHERE m.id IN (
+               SELECT mt.mentorId FROM Mentoring mt
+               WHERE mt.menteeId = :menteeId
+               AND mt.verifyStatus = :verifyStatus
+           )
+           """)
+    Slice<Mentor> findApprovedMentorsByMenteeId(@Param("menteeId") long menteeId, @Param("verifyStatus") VerifyStatus verifyStatus, Pageable pageable);
 }
