@@ -10,12 +10,15 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
+import com.example.solidconnection.mentor.dto.MatchedMentorResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
+import com.example.solidconnection.mentor.repository.MentorBatchQueryRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.University;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +38,57 @@ public class MentoringQueryService {
     private final MentorRepository mentorRepository;
     private final SiteUserRepository siteUserRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final MentorBatchQueryRepository mentorBatchQueryRepository;
+
+    @Transactional(readOnly = true)
+    public SliceResponse<MatchedMentorResponse> getMatchedMentors(long siteUserId, Pageable pageable) {
+        Slice<Mentor> mentorSlice = filterMatchedMentors(siteUserId, pageable);
+        List<Mentor> mentors = mentorSlice.toList();
+
+        List<MatchedMentorResponse> content = buildMatchedMentorsWithBatchQuery(mentors, siteUserId);
+
+        return SliceResponse.of(content, mentorSlice);
+    }
+
+    private Slice<Mentor> filterMatchedMentors(long siteUserId, Pageable pageable) {
+        return mentorRepository.findApprovedMentorsByMenteeId(siteUserId, VerifyStatus.APPROVED, pageable);
+    }
+
+    private List<MatchedMentorResponse> buildMatchedMentorsWithBatchQuery(List<Mentor> mentors, long currentUserId) {
+        Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
+        Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
+        Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
+
+        Map<Long, Long> mentorIdToRoomId = getMentorIdToRoomIdMap(mentors, currentUserId);
+
+        List<MatchedMentorResponse> matchedMentors = new ArrayList<>();
+        for (Mentor mentor : mentors) {
+            SiteUser mentorUser = mentorIdToSiteUser.get(mentor.getId());
+            University university = mentorIdToUniversity.get(mentor.getId());
+            boolean isApplied = mentorIdToIsApplied.get(mentor.getId());
+            Long roomId = mentorIdToRoomId.get(mentor.getId());
+            MatchedMentorResponse response = MatchedMentorResponse.of(mentor, mentorUser, university, isApplied, roomId);
+            matchedMentors.add(response);
+        }
+        return matchedMentors;
+    }
+
+    private Map<Long, Long> getMentorIdToRoomIdMap(List<Mentor> mentors, long menteeUserId) {
+        List<Long> mentorIds = mentors.stream().map(Mentor::getId).toList();
+        List<Mentoring> approvedMentorings = mentoringRepository.findApprovedMentoringsByMenteeIdAndMentorIds(menteeUserId, VerifyStatus.APPROVED, mentorIds);
+
+        List<Long> mentoringIds = approvedMentorings.stream().map(Mentoring::getId).toList();
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMentoringIdIn(mentoringIds);
+
+        Map<Long, Long> mentoringIdToRoomId = chatRooms.stream()
+                .collect(Collectors.toMap(ChatRoom::getMentoringId, ChatRoom::getId));
+
+        return approvedMentorings.stream()
+                .collect(Collectors.toMap(
+                        Mentoring::getMentorId,
+                        mentoring -> mentoringIdToRoomId.get(mentoring.getId())
+                ));
+    }
 
     @Transactional(readOnly = true)
     public SliceResponse<MentoringForMenteeResponse> getMentoringsForMentee(
