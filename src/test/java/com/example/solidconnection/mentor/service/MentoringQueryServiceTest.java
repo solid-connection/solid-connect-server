@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
@@ -10,16 +11,25 @@ import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
+import com.example.solidconnection.mentor.dto.ChannelResponse;
+import com.example.solidconnection.mentor.dto.MatchedMentorResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMentorResponse;
+import com.example.solidconnection.mentor.fixture.ChannelFixture;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.fixture.UniversityFixture;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,6 +55,12 @@ class MentoringQueryServiceTest {
     private MentoringFixture mentoringFixture;
 
     @Autowired
+    private UniversityFixture universityFixture;
+
+    @Autowired
+    private ChannelFixture channelFixture;
+
+    @Autowired
     private MentoringRepository mentoringRepository;
 
     @Autowired
@@ -53,6 +69,7 @@ class MentoringQueryServiceTest {
     private SiteUser mentorUser1, mentorUser2;
     private SiteUser menteeUser1, menteeUser2, menteeUser3;
     private Mentor mentor1, mentor2, mentor3;
+    private University university;
     private Pageable pageable;
 
     @BeforeEach
@@ -63,9 +80,10 @@ class MentoringQueryServiceTest {
         menteeUser1 = siteUserFixture.사용자(1, "mentee1");
         menteeUser2 = siteUserFixture.사용자(2, "mentee2");
         menteeUser3 = siteUserFixture.사용자(3, "mentee3");
-        mentor1 = mentorFixture.멘토(mentorUser1.getId(), 1L);
-        mentor2 = mentorFixture.멘토(mentorUser2.getId(), 1L);
-        mentor3 = mentorFixture.멘토(mentorUser3.getId(), 1L);
+        university = universityFixture.괌_대학();
+        mentor1 = mentorFixture.멘토(mentorUser1.getId(), university.getId());
+        mentor2 = mentorFixture.멘토(mentorUser2.getId(), university.getId());
+        mentor3 = mentorFixture.멘토(mentorUser3.getId(), university.getId());
         pageable = PageRequest.of(0, 3);
     }
 
@@ -237,6 +255,73 @@ class MentoringQueryServiceTest {
 
             // then
             assertThat(response.content()).isEmpty();
+        }
+    }
+
+    @Nested
+    class 멘티의_멘토_목록_조회_테스트 {
+
+        private static final int NO_NEXT_PAGE_NUMBER = -1;
+
+        private Mentoring mentoring1, mentoring2;
+        private ChatRoom chatRoom1, chatRoom2;
+
+        @BeforeEach
+        void setUp() {
+            mentoring1 = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser1.getId());
+            mentoring2 = mentoringFixture.승인된_멘토링(mentor2.getId(), menteeUser1.getId());
+
+            chatRoom1 = chatRoomFixture.멘토링_채팅방(mentoring1.getId());
+            chatRoom2 = chatRoomFixture.멘토링_채팅방(mentoring2.getId());
+        }
+
+        @Test
+        void 매칭된_멘토의_목록_정보를_조회한다() {
+            // given
+            Channel channel1 = channelFixture.채널(1, mentor1);
+            Channel channel2 = channelFixture.채널(2, mentor2);
+
+            // when
+            SliceResponse<MatchedMentorResponse> response = mentoringQueryService.getMatchedMentors(menteeUser1.getId(), PageRequest.of(0, 10));
+
+            // then
+            Map<Long, MatchedMentorResponse> matchMentorMap = response.content().stream()
+                    .collect(Collectors.toMap(MatchedMentorResponse::id, Function.identity()));
+            MatchedMentorResponse mentor1Response = matchMentorMap.get(mentor1.getId());
+            MatchedMentorResponse mentor2Response = matchMentorMap.get(mentor2.getId());
+            assertAll(
+                    () -> assertThat(mentor1Response.roomId()).isEqualTo(chatRoom1.getId()),
+                    () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
+                    () -> assertThat(mentor1Response.universityName()).isEqualTo(university.getKoreanName()),
+                    () -> assertThat(mentor1Response.country()).isEqualTo(university.getCountry().getKoreanName()),
+                    () -> assertThat(mentor1Response.channels()).extracting(ChannelResponse::url)
+                            .containsOnly(channel1.getUrl()),
+
+                    () -> assertThat(mentor2Response.roomId()).isEqualTo(chatRoom2.getId()),
+                    () -> assertThat(mentor2Response.nickname()).isEqualTo(mentorUser2.getNickname()),
+                    () -> assertThat(mentor2Response.universityName()).isEqualTo(university.getKoreanName()),
+                    () -> assertThat(mentor2Response.country()).isEqualTo(university.getCountry().getKoreanName()),
+                    () -> assertThat(mentor2Response.channels()).extracting(ChannelResponse::url)
+                            .containsOnly(channel2.getUrl())
+            );
+        }
+
+        @Test
+        void 다음_페이지_번호를_응답한다() {
+            // given
+            SliceResponse<MatchedMentorResponse> response = mentoringQueryService.getMatchedMentors(menteeUser1.getId(), PageRequest.of(0, 1));
+
+            // then
+            assertThat(response.nextPageNumber()).isEqualTo(2);
+        }
+
+        @Test
+        void 다음_페이지가_없으면_페이지_없음을_의미하는_값을_응답한다() {
+            // given
+            SliceResponse<MatchedMentorResponse> response = mentoringQueryService.getMatchedMentors(menteeUser1.getId(), PageRequest.of(0, 10));
+
+            // then
+            assertThat(response.nextPageNumber()).isEqualTo(NO_NEXT_PAGE_NUMBER);
         }
     }
 }
