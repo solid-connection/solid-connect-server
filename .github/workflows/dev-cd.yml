@@ -94,5 +94,5 @@ jobs:
             sudo nginx -s reload
 
             cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
-            docker compose down
+            docker compose -f docker-compose.dev.yml down
             docker compose -f docker-compose.dev.yml up -d --build
