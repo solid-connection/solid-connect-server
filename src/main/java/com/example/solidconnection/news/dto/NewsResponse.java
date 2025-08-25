@@ -1,6 +1,9 @@
 package com.example.solidconnection.news.dto;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 import com.example.solidconnection.news.domain.News;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.ZonedDateTime;
 
 public record NewsResponse(
@@ -9,16 +12,21 @@ public record NewsResponse(
         String description,
         String thumbnailUrl,
         String url,
+
+        @JsonInclude(NON_NULL)
+        Boolean isLiked,
+
         ZonedDateTime updatedAt
 ) {
 
-    public static NewsResponse from(News news) {
+    public static NewsResponse of(News news, Boolean isLiked) {
         return new NewsResponse(
                 news.getId(),
                 news.getTitle(),
                 news.getDescription(),
                 news.getThumbnailUrl(),
                 news.getUrl(),
+                isLiked,
                 news.getUpdatedAt()
         );
     }
