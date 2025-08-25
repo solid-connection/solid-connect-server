@@ -3,7 +3,6 @@ package com.example.solidconnection.report.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.report.dto.ReportRequest;
 import com.example.solidconnection.report.service.ReportService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +20,10 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<Void> createReport(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestBody ReportRequest reportRequest
     ) {
-        reportService.createReport(siteUser.getId(), reportRequest);
+        reportService.createReport(siteUserId, reportRequest);
         return ResponseEntity.ok().build();
     }
 }
