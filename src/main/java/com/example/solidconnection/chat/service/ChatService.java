@@ -174,15 +174,20 @@ public class ChatService {
     }
 
     @Transactional
-    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
-        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
-            return;
+    public Long createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        ChatRoom existingChatRoom = chatRoomRepository.findByMentoringId(mentoringId);
+        if (existingChatRoom != null) {
+            return existingChatRoom.getId();
         }
 
+        // 새 채팅방 생성
         ChatRoom chatRoom = new ChatRoom(mentoringId, false);
         chatRoom = chatRoomRepository.save(chatRoom);
+
         ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
         ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
         chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
+
+        return chatRoom.getId();
     }
 }

@@ -5,19 +5,18 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_N
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
 
+import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
-import com.example.solidconnection.mentor.dto.MentoringApprovedEvent;
 import com.example.solidconnection.mentor.dto.MentoringConfirmRequest;
 import com.example.solidconnection.mentor.dto.MentoringConfirmResponse;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ public class MentoringCommandService {
 
     private final MentoringRepository mentoringRepository;
     private final MentorRepository mentorRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ChatService chatService;
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
@@ -49,12 +48,13 @@ public class MentoringCommandService {
 
         mentoring.confirm(mentoringConfirmRequest.status());
 
+        Long chatRoomId = null;
         if (mentoringConfirmRequest.status() == VerifyStatus.APPROVED) {
             mentor.increaseMenteeCount();
-            eventPublisher.publishEvent(MentoringApprovedEvent.of(mentoringId, mentor.getSiteUserId(), mentoring.getMenteeId()));
+            chatRoomId = chatService.createMentoringChatRoom(mentoringId, mentor.getSiteUserId(), mentoring.getMenteeId());
         }
 
-        return MentoringConfirmResponse.from(mentoring);
+        return MentoringConfirmResponse.from(mentoring, chatRoomId);
     }
 
     private void validateMentoringNotConfirmed(Mentoring mentoring) {

@@ -34,7 +34,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
            """)
     long countUnreadMessages(@Param("chatRoomId") long chatRoomId, @Param("userId") long userId);
 
-    boolean existsByMentoringId(long mentoringId);
+    ChatRoom findByMentoringId(long mentoringId);
 
     List<ChatRoom> findAllByMentoringIdIn(List<Long> mentoringIds);
 }
