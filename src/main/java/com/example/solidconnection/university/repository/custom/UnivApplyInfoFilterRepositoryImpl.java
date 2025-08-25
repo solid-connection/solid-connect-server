@@ -146,6 +146,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     public List<UnivApplyInfo> findAllByText(String text, String term) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
+        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
 
@@ -153,6 +154,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
                 .join(region).on(country.regionCode.eq(region.code))
+                .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(termEq(univApplyInfo, term));
 
         // text 가 비어있다면 모든 대학지원정보를 id 오름차순으로 정렬하여 반환
