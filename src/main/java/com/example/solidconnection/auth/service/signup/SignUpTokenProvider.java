@@ -41,8 +41,7 @@ public class SignUpTokenProvider {
 
     public void validateSignUpToken(String token) {
         validateFormatAndExpiration(token);
-        String email = parseEmail(token);
-        validateIssuedByServer(email);
+        validateIssuedByServer(token);
     }
 
     private void validateFormatAndExpiration(String token) { // 파싱되는지, AuthType이 포함되어있는지 검증
@@ -54,8 +53,10 @@ public class SignUpTokenProvider {
         }
     }
 
-    private void validateIssuedByServer(String email) {
+    private void validateIssuedByServer(String token) {
+        String email = parseEmail(token);
         tokenStorage.findToken(new Subject(email), SignUpToken.class)
+                .filter(foundToken -> foundToken.equals(token))
                 .orElseThrow(() -> new CustomException(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER));
     }
 
