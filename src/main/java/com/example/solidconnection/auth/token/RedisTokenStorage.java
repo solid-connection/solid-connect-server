@@ -5,7 +5,6 @@ import com.example.solidconnection.auth.domain.Token;
 import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.auth.token.config.TokenProperties;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -21,8 +20,7 @@ public class RedisTokenStorage implements TokenStorage {
         redisTemplate.opsForValue().set(
                 createKey(subject, token.getClass()),
                 token.token(),
-                TokenProperties.getExpireTime(token.getClass()),
-                TimeUnit.MILLISECONDS
+                TokenProperties.getExpireTime(token.getClass())
         );
         return token;
     }

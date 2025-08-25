@@ -8,6 +8,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie.SameSite;
@@ -26,14 +27,14 @@ public class RefreshTokenCookieManager {
     private final TokenProperties tokenProperties;
 
     public void setCookie(HttpServletResponse response, String refreshToken) {
-        long tokenExpireTime = tokenProperties.refresh().expireTime();
+        Duration tokenExpireTime = tokenProperties.refresh().expireTime();
         long cookieMaxAge = convertExpireTimeToCookieMaxAge(tokenExpireTime);
         setRefreshTokenCookie(response, refreshToken, cookieMaxAge);
     }
 
-    private long convertExpireTimeToCookieMaxAge(long milliSeconds) {
+    private long convertExpireTimeToCookieMaxAge(Duration tokenExpireTime) {
         // jwt의 expireTime 단위인 millisecond를 cookie의 maxAge 단위인 second로 변환
-        return milliSeconds / 1000;
+        return tokenExpireTime.toSeconds();
     }
 
     public void deleteCookie(HttpServletResponse response) {

@@ -18,6 +18,7 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,7 +117,7 @@ class SignUpTokenProviderTest {
             // given
             String wrongAuthType = "카카오";
             Map<String, String> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, wrongAuthType));
-            String wrongAuthTypeClaim = tokenProvider.generateToken(subject, wrongClaim, 10000L);
+            String wrongAuthTypeClaim = tokenProvider.generateToken(subject, wrongClaim, Duration.ofMinutes(10));
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthTypeClaim))

@@ -87,15 +87,15 @@ news:
   default-thumbnail-url: "default-thumbnail-url"
 token:
   access:
-    expire-time: 600000 # 10minutes
     storage-key-prefix: "ACCESS"
+    expire-time: 10m
   refresh:
     cookie-domain: "test.domain.com"
-    expire-time: 600000 # 10minutes
     storage-key-prefix: "REFRESH"
+    expire-time: 10m
   sign-up:
-    expire-time: 600000 # 10minutes
     storage-key-prefix: "SIGN_UP"
+    expire-time: 10m
   black-list:
-    expire-time: 600000 # 10minutes
     storage-key-prefix: "BLACKLIST"
+    expire-time: 10m

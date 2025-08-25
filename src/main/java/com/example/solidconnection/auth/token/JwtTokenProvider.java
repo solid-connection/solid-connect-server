@@ -9,6 +9,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +22,20 @@ public class JwtTokenProvider implements TokenProvider {
     private final JwtProperties jwtProperties;
 
     @Override
-    public String generateToken(Subject subject, long expireTime) {
+    public String generateToken(Subject subject, Duration expireTime) {
         return generateJwtTokenValue(subject.value(), Map.of(), expireTime);
     }
 
     @Override
-    public String generateToken(Subject subject, Map<String, String> customClaims, long expireTime) {
+    public String generateToken(Subject subject, Map<String, String> customClaims, Duration expireTime) {
         return generateJwtTokenValue(subject.value(), customClaims, expireTime);
     }
 
-    private String generateJwtTokenValue(String subject, Map<String, String> claims, long expireTime) {
+    private String generateJwtTokenValue(String subject, Map<String, String> claims, Duration expireTime) {
         Claims jwtClaims = Jwts.claims().setSubject(subject);
         jwtClaims.putAll(claims);
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + expireTime);
+        Date expiredDate = new Date(now.getTime() + expireTime.toMillis());
         return Jwts.builder()
                 .setClaims(jwtClaims)
                 .setIssuedAt(now)

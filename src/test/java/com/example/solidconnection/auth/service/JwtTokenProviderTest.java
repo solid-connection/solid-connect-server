@@ -13,6 +13,7 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ class JwtTokenProviderTest {
     private JwtProperties jwtProperties;
 
     private final Subject expectedSubject = new Subject("subject123");
-    private final long expectedExpireTime = 10000L;
+    private final Duration expectedExpireTime = Duration.ofMinutes(10);
 
     @Nested
     class 토큰을_생성한다 {
@@ -44,7 +45,7 @@ class JwtTokenProviderTest {
 
             // then - subject와 만료 시간이 일치하는지 검증
             Subject actualSubject = tokenProvider.parseSubject(token);
-            long actualExpireTime = getActualExpireTime(token);
+            Duration actualExpireTime = getActualExpireTime(token);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(expectedSubject),
                     () -> assertThat(actualExpireTime).isEqualTo(expectedExpireTime)
@@ -65,7 +66,7 @@ class JwtTokenProviderTest {
 
             // then - subject와 커스텀 클레임이 일치하는지 검증
             Subject actualSubject = tokenProvider.parseSubject(token);
-            long actualExpireTime = getActualExpireTime(token);
+            Duration actualExpireTime = getActualExpireTime(token);
             assertAll(
                     () -> assertThat(actualSubject).isEqualTo(expectedSubject),
                     () -> assertThat(actualExpireTime).isEqualTo(expectedExpireTime),
@@ -74,12 +75,12 @@ class JwtTokenProviderTest {
             );
         }
 
-        private long getActualExpireTime(String token) {
+        private Duration getActualExpireTime(String token) {
             Claims claims = Jwts.parser()
                     .setSigningKey(jwtProperties.secret())
                     .parseClaimsJws(token)
                     .getBody();
-            return claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
+            return Duration.ofMillis(claims.getExpiration().getTime() - claims.getIssuedAt().getTime());
         }
     }
 

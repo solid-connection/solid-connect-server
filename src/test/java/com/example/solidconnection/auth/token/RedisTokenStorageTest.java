@@ -8,6 +8,7 @@ import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.domain.Token;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +33,7 @@ class RedisTokenStorageTest {
     @BeforeEach
     void setUp() {
         subject = new Subject("subject123");
-        expectedToken = new AccessToken(tokenProvider.generateToken(subject, 100000L));
+        expectedToken = new AccessToken(tokenProvider.generateToken(subject, Duration.ofMinutes(10)));
         tokenClass = expectedToken.getClass();
     }
 

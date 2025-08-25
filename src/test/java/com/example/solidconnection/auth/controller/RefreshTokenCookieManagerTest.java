@@ -62,7 +62,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("HttpOnly"),
                 () -> assertThat(header).contains("Secure"),
                 () -> assertThat(header).contains("Path=/"),
-                () -> assertThat(header).contains("Max-Age=" + tokenProperties.refresh().expireTime() / 1000),
+                () -> assertThat(header).contains("Max-Age=" + tokenProperties.refresh().expireTime().toSeconds()),
                 () -> assertThat(header).contains("Domain=" + domain),
                 () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
         );

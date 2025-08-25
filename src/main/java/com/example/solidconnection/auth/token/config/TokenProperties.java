@@ -5,6 +5,7 @@ import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.SignUpToken;
 import com.example.solidconnection.auth.domain.Token;
 import jakarta.annotation.PostConstruct;
+import java.time.Duration;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -27,7 +28,7 @@ public record TokenProperties(
         );
     }
 
-    public static long getExpireTime(Class<? extends Token> tokenClass) {
+    public static Duration getExpireTime(Class<? extends Token> tokenClass) {
         return tokenConfigs.get(tokenClass).expireTime();
     }
 
