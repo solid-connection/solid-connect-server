@@ -109,6 +109,24 @@ class JwtTokenProviderTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INVALID_TOKEN.getMessage());
         }
+
+        @Test
+        void subject_가_없는_토큰의_subject_를_추출하면_예외가_발생한다() {
+            // given
+            Claims claims = Jwts.claims(new HashMap<>());
+            String subjectNotExistingToken = createExpiredToken(claims);
+            String subjectBlankToken = tokenProvider.generateToken(new Subject("   "), expectedExpireTime);
+
+            // when, then
+            assertAll(
+                    () -> assertThatCode(() -> tokenProvider.parseSubject(subjectNotExistingToken))
+                            .isInstanceOf(CustomException.class)
+                            .hasMessage(ErrorCode.INVALID_TOKEN.getMessage()),
+                    () -> assertThatCode(() -> tokenProvider.parseSubject(subjectBlankToken))
+                            .isInstanceOf(CustomException.class)
+                            .hasMessage(ErrorCode.INVALID_TOKEN.getMessage())
+            );
+        }
     }
 
     @Nested

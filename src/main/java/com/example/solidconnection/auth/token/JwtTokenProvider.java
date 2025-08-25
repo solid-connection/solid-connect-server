@@ -45,7 +45,11 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public Subject parseSubject(String token) {
-        return new Subject(parseJwtClaims(token).getSubject());
+        String subject = parseJwtClaims(token).getSubject();
+        if (subject == null || subject.isBlank()) {
+            throw new CustomException(INVALID_TOKEN);
+        }
+        return new Subject(subject);
     }
 
     @Override
