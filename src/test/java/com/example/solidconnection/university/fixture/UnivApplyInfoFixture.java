@@ -39,6 +39,14 @@ public class UnivApplyInfoFixture {
                 .create();
     }
 
+    public UnivApplyInfo 아칸소주립대학_지원_정보() {
+        return univApplyInfoFixtureBuilder.univApplyInfo()
+                .term(term)
+                .koreanName("아칸소 주립 대학")
+                .university(universityFixture.아칸소_주립_대학())
+                .create();
+    }
+
     public UnivApplyInfo 메모리얼대학_세인트존스_A_지원_정보() {
         return univApplyInfoFixtureBuilder.univApplyInfo()
                 .term(term)
