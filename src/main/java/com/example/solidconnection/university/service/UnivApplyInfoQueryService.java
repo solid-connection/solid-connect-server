@@ -48,8 +48,12 @@ public class UnivApplyInfoQueryService {
     }
 
     @Transactional(readOnly = true)
+    @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
-        // todo: 구현
-        return null;
+        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository.findAllByText(text, term)
+                .stream()
+                .map(UnivApplyInfoPreviewResponse::from)
+                .toList();
+        return new UnivApplyInfoPreviewResponses(responses);
     }
 }
