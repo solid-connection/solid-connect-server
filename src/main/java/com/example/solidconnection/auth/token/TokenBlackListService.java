@@ -2,6 +2,7 @@ package com.example.solidconnection.auth.token;
 
 import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.security.filter.BlacklistChecker;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,12 @@ public class TokenBlackListService implements BlacklistChecker {
      * */
     public void addToBlacklist(String accessToken) {
         String blackListKey = createKey(accessToken);
-        redisTemplate.opsForValue().set(blackListKey, SIGN_OUT_VALUE);
+        redisTemplate.opsForValue().set(
+                blackListKey,
+                SIGN_OUT_VALUE,
+                tokenProperties.blackList().expireTime(),
+                TimeUnit.MICROSECONDS
+        );
     }
 
     @Override
