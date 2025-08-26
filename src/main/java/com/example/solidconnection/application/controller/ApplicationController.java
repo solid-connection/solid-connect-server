@@ -39,7 +39,7 @@ public class ApplicationController {
                 .body(applicationSubmissionResponse);
     }
 
-    @RequireRoleAccess(roles = {Role.ADMIN})
+    // @RequireRoleAccess(roles = {Role.ADMIN}) // todo : 추후 어드민 페이지에서 권한 변경 기능 추가 필요
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
             @AuthorizedUser long siteUserId,
