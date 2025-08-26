@@ -42,4 +42,8 @@ public class ChatAttachment extends BaseEntity {
             chatMessage.getChatAttachments().add(this);
         }
     }
+
+    protected void setChatMessage(ChatMessage chatMessage) {
+        this.chatMessage = chatMessage;
+    }
 }

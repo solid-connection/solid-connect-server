@@ -193,31 +193,14 @@ public class ChatService {
         for (String imageUrl : chatImageSendRequest.imageUrls()) {
             String thumbnailUrl = generateThumbnailUrl(imageUrl);
 
-            new ChatAttachment(
-                    true,
-                    imageUrl,
-                    thumbnailUrl,
-                    chatMessage
-            );
+            ChatAttachment attachment = new ChatAttachment(true, imageUrl, thumbnailUrl, null);
+            chatMessage.addAttachment(attachment);
         }
 
         chatMessageRepository.save(chatMessage);
 
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
-    }
-
-    @Transactional
-    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
-        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
-            return;
-        }
-
-        ChatRoom chatRoom = new ChatRoom(mentoringId, false);
-        chatRoom = chatRoomRepository.save(chatRoom);
-        ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
-        ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
-        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
     }
 
     private String generateThumbnailUrl(String originalUrl) {
@@ -237,5 +220,18 @@ public class ChatService {
         } catch (Exception e) {
             return originalUrl;
         }
+    }
+
+    @Transactional
+    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
+            return;
+        }
+
+        ChatRoom chatRoom = new ChatRoom(mentoringId, false);
+        chatRoom = chatRoomRepository.save(chatRoom);
+        ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
+        ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
+        chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
     }
 }
