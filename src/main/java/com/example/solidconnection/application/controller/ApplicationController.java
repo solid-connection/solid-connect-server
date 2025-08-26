@@ -6,8 +6,6 @@ import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.security.annotation.RequireRoleAccess;
-import com.example.solidconnection.siteuser.domain.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
