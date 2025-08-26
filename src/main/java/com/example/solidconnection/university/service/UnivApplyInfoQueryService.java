@@ -10,7 +10,6 @@ import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +19,12 @@ public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
 
-    @Value("${university.term}")
-    public String term;
-
     /*
      * 대학교 상세 정보를 불러온다.
      * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}:{1}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
                 = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
@@ -38,7 +34,7 @@ public class UnivApplyInfoQueryService {
     }
 
     @Transactional(readOnly = true)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request) {
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request, String term) {
         List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository
                 .findAllByFilter(request.languageTestType(), request.testScore(), term, request.countryCode())
                 .stream()
@@ -48,8 +44,12 @@ public class UnivApplyInfoQueryService {
     }
 
     @Transactional(readOnly = true)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
-        // todo: 구현
-        return null;
+    @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}:{1}", cacheManager = "customCacheManager", ttlSec = 86400)
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text, String term) {
+        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository.findAllByText(text, term)
+                .stream()
+                .map(UnivApplyInfoPreviewResponse::from)
+                .toList();
+        return new UnivApplyInfoPreviewResponses(responses);
     }
 }

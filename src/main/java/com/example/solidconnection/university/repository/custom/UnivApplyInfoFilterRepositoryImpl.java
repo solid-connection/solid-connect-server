@@ -1,14 +1,19 @@
 package com.example.solidconnection.university.repository.custom;
 
 import com.example.solidconnection.location.country.domain.QCountry;
+import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
 import com.example.solidconnection.university.domain.QUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -135,5 +140,47 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .findFirst()
                 .map(requirement -> givenTestType.compare(givenTestScore, requirement.getMinScore()))
                 .orElse(-1) >= 0;
+    }
+
+    @Override
+    public List<UnivApplyInfo> findAllByText(String text, String term) {
+        QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
+        QUniversity university = QUniversity.university;
+        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
+        QCountry country = QCountry.country;
+        QRegion region = QRegion.region;
+
+        JPAQuery<UnivApplyInfo> base = queryFactory.selectFrom(univApplyInfo)
+                .join(univApplyInfo.university, university).fetchJoin()
+                .join(university.country, country).fetchJoin()
+                .join(region).on(country.regionCode.eq(region.code))
+                .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
+                .where(termEq(univApplyInfo, term));
+
+        // text 가 비어있다면 모든 대학 지원 정보를 id 오름차순으로 정렬하여 반환
+        if (text == null || text.isBlank()) {
+            return base.orderBy(univApplyInfo.id.asc()).fetch();
+        }
+
+        // 매칭 조건 (대학 지원 정보명/국가명/지역명 중 하나라도 포함)
+        BooleanExpression univApplyInfoLike = univApplyInfo.koreanName.contains(text);
+        BooleanExpression countryLike = country.koreanName.contains(text);
+        BooleanExpression regionLike = region.koreanName.contains(text);
+        BooleanBuilder where = new BooleanBuilder()
+                .or(univApplyInfoLike)
+                .or(countryLike)
+                .or(regionLike);
+
+        // 우선순위 랭크: 대학 지원 정보명(0) > 국가명(1) > 지역명(2) > 그 외(3)
+        NumberExpression<Integer> rank = new CaseBuilder()
+                .when(univApplyInfoLike).then(0)
+                .when(countryLike).then(1)
+                .when(regionLike).then(2)
+                .otherwise(3);
+
+        // 정렬 조건: 랭크 오름차순 > 대학지원정보 id 오름차순
+        return base.where(where)
+                .orderBy(rank.asc(), univApplyInfo.id.asc())
+                .fetch();
     }
 }
