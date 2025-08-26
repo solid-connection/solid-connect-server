@@ -1,10 +1,11 @@
 package com.example.solidconnection.community.board.controller;
 
+import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.community.board.domain.BoardCode;
 import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.service.PostQueryService;
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.BoardCode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +33,7 @@ public class BoardController {
 
     @GetMapping("/{code}")
     public ResponseEntity<?> findPostsByCodeAndCategory(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId, // todo: '사용하지 않는 인자'로 인증된 유저만 접근하게 하기보다는, 다른 방식으로 접근하는것이 좋을 것 같다
             @PathVariable(value = "code") String code,
             @RequestParam(value = "category", defaultValue = "전체") String category) {
         List<PostListResponse> postsByCodeAndPostCategory = postQueryService

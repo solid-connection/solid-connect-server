@@ -1,10 +1,9 @@
 package com.example.solidconnection.application.service;
 
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 class NicknameCreator {

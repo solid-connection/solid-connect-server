@@ -1,10 +1,18 @@
 package com.example.solidconnection.auth.client;
 
+import static com.example.solidconnection.common.exception.ErrorCode.APPLE_AUTHORIZATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
+
+import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.AppleTokenDto;
 import com.example.solidconnection.auth.dto.oauth.AppleUserInfoDto;
-import com.example.solidconnection.config.client.AppleOAuthClientProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
+import com.example.solidconnection.auth.service.oauth.OAuthClient;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import io.jsonwebtoken.Jwts;
+import java.security.PublicKey;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,32 +24,32 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.PublicKey;
-import java.util.Objects;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLE_AUTHORIZATION_FAILED;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_APPLE_ID_TOKEN;
-
 /*
  * 애플 인증을 위한 OAuth2 클라이언트
  * https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens
  * */
 @Component
 @RequiredArgsConstructor
-public class AppleOAuthClient {
+public class AppleOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate;
     private final AppleOAuthClientProperties properties;
     private final AppleOAuthClientSecretProvider clientSecretProvider;
     private final ApplePublicKeyProvider publicKeyProvider;
 
-    public AppleUserInfoDto processOAuth(String code) {
+    @Override
+    public AuthType getAuthType() {
+        return AuthType.APPLE;
+    }
+
+    @Override
+    public OAuthUserInfoDto getUserInfo(String code) {
         String idToken = requestIdToken(code);
         PublicKey applePublicKey = publicKeyProvider.getApplePublicKey(idToken);
         return new AppleUserInfoDto(parseEmailFromToken(applePublicKey, idToken));
     }
 
-    public String requestIdToken(String code) {
+    private String requestIdToken(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> formData = buildFormData(code);

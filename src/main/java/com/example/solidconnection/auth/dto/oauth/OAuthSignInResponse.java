@@ -4,4 +4,5 @@ public record OAuthSignInResponse(
         boolean isRegistered,
         String accessToken,
         String refreshToken) implements OAuthResponse {
+
 }

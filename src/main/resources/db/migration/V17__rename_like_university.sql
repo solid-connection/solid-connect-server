@@ -1,0 +1,1 @@
+ALTER TABLE liked_university RENAME liked_university_info_for_apply;

@@ -1,13 +1,12 @@
 package com.example.solidconnection.cache.manager;
 
+import java.time.Duration;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.util.Set;
 
 @Component("customCacheManager")
 public class CustomCacheManager implements CacheManager {

@@ -15,9 +15,9 @@ public class SignInService {
     @Transactional
     public SignInResponse signIn(SiteUser siteUser) {
         resetQuitedAt(siteUser);
-        String accessToken = authTokenProvider.generateAccessToken(siteUser);
-        String refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
-        return new SignInResponse(accessToken, refreshToken);
+        AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
+        RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
+        return SignInResponse.of(accessToken, refreshToken);
     }
 
     private void resetQuitedAt(SiteUser siteUser) {

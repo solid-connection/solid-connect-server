@@ -1,6 +1,5 @@
 package com.example.solidconnection.community.post.domain;
 
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,33 +25,21 @@ public class PostLike {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_user_id")
-    private SiteUser siteUser;
+    private long siteUserId;
 
-    public void setPostAndSiteUser(Post post, SiteUser siteUser) {
+    public void setPostAndSiteUserId(Post post, long siteUserId) {
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
         this.post = post;
         post.getPostLikeList().add(this);
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostLikeList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getPostLikeList().add(this);
+        this.siteUserId = siteUserId;
     }
 
-    public void resetPostAndSiteUser() {
+    public void resetPost() {
         if (this.post != null) {
             this.post.getPostLikeList().remove(this);
         }
         this.post = null;
-
-        if (this.siteUser != null) {
-            this.siteUser.getPostLikeList().remove(this);
-        }
-        this.siteUser = null;
     }
 }

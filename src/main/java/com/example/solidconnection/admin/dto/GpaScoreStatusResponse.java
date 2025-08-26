@@ -1,7 +1,6 @@
 package com.example.solidconnection.admin.dto;
 
-import com.example.solidconnection.type.VerifyStatus;
-
+import com.example.solidconnection.common.VerifyStatus;
 import java.time.ZonedDateTime;
 
 public record GpaScoreStatusResponse(
@@ -12,4 +11,5 @@ public record GpaScoreStatusResponse(
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt
 ) {
+
 }

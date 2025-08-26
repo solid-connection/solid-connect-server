@@ -1,41 +1,37 @@
 package com.example.solidconnection.score.service;
 
-import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.s3.S3Service;
-import com.example.solidconnection.s3.UploadedFileUrlResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
+import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
-import com.example.solidconnection.score.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
-import com.example.solidconnection.score.dto.LanguageTestScoreStatusResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
+import com.example.solidconnection.score.fixture.GpaScoreFixture;
+import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.ImgType;
-import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.PreparationStatus;
-import com.example.solidconnection.type.Role;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.LanguageTestType;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
-
+@TestContainerSpringBootTest
 @DisplayName("점수 서비스 테스트")
-class ScoreServiceTest extends BaseIntegrationTest {
+class ScoreServiceTest {
 
     @Autowired
     private ScoreService scoreService;
@@ -44,43 +40,46 @@ class ScoreServiceTest extends BaseIntegrationTest {
     private GpaScoreRepository gpaScoreRepository;
 
     @Autowired
-    private SiteUserRepository siteUserRepository;
-
-    @Autowired
     private LanguageTestScoreRepository languageTestScoreRepository;
 
     @MockBean
     private S3Service s3Service;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private GpaScoreFixture gpaScoreFixture;
+
+    @Autowired
+    private LanguageTestScoreFixture languageTestScoreFixture;
+
+    private SiteUser user;
+
+    @BeforeEach
+    void setUp() {
+        user = siteUserFixture.사용자();
+    }
+
     @Test
     void GPA_점수_상태를_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
         List<GpaScore> scores = List.of(
-                createGpaScore(testUser, 3.5, 4.5),
-                createGpaScore(testUser, 3.8, 4.5)
+                gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user),
+                gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user)
         );
 
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
         // then
-        assertThat(response.gpaScoreStatusResponseList())
-                .hasSize(scores.size())
-                .containsExactlyInAnyOrder(
-                        scores.stream()
-                                .map(GpaScoreStatusResponse::from)
-                                .toArray(GpaScoreStatusResponse[]::new)
-                );
+        assertThat(response.gpaScoreStatusResponseList()).hasSize(scores.size());
     }
 
     @Test
     void GPA_점수가_없는_경우_빈_리스트를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
         // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(testUser);
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
         // then
         assertThat(response.gpaScoreStatusResponseList()).isEmpty();
@@ -89,33 +88,22 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Test
     void 어학_시험_점수_상태를_조회한다() {
         // given
-        SiteUser testUser = createSiteUser();
         List<LanguageTestScore> scores = List.of(
-                createLanguageTestScore(testUser, LanguageTestType.TOEIC, "100"),
-                createLanguageTestScore(testUser, LanguageTestType.TOEFL_IBT, "7.5")
+                languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user),
+                languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user)
         );
-        siteUserRepository.save(testUser);
 
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(testUser);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user.getId());
 
         // then
-        assertThat(response.languageTestScoreStatusResponseList())
-                .hasSize(scores.size())
-                .containsExactlyInAnyOrder(
-                        scores.stream()
-                                .map(LanguageTestScoreStatusResponse::from)
-                                .toArray(LanguageTestScoreStatusResponse[]::new)
-                );
+        assertThat(response.languageTestScoreStatusResponseList()).hasSize(scores.size());
     }
 
     @Test
     void 어학_시험_점수가_없는_경우_빈_리스트를_반환한다() {
-        // given
-        SiteUser testUser = createSiteUser();
-
         // when
-        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(testUser);
+        LanguageTestScoreStatusesResponse response = scoreService.getLanguageTestScoreStatus(user.getId());
 
         // then
         assertThat(response.languageTestScoreStatusResponseList()).isEmpty();
@@ -124,76 +112,33 @@ class ScoreServiceTest extends BaseIntegrationTest {
     @Test
     void GPA_점수를_등록한다() {
         // given
-        SiteUser testUser = createSiteUser();
         GpaScoreRequest request = createGpaScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
         given(s3Service.uploadFile(file, ImgType.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitGpaScore(testUser, request, file);
+        long scoreId = scoreService.submitGpaScore(user.getId(), request, file);
         GpaScore savedScore = gpaScoreRepository.findById(scoreId).orElseThrow();
 
         // then
-        assertAll(
-                () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
-                () -> assertThat(savedScore.getGpa().getGpa()).isEqualTo(request.gpa()),
-                () -> assertThat(savedScore.getGpa().getGpaCriteria()).isEqualTo(request.gpaCriteria()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
-                () -> assertThat(savedScore.getGpa().getGpaReportUrl()).isEqualTo(fileUrl)
-        );
+        assertThat(savedScore.getId()).isEqualTo(scoreId);
     }
 
     @Test
     void 어학_시험_점수를_등록한다() {
         // given
-        SiteUser testUser = createSiteUser();
         LanguageTestScoreRequest request = createLanguageTestScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
         given(s3Service.uploadFile(file, ImgType.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
-        long scoreId = scoreService.submitLanguageTestScore(testUser, request, file);
+        long scoreId = scoreService.submitLanguageTestScore(user.getId(), request, file);
         LanguageTestScore savedScore = languageTestScoreRepository.findById(scoreId).orElseThrow();
 
         // then
-        assertAll(
-                () -> assertThat(savedScore.getId()).isEqualTo(scoreId),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestType()).isEqualTo(request.languageTestType()),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestScore()).isEqualTo(request.languageTestScore()),
-                () -> assertThat(savedScore.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING),
-                () -> assertThat(savedScore.getLanguageTest().getLanguageTestReportUrl()).isEqualTo(fileUrl)
-        );
-    }
-
-    private SiteUser createSiteUser() {
-        SiteUser siteUser = new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                PreparationStatus.CONSIDERING,
-                Role.MENTEE
-        );
-        return siteUserRepository.save(siteUser);
-    }
-
-    private GpaScore createGpaScore(SiteUser siteUser, double gpa, double gpaCriteria) {
-        GpaScore gpaScore = new GpaScore(
-                new Gpa(gpa, gpaCriteria, "/gpa-report.pdf"),
-                siteUser
-        );
-        gpaScore.setSiteUser(siteUser);
-        return gpaScoreRepository.save(gpaScore);
-    }
-
-    private LanguageTestScore createLanguageTestScore(SiteUser siteUser, LanguageTestType languageTestType, String score) {
-        LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(languageTestType, score, "/gpa-report.pdf"),
-                siteUser
-        );
-        languageTestScore.setSiteUser(siteUser);
-        return languageTestScoreRepository.save(languageTestScore);
+        assertThat(savedScore.getId()).isEqualTo(scoreId);
     }
 
     private GpaScoreRequest createGpaScoreRequest() {

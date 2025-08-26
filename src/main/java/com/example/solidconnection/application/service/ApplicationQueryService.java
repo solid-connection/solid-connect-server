@@ -1,134 +1,136 @@
 package com.example.solidconnection.application.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.dto.ApplicantResponse;
+import com.example.solidconnection.application.dto.ApplicantsResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
-import com.example.solidconnection.application.dto.UniversityApplicantsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.VerifyStatus;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.domain.UniversityInfoForApply;
-import com.example.solidconnection.university.repository.UniversityInfoForApplyRepository;
-import com.example.solidconnection.university.repository.custom.UniversityFilterRepositoryImpl;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 
 @RequiredArgsConstructor
 @Service
 public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
-    private final UniversityInfoForApplyRepository universityInfoForApplyRepository;
-    private final UniversityFilterRepositoryImpl universityFilterRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
+    private final SiteUserRepository siteUserRepository;
 
     @Value("${university.term}")
     public String term;
 
-    /*
-     * 다른 지원자들의 성적을 조회한다.
-     * - 유저가 다른 지원자들을 볼 수 있는지 검증한다.
-     * - 지역과 키워드를 통해 대학을 필터링한다.
-     *   - 지역은 영어 대문자로 받는다 e.g. ASIA
-     * - 1지망, 2지망 지원자들을 조회한다.
-     * */
+    // todo: 캐싱 정책 변경 시 수정 필요
     @Transactional(readOnly = true)
-    // todo: 임시로 단일 키로 캐시 적용. 추후 캐싱 전략 재검토 필요.
-    @ThunderingHerdCaching(key = "applications:all", cacheManager = "customCacheManager", ttlSec = 86400)
-    public ApplicationsResponse getApplicants(SiteUser siteUser, String regionCode, String keyword) {
-        // 국가와 키워드와 지역을 통해 대학을 필터링한다.
-        List<University> universities
-                = universityFilterRepository.findByRegionCodeAndKeywords(regionCode, List.of(keyword));
-
-        // 1지망, 2지망, 3지망 지원자들을 조회한다.
-        List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(universities, siteUser, term);
-        List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(universities, siteUser, term);
-        List<UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(universities, siteUser, term);
-        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
+    public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
+        // 1. 대학 지원 정보 필터링 (regionCode, keyword)
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, List.of(keyword));
+        if (univApplyInfos.isEmpty()) {
+            return new ApplicationsResponse(List.of(), List.of(), List.of());
+        }
+        // 2. 조건에 맞는 모든 Application 한 번에 조회
+        List<Long> univApplyInfoIds = univApplyInfos.stream()
+                .map(UnivApplyInfo::getId)
+                .toList();
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
+        // 3. 지원서 분류 및 DTO 변환
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
     }
 
     @Transactional(readOnly = true)
-    public ApplicationsResponse getApplicantsByUserApplications(SiteUser siteUser) {
-        Application userLatestApplication = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term);
-        List<University> userAppliedUniversities = Arrays.asList(
-                        Optional.ofNullable(userLatestApplication.getFirstChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
-                                .orElse(null),
-                        Optional.ofNullable(userLatestApplication.getSecondChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
-                                .orElse(null),
-                        Optional.ofNullable(userLatestApplication.getThirdChoiceUniversity())
-                                .map(UniversityInfoForApply::getUniversity)
-                                .orElse(null)
-                ).stream()
+    public ApplicationsResponse getApplicantsByUserApplications(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Application userLatestApplication = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term);
+
+        List<Long> univApplyInfoIds = Stream.of(
+                        userLatestApplication.getFirstChoiceUnivApplyInfoId(),
+                        userLatestApplication.getSecondChoiceUnivApplyInfoId(),
+                        userLatestApplication.getThirdChoiceUnivApplyInfoId()
+                )
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        List<UniversityApplicantsResponse> firstChoiceApplicants = getFirstChoiceApplicants(userAppliedUniversities, siteUser, term);
-        List<UniversityApplicantsResponse> secondChoiceApplicants = getSecondChoiceApplicants(userAppliedUniversities, siteUser, term);
-        List<UniversityApplicantsResponse> thirdChoiceApplicants = getThirdChoiceApplicants(userAppliedUniversities, siteUser, term);
+        if (univApplyInfoIds.isEmpty()) {
+            return new ApplicationsResponse(List.of(), List.of(), List.of());
+        }
+
+        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term);
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
+
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
+    }
+
+    private ApplicationsResponse classifyApplicationsByChoice(
+            List<UnivApplyInfo> univApplyInfos,
+            List<Application> applications,
+            SiteUser siteUser) {
+        Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
+        Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUnivApplyInfoId);
+        Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
+
+        List<ApplicantsResponse> firstChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, firstChoiceMap, siteUser);
+        List<ApplicantsResponse> secondChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, secondChoiceMap, siteUser);
+        List<ApplicantsResponse> thirdChoiceApplicants =
+                createUniversityApplicantsResponses(univApplyInfos, thirdChoiceMap, siteUser);
+
         return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
     }
 
-    // 학기별로 상태가 관리된다.
-    // 금학기에 지원이력이 있는 사용자만 지원정보를 확인할 수 있도록 한다.
+    private Map<Long, List<Application>> createChoiceMap(
+            List<Application> applications,
+            Function<Application, Long> choiceIdExtractor) {
+        Map<Long, List<Application>> choiceMap = new HashMap<>();
+
+        for (Application application : applications) {
+            Long choiceId = choiceIdExtractor.apply(application);
+            if (choiceId != null) {
+                choiceMap.computeIfAbsent(choiceId, k -> new ArrayList<>()).add(application);
+            }
+        }
+
+        return choiceMap;
+    }
+
+    private List<ApplicantsResponse> createUniversityApplicantsResponses(
+            List<UnivApplyInfo> univApplyInfos,
+            Map<Long, List<Application>> choiceMap,
+            SiteUser siteUser) {
+        return univApplyInfos.stream()
+                .map(uia -> ApplicantsResponse.of(uia, choiceMap.getOrDefault(uia.getId(), List.of()), siteUser))
+                .toList();
+    }
+
     @Transactional(readOnly = true)
-    public void validateSiteUserCanViewApplicants(SiteUser siteUser) {
-        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserAndTerm(siteUser, term).getVerifyStatus();
+    public void validateSiteUserCanViewApplicants(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserIdAndTerm(siteUser.getId(), term).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);
         }
-    }
-
-    private List<UniversityApplicantsResponse> getFirstChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
-        return getApplicantsByChoice(
-                universities,
-                siteUser,
-                uia -> applicationRepository.findAllByFirstChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
-        );
-    }
-
-    private List<UniversityApplicantsResponse> getSecondChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
-        return getApplicantsByChoice(
-                universities,
-                siteUser,
-                uia -> applicationRepository.findAllBySecondChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
-        );
-    }
-
-    private List<UniversityApplicantsResponse> getThirdChoiceApplicants(List<University> universities, SiteUser siteUser, String term) {
-        return getApplicantsByChoice(
-                universities,
-                siteUser,
-                uia -> applicationRepository.findAllByThirdChoiceUniversityAndVerifyStatusAndTermAndIsDeleteFalse(uia, VerifyStatus.APPROVED, term)
-        );
-    }
-
-    private List<UniversityApplicantsResponse> getApplicantsByChoice(
-            List<University> searchedUniversities,
-            SiteUser siteUser,
-            Function<UniversityInfoForApply, List<Application>> findApplicationsByChoice) {
-        return universityInfoForApplyRepository.findByUniversitiesAndTerm(searchedUniversities, term).stream()
-                .map(universityInfoForApply -> UniversityApplicantsResponse.of(
-                        universityInfoForApply,
-                        findApplicationsByChoice.apply(universityInfoForApply).stream()
-                                .map(ap -> ApplicantResponse.of(
-                                        ap,
-                                        Objects.equals(siteUser.getId(), ap.getSiteUser().getId())))
-                                .toList()))
-                .toList();
     }
 }

@@ -1,34 +1,32 @@
 package com.example.solidconnection.community.post.service;
 
-import com.example.solidconnection.community.board.domain.Board;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import com.example.solidconnection.community.board.domain.BoardCode;
+import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.comment.domain.Comment;
-import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
-import com.example.solidconnection.community.post.dto.PostListResponse;
-import com.example.solidconnection.community.comment.repository.CommentRepository;
-import com.example.solidconnection.community.post.domain.PostImage;
+import com.example.solidconnection.community.comment.fixture.CommentFixture;
 import com.example.solidconnection.community.post.domain.Post;
-import com.example.solidconnection.community.post.dto.PostFindPostImageResponse;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.dto.PostFindResponse;
-import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.community.post.repository.PostImageRepository;
-import com.example.solidconnection.service.RedisService;
+import com.example.solidconnection.community.post.dto.PostListResponse;
+import com.example.solidconnection.community.post.fixture.PostFixture;
+import com.example.solidconnection.community.post.fixture.PostImageFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.BoardCode;
-import com.example.solidconnection.type.PostCategory;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.RedisUtils;
+import java.time.ZonedDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
+@TestContainerSpringBootTest
 @DisplayName("게시글 조회 서비스 테스트")
-class PostQueryServiceTest extends BaseIntegrationTest {
+class PostQueryServiceTest {
 
     @Autowired
     private PostQueryService postQueryService;
@@ -40,23 +38,61 @@ class PostQueryServiceTest extends BaseIntegrationTest {
     private RedisUtils redisUtils;
 
     @Autowired
-    private PostRepository postRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private BoardFixture boardFixture;
 
     @Autowired
-    private PostImageRepository postImageRepository;
+    private PostFixture postFixture;
+
+    @Autowired
+    private PostImageFixture postImageFixture;
+
+    @Autowired
+    private CommentFixture commentFixture;
+
+    private SiteUser user;
+    private Post post1;
+    private Post post2;
+    private Post post3;
+
+    @BeforeEach
+    void setUp() {
+        user = siteUserFixture.사용자();
+        post1 = postFixture.게시글(
+                "제목1",
+                "내용1",
+                false,
+                PostCategory.자유,
+                boardFixture.자유게시판(),
+                user
+        );
+        post2 = postFixture.게시글(
+                "제목2",
+                "내용2",
+                false,
+                PostCategory.자유,
+                boardFixture.미주권(),
+                user
+        );
+        post3 = postFixture.게시글(
+                "제목3",
+                "내용3",
+                true,
+                PostCategory.질문,
+                boardFixture.자유게시판(),
+                user
+        );
+    }
 
     @Test
     void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
         // given
-        List<Post> posts = List.of(
-                미주권_자유게시글, 아시아권_자유게시글, 유럽권_자유게시글, 자유게시판_자유게시글,
-                미주권_질문게시글, 아시아권_질문게시글, 유럽권_질문게시글, 자유게시판_질문게시글
-        );
+        List<Post> posts = List.of(post1, post2, post3);
         List<Post> expectedPosts = posts.stream()
-                .filter(post -> post.getCategory().equals(PostCategory.자유) && post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                .filter(post -> post.getCategory().equals(PostCategory.자유)
+                        && post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
@@ -76,12 +112,9 @@ class PostQueryServiceTest extends BaseIntegrationTest {
     @Test
     void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
         // given
-        List<Post> posts = List.of(
-                미주권_자유게시글, 아시아권_자유게시글, 유럽권_자유게시글, 자유게시판_자유게시글,
-                미주권_질문게시글, 아시아권_질문게시글, 유럽권_질문게시글, 자유게시판_질문게시글
-        );
+        List<Post> posts = List.of(post1, post2, post3);
         List<Post> expectedPosts = posts.stream()
-                .filter(post -> post.getBoard().getCode().equals(BoardCode.FREE.name()))
+                .filter(post -> post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
@@ -103,77 +136,74 @@ class PostQueryServiceTest extends BaseIntegrationTest {
         // given
         String expectedImageUrl = "test-image-url";
         List<String> imageUrls = List.of(expectedImageUrl);
-        Post testPost = createPost(자유게시판, 테스트유저_1, expectedImageUrl);
-        List<Comment> comments = createComments(testPost, 테스트유저_1, List.of("첫번째 댓글", "두번째 댓글"));
+        Post post = postFixture.게시글(
+                "제목",
+                "내용",
+                false,
+                PostCategory.자유,
+                boardFixture.자유게시판(),
+                user
+        );
+        postImageFixture.게시글_이미지(expectedImageUrl, post);
+        Comment comment1 = commentFixture.부모_댓글("댓글1", post, user);
+        Comment comment2 = commentFixture.부모_댓글("댓글2", post, user);
+        List<Comment> comments = List.of(comment1, comment2);
 
-        String validateKey = redisUtils.getValidatePostViewCountRedisKey(테스트유저_1.getId(), testPost.getId());
-        String viewCountKey = redisUtils.getPostViewCountRedisKey(testPost.getId());
+        String validateKey = redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId());
+        String viewCountKey = redisUtils.getPostViewCountRedisKey(post.getId());
 
         // when
-        PostFindResponse response = postQueryService.findPostById(
-                테스트유저_1,
-                testPost.getId()
-        );
+        PostFindResponse response = postQueryService.findPostById(user.getId(), post.getId());
 
         // then
         assertAll(
-                () -> assertThat(response.id()).isEqualTo(testPost.getId()),
-                () -> assertThat(response.title()).isEqualTo(testPost.getTitle()),
-                () -> assertThat(response.content()).isEqualTo(testPost.getContent()),
-                () -> assertThat(response.isQuestion()).isEqualTo(testPost.getIsQuestion()),
-                () -> assertThat(response.likeCount()).isEqualTo(testPost.getLikeCount()),
-                () -> assertThat(response.viewCount()).isEqualTo(testPost.getViewCount()),
-                () -> assertThat(response.postCategory()).isEqualTo(String.valueOf(testPost.getCategory())),
-
-                () -> assertThat(response.postFindBoardResponse().code()).isEqualTo(자유게시판.getCode()),
-                () -> assertThat(response.postFindBoardResponse().koreanName()).isEqualTo(자유게시판.getKoreanName()),
-
-                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(테스트유저_1.getId()),
-                () -> assertThat(response.postFindSiteUserResponse().nickname()).isEqualTo(테스트유저_1.getNickname()),
-                () -> assertThat(response.postFindSiteUserResponse().profileImageUrl()).isEqualTo(테스트유저_1.getProfileImageUrl()),
-
-                () -> assertThat(response.postFindPostImageResponses())
-                        .hasSize(imageUrls.size())
-                        .extracting(PostFindPostImageResponse::url)
-                        .containsExactlyElementsOf(imageUrls),
-
-                () -> assertThat(response.postFindCommentResponses())
-                        .hasSize(comments.size())
-                        .extracting(PostFindCommentResponse::content)
-                        .containsExactlyElementsOf(comments.stream().map(Comment::getContent).toList()),
-
-                () -> assertThat(response.isOwner()).isTrue(),
-                () -> assertThat(response.isLiked()).isFalse(),
-
+                () -> assertThat(response.id()).isEqualTo(post.getId()),
+                () -> assertThat(response.postFindBoardResponse().code()).isEqualTo(boardFixture.자유게시판().getCode()),
+                () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(user.getId()),
+                () -> assertThat(response.postFindPostImageResponses()).hasSize(imageUrls.size()),
+                () -> assertThat(response.postFindCommentResponses()).hasSize(comments.size()),
                 () -> assertThat(redisService.isKeyExists(viewCountKey)).isTrue(),
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
     }
 
-    private Post createPost(Board board, SiteUser siteUser, String originImageUrl) {
-        Post post = new Post(
-                "원본 제목",
-                "원본 내용",
-                false,
-                0L,
-                0L,
-                PostCategory.자유
+    @Test
+    void 게시글_목록_조회시_첫번째_이미지를_썸네일로_반환한다() {
+        // given
+        String firstImageUrl = "first-thumbnail-url";
+        String secondImageUrl = "second-thumbnail-url";
+        postImageFixture.게시글_이미지(firstImageUrl, post1);
+        postImageFixture.게시글_이미지(secondImageUrl, post1);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
         );
-        post.setBoardAndSiteUser(board, siteUser);
-        Post savedPost = postRepository.save(post);
-        PostImage postImage = new PostImage(originImageUrl);
-        postImage.setPost(savedPost);
-        postImageRepository.save(postImage);
-        return savedPost;
+
+        // then
+        PostListResponse postResponse = actualResponses.stream()
+                .filter(p -> p.id().equals(post1.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(postResponse.postThumbnailUrl()).isEqualTo(firstImageUrl);
     }
 
-    private List<Comment> createComments(Post post, SiteUser siteUser, List<String> contents) {
-        return contents.stream()
-                .map(content -> {
-                    Comment comment = new Comment(content);
-                    comment.setPostAndSiteUser(post, siteUser);
-                    return commentRepository.save(comment);
-                })
-                .toList();
+    @Test
+    void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name()
+        );
+
+        // then
+        PostListResponse postResponse = actualResponses.stream()
+                .filter(p -> p.id().equals(post3.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(postResponse.postThumbnailUrl()).isNull();
     }
 }

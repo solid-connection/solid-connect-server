@@ -1,0 +1,37 @@
+livedebugging {
+  enabled = true
+}
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+local.file_match "spring_logs" {
+  path_targets = [{ __path__ = "/var/log/spring/*.log" }]  // 서비스 로그 파일 경로
+}
+
+loki.source.file "spring_source" {
+  targets = local.file_match.spring_logs.targets  // 위에서 정의한 로그 파일 경로 사용
+  forward_to = [loki.process.spring_labels.receiver]  // 읽은 로그를 처리 단계로 전달
+}
+
+loki.process "spring_labels" {
+  forward_to = [loki.write.grafana_loki.receiver]  // 처리된 로그를 Loki로 전송
+
+  stage.static_labels {
+    values = {
+      service = "backend",
+      env = sys.env("ALLOY_ENV"),
+    }
+  }
+}
+
+loki.write "grafana_loki" {
+  endpoint {
+    url = "http://monitor.solid-connection.com:3100/loki/api/v1/push"
+    tenant_id = "fake"  // Loki 테넌트 ID (싱글 테넌시이기에 fake로 설정)
+    batch_wait = "1s"  // 로그 배치 전송 대기 시간
+    batch_size = "1MB"  // 로그 배치 크기
+  }
+}

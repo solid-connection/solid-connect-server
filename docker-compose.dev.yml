@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    network_mode: host
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: "localhost:6379"
+    depends_on:
+      - redis
+    network_mode: host
+
+  solid-connection-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: solid-connection-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./logs:/var/log/spring
+    depends_on:
+      - redis
+    network_mode: host
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./logs:/var/log/spring
+      - ./docs/config.alloy:/etc/alloy/config.alloy:ro
+    environment:
+      - ALLOY_ENV=dev

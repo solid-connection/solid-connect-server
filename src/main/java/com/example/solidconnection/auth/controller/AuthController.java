@@ -8,24 +8,23 @@ import com.example.solidconnection.auth.dto.SignInResponse;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.service.AuthService;
-import com.example.solidconnection.auth.service.CommonSignUpTokenProvider;
 import com.example.solidconnection.auth.service.EmailSignInService;
-import com.example.solidconnection.auth.service.EmailSignUpService;
 import com.example.solidconnection.auth.service.EmailSignUpTokenProvider;
-import com.example.solidconnection.auth.service.oauth.AppleOAuthService;
-import com.example.solidconnection.auth.service.oauth.KakaoOAuthService;
-import com.example.solidconnection.auth.service.oauth.OAuthSignUpService;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.custom.exception.ErrorCode;
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.auth.service.SignUpService;
+import com.example.solidconnection.auth.service.oauth.OAuthService;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.domain.AuthType;
-import com.example.solidconnection.siteuser.domain.SiteUser;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,35 +36,43 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final OAuthSignUpService oAuthSignUpService;
-    private final AppleOAuthService appleOAuthService;
-    private final KakaoOAuthService kakaoOAuthService;
+    private final OAuthService oAuthService;
+    private final SignUpService signUpService;
     private final EmailSignInService emailSignInService;
-    private final EmailSignUpService emailSignUpService;
     private final EmailSignUpTokenProvider emailSignUpTokenProvider;
-    private final CommonSignUpTokenProvider commonSignUpTokenProvider;
+    private final RefreshTokenCookieManager refreshTokenCookieManager;
 
     @PostMapping("/apple")
     public ResponseEntity<OAuthResponse> processAppleOAuth(
-            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
+            HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = appleOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.APPLE, oAuthCodeRequest);
+        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
+            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
+        }
         return ResponseEntity.ok(oAuthResponse);
     }
 
     @PostMapping("/kakao")
     public ResponseEntity<OAuthResponse> processKakaoOAuth(
-            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest
+            @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
+            HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = kakaoOAuthService.processOAuth(oAuthCodeRequest);
+        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.KAKAO, oAuthCodeRequest);
+        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
+            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
+        }
         return ResponseEntity.ok(oAuthResponse);
     }
 
     @PostMapping("/email/sign-in")
     public ResponseEntity<SignInResponse> signInWithEmail(
-            @Valid @RequestBody EmailSignInRequest signInRequest
+            @Valid @RequestBody EmailSignInRequest signInRequest,
+            HttpServletResponse httpServletResponse
     ) {
         SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
+        refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
         return ResponseEntity.ok(signInResponse);
     }
 
@@ -74,8 +81,7 @@ public class AuthController {
     public ResponseEntity<EmailSignUpTokenResponse> signUpWithEmail(
             @Valid @RequestBody EmailSignUpTokenRequest signUpRequest
     ) {
-        emailSignUpService.validateUniqueEmail(signUpRequest.email());
-        String signUpToken = emailSignUpTokenProvider.generateAndSaveSignUpToken(signUpRequest);
+        String signUpToken = emailSignUpTokenProvider.issueEmailSignUpToken(signUpRequest);
         return ResponseEntity.ok(new EmailSignUpTokenResponse(signUpToken));
     }
 
@@ -83,44 +89,46 @@ public class AuthController {
     public ResponseEntity<SignInResponse> signUp(
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
-        AuthType authType = commonSignUpTokenProvider.parseAuthType(signUpRequest.signUpToken());
-        if (AuthType.isEmail(authType)) {
-            SignInResponse signInResponse = emailSignUpService.signUp(signUpRequest);
-            return ResponseEntity.ok(signInResponse);
-        }
-        SignInResponse signInResponse = oAuthSignUpService.signUp(signUpRequest);
+        SignInResponse signInResponse = signUpService.signUp(signUpRequest);
         return ResponseEntity.ok(signInResponse);
     }
 
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(
-            Authentication authentication
+            Authentication authentication,
+            HttpServletResponse httpServletResponse
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
-        }
-        authService.signOut(token);
+        String accessToken = getAccessToken(authentication);
+        authService.signOut(accessToken);
+        refreshTokenCookieManager.deleteCookie(httpServletResponse);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/quit")
+    @DeleteMapping("/quit")
     public ResponseEntity<Void> quit(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId,
+            Authentication authentication,
+            HttpServletResponse httpServletResponse
     ) {
-        authService.quit(siteUser);
+        String accessToken = getAccessToken(authentication);
+        authService.quit(siteUserId, accessToken);
+        refreshTokenCookieManager.deleteCookie(httpServletResponse);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            Authentication authentication
+            HttpServletRequest request
     ) {
-        String token = authentication.getCredentials().toString();
-        if (token == null) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "토큰이 없습니다.");
-        }
-        ReissueResponse reissueResponse = authService.reissue(token);
+        String refreshToken = refreshTokenCookieManager.getRefreshToken(request);
+        ReissueResponse reissueResponse = authService.reissue(refreshToken);
         return ResponseEntity.ok(reissueResponse);
+    }
+
+    private String getAccessToken(Authentication authentication) {
+        if (authentication == null || !(authentication.getCredentials() instanceof String accessToken)) {
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED, "엑세스 토큰이 없습니다.");
+        }
+        return accessToken;
     }
 }
