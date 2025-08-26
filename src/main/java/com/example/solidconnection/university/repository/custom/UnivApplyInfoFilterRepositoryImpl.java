@@ -157,12 +157,12 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(termEq(univApplyInfo, term));
 
-        // text 가 비어있다면 모든 대학지원정보를 id 오름차순으로 정렬하여 반환
+        // text 가 비어있다면 모든 대학 지원 정보를 id 오름차순으로 정렬하여 반환
         if (text == null || text.isBlank()) {
             return base.orderBy(univApplyInfo.id.asc()).fetch();
         }
 
-        // 매칭 조건 (대학명/국가명/지역명 중 하나라도 포함)
+        // 매칭 조건 (대학 지원 정보명/국가명/지역명 중 하나라도 포함)
         BooleanExpression univApplyInfoLike = univApplyInfo.koreanName.contains(text);
         BooleanExpression countryLike = country.koreanName.contains(text);
         BooleanExpression regionLike = region.koreanName.contains(text);
@@ -171,7 +171,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .or(countryLike)
                 .or(regionLike);
 
-        // 우선순위 랭크: 대학명(0) > 국가명(1) > 지역명(2) > 그 외(3)
+        // 우선순위 랭크: 대학 지원 정보명(0) > 국가명(1) > 지역명(2) > 그 외(3)
         NumberExpression<Integer> rank = new CaseBuilder()
                 .when(univApplyInfoLike).then(0)
                 .when(countryLike).then(1)
