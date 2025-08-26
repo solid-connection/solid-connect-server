@@ -101,9 +101,9 @@ public class UnivApplyInfoController {
 
     @GetMapping("/search/text")
     public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByText(
-            @RequestParam(required = false) String text
+            @RequestParam(required = false) String value
     ) {
-        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(value, term);
         return ResponseEntity.ok(response);
     }
 }
