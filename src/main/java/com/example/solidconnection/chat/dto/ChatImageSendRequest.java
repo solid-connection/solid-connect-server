@@ -10,4 +10,5 @@ public record ChatImageSendRequest(
         @Size(min = 1, max = 10, message = "이미지는 1~10개까지 가능합니다")
         List<@NotBlank(message = "이미지 URL은 필수입니다") String> imageUrls
 ) {
+
 }
