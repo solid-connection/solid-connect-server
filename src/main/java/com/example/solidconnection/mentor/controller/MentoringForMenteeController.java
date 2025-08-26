@@ -45,8 +45,8 @@ public class MentoringForMenteeController {
             @AuthorizedUser long siteUserId,
             @PageableDefault
             @SortDefaults({
-                    @SortDefault(sort = "menteeCount", direction = Sort.Direction.DESC),
-                    @SortDefault(sort = "id", direction = Sort.Direction.ASC)
+                    @SortDefault(sort = "confirmedAt", direction = Sort.Direction.DESC),
+                    @SortDefault(sort = "id", direction = Sort.Direction.DESC)
             })
             Pageable pageable
     ) {

@@ -42,16 +42,18 @@ public class MentoringQueryService {
 
     @Transactional(readOnly = true)
     public SliceResponse<MatchedMentorResponse> getMatchedMentors(long siteUserId, Pageable pageable) {
-        Slice<Mentor> mentorSlice = filterMatchedMentors(siteUserId, pageable);
-        List<Mentor> mentors = mentorSlice.toList();
+        Slice<Mentoring> mentoringSlice = mentoringRepository.findApprovedMentoringsByMenteeId(siteUserId, VerifyStatus.APPROVED, pageable);
+
+        List<Long> mentorIds = mentoringSlice.getContent().stream()
+                .map(Mentoring::getMentorId)
+                .distinct()
+                .toList();
+
+        List<Mentor> mentors = mentorRepository.findAllById(mentorIds);
 
         List<MatchedMentorResponse> content = buildMatchedMentorsWithBatchQuery(mentors, siteUserId);
 
-        return SliceResponse.of(content, mentorSlice);
-    }
-
-    private Slice<Mentor> filterMatchedMentors(long siteUserId, Pageable pageable) {
-        return mentorRepository.findApprovedMentorsByMenteeId(siteUserId, VerifyStatus.APPROVED, pageable);
+        return SliceResponse.of(content, mentoringSlice);
     }
 
     private List<MatchedMentorResponse> buildMatchedMentorsWithBatchQuery(List<Mentor> mentors, long currentUserId) {
