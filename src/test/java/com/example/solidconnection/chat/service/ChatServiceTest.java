@@ -436,7 +436,7 @@ class ChatServiceTest {
         }
 
         @Test
-        void 채팅_참여자가_아니면_메시지를_전송할_수_없다() {
+        void 채팅_참여자가_아니면_예외가_발생한다() {
             // given
             SiteUser nonParticipant = siteUserFixture.사용자(333, "nonParticipant");
             ChatMessageSendRequest request = new ChatMessageSendRequest("안녕하세요");
@@ -454,6 +454,9 @@ class ChatServiceTest {
         private SiteUser sender;
         private ChatParticipant senderParticipant;
         private ChatRoom chatRoom;
+        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example.jpg";
+        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example2.jpg";
+        private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
 
         @BeforeEach
         void setUp() {
@@ -466,8 +469,8 @@ class ChatServiceTest {
         void 채팅방_참여자는_이미지_메시지를_전송할_수_있다() {
             // given
             final List<String> imageUrls = List.of(
-                    "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/test1.jpg",
-                    "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/test2.jpg"
+                    TEST_IMAGE_URL,
+                    TEST_IMAGE_URL2
             );
             ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
 
@@ -489,7 +492,7 @@ class ChatServiceTest {
                     () -> assertThat(response.attachments().get(1).url()).isEqualTo(imageUrls.get(1)),
                     () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
                     () -> assertThat(response.senderId()).isEqualTo(senderParticipant.getId()),
-                    () -> assertThat(response.content()).isEmpty() // 이미지 메시지는 빈 content
+                    () -> assertThat(response.content()).isEmpty()
             );
         }
 
@@ -497,7 +500,7 @@ class ChatServiceTest {
         void 단일_이미지_메시지가_정상_전송된다() {
             // given
             final List<String> imageUrls = List.of(
-                    "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/single.jpg"
+                    TEST_IMAGE_URL
             );
             ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
 
@@ -518,10 +521,10 @@ class ChatServiceTest {
         }
 
         @Test
-        void 채팅_참여자가_아니면_이미지_메시지를_전송할_수_없다() {
+        void 채팅_참여자가_아니면_예외가_발생한다() {
             // given
             SiteUser nonParticipant = siteUserFixture.사용자(333, "nonParticipant");
-            List<String> imageUrls = List.of("https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/test.jpg");
+            List<String> imageUrls = List.of(TEST_IMAGE_URL);
             ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
 
             // when & then
@@ -534,7 +537,7 @@ class ChatServiceTest {
         void 썸네일_URL이_정상적으로_생성된다() {
             // given
             final List<String> imageUrls = List.of(
-                    "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example.jpg"
+                    TEST_IMAGE_URL
             );
             ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
 
@@ -550,7 +553,7 @@ class ChatServiceTest {
             assertAll(
                     () -> assertThat(response.attachments().get(0).url()).isEqualTo(imageUrls.get(0)),
                     () -> assertThat(response.attachments().get(0).thumbnailUrl()).isEqualTo(
-                            "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg"
+                            EXPECTED_THUMBNAIL_URL
                     )
             );
         }
