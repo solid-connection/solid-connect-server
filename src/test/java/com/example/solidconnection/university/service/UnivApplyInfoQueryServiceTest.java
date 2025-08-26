@@ -102,7 +102,7 @@ class UnivApplyInfoQueryServiceTest {
             languageRequirementFixture.토플_70(괌대학_B_지원_정보);
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request, term);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -119,7 +119,7 @@ class UnivApplyInfoQueryServiceTest {
             languageRequirementFixture.토익_900(괌대학_B_지원_정보);
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request, term);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -137,8 +137,8 @@ class UnivApplyInfoQueryServiceTest {
             languageRequirementFixture.토익_800(메모리얼대학_세인트존스_A_지원_정보);
 
             // when
-            UnivApplyInfoPreviewResponses response1 = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request1);
-            UnivApplyInfoPreviewResponses response2 = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request2);
+            UnivApplyInfoPreviewResponses response1 = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request1, term);
+            UnivApplyInfoPreviewResponses response2 = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request2, term);
 
             // then
             assertAll(
@@ -163,7 +163,7 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(null);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(null, term);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -185,7 +185,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.괌대학_A_지원_정보();
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -204,7 +204,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.메이지대학_지원_정보();
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -223,7 +223,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.메이지대학_지원_정보();
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -243,7 +243,7 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 대학지원정보_아 = univApplyInfoFixture.아칸소주립대학_지원_정보();
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -261,8 +261,8 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
 
             // when
-            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
-            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
+            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text, term);
 
             // then
             assertThatCode(() -> {
