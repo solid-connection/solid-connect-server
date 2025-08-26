@@ -5,4 +5,5 @@ public record SiteUserResponse(
         String nickname,
         String profileImageUrl
 ) {
+
 }

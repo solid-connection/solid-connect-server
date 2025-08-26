@@ -41,7 +41,7 @@ VALUES ('BN', '브루나이', 'ASIA'),
        ('MY', '말레이시아', 'ASIA'),
        ('RU', '러시아', 'EUROPE');
 
-INSERT INTO site_user (email, nickname, profile_image_url, preparation_stage, role, password, auth_type)
+INSERT INTO site_user (email, nickname, profile_image_url, exchange_status, role, password, auth_type)
 VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',
         'CONSIDERING', 'MENTEE',
         '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'); -- 12341234

@@ -1,53 +1,72 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.auth.domain.TokenType;
-import com.example.solidconnection.config.security.JwtProperties;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.Map;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-import static com.example.solidconnection.util.JwtUtils.parseSubjectIgnoringExpiration;
-
 @Component
-public class AuthTokenProvider extends TokenProvider {
+@RequiredArgsConstructor
+public class AuthTokenProvider {
 
-    public AuthTokenProvider(JwtProperties jwtProperties, RedisTemplate<String, String> redisTemplate) {
-        super(jwtProperties, redisTemplate);
+    private static final String ROLE_CLAIM_KEY = "role";
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenProvider tokenProvider;
+    private final SiteUserRepository siteUserRepository;
+
+    public AccessToken generateAccessToken(SiteUser siteUser) {
+        Subject subject = toSubject(siteUser);
+        Role role = siteUser.getRole();
+        String token = tokenProvider.generateToken(
+                subject.value(),
+                Map.of(ROLE_CLAIM_KEY, role.name()),
+                TokenType.ACCESS
+        );
+        return new AccessToken(subject, role, token);
     }
 
-    public String generateAccessToken(SiteUser siteUser) {
-        String subject = siteUser.getId().toString();
-        return generateToken(subject, TokenType.ACCESS);
+    public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
+        Subject subject = toSubject(siteUser);
+        String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
+        tokenProvider.saveToken(token, TokenType.REFRESH);
+        return new RefreshToken(subject, token);
     }
 
-    public String generateAccessToken(String subject) {
-        return generateToken(subject, TokenType.ACCESS);
-    }
-
-    public String generateAndSaveRefreshToken(SiteUser siteUser) {
-        String subject = siteUser.getId().toString();
-        String refreshToken = generateToken(subject, TokenType.REFRESH);
-        return saveToken(refreshToken, TokenType.REFRESH);
-    }
-
-    public String generateAndSaveBlackListToken(String accessToken) {
-        String blackListToken = generateToken(accessToken, TokenType.BLACKLIST);
-        return saveToken(blackListToken, TokenType.BLACKLIST);
-    }
-
-    public Optional<String> findRefreshToken(String subject) {
+    /*
+     * 유효한 리프레시 토큰인지 확인한다.
+     * - 요청된 토큰과 같은 subject 의 리프레시 토큰을 조회한다.
+     * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
+     * */
+    public boolean isValidRefreshToken(String requestedRefreshToken) {
+        String subject = tokenProvider.parseSubject(requestedRefreshToken);
         String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
-        return Optional.ofNullable(redisTemplate.opsForValue().get(refreshTokenKey));
+        String foundRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
+        return Objects.equals(requestedRefreshToken, foundRefreshToken);
     }
 
-    public Optional<String> findBlackListToken(String subject) {
-        String blackListTokenKey = TokenType.BLACKLIST.addPrefix(subject);
-        return Optional.ofNullable(redisTemplate.opsForValue().get(blackListTokenKey));
+    public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
+        String subject = accessToken.subject().value();
+        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
+        redisTemplate.delete(refreshTokenKey);
     }
 
-    public String getEmail(String token) {
-        return parseSubjectIgnoringExpiration(token, jwtProperties.secret());
+    public SiteUser parseSiteUser(String token) {
+        String subject = tokenProvider.parseSubject(token);
+        long siteUserId = Long.parseLong(subject);
+        return siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    public Subject toSubject(SiteUser siteUser) {
+        return new Subject(siteUser.getId().toString());
     }
 }

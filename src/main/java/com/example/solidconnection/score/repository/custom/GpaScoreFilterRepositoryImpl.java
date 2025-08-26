@@ -1,30 +1,29 @@
 package com.example.solidconnection.score.repository.custom;
 
+import static com.example.solidconnection.score.domain.QGpaScore.gpaScore;
+import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
+import static org.springframework.util.StringUtils.hasText;
+
 import com.example.solidconnection.admin.dto.GpaResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
 import com.example.solidconnection.admin.dto.GpaScoreStatusResponse;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.admin.dto.SiteUserResponse;
-import com.example.solidconnection.type.VerifyStatus;
+import com.example.solidconnection.common.VerifyStatus;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-
-import static com.example.solidconnection.score.domain.QGpaScore.gpaScore;
-import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
-import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
@@ -70,7 +69,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         List<GpaScoreSearchResponse> content = queryFactory
                 .select(GPA_SCORE_SEARCH_RESPONSE_PROJECTION)
                 .from(gpaScore)
-                .join(gpaScore.siteUser, siteUser)
+                .join(siteUser).on(gpaScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),
@@ -84,7 +83,7 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
         Long totalCount = queryFactory
                 .select(gpaScore.count())
                 .from(gpaScore)
-                .join(gpaScore.siteUser, siteUser)
+                .join(siteUser).on(gpaScore.siteUserId.eq(siteUser.id))
                 .where(
                         verifyStatusEq(condition.verifyStatus()),
                         nicknameContains(condition.nickname()),

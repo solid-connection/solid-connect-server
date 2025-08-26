@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.domain;
 
-import com.example.solidconnection.entity.Country;
-import com.example.solidconnection.entity.Region;
+import com.example.solidconnection.location.country.domain.Country;
+import com.example.solidconnection.location.region.domain.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class University {

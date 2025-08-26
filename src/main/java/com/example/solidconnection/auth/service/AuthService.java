@@ -1,56 +1,66 @@
 package com.example.solidconnection.auth.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.auth.dto.ReissueResponse;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.auth.token.TokenBlackListService;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
 
     private final AuthTokenProvider authTokenProvider;
+    private final TokenBlackListService tokenBlackListService;
+    private final SiteUserRepository siteUserRepository;
 
     /*
-     * 로그아웃 한다.
+     * 로그아웃한다.
      * - 엑세스 토큰을 블랙리스트에 추가한다.
+     * - 리프레시 토큰을 삭제한다.
      * */
-    public void signOut(String accessToken) {
-        authTokenProvider.generateAndSaveBlackListToken(accessToken);
+    public void signOut(String token) {
+        SiteUser siteUser = authTokenProvider.parseSiteUser(token);
+        AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
+        authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
+        tokenBlackListService.addToBlacklist(accessToken);
     }
 
     /*
      * 탈퇴한다.
      * - 탈퇴한 시점의 다음날을 탈퇴일로 잡는다.
      * - e.g. 2024-01-01 18:00 탈퇴 시, 2024-01-02 00:00 가 탈퇴일이 된다.
+     * - 로그아웃한다.
      * */
     @Transactional
-    public void quit(SiteUser siteUser) {
+    public void quit(long siteUserId, String token) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         siteUser.setQuitedAt(tomorrow);
+        signOut(token);
     }
 
     /*
      * 액세스 토큰을 재발급한다.
-     * - 리프레시 토큰이 만료되었거나, 존재하지 않는다면 예외 응답을 반환한다.
-     * - 리프레시 토큰이 존재한다면, 액세스 토큰을 재발급한다.
+     * - 유효한 리프레시토큰이면, 액세스 토큰을 재발급한다.
+     * - 그렇지 않으면 예외를 발생시킨다.
      * */
-    public ReissueResponse reissue(String subject) {
-        // 리프레시 토큰 만료 확인
-        Optional<String> optionalRefreshToken = authTokenProvider.findRefreshToken(subject);
-        if (optionalRefreshToken.isEmpty()) {
+    public ReissueResponse reissue(String requestedRefreshToken) {
+        // 리프레시 토큰 확인
+        if (!authTokenProvider.isValidRefreshToken(requestedRefreshToken)) {
             throw new CustomException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
-        String newAccessToken = authTokenProvider.generateAccessToken(subject);
-        return new ReissueResponse(newAccessToken);
+        SiteUser siteUser = authTokenProvider.parseSiteUser(requestedRefreshToken);
+        AccessToken newAccessToken = authTokenProvider.generateAccessToken(siteUser);
+        return ReissueResponse.from(newAccessToken);
     }
 }

@@ -5,4 +5,5 @@ public record GpaResponse(
         double gpaCriteria,
         String gpaReportUrl
 ) {
+
 }

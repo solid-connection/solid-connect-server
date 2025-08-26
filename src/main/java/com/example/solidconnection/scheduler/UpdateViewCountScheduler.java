@@ -1,7 +1,10 @@
 package com.example.solidconnection.scheduler;
 
-import com.example.solidconnection.service.UpdateViewCountService;
+import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PATTERN;
+
+import com.example.solidconnection.community.post.service.UpdateViewCountService;
 import com.example.solidconnection.util.RedisUtils;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -10,10 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static com.example.solidconnection.type.RedisConstants.VIEW_COUNT_KEY_PATTERN;
 
 @RequiredArgsConstructor
 @Component

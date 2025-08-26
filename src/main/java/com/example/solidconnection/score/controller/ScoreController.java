@@ -1,12 +1,11 @@
 package com.example.solidconnection.score.controller;
 
-import com.example.solidconnection.custom.resolver.AuthorizedUser;
+import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.score.dto.GpaScoreRequest;
 import com.example.solidconnection.score.dto.GpaScoreStatusesResponse;
 import com.example.solidconnection.score.dto.LanguageTestScoreRequest;
 import com.example.solidconnection.score.dto.LanguageTestScoreStatusesResponse;
 import com.example.solidconnection.score.service.ScoreService;
-import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,40 +27,40 @@ public class ScoreController {
     // 학점을 등록하는 api
     @PostMapping("/gpas")
     public ResponseEntity<Long> submitGpaScore(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestPart("gpaScoreRequest") GpaScoreRequest gpaScoreRequest,
             @RequestParam("file") MultipartFile file
     ) {
-        Long id = scoreService.submitGpaScore(siteUser, gpaScoreRequest, file);
+        Long id = scoreService.submitGpaScore(siteUserId, gpaScoreRequest, file);
         return ResponseEntity.ok(id);
     }
 
     // 어학성적을 등록하는 api
     @PostMapping("/language-tests")
     public ResponseEntity<Long> submitLanguageTestScore(
-            @AuthorizedUser SiteUser siteUser,
+            @AuthorizedUser long siteUserId,
             @Valid @RequestPart("languageTestScoreRequest") LanguageTestScoreRequest languageTestScoreRequest,
             @RequestParam("file") MultipartFile file
     ) {
-        Long id = scoreService.submitLanguageTestScore(siteUser, languageTestScoreRequest, file);
+        Long id = scoreService.submitLanguageTestScore(siteUserId, languageTestScoreRequest, file);
         return ResponseEntity.ok(id);
     }
 
     // 학점 상태를 확인하는 api
     @GetMapping("/gpas")
     public ResponseEntity<GpaScoreStatusesResponse> getGpaScoreStatus(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        GpaScoreStatusesResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUser);
+        GpaScoreStatusesResponse gpaScoreStatus = scoreService.getGpaScoreStatus(siteUserId);
         return ResponseEntity.ok(gpaScoreStatus);
     }
 
     // 어학 성적 상태를 확인하는 api
     @GetMapping("/language-tests")
     public ResponseEntity<LanguageTestScoreStatusesResponse> getLanguageTestScoreStatus(
-            @AuthorizedUser SiteUser siteUser
+            @AuthorizedUser long siteUserId
     ) {
-        LanguageTestScoreStatusesResponse languageTestScoreStatus = scoreService.getLanguageTestScoreStatus(siteUser);
+        LanguageTestScoreStatusesResponse languageTestScoreStatus = scoreService.getLanguageTestScoreStatus(siteUserId);
         return ResponseEntity.ok(languageTestScoreStatus);
     }
 }

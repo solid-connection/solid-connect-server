@@ -1,6 +1,5 @@
 package com.example.solidconnection.university.domain;
 
-import com.example.solidconnection.type.LanguageTestType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class LanguageRequirement {
@@ -33,5 +33,6 @@ public class LanguageRequirement {
     private String minScore;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UniversityInfoForApply universityInfoForApply;
+    @JoinColumn(name = "university_info_for_apply_id")
+    private UnivApplyInfo univApplyInfo;
 }

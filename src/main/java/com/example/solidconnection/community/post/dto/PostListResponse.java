@@ -1,8 +1,7 @@
 package com.example.solidconnection.community.post.dto;
 
-import com.example.solidconnection.community.post.domain.PostImage;
 import com.example.solidconnection.community.post.domain.Post;
-
+import com.example.solidconnection.community.post.domain.PostImage;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +15,7 @@ public record PostListResponse(
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt,
         String postCategory,
-        String url
+        String postThumbnailUrl
 ) {
 
     public static PostListResponse from(Post post) {

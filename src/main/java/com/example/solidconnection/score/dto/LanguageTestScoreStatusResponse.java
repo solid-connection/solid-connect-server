@@ -1,7 +1,7 @@
 package com.example.solidconnection.score.dto;
 
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.type.VerifyStatus;
 
 public record LanguageTestScoreStatusResponse(
         long id,
@@ -9,6 +9,7 @@ public record LanguageTestScoreStatusResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static LanguageTestScoreStatusResponse from(LanguageTestScore languageTestScore) {
         return new LanguageTestScoreStatusResponse(
                 languageTestScore.getId(),

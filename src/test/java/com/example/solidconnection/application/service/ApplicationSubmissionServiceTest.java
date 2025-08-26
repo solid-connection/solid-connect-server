@@ -1,35 +1,38 @@
 package com.example.solidconnection.application.service;
 
-import com.example.solidconnection.application.domain.Application;
-import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.application.domain.LanguageTest;
-import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
-import com.example.solidconnection.application.dto.ApplyRequest;
-import com.example.solidconnection.application.dto.UniversityChoiceRequest;
-import com.example.solidconnection.application.repository.ApplicationRepository;
-import com.example.solidconnection.custom.exception.CustomException;
-import com.example.solidconnection.score.domain.GpaScore;
-import com.example.solidconnection.score.domain.LanguageTestScore;
-import com.example.solidconnection.score.repository.GpaScoreRepository;
-import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.support.integration.BaseIntegrationTest;
-import com.example.solidconnection.type.LanguageTestType;
-import com.example.solidconnection.type.VerifyStatus;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
-import static com.example.solidconnection.custom.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
+import com.example.solidconnection.application.dto.ApplyRequest;
+import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
+import com.example.solidconnection.application.repository.ApplicationRepository;
+import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.score.domain.GpaScore;
+import com.example.solidconnection.score.domain.LanguageTestScore;
+import com.example.solidconnection.score.fixture.GpaScoreFixture;
+import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+@TestContainerSpringBootTest
 @DisplayName("지원서 제출 서비스 테스트")
-class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
+class ApplicationSubmissionServiceTest {
 
     @Autowired
     private ApplicationSubmissionService applicationSubmissionService;
@@ -38,138 +41,127 @@ class ApplicationSubmissionServiceTest extends BaseIntegrationTest {
     private ApplicationRepository applicationRepository;
 
     @Autowired
-    private GpaScoreRepository gpaScoreRepository;
+    private SiteUserFixture siteUserFixture;
 
     @Autowired
-    private LanguageTestScoreRepository languageTestScoreRepository;
+    private UnivApplyInfoFixture univApplyInfoFixture;
+
+    @Autowired
+    private GpaScoreFixture gpaScoreFixture;
+
+    @Autowired
+    private LanguageTestScoreFixture languageTestScoreFixture;
+
+    @Value("${university.term}")
+    private String term;
+
+    private SiteUser user;
+    private UnivApplyInfo 괌대학_A_지원_정보;
+    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 서던덴마크대학교_지원_정보;
+
+    @BeforeEach
+    void setUp() {
+        user = siteUserFixture.사용자();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
+        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
+    }
 
     @Test
     void 정상적으로_지원서를_제출한다() {
         // given
-        GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
-                네바다주립대학_라스베이거스_지원_정보.getId(),
-                메모리얼대학_세인트존스_A_지원_정보.getId()
+                괌대학_B_지원_정보.getId(),
+                서던덴마크대학교_지원_정보.getId()
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when
-        ApplicationSubmissionResponse response = applicationSubmissionService.apply(테스트유저_1, request);
+        ApplicationSubmissionResponse response = applicationSubmissionService.apply(user.getId(), request);
 
         // then
-        Application savedApplication = applicationRepository.findBySiteUserAndTerm(테스트유저_1, term).orElseThrow();
+        Application savedApplication = applicationRepository.findBySiteUserIdAndTerm(user.getId(), term).orElseThrow();
         assertAll(
-                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount()),
-                () -> assertThat(savedApplication.getGpa()).isEqualTo(gpaScore.getGpa()),
-                () -> assertThat(savedApplication.getLanguageTest()).isEqualTo(languageTestScore.getLanguageTest()),
-                () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
-                () -> assertThat(savedApplication.getNicknameForApply()).isNotNull(),
-                () -> assertThat(savedApplication.getTerm()).isEqualTo(term),
-                () -> assertThat(savedApplication.isDelete()).isFalse(),
-                () -> assertThat(savedApplication.getFirstChoiceUniversity().getId()).isEqualTo(괌대학_A_지원_정보.getId()),
-                () -> assertThat(savedApplication.getSecondChoiceUniversity().getId()).isEqualTo(네바다주립대학_라스베이거스_지원_정보.getId()),
-                () -> assertThat(savedApplication.getThirdChoiceUniversity().getId()).isEqualTo(메모리얼대학_세인트존스_A_지원_정보.getId()),
-                () -> assertThat(savedApplication.getSiteUser().getId()).isEqualTo(테스트유저_1.getId())
+                () -> assertThat(response.applyCount())
+                        .isEqualTo(savedApplication.getUpdateCount()),
+                () -> assertThat(savedApplication.getVerifyStatus())
+                        .isEqualTo(VerifyStatus.APPROVED),
+                () -> assertThat(savedApplication.isDelete())
+                        .isFalse(),
+                () -> assertThat(savedApplication.getFirstChoiceUnivApplyInfoId())
+                        .isEqualTo(괌대학_A_지원_정보.getId()),
+                () -> assertThat(savedApplication.getSecondChoiceUnivApplyInfoId())
+                        .isEqualTo(괌대학_B_지원_정보.getId()),
+                () -> assertThat(savedApplication.getThirdChoiceUnivApplyInfoId())
+                        .isEqualTo(서던덴마크대학교_지원_정보.getId())
         );
     }
 
     @Test
-    void 미승인된_GPA_성적으로_지원하면_예외_응답을_반환한다() {
+    void 미승인된_GPA_성적으로_지원하면_예외가_발생한다() {
         // given
-        GpaScore gpaScore = createUnapprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_GPA_SCORE_STATUS.getMessage());
     }
 
     @Test
-    void 미승인된_어학성적으로_지원하면_예외_응답을_반환한다() {
+    void 미승인된_어학성적으로_지원하면_예외가_발생한다() {
         // given
-        GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createUnapprovedLanguageTestScore(테스트유저_1);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user);
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_LANGUAGE_TEST_SCORE_STATUS.getMessage());
     }
 
     @Test
-    void 지원서_수정_횟수를_초과하면_예외_응답을_반환한다() {
+    void 지원서_수정_횟수를_초과하면_예외가_발생한다() {
         // given
-        GpaScore gpaScore = createApprovedGpaScore(테스트유저_1);
-        LanguageTestScore languageTestScore = createApprovedLanguageTestScore(테스트유저_1);
-        UniversityChoiceRequest universityChoiceRequest = new UniversityChoiceRequest(
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
                 null,
                 null
         );
-        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), universityChoiceRequest);
+        ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         for (int i = 0; i < APPLICATION_UPDATE_COUNT_LIMIT; i++) {
-            applicationSubmissionService.apply(테스트유저_1, request);
+            applicationSubmissionService.apply(user.getId(), request);
         }
 
         // when & then
         assertThatCode(() ->
-                applicationSubmissionService.apply(테스트유저_1, request)
+                               applicationSubmissionService.apply(user.getId(), request)
         )
                 .isInstanceOf(CustomException.class)
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());
-    }
-
-    private GpaScore createUnapprovedGpaScore(SiteUser siteUser) {
-        GpaScore gpaScore = new GpaScore(
-                new Gpa(4.0,  4.5, "/gpa-report.pdf"),
-                siteUser
-        );
-        return gpaScoreRepository.save(gpaScore);
-    }
-
-    private GpaScore createApprovedGpaScore(SiteUser siteUser) {
-        GpaScore gpaScore = new GpaScore(
-                new Gpa(4.0, 4.5, "/gpa-report.pdf"),
-                siteUser
-        );
-        gpaScore.setVerifyStatus(VerifyStatus.APPROVED);
-        return gpaScoreRepository.save(gpaScore);
-    }
-
-    private LanguageTestScore createUnapprovedLanguageTestScore(SiteUser siteUser) {
-        LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                siteUser
-        );
-        return languageTestScoreRepository.save(languageTestScore);
-    }
-
-    private LanguageTestScore createApprovedLanguageTestScore(SiteUser siteUser) {
-        LanguageTestScore languageTestScore = new LanguageTestScore(
-                new LanguageTest(LanguageTestType.TOEIC, "100", "/gpa-report.pdf"),
-                siteUser
-        );
-        languageTestScore.setVerifyStatus(VerifyStatus.APPROVED);
-        return languageTestScoreRepository.save(languageTestScore);
     }
 }

@@ -1,22 +1,21 @@
 package com.example.solidconnection.auth.client;
 
-import com.example.solidconnection.config.client.AppleOAuthClientProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import static com.example.solidconnection.common.exception.ErrorCode.FAILED_TO_READ_APPLE_PRIVATE_KEY;
+
+import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
+import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.stereotype.Component;
-
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.FAILED_TO_READ_APPLE_PRIVATE_KEY;
+import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.stereotype.Component;
 
 /*
  * 애플 OAuth 에 필요한 클라이언트 시크릿은 매번 동적으로 생성해야 한다.

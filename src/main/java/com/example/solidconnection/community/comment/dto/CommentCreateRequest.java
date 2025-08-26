@@ -17,6 +17,7 @@ public record CommentCreateRequest(
 
         Long parentId
 ) {
+
     public Comment toEntity(SiteUser siteUser, Post post, Comment parentComment) {
 
         Comment comment = new Comment(
@@ -24,9 +25,9 @@ public record CommentCreateRequest(
         );
 
         if (parentComment == null) {
-            comment.setPostAndSiteUser(post, siteUser);
+            comment.setPostAndSiteUserId(post, siteUser.getId());
         } else {
-            comment.setParentCommentAndPostAndSiteUser(parentComment, post, siteUser);
+            comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
         }
         return comment;
     }

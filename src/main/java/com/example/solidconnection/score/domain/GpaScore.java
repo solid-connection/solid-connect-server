@@ -1,9 +1,9 @@
 package com.example.solidconnection.score.domain;
 
 import com.example.solidconnection.application.domain.Gpa;
-import com.example.solidconnection.entity.common.BaseEntity;
+import com.example.solidconnection.common.BaseEntity;
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.type.VerifyStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -12,7 +12,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,28 +31,19 @@ public class GpaScore extends BaseEntity {
     private Gpa gpa;
 
     @Setter
-    @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private VerifyStatus verifyStatus;
+    private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
     private String rejectedReason;
 
-    @ManyToOne
-    private SiteUser siteUser;
+    private long siteUserId;
 
     public GpaScore(Gpa gpa, SiteUser siteUser) {
         this.gpa = gpa;
-        this.siteUser = siteUser;
+        this.siteUserId = siteUser.getId();
         this.verifyStatus = VerifyStatus.PENDING;
         this.rejectedReason = null;
-    }
-
-    public void setSiteUser(SiteUser siteUser) {
-        if (this.siteUser != null) {
-            this.siteUser.getGpaScoreList().remove(this);
-        }
-        this.siteUser = siteUser;
-        siteUser.getGpaScoreList().add(this);
     }
 
     public void updateGpaScore(Gpa gpa, VerifyStatus verifyStatus, String rejectedReason) {

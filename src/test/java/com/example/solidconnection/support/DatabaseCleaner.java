@@ -2,13 +2,12 @@ package com.example.solidconnection.support;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class DatabaseCleaner {
@@ -38,11 +37,11 @@ public class DatabaseCleaner {
     @SuppressWarnings("unchecked")
     private List<String> getTruncateQueries() {
         String sql = """
-                SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q
-                FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = (SELECT DATABASE())
-                AND TABLE_TYPE = 'BASE TABLE'
-                """;
+                     SELECT CONCAT('TRUNCATE TABLE ', TABLE_NAME, ';') AS q
+                     FROM INFORMATION_SCHEMA.TABLES
+                     WHERE TABLE_SCHEMA = (SELECT DATABASE())
+                     AND TABLE_TYPE = 'BASE TABLE'
+                     """;
 
         return em.createNativeQuery(sql).getResultList();
     }

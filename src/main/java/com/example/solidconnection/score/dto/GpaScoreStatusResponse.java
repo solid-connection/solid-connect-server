@@ -1,7 +1,7 @@
 package com.example.solidconnection.score.dto;
 
+import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.score.domain.GpaScore;
-import com.example.solidconnection.type.VerifyStatus;
 
 public record GpaScoreStatusResponse(
         long id,
@@ -9,6 +9,7 @@ public record GpaScoreStatusResponse(
         VerifyStatus verifyStatus,
         String rejectedReason
 ) {
+
     public static GpaScoreStatusResponse from(GpaScore gpaScore) {
         return new GpaScoreStatusResponse(
                 gpaScore.getId(),

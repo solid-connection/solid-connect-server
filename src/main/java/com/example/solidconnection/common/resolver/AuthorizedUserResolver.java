@@ -1,0 +1,57 @@
+package com.example.solidconnection.common.resolver;
+
+import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.MethodParameter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
+@Component
+@RequiredArgsConstructor
+public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.hasParameterAnnotation(AuthorizedUser.class)
+                && (parameter.getParameterType().equals(long.class)
+                || parameter.getParameterType().equals(Long.class));
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter,
+                                  ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest,
+                                  WebDataBinderFactory binderFactory) {
+        Long siteUserId = extractIdFromAuthentication();
+        if (isRequired(parameter) && siteUserId == null) {
+            throw new CustomException(AUTHENTICATION_FAILED, "로그인 상태가 아닙니다.");
+        }
+        return siteUserId;
+    }
+
+    private Long extractIdFromAuthentication() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            SiteUserDetails principal = (SiteUserDetails) authentication.getPrincipal();
+            return principal.getSiteUser().getId();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isRequired(MethodParameter parameter) {
+        if (parameter.getParameterType().isPrimitive()) { // NPE 방지를 위해 required로 간주
+            return true;
+        }
+        AuthorizedUser authorizedUser = parameter.getParameterAnnotation(AuthorizedUser.class);
+        return authorizedUser != null && authorizedUser.required();
+    }
+}

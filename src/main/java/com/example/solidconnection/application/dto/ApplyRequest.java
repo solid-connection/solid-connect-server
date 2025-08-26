@@ -1,5 +1,6 @@
 package com.example.solidconnection.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +13,8 @@ public record ApplyRequest(
         Long languageTestScoreId,
 
         @Valid
-        UniversityChoiceRequest universityChoiceRequest
+        @JsonProperty("universityChoiceRequest")
+        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest
 ) {
+
 }

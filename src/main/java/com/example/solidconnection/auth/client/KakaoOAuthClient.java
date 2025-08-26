@@ -1,9 +1,17 @@
 package com.example.solidconnection.auth.client;
 
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
+import static com.example.solidconnection.common.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
+import static com.example.solidconnection.common.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
+
+import com.example.solidconnection.auth.client.config.KakaoOAuthClientProperties;
 import com.example.solidconnection.auth.dto.oauth.KakaoTokenDto;
 import com.example.solidconnection.auth.dto.oauth.KakaoUserInfoDto;
-import com.example.solidconnection.config.client.KakaoOAuthClientProperties;
-import com.example.solidconnection.custom.exception.CustomException;
+import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
+import com.example.solidconnection.auth.service.oauth.OAuthClient;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.siteuser.domain.AuthType;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,12 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Objects;
-
-import static com.example.solidconnection.custom.exception.ErrorCode.INVALID_OR_EXPIRED_KAKAO_AUTH_CODE;
-import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_REDIRECT_URI_MISMATCH;
-import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_INFO_FAIL;
-
 /*
  * 카카오 인증을 위한 OAuth2 클라이언트
  * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
@@ -28,12 +30,18 @@ import static com.example.solidconnection.custom.exception.ErrorCode.KAKAO_USER_
  * */
 @Component
 @RequiredArgsConstructor
-public class KakaoOAuthClient {
+public class KakaoOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate;
     private final KakaoOAuthClientProperties kakaoOAuthClientProperties;
 
-    public KakaoUserInfoDto getUserInfo(String code) {
+    @Override
+    public AuthType getAuthType() {
+        return AuthType.KAKAO;
+    }
+
+    @Override
+    public OAuthUserInfoDto getUserInfo(String code) {
         String kakaoAccessToken = getKakaoAccessToken(code);
         return getKakaoUserInfo(kakaoAccessToken);
     }
