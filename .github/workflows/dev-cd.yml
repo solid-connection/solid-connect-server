@@ -77,7 +77,7 @@ jobs:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USERNAME }}
           key: ${{ secrets.DEV_PRIVATE_KEY }}
-          source: "./docs/infra-config/nginx.conf"
+          source: "./docs/infra-config/nginx.dev.conf"
           target: "/home/${{ secrets.DEV_USERNAME }}/solid-connection-dev/nginx"
           rename: "default.conf"
 
