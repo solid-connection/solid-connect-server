@@ -6,8 +6,6 @@ import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.service.ApplicationQueryService;
 import com.example.solidconnection.application.service.ApplicationSubmissionService;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.security.annotation.RequireRoleAccess;
-import com.example.solidconnection.siteuser.domain.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,7 +37,7 @@ public class ApplicationController {
                 .body(applicationSubmissionResponse);
     }
 
-    @RequireRoleAccess(roles = {Role.ADMIN})
+    // @RequireRoleAccess(roles = {Role.ADMIN}) // todo : 추후 어드민 페이지에서 권한 변경 기능 추가 필요
     @GetMapping
     public ResponseEntity<ApplicationsResponse> getApplicants(
             @AuthorizedUser long siteUserId,
