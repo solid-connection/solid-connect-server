@@ -1,5 +1,6 @@
 package com.example.solidconnection.report.service;
 
+import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.post.repository.PostRepository;
@@ -19,6 +20,7 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final SiteUserRepository siteUserRepository;
     private final PostRepository postRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
     public void createReport(long reporterId, ReportRequest request) {
@@ -37,7 +39,12 @@ public class ReportService {
     }
 
     private void validateTargetExists(TargetType targetType, long targetId) {
-        if (targetType == TargetType.POST && !postRepository.existsById(targetId)) {
+        boolean exists = switch (targetType) {
+            case POST -> postRepository.existsById(targetId);
+            case CHAT -> chatMessageRepository.existsById(targetId);
+        };
+
+        if (!exists) {
             throw new CustomException(ErrorCode.REPORT_TARGET_NOT_FOUND);
         }
     }
