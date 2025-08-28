@@ -19,4 +19,6 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long> {
 
     @Query("SELECT u FROM SiteUser u WHERE u.quitedAt <= :cutoffDate")
     List<SiteUser> findUsersToBeRemoved(@Param("cutoffDate") LocalDate cutoffDate);
+
+    List<SiteUser> findAllByIdIn(List<Long> ids);
 }

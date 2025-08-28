@@ -23,11 +23,11 @@ import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.chat.dto.ChatRoomData;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -62,28 +62,50 @@ public class ChatService {
 
     @Transactional(readOnly = true)
     public ChatRoomListResponse getChatRooms(long siteUserId) {
-        // todo : n + 1 문제 해결 필요!
-        List<ChatRoom> chatRooms = chatRoomRepository.findOneOnOneChatRoomsByUserId(siteUserId);
-        List<ChatRoomResponse> chatRoomInfos = chatRooms.stream()
-                .map(chatRoom -> toChatRoomResponse(chatRoom, siteUserId))
+        List<ChatRoom> chatRooms = chatRoomRepository.findOneOnOneChatRoomsByUserIdWithParticipants(siteUserId);
+
+        if (chatRooms.isEmpty()) {
+            return ChatRoomListResponse.of(Collections.emptyList());
+        }
+
+        ChatRoomData chatRoomData = getChatRoomData(chatRooms, siteUserId);
+
+        List<ChatRoomResponse> responses = chatRooms.stream()
+                .map(chatRoom -> createChatRoomResponse(chatRoom, siteUserId, chatRoomData))
                 .toList();
-        return ChatRoomListResponse.of(chatRoomInfos);
+
+        return ChatRoomListResponse.of(responses);
     }
 
-    private ChatRoomResponse toChatRoomResponse(ChatRoom chatRoom, long siteUserId) {
-        Optional<ChatMessage> latestMessage = chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId());
-        String lastChatMessage = latestMessage.map(ChatMessage::getContent).orElse("");
-        ZonedDateTime lastReceivedTime = latestMessage.map(ChatMessage::getCreatedAt).orElse(null);
+    private ChatRoomData getChatRoomData(List<ChatRoom> chatRooms, long siteUserId) {
+        List<Long> chatRoomIds = chatRooms.stream().map(ChatRoom::getId).toList();
+        List<Long> partnerUserIds = chatRooms.stream()
+                .map(chatRoom -> findPartner(chatRoom, siteUserId).getSiteUserId())
+                .toList();
 
-        ChatParticipant partnerParticipant = findPartner(chatRoom, siteUserId);
+        return ChatRoomData.from(
+                chatMessageRepository.findLatestMessagesByChatRoomIds(chatRoomIds),
+                chatMessageRepository.countUnreadMessagesBatch(chatRoomIds, siteUserId),
+                siteUserRepository.findAllByIdIn(partnerUserIds)
+        );
+    }
 
-        SiteUser siteUser = siteUserRepository.findById(partnerParticipant.getSiteUserId())
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        ChatParticipantResponse partner = ChatParticipantResponse.of(siteUser.getId(), siteUser.getNickname(), siteUser.getProfileImageUrl());
+    private ChatRoomResponse createChatRoomResponse(ChatRoom chatRoom, long siteUserId, ChatRoomData chatRoomData) {
+        ChatMessage latestMessage = chatRoomData.latestMessages().get(chatRoom.getId());
+        ChatParticipant partner = findPartner(chatRoom, siteUserId);
+        SiteUser partnerUser = chatRoomData.partnerUsers().get(partner.getSiteUserId());
 
-        long unReadCount = chatRoomRepository.countUnreadMessages(chatRoom.getId(), siteUserId);
+        if (partnerUser == null) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
 
-        return ChatRoomResponse.of(chatRoom.getId(), lastChatMessage, lastReceivedTime, partner, unReadCount);
+        return ChatRoomResponse.of(
+                chatRoom.getId(),
+                latestMessage != null ? latestMessage.getContent() : "",
+                latestMessage != null ? latestMessage.getCreatedAt() : null,
+                ChatParticipantResponse.of(partnerUser.getId(), partnerUser.getNickname(), partnerUser.getProfileImageUrl()),
+                chatRoomData.unreadCounts().getOrDefault(chatRoom.getId(), 0L)
+        );
     }
 
     @Transactional(readOnly = true)
@@ -223,15 +245,20 @@ public class ChatService {
     }
 
     @Transactional
-    public void createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
-        if (chatRoomRepository.existsByMentoringId(mentoringId)) {
-            return;
+    public Long createMentoringChatRoom(Long mentoringId, Long mentorId, Long menteeId) {
+        ChatRoom existingChatRoom = chatRoomRepository.findByMentoringId(mentoringId);
+        if (existingChatRoom != null) {
+            return existingChatRoom.getId();
         }
 
+        // 새 채팅방 생성
         ChatRoom chatRoom = new ChatRoom(mentoringId, false);
         chatRoom = chatRoomRepository.save(chatRoom);
+
         ChatParticipant mentorParticipant = new ChatParticipant(mentorId, chatRoom);
         ChatParticipant menteeParticipant = new ChatParticipant(menteeId, chatRoom);
         chatParticipantRepository.saveAll(List.of(mentorParticipant, menteeParticipant));
+
+        return chatRoom.getId();
     }
 }

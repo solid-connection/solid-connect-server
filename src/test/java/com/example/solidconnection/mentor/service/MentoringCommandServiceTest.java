@@ -134,23 +134,17 @@ class MentoringCommandServiceTest {
             assertThat(beforeChatRoom).isEmpty();
 
             // when
-            mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
+            MentoringConfirmResponse response = mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
 
             // then
-            ChatRoom afterChatRoom = await()
-                    .atMost(Duration.ofSeconds(5))
-                    .pollInterval(Duration.ofMillis(100))
-                    .until(() -> chatRoomRepositoryForTest
-                                   .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId()),
-                           Optional::isPresent)
-                    .orElseThrow();
-
+            ChatRoom afterChatRoom = chatRoomRepositoryForTest.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId()).orElseThrow();
             List<Long> participantIds = afterChatRoom.getChatParticipants().stream()
                     .map(ChatParticipant::getSiteUserId)
                     .toList();
             assertAll(
                     () -> assertThat(afterChatRoom.isGroup()).isFalse(),
-                    () -> assertThat(participantIds).containsExactly(mentorUser1.getId(), menteeUser.getId())
+                    () -> assertThat(participantIds).containsExactly(mentorUser1.getId(), menteeUser.getId()),
+                    () -> assertThat(response.chatRoomId()).isEqualTo(afterChatRoom.getId())
             );
         }
 
@@ -186,19 +180,14 @@ class MentoringCommandServiceTest {
             assertThat(beforeChatRoom).isEmpty();
 
             // when
-            mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
+            MentoringConfirmResponse response = mentoringCommandService.confirmMentoring(mentorUser1.getId(), mentoring.getId(), request);
 
             // then
-            await()
-                    .pollInterval(Duration.ofMillis(100))
-                    .during(Duration.ofSeconds(1))
-                    .until(() -> chatRoomRepositoryForTest
-                                         .findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId())
-                                         .isEmpty());
-
             Optional<ChatRoom> afterChatRoom = chatRoomRepositoryForTest.findOneOnOneChatRoomByParticipants(mentorUser1.getId(), menteeUser.getId());
-            assertThat(afterChatRoom).isEmpty();
-
+            assertAll(
+                    () -> assertThat(response.chatRoomId()).isNull(),
+                    () -> assertThat(afterChatRoom).isEmpty()
+            );
         }
 
         @Test

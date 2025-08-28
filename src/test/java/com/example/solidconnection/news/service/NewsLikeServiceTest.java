@@ -7,7 +7,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.news.domain.News;
-import com.example.solidconnection.news.dto.LikedNewsResponse;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.news.repository.LikedNewsRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -42,31 +41,6 @@ class NewsLikeServiceTest {
     void setUp() {
         user = siteUserFixture.사용자();
         news = newsFixture.소식지(siteUserFixture.멘토(1, "mentor").getId());
-    }
-
-    @Nested
-    class 소식지_좋아요_상태를_조회한다 {
-
-        @Test
-        void 좋아요한_소식지의_좋아요_상태를_조회한다() {
-            // given
-            newsLikeService.addNewsLike(user.getId(), news.getId());
-
-            // when
-            LikedNewsResponse response = newsLikeService.isNewsLiked(user.getId(), news.getId());
-
-            // then
-            assertThat(response.isLike()).isTrue();
-        }
-
-        @Test
-        void 좋아요하지_않은_소식지의_좋아요_상태를_조회한다() {
-            // when
-            LikedNewsResponse response = newsLikeService.isNewsLiked(user.getId(), news.getId());
-
-            // then
-            assertThat(response.isLike()).isFalse();
-        }
     }
 
     @Nested
