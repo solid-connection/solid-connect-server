@@ -5,6 +5,7 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.dto.urlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,14 @@ public class S3Controller {
     ) {
         UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.LANGUAGE_TEST);
         return ResponseEntity.ok(profileImageUrl);
+    }
+
+    @PostMapping("/chat")
+    public ResponseEntity<List<UploadedFileUrlResponse>> uploadChatImage(
+            @RequestParam("files") List<MultipartFile> imageFiles
+    ) {
+        List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(imageFiles, ImgType.CHAT);
+        return ResponseEntity.ok(chatImageUrls);
     }
 
     @GetMapping("/s3-url-prefix")

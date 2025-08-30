@@ -33,7 +33,7 @@ public class ChatMessage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
 
-    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ChatAttachment> chatAttachments = new ArrayList<>();
 
     public ChatMessage(String content, long senderId, ChatRoom chatRoom) {
@@ -43,5 +43,10 @@ public class ChatMessage extends BaseEntity {
         if (chatRoom != null) {
             chatRoom.getChatMessages().add(this);
         }
+    }
+
+    public void addAttachment(ChatAttachment attachment) {
+        this.chatAttachments.add(attachment);
+        attachment.setChatMessage(this);
     }
 }
