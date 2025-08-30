@@ -8,6 +8,7 @@ public interface UnivApplyInfoFilterRepository {
 
     List<UnivApplyInfo> findAllByRegionCodeAndKeywords(String regionCode, List<String> keywords);
 
-    List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndLanguageTestTypeAndTestScoreAndTerm(
-            String regionCode, List<String> keywords, LanguageTestType testType, String testScore, String term);
+    List<UnivApplyInfo> findAllByFilter(LanguageTestType testType, String testScore, String term, List<String> countryKoreanNames);
+
+    List<UnivApplyInfo> findAllByText(String text, String term);
 }

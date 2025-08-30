@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 public enum LanguageTestType {
 
-    CEFR((s1, s2) -> s1.compareTo(s2)),
-    JLPT((s1, s2) -> s2.compareTo(s1)),
+    CEFR(String::compareTo),
+    JLPT(Comparator.reverseOrder()),
     DALF(LanguageTestType::compareIntegerScores),
     DELF(LanguageTestType::compareIntegerScores),
     DUOLINGO(LanguageTestType::compareIntegerScores),
@@ -16,7 +16,7 @@ public enum LanguageTestType {
     TOEFL_IBT(LanguageTestType::compareIntegerScores),
     TOEFL_ITP(LanguageTestType::compareIntegerScores),
     TOEIC(LanguageTestType::compareIntegerScores),
-    ETC((s1, s2) -> 0), // 기타 언어시험은 점수를 비교할 수 없으므로 항상 크다고 비교한다.
+    ETC((s1, s2) -> 0), // 기타 언어시험은 점수를 비교할 수 없으므로 항상 같다고 비교한다.
     ;
 
     private final Comparator<String> comparator;

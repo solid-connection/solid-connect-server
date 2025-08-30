@@ -31,9 +31,9 @@ public class GpaScore extends BaseEntity {
     private Gpa gpa;
 
     @Setter
-    @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private VerifyStatus verifyStatus;
+    private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
     private String rejectedReason;
 

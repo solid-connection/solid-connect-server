@@ -32,6 +32,15 @@ public final class UniversityFixture {
                 .create();
     }
 
+    public University 아칸소_주립_대학() {
+        return universityFixtureBuilder.university()
+                .koreanName("아칸소 주립 대학")
+                .englishName("Arkansas State University")
+                .country(countryFixture.미국())
+                .region(regionFixture.영미권())
+                .create();
+    }
+
     public University 메모리얼_대학_세인트존스() {
         return universityFixtureBuilder.university()
                 .koreanName("메모리얼 대학 세인트존스")
