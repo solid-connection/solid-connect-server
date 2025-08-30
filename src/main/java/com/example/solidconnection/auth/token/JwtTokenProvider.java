@@ -2,18 +2,17 @@ package com.example.solidconnection.auth.token;
 
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_TOKEN;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,23 +20,22 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider implements TokenProvider {
 
     private final JwtProperties jwtProperties;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public final String generateToken(String string, TokenType tokenType) {
-        return generateJwtTokenValue(string, Map.of(), tokenType.getExpireTime());
+    public String generateToken(Subject subject, Duration expireTime) {
+        return generateJwtTokenValue(subject.value(), Map.of(), expireTime);
     }
 
     @Override
-    public String generateToken(String string, Map<String, String> customClaims, TokenType tokenType) {
-        return generateJwtTokenValue(string, customClaims, tokenType.getExpireTime());
+    public String generateToken(Subject subject, Map<String, String> customClaims, Duration expireTime) {
+        return generateJwtTokenValue(subject.value(), customClaims, expireTime);
     }
 
-    private String generateJwtTokenValue(String subject, Map<String, String> claims, long expireTime) {
+    private String generateJwtTokenValue(String subject, Map<String, String> claims, Duration expireTime) {
         Claims jwtClaims = Jwts.claims().setSubject(subject);
         jwtClaims.putAll(claims);
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + expireTime);
+        Date expiredDate = new Date(now.getTime() + expireTime.toMillis());
         return Jwts.builder()
                 .setClaims(jwtClaims)
                 .setIssuedAt(now)
@@ -47,24 +45,20 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public final String saveToken(String token, TokenType tokenType) {
-        String subject = parseSubject(token);
-        redisTemplate.opsForValue().set(
-                tokenType.addPrefix(subject),
-                token,
-                tokenType.getExpireTime(),
-                TimeUnit.MILLISECONDS
-        );
-        return token;
+    public Subject parseSubject(String token) {
+        String subject = parseJwtClaims(token).getSubject();
+        if (subject == null || subject.isBlank()) {
+            throw new CustomException(INVALID_TOKEN);
+        }
+        return new Subject(subject);
     }
 
     @Override
-    public String parseSubject(String token) {
-        return parseClaims(token).getSubject();
+    public <T> T parseClaims(String token, String claimName, Class<T> claimType) {
+        return parseJwtClaims(token).get(claimName, claimType);
     }
 
-    @Override
-    public Claims parseClaims(String token) {
+    private Claims parseJwtClaims(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(jwtProperties.secret())

@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.common.exception.CustomException;
@@ -27,6 +27,6 @@ public class EmailSignUpTokenProvider {
         }
 
         passwordTemporaryStorage.save(email, password);
-        return signUpTokenProvider.generateAndSaveSignUpToken(email, AuthType.EMAIL);
+        return signUpTokenProvider.generateAndSaveSignUpToken(email, AuthType.EMAIL).token();
     }
 }

@@ -1,10 +1,9 @@
 package com.example.solidconnection.auth.service;
 
-import static com.example.solidconnection.auth.domain.TokenType.BLACKLIST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.solidconnection.auth.token.TokenBlackListService;
-import com.example.solidconnection.siteuser.domain.Role;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,13 +22,15 @@ class TokenBlackListServiceTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    private AccessToken accessToken;
+    @Autowired
+    private TokenProperties tokenProperties;
+
+    private String accessToken;
 
     @BeforeEach
     void setUp() {
-        accessToken = new AccessToken("subject", Role.MENTEE, "token");
+        accessToken = "accessToken";
     }
-
 
     @Test
     void 액세스_토큰을_블랙리스트에_추가한다() {
@@ -37,7 +38,7 @@ class TokenBlackListServiceTest {
         tokenBlackListService.addToBlacklist(accessToken);
 
         // then
-        String blackListTokenKey = BLACKLIST.addPrefix(accessToken.token());
+        String blackListTokenKey = tokenProperties.blackList().storageKeyPrefix() + ":" + accessToken;
         String foundBlackListToken = redisTemplate.opsForValue().get(blackListTokenKey);
         assertThat(foundBlackListToken).isNotNull();
     }
@@ -51,13 +52,13 @@ class TokenBlackListServiceTest {
             tokenBlackListService.addToBlacklist(accessToken);
 
             // when, then
-            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue();
+            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken)).isTrue();
         }
 
         @Test
         void 블랙리스트에_토큰이_없는_경우() {
             // when, then
-            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isFalse();
+            assertThat(tokenBlackListService.isTokenBlacklisted(accessToken)).isFalse();
         }
     }
 }

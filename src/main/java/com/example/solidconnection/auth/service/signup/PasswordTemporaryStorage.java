@@ -1,8 +1,7 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,14 +15,14 @@ public class PasswordTemporaryStorage {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final TokenProperties tokenProperties;
 
     public void save(String email, String rawPassword) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
         redisTemplate.opsForValue().set(
                 convertToKey(email),
                 encodedPassword,
-                TokenType.SIGN_UP.getExpireTime(),
-                TimeUnit.MILLISECONDS
+                tokenProperties.signUp().expireTime()
         );
     }
 

@@ -25,8 +25,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /*
- * 애플 인증을 위한 OAuth2 클라이언트
- * https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens
+ * - 애플 인증을 위한 OAuth2 클라이언트
+ *   - https://developer.apple.com/documentation/signinwithapplerestapi/generate_and_validate_tokens
+ * - OAuthClient 인터페이스를 사용하는 전략 패턴으로 구현됨
  * */
 @Component
 @RequiredArgsConstructor

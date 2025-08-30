@@ -1,4 +1,4 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signin;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_IN_FAILED;
 
