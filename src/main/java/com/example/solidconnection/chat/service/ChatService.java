@@ -5,10 +5,12 @@ import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNE
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_CHAT_ROOM_STATE;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.chat.domain.ChatAttachment;
 import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatAttachmentResponse;
+import com.example.solidconnection.chat.dto.ChatImageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
@@ -193,6 +195,53 @@ public class ChatService {
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
 
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
+    }
+
+    @Transactional
+    public void sendChatImage(ChatImageSendRequest chatImageSendRequest, long siteUserId, long roomId) {
+        long senderId = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND))
+                .getId();
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE));
+
+        ChatMessage chatMessage = new ChatMessage(
+                "",
+                senderId,
+                chatRoom
+        );
+
+        for (String imageUrl : chatImageSendRequest.imageUrls()) {
+            String thumbnailUrl = generateThumbnailUrl(imageUrl);
+
+            ChatAttachment attachment = new ChatAttachment(true, imageUrl, thumbnailUrl, null);
+            chatMessage.addAttachment(attachment);
+        }
+
+        chatMessageRepository.save(chatMessage);
+
+        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
+        simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
+    }
+
+    private String generateThumbnailUrl(String originalUrl) {
+        try {
+            String fileName = originalUrl.substring(originalUrl.lastIndexOf('/') + 1);
+
+            String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+            String extension = fileName.substring(fileName.lastIndexOf('.'));
+
+            String thumbnailFileName = nameWithoutExt + "_thumb" + extension;
+
+            String thumbnailUrl = originalUrl.replace("chat/images/", "chat/thumbnails/")
+                    .replace(fileName, thumbnailFileName);
+
+            return thumbnailUrl;
+
+        } catch (Exception e) {
+            return originalUrl;
+        }
     }
 
     @Transactional
