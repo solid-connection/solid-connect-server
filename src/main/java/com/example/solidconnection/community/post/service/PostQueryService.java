@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -21,6 +22,7 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.repository.UserBlockRepository;
 import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +40,7 @@ public class PostQueryService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final SiteUserRepository siteUserRepository;
+    private final UserBlockRepository userBlockRepository;
     private final CommentService commentService;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
@@ -63,6 +66,12 @@ public class PostQueryService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getByIdUsingEntityGraph(postId);
+
+        boolean isBlockedByMe = userBlockRepository.existsByBlockerIdAndBlockedId(siteUserId, post.getSiteUserId());
+        if (isBlockedByMe) {
+            throw new CustomException(ACCESS_DENIED);
+        }
+
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
 

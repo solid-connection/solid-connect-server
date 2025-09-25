@@ -1,8 +1,11 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.domain.BoardCode;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
@@ -172,6 +175,21 @@ class PostQueryServiceTest {
                 () -> assertThat(redisService.isKeyExists(viewCountKey)).isTrue(),
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
+    }
+
+    @Test
+    void 차단한_사용자의_게시글을_조회하면_예외가_발생한다() {
+        // given
+        SiteUser blockedUser = siteUserFixture.사용자(1, "blockedUser");
+        userBlockFixture.유저_차단(user.getId(), blockedUser.getId());
+        Board board = boardFixture.자유게시판();
+        Post post = postFixture.게시글(board, blockedUser);
+
+        // when & then
+        assertThatCode(() -> postQueryService.findPostById(user.getId(), post.getId()))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ACCESS_DENIED.getMessage());
+
     }
 
     @Test
