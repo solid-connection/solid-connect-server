@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_BLOCKED_BY_CURRENT_USER;
+import static com.example.solidconnection.common.exception.ErrorCode.BLOCK_USER_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CANNOT_BLOCK_YOURSELF;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
@@ -9,6 +10,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.NicknameExistsResponse;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.fixture.UserBlockFixture;
 import com.example.solidconnection.siteuser.repository.UserBlockRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ class SiteUserServiceTest {
 
     @Autowired
     private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private UserBlockFixture userBlockFixture;
 
     private SiteUser user;
 
@@ -95,6 +100,26 @@ class SiteUserServiceTest {
             assertThatCode(() -> siteUserService.blockUser(user.getId(), blockedUser.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_BLOCKED_BY_CURRENT_USER.getMessage());
+        }
+
+        @Test
+        void 성공적으로_유저_차단을_취소한다() {
+            // given
+            userBlockFixture.유저_차단(user.getId(), blockedUser.getId());
+
+            // when
+            siteUserService.cancelUserBlock(user.getId(), blockedUser.getId());
+
+            // then
+            assertThat(userBlockRepository.existsByBlockerIdAndBlockedId(user.getId(), blockedUser.getId())).isFalse();
+        }
+
+        @Test
+        void 차단하지_않았으면_예외가_발생한다() {
+            // when & then
+            assertThatCode(() -> siteUserService.cancelUserBlock(user.getId(), blockedUser.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(BLOCK_USER_NOT_FOUND.getMessage());
         }
     }
 }
