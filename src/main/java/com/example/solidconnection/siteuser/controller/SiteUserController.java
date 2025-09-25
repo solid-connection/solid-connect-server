@@ -5,6 +5,7 @@ import com.example.solidconnection.siteuser.dto.NicknameExistsResponse;
 import com.example.solidconnection.siteuser.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,15 @@ public class SiteUserController {
             @PathVariable("blocked-id") Long blockedId
     ) {
         siteUserService.blockUser(siteUserId, blockedId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/block/{blocked-id}")
+    public ResponseEntity<Void> cancelUserBlock(
+            @AuthorizedUser long siteUserId,
+            @PathVariable("blocked-id") Long blockedId
+    ) {
+        siteUserService.cancelUserBlock(siteUserId, blockedId);
         return ResponseEntity.ok().build();
     }
 }

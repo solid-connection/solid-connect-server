@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_BLOCKED_BY_CURRENT_USER;
+import static com.example.solidconnection.common.exception.ErrorCode.BLOCK_USER_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.CANNOT_BLOCK_YOURSELF;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -43,5 +44,15 @@ public class SiteUserService {
         if (userBlockRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId)) {
             throw new CustomException(ALREADY_BLOCKED_BY_CURRENT_USER);
         }
+    }
+
+    @Transactional
+    public void cancelUserBlock(long blockerId, long blockedId) {
+        if (!siteUserRepository.existsById(blockedId)) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
+        UserBlock userBlock = userBlockRepository.findByBlockerIdAndBlockedId(blockerId, blockedId)
+                .orElseThrow(() -> new CustomException(BLOCK_USER_NOT_FOUND));
+        userBlockRepository.delete(userBlock);
     }
 }

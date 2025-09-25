@@ -47,6 +47,7 @@ public enum ErrorCode {
     REPORT_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 신고 대상입니다."),
     CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
     CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅 참여자를 찾을 수 없습니다."),
+    BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
