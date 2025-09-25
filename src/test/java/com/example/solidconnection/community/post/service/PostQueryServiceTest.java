@@ -189,7 +189,6 @@ class PostQueryServiceTest {
         assertThatCode(() -> postQueryService.findPostById(user.getId(), post.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ACCESS_DENIED.getMessage());
-
     }
 
     @Test
