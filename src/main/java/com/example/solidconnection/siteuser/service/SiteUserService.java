@@ -5,15 +5,20 @@ import static com.example.solidconnection.common.exception.ErrorCode.BLOCK_USER_
 import static com.example.solidconnection.common.exception.ErrorCode.CANNOT_BLOCK_YOURSELF;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.UserBlock;
 import com.example.solidconnection.siteuser.dto.NicknameExistsResponse;
+import com.example.solidconnection.siteuser.dto.UserBlockResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.siteuser.repository.UserBlockRepository;
-import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +30,14 @@ public class SiteUserService {
     public NicknameExistsResponse checkNicknameExists(String nickname) {
         boolean exists = siteUserRepository.existsByNickname(nickname);
         return NicknameExistsResponse.from(exists);
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<UserBlockResponse> getBlockedUsers(long siteUserId, Pageable pageable) {
+        Slice<UserBlockResponse> slice = userBlockRepository.findBlockedUsersWithNickname(siteUserId, pageable);
+
+        List<UserBlockResponse> content = slice.getContent();
+        return SliceResponse.of(content, slice);
     }
 
     @Transactional
