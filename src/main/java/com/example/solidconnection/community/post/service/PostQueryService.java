@@ -43,13 +43,18 @@ public class PostQueryService {
     private final RedisUtils redisUtils;
 
     @Transactional(readOnly = true)
-    public List<PostListResponse> findPostsByCodeAndPostCategory(String code, String category) {
+    public List<PostListResponse> findPostsByCodeAndPostCategory(String code, String category, Long siteUserId) {
 
         String boardCode = validateCode(code);
         PostCategory postCategory = validatePostCategory(category);
         boardRepository.getByCode(boardCode);
-        List<Post> postList = postRepository.findByBoardCode(boardCode);
 
+        List<Post> postList; // todo : 추후 개선 필요(현재 최신순으로 응답나가지 않고 있음)
+        if (siteUserId != null) {
+            postList = postRepository.findByBoardCodeExcludingBlockedUsers(boardCode, siteUserId);
+        } else {
+            postList = postRepository.findByBoardCode(boardCode);
+        }
         return PostListResponse.from(getPostListByPostCategory(postList, postCategory));
     }
 

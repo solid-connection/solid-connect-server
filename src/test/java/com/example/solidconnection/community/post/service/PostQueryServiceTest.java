@@ -3,6 +3,7 @@ package com.example.solidconnection.community.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.board.domain.BoardCode;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.comment.domain.Comment;
@@ -15,6 +16,7 @@ import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.fixture.UserBlockFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.util.RedisUtils;
 import java.time.ZonedDateTime;
@@ -51,6 +53,9 @@ class PostQueryServiceTest {
 
     @Autowired
     private CommentFixture commentFixture;
+
+    @Autowired
+    private UserBlockFixture userBlockFixture;
 
     private SiteUser user;
     private Post post1;
@@ -99,7 +104,8 @@ class PostQueryServiceTest {
         // when
         List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
                 BoardCode.FREE.name(),
-                PostCategory.자유.name()
+                PostCategory.자유.name(),
+                null
         );
 
         // then
@@ -121,7 +127,8 @@ class PostQueryServiceTest {
         // when
         List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
                 BoardCode.FREE.name(),
-                PostCategory.전체.name()
+                PostCategory.전체.name(),
+                null
         );
 
         // then
@@ -178,7 +185,8 @@ class PostQueryServiceTest {
         // when
         List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
                 BoardCode.FREE.name(),
-                PostCategory.전체.name()
+                PostCategory.전체.name(),
+                null
         );
 
         // then
@@ -195,7 +203,8 @@ class PostQueryServiceTest {
         // when
         List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
                 BoardCode.FREE.name(),
-                PostCategory.전체.name()
+                PostCategory.전체.name(),
+                null
         );
 
         // then
@@ -205,5 +214,29 @@ class PostQueryServiceTest {
                 .orElseThrow();
 
         assertThat(postResponse.postThumbnailUrl()).isNull();
+    }
+
+    @Test
+    void 차단한_사용자의_게시글은_제외된다() {
+        // given
+        SiteUser blockedUser = siteUserFixture.사용자(1, "blockedUser");
+        SiteUser notBlockedUser = siteUserFixture.사용자(2, "notBlockedUser");
+        userBlockFixture.유저_차단(user.getId(), blockedUser.getId());
+        Board board = boardFixture.자유게시판();
+        Post blockedPost = postFixture.게시글(board, blockedUser);
+        Post notBlockedPost = postFixture.게시글(board, notBlockedUser);
+
+        // when
+        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategory(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name(),
+                user.getId()
+        );
+
+        // then
+        assertAll(
+                () -> assertThat(response).extracting(PostListResponse::id).contains(notBlockedPost.getId()),
+                () -> assertThat(response).extracting(PostListResponse::id).doesNotContain(blockedPost.getId())
+        );
     }
 }
