@@ -45,7 +45,8 @@ public class ApplicationQueryService {
         // 1. 대학 지원 정보 필터링 (regionCode, keyword)
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, List.of(keyword), term);
+        List<String> keywords = (keyword == null || keyword.isBlank()) ? List.of() : List.of(keyword);
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywords(regionCode, keywords, term);
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of(), List.of(), List.of());
         }
