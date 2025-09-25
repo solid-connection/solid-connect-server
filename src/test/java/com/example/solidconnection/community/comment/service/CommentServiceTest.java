@@ -205,7 +205,7 @@ class CommentServiceTest {
 
 
             // when
-            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(post.getId(), user1.getId());
+            List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
