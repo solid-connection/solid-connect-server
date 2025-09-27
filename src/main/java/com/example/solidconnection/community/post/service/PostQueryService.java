@@ -67,10 +67,7 @@ public class PostQueryService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getByIdUsingEntityGraph(postId);
 
-        boolean isBlockedByMe = userBlockRepository.existsByBlockerIdAndBlockedId(siteUserId, post.getSiteUserId());
-        if (isBlockedByMe) {
-            throw new CustomException(ACCESS_DENIED);
-        }
+        validatedIsBlockedByMe(post, siteUser);
 
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
@@ -124,5 +121,11 @@ public class PostQueryService {
         return postList.stream()
                 .filter(post -> post.getCategory().equals(postCategory))
                 .collect(Collectors.toList());
+    }
+
+    private void validatedIsBlockedByMe(Post post, SiteUser siteUser) {
+        if (userBlockRepository.existsByBlockerIdAndBlockedId(siteUser.getId(), post.getSiteUserId())) {
+            throw new CustomException(ACCESS_DENIED);
+        }
     }
 }
