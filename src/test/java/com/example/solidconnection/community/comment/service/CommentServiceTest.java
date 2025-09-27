@@ -215,8 +215,8 @@ class CommentServiceTest {
                         .containsExactly(parentComment1.getId(), childComment1.getId()),
                 () -> assertThat(responses)
                         .extracting(PostFindCommentResponse::id)
-                        .doesNotContain(childComment2.getId(), parentCommen2.getId(), childComment3.getId(), childComment4.getId()))
-            ;
+                        .doesNotContain(childComment2.getId(), parentCommen2.getId(), childComment3.getId(), childComment4.getId())
+            );
         }
     }
 
