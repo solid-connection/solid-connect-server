@@ -36,7 +36,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                SELECT * FROM CommentTree
                ORDER BY path
                """, nativeQuery = true)
-    List<Comment> findCommentTreeByPostId(@Param("postId") Long postId, @Param("siteUserId") Long siteUserId);
+    List<Comment> findCommentTreeByPostIdExcludingBlockedUsers(@Param("postId") Long postId, @Param("siteUserId") Long siteUserId);
 
     default Comment getById(Long id) {
         return findById(id)
