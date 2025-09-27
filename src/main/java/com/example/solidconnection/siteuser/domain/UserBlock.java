@@ -34,4 +34,9 @@ public class UserBlock extends BaseEntity {
 
     @Column(name = "blocked_id", nullable = false)
     private long blockedId;
+
+    public UserBlock(long blockerId, long blockedId) {
+        this.blockerId = blockerId;
+        this.blockedId = blockedId;
+    }
 }

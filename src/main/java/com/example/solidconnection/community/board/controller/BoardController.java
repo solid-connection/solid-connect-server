@@ -33,11 +33,11 @@ public class BoardController {
 
     @GetMapping("/{code}")
     public ResponseEntity<?> findPostsByCodeAndCategory(
-            @AuthorizedUser long siteUserId, // todo: '사용하지 않는 인자'로 인증된 유저만 접근하게 하기보다는, 다른 방식으로 접근하는것이 좋을 것 같다
+            @AuthorizedUser(required = false) Long siteUserId,
             @PathVariable(value = "code") String code,
             @RequestParam(value = "category", defaultValue = "전체") String category) {
         List<PostListResponse> postsByCodeAndPostCategory = postQueryService
-                .findPostsByCodeAndPostCategory(code, category);
+                .findPostsByCodeAndPostCategory(code, category, siteUserId);
         return ResponseEntity.ok().body(postsByCodeAndPostCategory);
     }
 }
