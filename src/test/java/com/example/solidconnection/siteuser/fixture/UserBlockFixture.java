@@ -16,5 +16,4 @@ public class UserBlockFixture {
                 .blockedId(blockedId)
                 .create();
     }
-
 }
