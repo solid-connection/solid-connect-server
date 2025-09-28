@@ -31,7 +31,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByRegionCodeAndKeywords(String regionCode, List<String> keywords, String term) {
+    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTerm(String regionCode, List<String> keywords, String term) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
