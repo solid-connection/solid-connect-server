@@ -8,6 +8,7 @@ public enum LanguageTestType {
     JLPT(Comparator.reverseOrder()),
     DALF(LanguageTestType::compareIntegerScores),
     DELF(LanguageTestType::compareIntegerScores),
+    DELE(String::compareTo),
     DUOLINGO(LanguageTestType::compareIntegerScores),
     IELTS(LanguageTestType::compareDoubleScores),
     NEW_HSK(LanguageTestType::compareIntegerScores),

@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.RefreshToken;
+import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -19,7 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @DisplayName("인증 서비스 테스트")
 @TestContainerSpringBootTest
@@ -35,7 +36,7 @@ class AuthServiceTest {
     private TokenBlackListService tokenBlackListService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private TokenStorage tokenStorage;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -43,13 +44,18 @@ class AuthServiceTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     private SiteUser siteUser;
     private AccessToken accessToken;
+    private Subject expectedSubject;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
         accessToken = authTokenProvider.generateAccessToken(siteUser);
+        expectedSubject = tokenProvider.parseSubject(accessToken.token());
     }
 
     @Test
@@ -58,9 +64,8 @@ class AuthServiceTest {
         authService.signOut(accessToken.token());
 
         // then
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
         assertAll(
-                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }
@@ -72,11 +77,10 @@ class AuthServiceTest {
 
         // then
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(accessToken.subject().value());
         SiteUser actualSitUser = siteUserRepository.findById(siteUser.getId()).orElseThrow();
         assertAll(
                 () -> assertThat(actualSitUser.getQuitedAt()).isEqualTo(tomorrow),
-                () -> assertThat(redisTemplate.opsForValue().get(refreshTokenKey)).isNull(),
+                () -> assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty(),
                 () -> assertThat(tokenBlackListService.isTokenBlacklisted(accessToken.token())).isTrue()
         );
     }

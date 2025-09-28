@@ -3,6 +3,10 @@ package com.example.solidconnection.report.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.example.solidconnection.chat.domain.ChatMessage;
+import com.example.solidconnection.chat.domain.ChatRoom;
+import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.board.domain.Board;
@@ -45,18 +49,27 @@ class ReportServiceTest {
     @Autowired
     private ReportFixture reportFixture;
 
+    @Autowired
+    private ChatRoomFixture chatRoomFixture;
+
+    @Autowired
+    private ChatMessageFixture chatMessageFixture;
+
     private SiteUser siteUser;
     private Post post;
+    private ChatMessage chatMessage;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
         Board board = boardFixture.자유게시판();
         post = postFixture.게시글(board, siteUser);
+        ChatRoom chatRoom = chatRoomFixture.채팅방(false);
+        chatMessage = chatMessageFixture.메시지("채팅", siteUser.getId(), chatRoom);
     }
 
     @Nested
-    class 신고_생성 {
+    class 포스트_신고 {
 
         @Test
         void 정상적으로_신고한다() {
@@ -96,4 +109,47 @@ class ReportServiceTest {
                     .hasMessageContaining(ErrorCode.ALREADY_REPORTED_BY_CURRENT_USER.getMessage());
         }
     }
+
+    @Nested
+    class 채팅_신고 {
+
+        @Test
+        void 정상적으로_신고한다() {
+            // given
+            ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.CHAT, chatMessage.getId());
+
+            // when
+            reportService.createReport(siteUser.getId(), request);
+
+            // then
+            boolean isSaved = reportRepository.existsByReporterIdAndTargetTypeAndTargetId(
+                    siteUser.getId(), TargetType.CHAT, chatMessage.getId());
+            assertThat(isSaved).isTrue();
+        }
+
+        @Test
+        void 신고_대상이_존재하지_않으면_예외가_발생한다() {
+            // given
+            long notExistingId = 999L;
+            ReportRequest request = new ReportRequest(ReportType.SPAM, TargetType.CHAT, notExistingId);
+
+            // when & then
+            assertThatCode(() -> reportService.createReport(siteUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(ErrorCode.REPORT_TARGET_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 이미_신고한_경우_예외가_발생한다() {
+            // given
+            reportFixture.신고(siteUser.getId(), TargetType.CHAT, chatMessage.getId());
+            ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.CHAT, chatMessage.getId());
+
+            // when & then
+            assertThatCode(() -> reportService.createReport(siteUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(ErrorCode.ALREADY_REPORTED_BY_CURRENT_USER.getMessage());
+        }
+    }
 }
+

@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class ChatAttachment extends BaseEntity {
     @Column(length = 500)
     private String thumbnailUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private ChatMessage chatMessage;
 
     public ChatAttachment(boolean isImage, String url, String thumbnailUrl, ChatMessage chatMessage) {
@@ -39,6 +40,19 @@ public class ChatAttachment extends BaseEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.chatMessage = chatMessage;
         if (chatMessage != null) {
+            chatMessage.getChatAttachments().add(this);
+        }
+    }
+
+    protected void setChatMessage(ChatMessage chatMessage) {
+        if (this.chatMessage == chatMessage) return;
+
+        if (this.chatMessage != null) {
+            this.chatMessage.getChatAttachments().remove(this);
+        }
+
+        this.chatMessage = chatMessage;
+        if (chatMessage != null && !chatMessage.getChatAttachments().contains(this)) {
             chatMessage.getChatAttachments().add(this);
         }
     }
