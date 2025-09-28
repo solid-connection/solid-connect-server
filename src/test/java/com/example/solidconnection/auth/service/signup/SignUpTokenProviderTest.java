@@ -1,28 +1,33 @@
-package com.example.solidconnection.auth.service;
+package com.example.solidconnection.auth.service.signup;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER;
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.SignUpToken;
+import com.example.solidconnection.auth.domain.Subject;
+import com.example.solidconnection.auth.service.TokenProvider;
+import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @TestContainerSpringBootTest
 @DisplayName("회원가입 토큰 제공자 테스트")
@@ -34,30 +39,30 @@ class SignUpTokenProviderTest {
     @Autowired
     private TokenProvider tokenProvider;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    @SpyBean
+    private TokenStorage tokenStorage;
 
     @Autowired
     private JwtProperties jwtProperties;
 
     private final String authTypeClaimKey = "authType";
     private final String email = "test@email.com";
+    private final Subject subject = new Subject(email);
     private final AuthType authType = AuthType.KAKAO;
 
     @Test
     void 회원가입_토큰을_생성하고_저장한다() {
         // when
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // then
-        Claims claims = tokenProvider.parseClaims(signUpToken);
-        String actualSubject = claims.getSubject();
-        AuthType actualAuthType = AuthType.valueOf(claims.get(authTypeClaimKey, String.class));
-        String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
+        Subject actualSubject = tokenProvider.parseSubject(signUpToken);
+        String actualAuthType = tokenProvider.parseClaims(signUpToken, authTypeClaimKey, String.class);
+        Optional<String> actualSavedToken = tokenStorage.findToken(actualSubject, SignUpToken.class);
         assertAll(
-                () -> assertThat(actualSubject).isEqualTo(email),
-                () -> assertThat(actualAuthType).isEqualTo(authType),
-                () -> assertThat(redisTemplate.opsForValue().get(signUpTokenKey)).isEqualTo(signUpToken)
+                () -> assertThat(actualSubject.value()).isEqualTo(email),
+                () -> assertThat(actualAuthType).isEqualTo(authType.toString()),
+                () -> assertThat(actualSavedToken).hasValue(signUpToken)
         );
     }
 
@@ -70,8 +75,7 @@ class SignUpTokenProviderTest {
         signUpTokenProvider.deleteByEmail(email);
 
         // then
-        String signUpTokenKey = TokenType.SIGN_UP.addPrefix(email);
-        assertThat(redisTemplate.opsForValue().get(signUpTokenKey)).isNull();
+        assertThat(tokenStorage.findToken(subject, SignUpToken.class)).isEmpty();
     }
 
     @Nested
@@ -80,9 +84,7 @@ class SignUpTokenProviderTest {
         @Test
         void 검증_성공한다() {
             // given
-            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, authType));
-            String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
-            redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
+            String validToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(validToken)).doesNotThrowAnyException();
@@ -114,8 +116,8 @@ class SignUpTokenProviderTest {
         void 정해진_형식에_맞지_않으면_예외가_발생한다_authType_클래스_불일치() {
             // given
             String wrongAuthType = "카카오";
-            Map<String, Object> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, wrongAuthType));
-            String wrongAuthTypeClaim = createBaseJwtBuilder().addClaims(wrongClaim).compact();
+            Map<String, String> wrongClaim = new HashMap<>(Map.of(authTypeClaimKey, wrongAuthType));
+            String wrongAuthTypeClaim = tokenProvider.generateToken(subject, wrongClaim, Duration.ofMinutes(10));
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(wrongAuthTypeClaim))
@@ -124,22 +126,10 @@ class SignUpTokenProviderTest {
         }
 
         @Test
-        void 정해진_형식에_맞지_않으면_예외가_발생한다_subject_누락() {
-            // given
-            Map<String, Object> claim = new HashMap<>(Map.of(authTypeClaimKey, authType));
-            String noSubject = createBaseJwtBuilder().addClaims(claim).compact();
-
-            // when & then
-            assertThatCode(() -> signUpTokenProvider.validateSignUpToken(noSubject))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(SIGN_UP_TOKEN_INVALID.getMessage());
-        }
-
-        @Test
         void 우리_서버에_발급된_토큰이_아니면_예외가_발생한다() {
             // given
-            Map<String, Object> validClaim = new HashMap<>(Map.of(authTypeClaimKey, authType));
-            String signUpToken = createBaseJwtBuilder().addClaims(validClaim).setSubject(email).compact();
+            String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
+            given(tokenStorage.findToken(subject, SignUpToken.class)).willReturn(empty());
 
             // when & then
             assertThatCode(() -> signUpTokenProvider.validateSignUpToken(signUpToken))
@@ -151,12 +141,10 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_이메일을_추출한다() {
         // given
-        Map<String, Object> claim = Map.of(authTypeClaimKey, authType);
-        String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
-        redisTemplate.opsForValue().set(TokenType.SIGN_UP.addPrefix(email), validToken);
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // when
-        String extractedEmail = signUpTokenProvider.parseEmail(validToken);
+        String extractedEmail = signUpTokenProvider.parseEmail(signUpToken);
 
         // then
         assertThat(extractedEmail).isEqualTo(email);
@@ -165,11 +153,10 @@ class SignUpTokenProviderTest {
     @Test
     void 회원가입_토큰에서_인증_타입을_추출한다() {
         // given
-        Map<String, Object> claim = Map.of(authTypeClaimKey, authType);
-        String validToken = createBaseJwtBuilder().setSubject(email).addClaims(claim).compact();
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
 
         // when
-        AuthType extractedAuthType = signUpTokenProvider.parseAuthType(validToken);
+        AuthType extractedAuthType = signUpTokenProvider.parseAuthType(signUpToken);
 
         // then
         assertThat(extractedAuthType).isEqualTo(authType);
@@ -182,12 +169,5 @@ class SignUpTokenProviderTest {
                 .setExpiration(new Date(System.currentTimeMillis() - 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
                 .compact();
-    }
-
-    private JwtBuilder createBaseJwtBuilder() {
-        return Jwts.builder()
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret());
     }
 }

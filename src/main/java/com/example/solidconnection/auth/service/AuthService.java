@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -26,11 +27,9 @@ public class AuthService {
      * - 엑세스 토큰을 블랙리스트에 추가한다.
      * - 리프레시 토큰을 삭제한다.
      * */
-    public void signOut(String token) {
-        SiteUser siteUser = authTokenProvider.parseSiteUser(token);
-        AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
-        authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
+    public void signOut(String accessToken) {
         tokenBlackListService.addToBlacklist(accessToken);
+        authTokenProvider.deleteRefreshTokenByAccessToken(accessToken);
     }
 
     /*

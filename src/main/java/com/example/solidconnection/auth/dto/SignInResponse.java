@@ -1,7 +1,7 @@
 package com.example.solidconnection.auth.dto;
 
-import com.example.solidconnection.auth.service.AccessToken;
-import com.example.solidconnection.auth.service.RefreshToken;
+import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.RefreshToken;
 
 public record SignInResponse(
         String accessToken,

@@ -11,6 +11,8 @@ import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatReadStatus;
 import com.example.solidconnection.chat.domain.ChatRoom;
+import com.example.solidconnection.chat.domain.MessageType;
+import com.example.solidconnection.chat.dto.ChatImageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
@@ -28,6 +30,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -433,7 +436,7 @@ class ChatServiceTest {
         }
 
         @Test
-        void 채팅_참여자가_아니면_메시지를_전송할_수_없다() {
+        void 채팅_참여자가_아니면_예외가_발생한다() {
             // given
             SiteUser nonParticipant = siteUserFixture.사용자(333, "nonParticipant");
             ChatMessageSendRequest request = new ChatMessageSendRequest("안녕하세요");
@@ -442,6 +445,117 @@ class ChatServiceTest {
             assertThatCode(() -> chatService.sendChatMessage(request, nonParticipant.getId(), chatRoom.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 채팅_이미지를_전송한다 {
+
+        private SiteUser sender;
+        private ChatParticipant senderParticipant;
+        private ChatRoom chatRoom;
+        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example.jpg";
+        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example2.jpg";
+        private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
+
+        @BeforeEach
+        void setUp() {
+            sender = siteUserFixture.사용자(111, "sender");
+            chatRoom = chatRoomFixture.채팅방(false);
+            senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+        }
+
+        @Test
+        void 채팅방_참여자는_이미지_메시지를_전송할_수_있다() {
+            // given
+            final List<String> imageUrls = List.of(
+                    TEST_IMAGE_URL,
+                    TEST_IMAGE_URL2
+            );
+            ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
+
+            // when
+            chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+
+            // then
+            ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
+
+            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+
+            ChatMessageSendResponse response = payloadCaptor.getValue();
+
+            assertAll(
+                    () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
+                    () -> assertThat(response.attachments()).hasSize(imageUrls.size()),
+                    () -> assertThat(response.attachments().get(0).url()).isEqualTo(imageUrls.get(0)),
+                    () -> assertThat(response.attachments().get(1).url()).isEqualTo(imageUrls.get(1)),
+                    () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
+                    () -> assertThat(response.senderId()).isEqualTo(senderParticipant.getId()),
+                    () -> assertThat(response.content()).isEmpty()
+            );
+        }
+
+        @Test
+        void 단일_이미지_메시지가_정상_전송된다() {
+            // given
+            final List<String> imageUrls = List.of(
+                    TEST_IMAGE_URL
+            );
+            ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
+
+            // when
+            chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+
+            // then
+            ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
+            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+
+            ChatMessageSendResponse response = payloadCaptor.getValue();
+
+            assertAll(
+                    () -> assertThat(response.attachments()).hasSize(1),
+                    () -> assertThat(response.attachments().get(0).url()).isEqualTo(imageUrls.get(0)),
+                    () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE)
+            );
+        }
+
+        @Test
+        void 채팅_참여자가_아니면_예외가_발생한다() {
+            // given
+            SiteUser nonParticipant = siteUserFixture.사용자(333, "nonParticipant");
+            List<String> imageUrls = List.of(TEST_IMAGE_URL);
+            ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
+
+            // when & then
+            assertThatCode(() -> chatService.sendChatImage(request, nonParticipant.getId(), chatRoom.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 썸네일_URL이_정상적으로_생성된다() {
+            // given
+            final List<String> imageUrls = List.of(
+                    TEST_IMAGE_URL
+            );
+            ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
+
+            // when
+            chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+
+            // then
+            ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
+            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+
+            ChatMessageSendResponse response = payloadCaptor.getValue();
+
+            assertAll(
+                    () -> assertThat(response.attachments().get(0).url()).isEqualTo(imageUrls.get(0)),
+                    () -> assertThat(response.attachments().get(0).thumbnailUrl()).isEqualTo(
+                            EXPECTED_THUMBNAIL_URL
+                    )
+            );
         }
     }
 }

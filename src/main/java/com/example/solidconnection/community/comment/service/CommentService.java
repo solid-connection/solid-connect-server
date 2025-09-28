@@ -40,7 +40,7 @@ public class CommentService {
     public List<PostFindCommentResponse> findCommentsByPostId(long siteUserId, Long postId) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
+        List<Comment> allComments = commentRepository.findCommentTreeByPostIdExcludingBlockedUsers(postId, siteUserId);
         List<Comment> filteredComments = filterCommentsByDeletionRules(allComments);
 
         Set<Long> userIds = filteredComments.stream()

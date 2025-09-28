@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.post.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ACCESS_DENIED;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_BOARD_CODE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -21,6 +22,7 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.repository.UserBlockRepository;
 import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
@@ -38,18 +40,24 @@ public class PostQueryService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final SiteUserRepository siteUserRepository;
+    private final UserBlockRepository userBlockRepository;
     private final CommentService commentService;
     private final RedisService redisService;
     private final RedisUtils redisUtils;
 
     @Transactional(readOnly = true)
-    public List<PostListResponse> findPostsByCodeAndPostCategory(String code, String category) {
+    public List<PostListResponse> findPostsByCodeAndPostCategory(String code, String category, Long siteUserId) {
 
         String boardCode = validateCode(code);
         PostCategory postCategory = validatePostCategory(category);
         boardRepository.getByCode(boardCode);
-        List<Post> postList = postRepository.findByBoardCode(boardCode);
 
+        List<Post> postList; // todo : 추후 개선 필요(현재 최신순으로 응답나가지 않고 있음)
+        if (siteUserId != null) {
+            postList = postRepository.findByBoardCodeExcludingBlockedUsers(boardCode, siteUserId);
+        } else {
+            postList = postRepository.findByBoardCode(boardCode);
+        }
         return PostListResponse.from(getPostListByPostCategory(postList, postCategory));
     }
 
@@ -58,6 +66,9 @@ public class PostQueryService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Post post = postRepository.getByIdUsingEntityGraph(postId);
+
+        validatedIsBlockedByMe(post, siteUser);
+
         Boolean isOwner = getIsOwner(post, siteUser);
         Boolean isLiked = getIsLiked(post, siteUser);
 
@@ -110,5 +121,11 @@ public class PostQueryService {
         return postList.stream()
                 .filter(post -> post.getCategory().equals(postCategory))
                 .collect(Collectors.toList());
+    }
+
+    private void validatedIsBlockedByMe(Post post, SiteUser siteUser) {
+        if (userBlockRepository.existsByBlockerIdAndBlockedId(siteUser.getId(), post.getSiteUserId())) {
+            throw new CustomException(ACCESS_DENIED);
+        }
     }
 }

@@ -9,30 +9,21 @@ import org.springframework.data.repository.query.Param;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     @Query("""
-           SELECT cr FROM ChatRoom cr
-           JOIN cr.chatParticipants cp
-           WHERE cp.siteUserId = :userId AND cr.isGroup = false
+           SELECT DISTINCT cr FROM ChatRoom cr
+           JOIN FETCH cr.chatParticipants
+           WHERE cr.id IN (
+               SELECT DISTINCT cp2.chatRoom.id
+               FROM ChatParticipant cp2
+               WHERE cp2.siteUserId = :userId
+           )
+           AND cr.isGroup = false
            ORDER BY (
                SELECT MAX(cm.createdAt)
                FROM ChatMessage cm
                WHERE cm.chatRoom = cr
            ) DESC NULLS LAST
            """)
-    List<ChatRoom> findOneOnOneChatRoomsByUserId(@Param("userId") long userId);
-
-    @Query("""
-           SELECT COUNT(cm) FROM ChatMessage cm
-           LEFT JOIN ChatReadStatus crs ON crs.chatRoomId = cm.chatRoom.id 
-               AND crs.chatParticipantId = (
-                   SELECT cp.id FROM ChatParticipant cp 
-                   WHERE cp.chatRoom.id = :chatRoomId 
-                   AND cp.siteUserId = :userId
-               )
-           WHERE cm.chatRoom.id = :chatRoomId
-           AND cm.senderId != :userId
-           AND (crs.updatedAt IS NULL OR cm.createdAt > crs.updatedAt)
-           """)
-    long countUnreadMessages(@Param("chatRoomId") long chatRoomId, @Param("userId") long userId);
+    List<ChatRoom> findOneOnOneChatRoomsByUserIdWithParticipants(@Param("userId") long userId);
 
     ChatRoom findByMentoringId(long mentoringId);
 

@@ -3,11 +3,12 @@ package com.example.solidconnection.auth.controller;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_NOT_EXISTS;
 
 import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie.SameSite;
@@ -23,15 +24,17 @@ public class RefreshTokenCookieManager {
     private static final String PATH = "/";
 
     private final RefreshTokenCookieProperties properties;
+    private final TokenProperties tokenProperties;
 
     public void setCookie(HttpServletResponse response, String refreshToken) {
-        long maxAge = convertExpireTimeToCookieMaxAge(TokenType.REFRESH.getExpireTime());
-        setRefreshTokenCookie(response, refreshToken, maxAge);
+        Duration tokenExpireTime = tokenProperties.refresh().expireTime();
+        long cookieMaxAge = convertExpireTimeToCookieMaxAge(tokenExpireTime);
+        setRefreshTokenCookie(response, refreshToken, cookieMaxAge);
     }
 
-    private long convertExpireTimeToCookieMaxAge(long milliSeconds) {
+    private long convertExpireTimeToCookieMaxAge(Duration tokenExpireTime) {
         // jwt의 expireTime 단위인 millisecond를 cookie의 maxAge 단위인 second로 변환
-        return milliSeconds / 1000;
+        return tokenExpireTime.toSeconds();
     }
 
     public void deleteCookie(HttpServletResponse response) {

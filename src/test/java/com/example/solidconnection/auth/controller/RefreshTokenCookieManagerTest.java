@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 import com.example.solidconnection.auth.controller.config.RefreshTokenCookieProperties;
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -31,6 +31,9 @@ class RefreshTokenCookieManagerTest {
 
     @Autowired
     private RefreshTokenCookieManager cookieManager;
+
+    @Autowired
+    private TokenProperties tokenProperties;
 
     @MockBean
     private RefreshTokenCookieProperties refreshTokenCookieProperties;
@@ -59,7 +62,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("HttpOnly"),
                 () -> assertThat(header).contains("Secure"),
                 () -> assertThat(header).contains("Path=/"),
-                () -> assertThat(header).contains("Max-Age=" + TokenType.REFRESH.getExpireTime() / 1000),
+                () -> assertThat(header).contains("Max-Age=" + tokenProperties.refresh().expireTime().toSeconds()),
                 () -> assertThat(header).contains("Domain=" + domain),
                 () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
         );

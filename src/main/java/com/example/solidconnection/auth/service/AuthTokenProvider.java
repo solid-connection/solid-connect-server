@@ -2,7 +2,10 @@ package com.example.solidconnection.auth.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
-import com.example.solidconnection.auth.domain.TokenType;
+import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.RefreshToken;
+import com.example.solidconnection.auth.domain.Subject;
+import com.example.solidconnection.auth.token.config.TokenProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -10,7 +13,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,26 +21,30 @@ public class AuthTokenProvider {
 
     private static final String ROLE_CLAIM_KEY = "role";
 
-    private final RedisTemplate<String, String> redisTemplate;
     private final TokenProvider tokenProvider;
+    private final TokenStorage tokenStorage;
     private final SiteUserRepository siteUserRepository;
+    private final TokenProperties tokenProperties;
 
     public AccessToken generateAccessToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
         Role role = siteUser.getRole();
         String token = tokenProvider.generateToken(
-                subject.value(),
+                subject,
                 Map.of(ROLE_CLAIM_KEY, role.name()),
-                TokenType.ACCESS
+                tokenProperties.access().expireTime()
         );
-        return new AccessToken(subject, role, token);
+        return new AccessToken(token);
     }
 
     public RefreshToken generateAndSaveRefreshToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
-        String token = tokenProvider.generateToken(subject.value(), TokenType.REFRESH);
-        tokenProvider.saveToken(token, TokenType.REFRESH);
-        return new RefreshToken(subject, token);
+        String token = tokenProvider.generateToken(
+                subject,
+                tokenProperties.refresh().expireTime()
+        );
+        RefreshToken refreshToken = new RefreshToken(token);
+        return tokenStorage.saveToken(subject, refreshToken);
     }
 
     /*
@@ -47,21 +53,20 @@ public class AuthTokenProvider {
      * - 조회된 리프레시 토큰과 요청된 토큰이 같은지 비교한다.
      * */
     public boolean isValidRefreshToken(String requestedRefreshToken) {
-        String subject = tokenProvider.parseSubject(requestedRefreshToken);
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
-        String foundRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
-        return Objects.equals(requestedRefreshToken, foundRefreshToken);
+        Subject subject = tokenProvider.parseSubject(requestedRefreshToken);
+        return tokenStorage.findToken(subject, RefreshToken.class)
+                .map(foundRefreshToken -> Objects.equals(foundRefreshToken, requestedRefreshToken))
+                .orElse(false);
     }
 
-    public void deleteRefreshTokenByAccessToken(AccessToken accessToken) {
-        String subject = accessToken.subject().value();
-        String refreshTokenKey = TokenType.REFRESH.addPrefix(subject);
-        redisTemplate.delete(refreshTokenKey);
+    public void deleteRefreshTokenByAccessToken(String accessToken) {
+        Subject subject = tokenProvider.parseSubject(accessToken);
+        tokenStorage.deleteToken(subject, RefreshToken.class);
     }
 
     public SiteUser parseSiteUser(String token) {
-        String subject = tokenProvider.parseSubject(token);
-        long siteUserId = Long.parseLong(subject);
+        Subject subject = tokenProvider.parseSubject(token);
+        long siteUserId = Long.parseLong(subject.value());
         return siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }

@@ -5,6 +5,7 @@ import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.CheckMentoringRequest;
 import com.example.solidconnection.mentor.dto.CheckedMentoringsResponse;
+import com.example.solidconnection.mentor.dto.MatchedMentorResponse;
 import com.example.solidconnection.mentor.dto.MentoringApplyRequest;
 import com.example.solidconnection.mentor.dto.MentoringApplyResponse;
 import com.example.solidconnection.mentor.dto.MentoringForMenteeResponse;
@@ -37,6 +38,21 @@ public class MentoringForMenteeController {
     private final MentoringCommandService mentoringCommandService;
     private final MentoringQueryService mentoringQueryService;
     private final MentoringCheckService mentoringCheckService;
+
+    @RequireRoleAccess(roles = Role.MENTEE)
+    @GetMapping("/matched-mentors")
+    public ResponseEntity<SliceResponse<MatchedMentorResponse>> getMatchedMentors(
+            @AuthorizedUser long siteUserId,
+            @PageableDefault
+            @SortDefaults({
+                    @SortDefault(sort = "confirmedAt", direction = Sort.Direction.DESC),
+                    @SortDefault(sort = "id", direction = Sort.Direction.DESC)
+            })
+            Pageable pageable
+    ) {
+        SliceResponse<MatchedMentorResponse> response = mentoringQueryService.getMatchedMentors(siteUserId, pageable);
+        return ResponseEntity.ok(response);
+    }
 
     @RequireRoleAccess(roles = Role.MENTEE)
     @PostMapping

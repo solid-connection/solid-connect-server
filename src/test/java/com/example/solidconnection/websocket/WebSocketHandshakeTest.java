@@ -4,7 +4,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.solidconnection.auth.service.AccessToken;
+import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -30,8 +30,8 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @TestContainerSpringBootTest
-@DisplayName("WebSocket/STOMP 통합 테스트")
-class WebSocketStompIntegrationTest {
+@DisplayName("WebSocket Handshake 테스트")
+class WebSocketHandshakeTest {
 
     @LocalServerPort
     private int port;
@@ -47,7 +47,7 @@ class WebSocketStompIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        this.url = String.format("ws://localhost:%d/connect", port);
+        this.url = String.format("http://localhost:%d/connect", port);
         List<Transport> transports = List.of(new WebSocketTransport(new StandardWebSocketClient()));
         this.stompClient = new WebSocketStompClient(new SockJsClient(transports));
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());

@@ -21,7 +21,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         TokenAuthentication tokenAuth = (TokenAuthentication) auth;
         String token = tokenAuth.getToken();
 
-        String username = tokenProvider.parseSubject(token);
+        String username = tokenProvider.parseSubject(token).value();
         SiteUserDetails userDetails = (SiteUserDetails) siteUserDetailsService.loadUserByUsername(username);
         return new TokenAuthentication(token, userDetails);
     }

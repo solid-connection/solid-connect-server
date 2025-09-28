@@ -86,5 +86,16 @@ cors:
 news:
   default-thumbnail-url: "default-thumbnail-url"
 token:
+  access:
+    storage-key-prefix: "ACCESS"
+    expire-time: 10m
   refresh:
     cookie-domain: "test.domain.com"
+    storage-key-prefix: "REFRESH"
+    expire-time: 10m
+  sign-up:
+    storage-key-prefix: "SIGN_UP"
+    expire-time: 10m
+  black-list:
+    storage-key-prefix: "BLACKLIST"
+    expire-time: 10m

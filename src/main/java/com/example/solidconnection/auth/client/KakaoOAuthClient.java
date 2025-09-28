@@ -23,10 +23,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /*
- * 카카오 인증을 위한 OAuth2 클라이언트
- * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
- * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
- * https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+ * - 카카오 인증을 위한 OAuth2 클라이언트
+ *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
+ *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
+ *   - https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+ * - OAuthClient 인터페이스를 사용하는 전략 패턴으로 구현됨
  * */
 @Component
 @RequiredArgsConstructor

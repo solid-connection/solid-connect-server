@@ -47,6 +47,7 @@ public enum ErrorCode {
     REPORT_TARGET_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 신고 대상입니다."),
     CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
     CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅 참여자를 찾을 수 없습니다."),
+    BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -125,6 +126,10 @@ public enum ErrorCode {
 
     // report
     ALREADY_REPORTED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 신고한 상태입니다."),
+
+    // block
+    ALREADY_BLOCKED_BY_CURRENT_USER(HttpStatus.BAD_REQUEST.value(), "이미 차단한 상태입니다."),
+    CANNOT_BLOCK_YOURSELF(HttpStatus.BAD_REQUEST.value(), "자기 자신을 차단할 수 없습니다."),
 
     // chat
     INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
