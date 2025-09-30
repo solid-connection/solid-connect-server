@@ -93,8 +93,6 @@ class CommentServiceTest {
             // when
             List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
-            System.out.println(responses);
-
             // then
             assertAll(
                     () -> assertThat(responses).hasSize(comments.size()),
