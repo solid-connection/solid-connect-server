@@ -105,7 +105,7 @@ class PostQueryServiceTest {
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.자유.name(),
                 null
@@ -128,7 +128,7 @@ class PostQueryServiceTest {
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -200,7 +200,7 @@ class PostQueryServiceTest {
         postImageFixture.게시글_이미지(secondImageUrl, post1);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -218,7 +218,7 @@ class PostQueryServiceTest {
     @Test
     void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -244,7 +244,7 @@ class PostQueryServiceTest {
         Post notBlockedPost = postFixture.게시글(board, notBlockedUser);
 
         // when
-        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
+        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 user.getId()

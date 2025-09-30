@@ -24,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
        )
        ORDER BY p.createdAt DESC
        """)
-    List<Post> findByBoardCodeExcludingBlockedUsers(@Param("boardCode") String boardCode, @Param("siteUserId") Long siteUserId);
+    List<Post> findByBoardCodeExcludingBlockedUsersOrderByCreatedAtDesc(@Param("boardCode") String boardCode, @Param("siteUserId") Long siteUserId);
 
     @EntityGraph(attributePaths = {"postImageList"})
     Optional<Post> findPostById(Long id);

@@ -37,7 +37,7 @@ public class BoardController {
             @PathVariable(value = "code") String code,
             @RequestParam(value = "category", defaultValue = "전체") String category) {
         List<PostListResponse> postsByCodeAndPostCategory = postQueryService
-                .findPostsByCodeAndPostCategoryOrderByCreatedAt(code, category, siteUserId);
+                .findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(code, category, siteUserId);
         return ResponseEntity.ok().body(postsByCodeAndPostCategory);
     }
 }
