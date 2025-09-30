@@ -8,6 +8,8 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -32,5 +34,9 @@ public abstract class BaseEntity {
     @PreUpdate
     public void onPreUpdate() {
         this.updatedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+    }
+
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt.truncatedTo(ChronoUnit.MICROS);
     }
 }

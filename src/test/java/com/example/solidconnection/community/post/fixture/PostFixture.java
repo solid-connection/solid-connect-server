@@ -47,4 +47,25 @@ public class PostFixture {
                 .siteUser(siteUser)
                 .create();
     }
+
+    public Post 게시글_특정_시간_이후로_저장(
+            String title,
+            String content,
+            Boolean isQuestion,
+            PostCategory postCategory,
+            Board board,
+            SiteUser siteUser,
+            int time
+    ) {
+        return postFixtureBuilder
+                .title(title)
+                .content(content)
+                .isQuestion(isQuestion)
+                .likeCount(0L)
+                .viewCount(0L)
+                .postCategory(postCategory)
+                .board(board)
+                .siteUser(siteUser)
+                .createAfterCertainTime(time);
+    }
 }

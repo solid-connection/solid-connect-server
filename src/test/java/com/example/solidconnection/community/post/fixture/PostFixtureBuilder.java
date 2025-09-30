@@ -8,6 +8,9 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+
 @TestComponent
 @RequiredArgsConstructor
 public class PostFixtureBuilder {
@@ -72,6 +75,19 @@ public class PostFixtureBuilder {
                 viewCount,
                 postCategory);
         post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
+        return postRepository.save(post);
+    }
+
+    public Post createAfterCertainTime(int time) {
+        Post post = new Post(
+                title,
+                content,
+                isQuestion,
+                likeCount,
+                viewCount,
+                postCategory);
+        post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
+        post.setCreatedAt(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(time));
         return postRepository.save(post);
     }
 }

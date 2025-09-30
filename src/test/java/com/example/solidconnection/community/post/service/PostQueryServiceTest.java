@@ -76,21 +76,23 @@ class PostQueryServiceTest {
                 boardFixture.자유게시판(),
                 user
         );
-        post2 = postFixture.게시글(
+        post2 = postFixture.게시글_특정_시간_이후로_저장(
                 "제목2",
                 "내용2",
                 false,
                 PostCategory.자유,
                 boardFixture.미주권(),
-                user
+                user,
+                3
         );
-        post3 = postFixture.게시글(
+        post3 = postFixture.게시글_특정_시간_이후로_저장(
                 "제목3",
                 "내용3",
                 true,
                 PostCategory.질문,
                 boardFixture.자유게시판(),
-                user
+                user,
+                6
         );
     }
 
