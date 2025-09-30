@@ -97,7 +97,7 @@ class PostQueryServiceTest {
     @Test
     void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
         // given
-        List<Post> posts = List.of(post1, post2, post3);
+        List<Post> posts = List.of(post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getCategory().equals(PostCategory.자유)
                         && post.getBoardCode().equals(BoardCode.FREE.name()))
@@ -105,7 +105,7 @@ class PostQueryServiceTest {
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
                 BoardCode.FREE.name(),
                 PostCategory.자유.name(),
                 null
@@ -121,14 +121,14 @@ class PostQueryServiceTest {
     @Test
     void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
         // given
-        List<Post> posts = List.of(post1, post2, post3);
+        List<Post> posts = List.of(post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -200,7 +200,7 @@ class PostQueryServiceTest {
         postImageFixture.게시글_이미지(secondImageUrl, post1);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -218,7 +218,7 @@ class PostQueryServiceTest {
     @Test
     void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -244,7 +244,7 @@ class PostQueryServiceTest {
         Post notBlockedPost = postFixture.게시글(board, notBlockedUser);
 
         // when
-        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAt(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 user.getId()
