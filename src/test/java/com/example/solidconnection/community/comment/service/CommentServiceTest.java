@@ -82,14 +82,18 @@ class CommentServiceTest {
     class 댓글_조회_테스트 {
 
         @Test
-        void 게시글의_모든_댓글을_조회한다() {
+        void 게시글의_모든_댓글과_대댓글을_생성시간_기준으로_정렬해_조회한다() {
             // given
             Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
-            Comment childComment = commentFixture.자식_댓글("자식 댓글 1", post, user2, parentComment);
-            List<Comment> comments = List.of(parentComment, childComment);
+            Comment childComment1 = commentFixture.자식_댓글("자식 댓글 1", post, user2, parentComment);
+            Comment childComment2 = commentFixture.자식_댓글("자식 댓글 2", post, user1, parentComment);
+            Comment childComment3 = commentFixture.자식_댓글("자식 댓글 3", post, user2, parentComment);
+            List<Comment> comments = List.of(parentComment, childComment1, childComment2, childComment3);
 
             // when
             List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
+
+            System.out.println(responses);
 
             // then
             assertAll(
@@ -103,10 +107,26 @@ class CommentServiceTest {
                                     () -> assertThat(response.isOwner()).isTrue()
                             )),
                     () -> assertThat(responses)
-                            .filteredOn(response -> response.id().equals(childComment.getId()))
+                            .filteredOn(response -> response.id().equals(childComment1.getId()))
                             .singleElement()
                             .satisfies(response -> assertAll(
-                                    () -> assertThat(response.id()).isEqualTo(childComment.getId()),
+                                    () -> assertThat(response.id()).isEqualTo(childComment1.getId()),
+                                    () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
+                                    () -> assertThat(response.isOwner()).isFalse()
+                            )),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> response.id().equals(childComment2.getId()))
+                            .singleElement()
+                            .satisfies(response -> assertAll(
+                                    () -> assertThat(response.id()).isEqualTo(childComment2.getId()),
+                                    () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
+                                    () -> assertThat(response.isOwner()).isTrue()
+                            )),
+                    () -> assertThat(responses)
+                            .filteredOn(response -> response.id().equals(childComment3.getId()))
+                            .singleElement()
+                            .satisfies(response -> assertAll(
+                                    () -> assertThat(response.id()).isEqualTo(childComment3.getId()),
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.isOwner()).isFalse()
                             ))
