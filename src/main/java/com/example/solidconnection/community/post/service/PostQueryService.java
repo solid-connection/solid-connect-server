@@ -52,7 +52,7 @@ public class PostQueryService {
         PostCategory postCategory = validatePostCategory(category);
         boardRepository.getByCode(boardCode);
 
-        List<Post> postList; // todo : 추후 개선 필요(현재 최신순으로 응답나가지 않고 있음)
+        List<Post> postList;
         if (siteUserId != null) {
             postList = postRepository.findByBoardCodeExcludingBlockedUsersOrderByCreatedAtDesc(boardCode, siteUserId);
         } else {
