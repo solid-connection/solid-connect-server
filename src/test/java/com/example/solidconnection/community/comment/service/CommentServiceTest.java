@@ -86,8 +86,8 @@ class CommentServiceTest {
             // given
             Comment parentComment = commentFixture.부모_댓글("부모 댓글", post, user1);
             Comment childComment1 = commentFixture.자식_댓글("자식 댓글 1", post, user2, parentComment);
-            Comment childComment2 = commentFixture.자식_댓글("자식 댓글 2", post, user1, parentComment);
-            Comment childComment3 = commentFixture.자식_댓글("자식 댓글 3", post, user2, parentComment);
+            Comment childComment2 = commentFixture.자식_댓글_지연저장("자식 댓글 2", post, user1, parentComment, 3);
+            Comment childComment3 = commentFixture.자식_댓글_지연저장("자식 댓글 3", post, user2, parentComment, 5);
             List<Comment> comments = List.of(parentComment, childComment1, childComment2, childComment3);
 
             // when
@@ -129,7 +129,15 @@ class CommentServiceTest {
                                     () -> assertThat(response.id()).isEqualTo(childComment3.getId()),
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.isOwner()).isFalse()
-                            ))
+                            )),
+                    () -> assertThat(responses)
+                            .extracting("id")
+                            .containsExactly(
+                                    parentComment.getId(),
+                                    childComment1.getId(),
+                                    childComment2.getId(),
+                                    childComment3.getId()
+                            )
             );
         }
 
