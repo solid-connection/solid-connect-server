@@ -138,7 +138,7 @@ class PostQueryServiceTest {
     @Test
     void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
         // given
-        List<Post> posts = List.of(post3, post2, post1);
+        List<Post> posts = List.of(post4, post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
