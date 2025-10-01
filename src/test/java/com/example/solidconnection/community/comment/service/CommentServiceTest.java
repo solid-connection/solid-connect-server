@@ -226,10 +226,11 @@ class CommentServiceTest {
             userBlockFixture.유저_차단(user1.getId(), user2.getId());
             Comment parentComment1 = commentFixture.부모_댓글("부모 댓글1", post, user1);
             Comment childComment1 = commentFixture.자식_댓글("자식 댓글1", post, user1, parentComment1);
-            Comment childComment2 = commentFixture.자식_댓글("자식 댓글2", post, user2, parentComment1);
-            Comment parentCommen2 = commentFixture.부모_댓글("부모 댓글2", post, user2);
-            Comment childComment3 = commentFixture.자식_댓글("자식 댓글1", post, user1, parentCommen2);
-            Comment childComment4 = commentFixture.자식_댓글("자식 댓글1", post, user1, parentCommen2);
+            Comment childComment2 = commentFixture.자식_댓글_지연저장("자식 댓글2", post, user2, parentComment1, 2);
+            Comment childComment3 = commentFixture.자식_댓글_지연저장("자식 댓글3", post, user1, parentComment1, 3);
+            Comment parentComment2 = commentFixture.부모_댓글("부모 댓글2", post, user2);
+            Comment childComment4 = commentFixture.자식_댓글("자식 댓글1", post, user1, parentComment2);
+            Comment childComment5 = commentFixture.자식_댓글_지연저장("자식 댓글1", post, user1, parentComment2, 2);
 
 
             // when
@@ -237,13 +238,16 @@ class CommentServiceTest {
 
             // then
             assertAll(
-                () -> assertThat(responses).hasSize(2),
+                () -> assertThat(responses).hasSize(3),
                 () -> assertThat(responses)
                         .extracting(PostFindCommentResponse::id)
-                        .containsExactly(parentComment1.getId(), childComment1.getId()),
+                        .containsExactly(parentComment1.getId(), childComment1.getId(), childComment3.getId()),
                 () -> assertThat(responses)
                         .extracting(PostFindCommentResponse::id)
-                        .doesNotContain(childComment2.getId(), parentCommen2.getId(), childComment3.getId(), childComment4.getId())
+                        .doesNotContain(childComment2.getId(), parentComment2.getId(), childComment4.getId(), childComment5.getId()),
+                () -> assertThat(responses)
+                        .extracting(PostFindCommentResponse::id)
+                        .containsSubsequence(parentComment1.getId(), childComment1.getId(), childComment3.getId())
             );
         }
     }
