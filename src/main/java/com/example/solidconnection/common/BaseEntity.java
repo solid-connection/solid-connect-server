@@ -35,8 +35,4 @@ public abstract class BaseEntity {
     public void onPreUpdate() {
         this.updatedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt.truncatedTo(ChronoUnit.MICROS);
-    }
 }
