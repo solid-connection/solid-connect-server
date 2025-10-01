@@ -48,14 +48,14 @@ public class PostFixture {
                 .create();
     }
 
-    public Post 게시글_특정_시간_이후로_저장(
+    public Post 게시글_지연저장(
             String title,
             String content,
             Boolean isQuestion,
             PostCategory postCategory,
             Board board,
             SiteUser siteUser,
-            int time
+            long secondsDelay
     ) {
         return postFixtureBuilder
                 .title(title)
@@ -66,6 +66,6 @@ public class PostFixture {
                 .postCategory(postCategory)
                 .board(board)
                 .siteUser(siteUser)
-                .createAfterCertainTime(time);
+                .createWithDelaySeconds(secondsDelay);
     }
 }

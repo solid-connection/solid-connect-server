@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.post.fixture;
 
+import com.example.solidconnection.common.helper.TestTimeHelper;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostCategory;
@@ -7,9 +8,6 @@ import com.example.solidconnection.community.post.repository.PostRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
-
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 @TestComponent
 @RequiredArgsConstructor
@@ -78,7 +76,7 @@ public class PostFixtureBuilder {
         return postRepository.save(post);
     }
 
-    public Post createAfterCertainTime(int time) {
+    public Post createWithDelaySeconds(long seconds) {
         Post post = new Post(
                 title,
                 content,
@@ -87,7 +85,12 @@ public class PostFixtureBuilder {
                 viewCount,
                 postCategory);
         post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
-        post.setCreatedAt(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(time));
+
+        Post saved = postRepository.save(post);
+
+        System.out.println(saved);
+
+        TestTimeHelper.setCreatedAt(saved, saved.getCreatedAt().plusSeconds(seconds));
         return postRepository.save(post);
     }
 }
