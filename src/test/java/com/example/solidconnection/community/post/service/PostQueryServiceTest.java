@@ -64,6 +64,7 @@ class PostQueryServiceTest {
     private Post post1;
     private Post post2;
     private Post post3;
+    private Post post4;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +77,7 @@ class PostQueryServiceTest {
                 boardFixture.자유게시판(),
                 user
         );
-        post2 = postFixture.게시글_특정_시간_이후로_저장(
+        post2 = postFixture.게시글_지연저장(
                 "제목2",
                 "내용2",
                 false,
@@ -85,7 +86,7 @@ class PostQueryServiceTest {
                 user,
                 3
         );
-        post3 = postFixture.게시글_특정_시간_이후로_저장(
+        post3 = postFixture.게시글_지연저장(
                 "제목3",
                 "내용3",
                 true,
@@ -94,12 +95,21 @@ class PostQueryServiceTest {
                 user,
                 6
         );
+        post4 = postFixture.게시글_지연저장(
+                "제목1",
+                "내용1",
+                false,
+                PostCategory.자유,
+                boardFixture.자유게시판(),
+                user,
+                9
+        );
     }
 
     @Test
-    void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
+    void 게시판_코드와_카테고리로_게시글_목록을_최신순으로_조회한다() {
         // given
-        List<Post> posts = List.of(post3, post2, post1);
+        List<Post> posts = List.of(post4, post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getCategory().equals(PostCategory.자유)
                         && post.getBoardCode().equals(BoardCode.FREE.name()))
@@ -114,10 +124,15 @@ class PostQueryServiceTest {
         );
 
         // then
-        assertThat(actualResponses)
-                .usingRecursiveComparison()
-                .ignoringFieldsOfTypes(ZonedDateTime.class)
-                .isEqualTo(expectedResponses);
+        assertAll(
+                () -> assertThat(actualResponses)
+                        .usingRecursiveComparison()
+                        .ignoringFieldsOfTypes(ZonedDateTime.class)
+                        .isEqualTo(expectedResponses),
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .containsExactly(post4.getId(), post1.getId())
+        );
     }
 
     @Test
