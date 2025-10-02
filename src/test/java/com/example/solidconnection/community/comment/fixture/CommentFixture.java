@@ -32,4 +32,19 @@ public class CommentFixture {
                 .parentComment(parentComment)
                 .createChild();
     }
+
+    public Comment 자식_댓글_지연저장(
+            String content,
+            Post post,
+            SiteUser siteUser,
+            Comment parentComment,
+            long secondsDelay
+    ) {
+        return commentFixtureBuilder
+                .content(content)
+                .post(post)
+                .siteUser(siteUser)
+                .parentComment(parentComment)
+                .createChildWithDelaySeconds(secondsDelay);
+    }
 }

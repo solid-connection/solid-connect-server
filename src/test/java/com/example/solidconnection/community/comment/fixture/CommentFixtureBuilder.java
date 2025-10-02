@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.comment.fixture;
 
+import com.example.solidconnection.common.helper.TestTimeHelper;
 import com.example.solidconnection.community.comment.domain.Comment;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
 import com.example.solidconnection.community.post.domain.Post;
@@ -46,8 +47,18 @@ public class CommentFixtureBuilder {
 
     public Comment createChild() {
         Comment comment = new Comment(content);
-        comment.setPostAndSiteUserId(post, siteUser.getId());
         comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
         return commentRepository.save(comment);
+    }
+
+    public Comment createChildWithDelaySeconds(long seconds) {
+        Comment comment = new Comment(content);
+        comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
+
+        Comment saved = commentRepository.save(comment);
+
+        TestTimeHelper.setCreatedAt(saved, saved.getCreatedAt().plusSeconds(seconds));
+
+        return commentRepository.save(saved);
     }
 }
