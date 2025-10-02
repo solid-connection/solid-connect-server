@@ -47,14 +47,12 @@ public class CommentFixtureBuilder {
 
     public Comment createChild() {
         Comment comment = new Comment(content);
-        comment.setPostAndSiteUserId(post, siteUser.getId());
         comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
         return commentRepository.save(comment);
     }
 
     public Comment createChildWithDelaySeconds(long seconds) {
         Comment comment = new Comment(content);
-        comment.setPostAndSiteUserId(post, siteUser.getId());
         comment.setParentCommentAndPostAndSiteUserId(parentComment, post, siteUser.getId());
 
         Comment saved = commentRepository.save(comment);
