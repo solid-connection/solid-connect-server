@@ -1,5 +1,6 @@
 package com.example.solidconnection.application.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Embeddable
 @EqualsAndHashCode(of = {"languageTestType", "languageTestScore", "languageTestReportUrl"})
-public class LanguageTest {
+public class LanguageTest extends BaseEntity {
 
     @Column(nullable = false, name = "language_test_type", length = 10)
     @Enumerated(EnumType.STRING)

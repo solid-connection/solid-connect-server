@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.board.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Board {
+public class Board extends BaseEntity {
 
     @Id
     @Column(length = 20)

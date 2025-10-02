@@ -2,6 +2,7 @@ package com.example.solidconnection.application.domain;
 
 import static com.example.solidconnection.common.VerifyStatus.PENDING;
 
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
@@ -35,7 +36,7 @@ import org.hibernate.annotations.DynamicUpdate;
         @Index(name = "idx_app_third_choice_search",
                 columnList = "verify_status, term, is_delete, third_choice_university_info_for_apply_id")
 })
-public class Application {
+public class Application extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.example.solidconnection.siteuser.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +32,7 @@ import lombok.Setter;
                 columnNames = {"nickname"}
         )
 })
-public class SiteUser {
+public class SiteUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

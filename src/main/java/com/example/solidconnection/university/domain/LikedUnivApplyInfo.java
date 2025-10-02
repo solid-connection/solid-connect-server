@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
                         columnNames = {"site_user_id", "university_info_for_apply_id"}
                 )
         })
-public class LikedUnivApplyInfo {
+public class LikedUnivApplyInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
