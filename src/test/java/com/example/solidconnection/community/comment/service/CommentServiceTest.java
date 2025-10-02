@@ -1,9 +1,22 @@
 package com.example.solidconnection.community.comment.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPDATE_DEPRECATED_COMMENT;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_ID;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_COMMENT_LEVEL;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.comment.domain.Comment;
-import com.example.solidconnection.community.comment.dto.*;
+import com.example.solidconnection.community.comment.dto.CommentCreateRequest;
+import com.example.solidconnection.community.comment.dto.CommentCreateResponse;
+import com.example.solidconnection.community.comment.dto.CommentDeleteResponse;
+import com.example.solidconnection.community.comment.dto.CommentUpdateRequest;
+import com.example.solidconnection.community.comment.dto.CommentUpdateResponse;
+import com.example.solidconnection.community.comment.dto.PostFindCommentResponse;
 import com.example.solidconnection.community.comment.fixture.CommentFixture;
 import com.example.solidconnection.community.comment.repository.CommentRepository;
 import com.example.solidconnection.community.post.domain.Post;
@@ -15,18 +28,12 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.UserBlockFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
-import static com.example.solidconnection.common.exception.ErrorCode.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @TestContainerSpringBootTest
 @DisplayName("댓글 서비스 테스트")
@@ -117,7 +124,7 @@ class CommentServiceTest {
                                     () -> assertThat(response.isOwner()).isFalse()
                             )),
                     () -> assertThat(responses)
-                            .extracting("id")
+                            .extracting(PostFindCommentResponse::id)
                             .containsExactly(
                                     parentComment.getId(),
                                     childComment1.getId(),
@@ -218,22 +225,21 @@ class CommentServiceTest {
             Comment childComment4 = commentFixture.자식_댓글("자식 댓글1", post, user1, parentComment2);
             Comment childComment5 = commentFixture.자식_댓글_지연저장("자식 댓글1", post, user1, parentComment2, 2);
 
-
             // when
             List<PostFindCommentResponse> responses = commentService.findCommentsByPostId(user1.getId(), post.getId());
 
             // then
             assertAll(
-                () -> assertThat(responses).hasSize(3),
-                () -> assertThat(responses)
-                        .extracting(PostFindCommentResponse::id)
-                        .containsExactly(parentComment1.getId(), childComment1.getId(), childComment3.getId()),
-                () -> assertThat(responses)
-                        .extracting(PostFindCommentResponse::id)
-                        .doesNotContain(childComment2.getId(), parentComment2.getId(), childComment4.getId(), childComment5.getId()),
-                () -> assertThat(responses)
-                        .extracting(PostFindCommentResponse::id)
-                        .containsSubsequence(parentComment1.getId(), childComment1.getId(), childComment3.getId())
+                    () -> assertThat(responses).hasSize(3),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .containsExactly(parentComment1.getId(), childComment1.getId(), childComment3.getId()),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .doesNotContain(childComment2.getId(), parentComment2.getId(), childComment4.getId(), childComment5.getId()),
+                    () -> assertThat(responses)
+                            .extracting(PostFindCommentResponse::id)
+                            .containsSubsequence(parentComment1.getId(), childComment1.getId(), childComment3.getId())
             );
         }
     }
