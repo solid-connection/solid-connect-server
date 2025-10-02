@@ -92,7 +92,6 @@ class CommentServiceTest {
                             .filteredOn(response -> response.id().equals(parentComment.getId()))
                             .singleElement()
                             .satisfies(response -> assertAll(
-                                    () -> assertThat(response.id()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.parentId()).isNull(),
                                     () -> assertThat(response.isOwner()).isTrue()
                             )),
@@ -100,7 +99,6 @@ class CommentServiceTest {
                             .filteredOn(response -> response.id().equals(childComment1.getId()))
                             .singleElement()
                             .satisfies(response -> assertAll(
-                                    () -> assertThat(response.id()).isEqualTo(childComment1.getId()),
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.isOwner()).isFalse()
                             )),
@@ -108,7 +106,6 @@ class CommentServiceTest {
                             .filteredOn(response -> response.id().equals(childComment2.getId()))
                             .singleElement()
                             .satisfies(response -> assertAll(
-                                    () -> assertThat(response.id()).isEqualTo(childComment2.getId()),
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.isOwner()).isTrue()
                             )),
@@ -116,7 +113,6 @@ class CommentServiceTest {
                             .filteredOn(response -> response.id().equals(childComment3.getId()))
                             .singleElement()
                             .satisfies(response -> assertAll(
-                                    () -> assertThat(response.id()).isEqualTo(childComment3.getId()),
                                     () -> assertThat(response.parentId()).isEqualTo(parentComment.getId()),
                                     () -> assertThat(response.isOwner()).isFalse()
                             )),
