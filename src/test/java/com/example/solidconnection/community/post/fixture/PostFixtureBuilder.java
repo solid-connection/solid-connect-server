@@ -88,8 +88,6 @@ public class PostFixtureBuilder {
 
         Post saved = postRepository.save(post);
 
-        System.out.println(saved);
-
         TestTimeHelper.setCreatedAt(saved, saved.getCreatedAt().plusSeconds(seconds));
         return postRepository.save(post);
     }
