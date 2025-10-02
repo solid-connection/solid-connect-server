@@ -17,13 +17,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoardCodeOrderByCreatedAtDesc(String boardCode);
 
     @Query("""
-       SELECT p FROM Post p
-       WHERE p.boardCode = :boardCode
-       AND p.siteUserId NOT IN (
-           SELECT ub.blockedId FROM UserBlock ub WHERE ub.blockerId = :siteUserId
-       )
-       ORDER BY p.createdAt DESC
-       """)
+           SELECT p FROM Post p
+           WHERE p.boardCode = :boardCode
+           AND p.siteUserId NOT IN (
+               SELECT ub.blockedId FROM UserBlock ub WHERE ub.blockerId = :siteUserId
+           )
+           ORDER BY p.createdAt DESC
+           """)
     List<Post> findByBoardCodeExcludingBlockedUsersOrderByCreatedAtDesc(@Param("boardCode") String boardCode, @Param("siteUserId") Long siteUserId);
 
     @EntityGraph(attributePaths = {"postImageList"})
