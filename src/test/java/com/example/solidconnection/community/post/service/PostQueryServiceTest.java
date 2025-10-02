@@ -96,8 +96,8 @@ class PostQueryServiceTest {
                 6
         );
         post4 = postFixture.게시글_지연저장(
-                "제목1",
-                "내용1",
+                "제목4",
+                "내용4",
                 false,
                 PostCategory.자유,
                 boardFixture.자유게시판(),
@@ -272,5 +272,37 @@ class PostQueryServiceTest {
                 () -> assertThat(response).extracting(PostListResponse::id).contains(notBlockedPost.getId()),
                 () -> assertThat(response).extracting(PostListResponse::id).doesNotContain(blockedPost.getId())
         );
+    }
+
+    @Test
+    void 차단한_사용자의_게시글은_제외하고_게시글_목록을_최신순으로_조회한다() {
+        // given
+        SiteUser blockedUser = siteUserFixture.사용자(1, "blockedUser");
+        userBlockFixture.유저_차단(user.getId(), blockedUser.getId());
+        Board board = boardFixture.자유게시판();
+        Post blockedPost = postFixture.게시글(board, blockedUser);
+        List<Post> expectedResponse = List.of(post4, post3, post1);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name(),
+                user.getId()
+        );
+
+        // then
+        assertAll(
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .containsExactlyElementsOf(
+                                expectedResponse.stream()
+                                        .map(Post::getId)
+                                        .toList()
+                        ),
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .doesNotContain(blockedPost.getId())
+        );
+
     }
 }
