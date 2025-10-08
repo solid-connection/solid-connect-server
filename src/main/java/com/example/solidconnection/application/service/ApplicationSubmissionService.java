@@ -20,9 +20,10 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +37,7 @@ public class ApplicationSubmissionService {
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
-
-    @Value("${university.term}")
-    private String term;
+    private final TermRepository termRepository;
 
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
@@ -49,12 +48,14 @@ public class ApplicationSubmissionService {
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
         Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
         Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
-        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTerm(siteUser.getId(), term);
+        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTermId(siteUser.getId(), term.getId());
         int updateCount = existingApplication
                 .map(application -> {
                     validateUpdateLimitNotExceed(application);
@@ -67,7 +68,7 @@ public class ApplicationSubmissionService {
                 siteUser,
                 gpaScore.getGpa(),
                 languageTestScore.getLanguageTest(),
-                term,
+                term.getId(),
                 updateCount,
                 firstChoiceUnivApplyInfoId,
                 secondChoiceUnivApplyInfoId,
