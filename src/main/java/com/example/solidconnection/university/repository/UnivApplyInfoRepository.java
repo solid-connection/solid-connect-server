@@ -32,9 +32,9 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                          FROM InterestedRegion ir
                          WHERE ir.siteUserId = :siteUserId
                      ))
-                     AND uai.term = :term
+                     AND uai.termId = :termId
            """)
-    List<UnivApplyInfo> findAllBySiteUsersInterestedCountryOrRegionAndTerm(@Param("siteUserId") Long siteUserId, @Param("term") String term);
+    List<UnivApplyInfo> findAllBySiteUsersInterestedCountryOrRegionAndTermId(@Param("siteUserId") Long siteUserId, @Param("termId") long termId);
 
     @Query("""
                SELECT uai
@@ -43,10 +43,10 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                LEFT JOIN FETCH uai.university u
                LEFT JOIN FETCH u.country c
                LEFT JOIN FETCH u.region r
-               WHERE uai.term = :term
+               WHERE uai.termId = :termId
                ORDER BY FUNCTION('RAND')
            """)
-    List<UnivApplyInfo> findRandomByTerm(@Param("term") String term, Pageable pageable); // JPA에서 LIMIT 사용이 불가하므로 Pageable을 통해 0page에서 정해진 개수 만큼 가져오는 방식으로 구현
+    List<UnivApplyInfo> findRandomByTermId(@Param("termId") long termId, Pageable pageable); // JPA에서 LIMIT 사용이 불가하므로 Pageable을 통해 0page에서 정해진 개수 만큼 가져오는 방식으로 구현
 
     default UnivApplyInfo getUnivApplyInfoById(Long id) {
         return findById(id)
