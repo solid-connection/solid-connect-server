@@ -27,13 +27,13 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Table(indexes = {
         @Index(name = "idx_app_user_term_delete",
-                columnList = "site_user_id, term, is_delete"),
+                columnList = "site_user_id, term_id, is_delete"),
         @Index(name = "idx_app_first_choice_search",
-                columnList = "verify_status, term, is_delete, first_choice_university_info_for_apply_id"),
+                columnList = "verify_status, term_id, is_delete, first_choice_university_info_for_apply_id"),
         @Index(name = "idx_app_second_choice_search",
-                columnList = "verify_status, term, is_delete, second_choice_university_info_for_apply_id"),
+                columnList = "verify_status, term_id, is_delete, second_choice_university_info_for_apply_id"),
         @Index(name = "idx_app_third_choice_search",
-                columnList = "verify_status, term, is_delete, third_choice_university_info_for_apply_id")
+                columnList = "verify_status, term_id, is_delete, third_choice_university_info_for_apply_id")
 })
 public class Application {
 
@@ -58,8 +58,8 @@ public class Application {
     @Column(columnDefinition = "int not null default 1", name = "update_count")
     private Integer updateCount;
 
-    @Column(length = 50, nullable = false, name = "term")
-    private String term;
+    @Column(nullable = false, name = "term_id")
+    private long termId;
 
     @Column(name = "is_delete")
     private boolean isDelete = false;
@@ -80,11 +80,11 @@ public class Application {
             SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
-            String term) {
+            long termId) {
         this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.term = term;
+        this.termId = termId;
         this.updateCount = 1;
         this.verifyStatus = PENDING;
     }
@@ -93,7 +93,7 @@ public class Application {
             SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
-            String term,
+            long termId,
             Integer updateCount,
             long firstChoiceUnivApplyInfoId,
             Long secondChoiceUnivApplyInfoId,
@@ -102,7 +102,7 @@ public class Application {
         this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.term = term;
+        this.termId = termId;
         this.updateCount = updateCount;
         this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
         this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
@@ -115,7 +115,7 @@ public class Application {
             SiteUser siteUser,
             Gpa gpa,
             LanguageTest languageTest,
-            String term,
+            long termId,
             long firstChoiceUnivApplyInfoId,
             Long secondChoiceUnivApplyInfoId,
             Long thirdChoiceUnivApplyInfoId,
@@ -123,7 +123,7 @@ public class Application {
         this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
-        this.term = term;
+        this.termId = termId;
         this.updateCount = 1;
         this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
         this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
