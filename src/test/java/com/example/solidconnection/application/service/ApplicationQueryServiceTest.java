@@ -17,6 +17,8 @@ import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import java.util.List;
@@ -25,7 +27,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 @TestContainerSpringBootTest
 @DisplayName("지원서 조회 서비스 테스트")
@@ -55,8 +56,8 @@ class ApplicationQueryServiceTest {
     @Autowired
     private ApplicationFixture applicationFixture;
 
-    @Value("${university.term}")
-    private String term;
+    @Autowired
+    private TermFixture termFixture;
 
     private SiteUser user1;
     private SiteUser user2;
@@ -74,8 +75,12 @@ class ApplicationQueryServiceTest {
     private UnivApplyInfo 괌대학_B_지원_정보;
     private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
+    private Term term;
+
     @BeforeEach
     void setUp() {
+        term = termFixture.현재_학기("2025-2");
+
         user1 = siteUserFixture.사용자(1, "test1");
         gpaScore1 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user1);
         languageTestScore1 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user1);
@@ -88,9 +93,9 @@ class ApplicationQueryServiceTest {
         gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user3);
         languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
 
-        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
-        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
-        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
     }
 
     @Nested
@@ -102,7 +107,7 @@ class ApplicationQueryServiceTest {
             Application application1 = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -112,7 +117,7 @@ class ApplicationQueryServiceTest {
             Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_B_지원_정보.getId(),
@@ -122,7 +127,7 @@ class ApplicationQueryServiceTest {
             Application application3 = applicationFixture.지원서(
                     user3,
                     "nickname3",
-                    term,
+                    term.getId(),
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
                     서던덴마크대학교_지원_정보.getId(),
@@ -154,7 +159,7 @@ class ApplicationQueryServiceTest {
             Application application1 = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -164,7 +169,7 @@ class ApplicationQueryServiceTest {
             Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_B_지원_정보.getId(),
@@ -174,7 +179,7 @@ class ApplicationQueryServiceTest {
             applicationFixture.지원서(
                     user3,
                     "nickname3",
-                    term,
+                    term.getId(),
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
                     서던덴마크대학교_지원_정보.getId(),
@@ -204,7 +209,7 @@ class ApplicationQueryServiceTest {
             Application application1 = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -214,7 +219,7 @@ class ApplicationQueryServiceTest {
             Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_B_지원_정보.getId(),
@@ -224,7 +229,7 @@ class ApplicationQueryServiceTest {
             applicationFixture.지원서(
                     user3,
                     "nickname3",
-                    term,
+                    term.getId(),
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
                     서던덴마크대학교_지원_정보.getId(),
@@ -251,10 +256,11 @@ class ApplicationQueryServiceTest {
         @Test
         void 이전_학기_지원자는_조회되지_않는다() {
             // given
+            Term previousTerm = termFixture.이전_학기("2024-2");
             Application application = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    "1988-1",
+                    previousTerm.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -282,7 +288,7 @@ class ApplicationQueryServiceTest {
             Application firstApplication = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -294,7 +300,7 @@ class ApplicationQueryServiceTest {
             Application secondApplication = applicationFixture.지원서(
                     user1,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_B_지원_정보.getId(),
@@ -326,7 +332,7 @@ class ApplicationQueryServiceTest {
             Application application1 = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -336,7 +342,7 @@ class ApplicationQueryServiceTest {
             Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -346,7 +352,7 @@ class ApplicationQueryServiceTest {
             applicationFixture.지원서(
                     user3,
                     "nickname3",
-                    term,
+                    term.getId(),
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
                     서던덴마크대학교_지원_정보.getId(),
@@ -369,7 +375,7 @@ class ApplicationQueryServiceTest {
             Application application1 = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    term,
+                    term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -379,7 +385,7 @@ class ApplicationQueryServiceTest {
             Application application2 = applicationFixture.지원서(
                     user2,
                     "nickname2",
-                    term,
+                    term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -389,7 +395,7 @@ class ApplicationQueryServiceTest {
             Application application3 = applicationFixture.지원서(
                     user3,
                     "nickname3",
-                    term,
+                    term.getId(),
                     gpaScore3.getGpa(),
                     languageTestScore3.getLanguageTest(),
                     서던덴마크대학교_지원_정보.getId(),
