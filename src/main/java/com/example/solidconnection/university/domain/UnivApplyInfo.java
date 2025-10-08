@@ -32,8 +32,8 @@ public class UnivApplyInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50, nullable = false)
-    private String term;
+    @Column(nullable = false, name = "term_id")
+    private long termId;
 
     @Column(nullable = false, length = 100)
     private String koreanName;
