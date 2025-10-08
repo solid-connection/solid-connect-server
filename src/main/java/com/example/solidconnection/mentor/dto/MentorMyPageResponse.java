@@ -19,14 +19,14 @@ public record MentorMyPageResponse(
         List<ChannelResponse> channels
 ) {
 
-    public static MentorMyPageResponse of(Mentor mentor, SiteUser siteUser, University university) {
+    public static MentorMyPageResponse of(Mentor mentor, SiteUser siteUser, University university, String termName) {
         return new MentorMyPageResponse(
                 mentor.getId(),
                 siteUser.getProfileImageUrl(),
                 siteUser.getNickname(),
                 university.getCountry().getKoreanName(),
                 university.getKoreanName(),
-                mentor.getTerm(),
+                termName,
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),
