@@ -4,6 +4,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_LIK
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_UNIV_APPLY_INFO;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
@@ -11,7 +13,10 @@ import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,9 +28,7 @@ public class LikedUnivApplyInfoService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
-
-    @Value("${university.term}")
-    public String term;
+    private final TermRepository termRepository;
 
     /*
      * '좋아요'한 대학교 목록을 조회한다.
@@ -33,8 +36,18 @@ public class LikedUnivApplyInfoService {
     @Transactional(readOnly = true)
     public List<UnivApplyInfoPreviewResponse> getLikedUnivApplyInfos(long siteUserId) {
         List<UnivApplyInfo> univApplyInfos = likedUnivApplyInfoRepository.findUnivApplyInfosBySiteUserId(siteUserId);
+        Set<Long> termIds = univApplyInfos.stream()
+                .map(UnivApplyInfo::getTermId)
+                .collect(Collectors.toSet());
+
+        Map<Long, String> termMap = termRepository.findAllById(termIds).stream()
+                .collect(Collectors.toMap(Term::getId, Term::getName));
+
         return univApplyInfos.stream()
-                .map(UnivApplyInfoPreviewResponse::from)
+                .map(univApplyInfo -> {
+                    String termName = termMap.getOrDefault(univApplyInfo.getTermId(), "Unknown");
+                    return UnivApplyInfoPreviewResponse.from(univApplyInfo, termName);
+                })
                 .toList();
     }
 

@@ -48,6 +48,8 @@ public enum ErrorCode {
     CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
     CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅 참여자를 찾을 수 없습니다."),
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
+    TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
+    CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),

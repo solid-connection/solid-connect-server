@@ -1,6 +1,12 @@
 package com.example.solidconnection.university.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
+
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
@@ -18,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final TermRepository termRepository;
 
     /*
      * 대학교 상세 정보를 불러온다.
@@ -30,25 +37,39 @@ public class UnivApplyInfoQueryService {
                 = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
         University university = univApplyInfo.getUniversity();
 
-        return UnivApplyInfoDetailResponse.of(university, univApplyInfo);
+        Term term = termRepository.findById(univApplyInfo.getTermId())
+                .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
+        return UnivApplyInfoDetailResponse.of(university, univApplyInfo, term.getName());
     }
 
     @Transactional(readOnly = true)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request, String term) {
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request) {
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
         List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository
-                .findAllByFilter(request.languageTestType(), request.testScore(), term, request.countryCode())
+                .findAllByFilter(request.languageTestType(), request.testScore(), term.getId(), request.countryCode())
                 .stream()
-                .map(UnivApplyInfoPreviewResponse::from)
+                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                        univApplyInfo,
+                        term.getName()
+                ))
                 .toList();
         return new UnivApplyInfoPreviewResponses(responses);
     }
 
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}:{1}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text, String term) {
-        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository.findAllByText(text, term)
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
+        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository.findAllByText(text, term.getId())
                 .stream()
-                .map(UnivApplyInfoPreviewResponse::from)
+                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                        univApplyInfo,
+                        term.getName()
+                ))
                 .toList();
         return new UnivApplyInfoPreviewResponses(responses);
     }

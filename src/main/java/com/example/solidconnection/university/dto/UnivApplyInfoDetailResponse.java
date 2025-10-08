@@ -34,10 +34,12 @@ public record UnivApplyInfoDetailResponse(
 
     public static UnivApplyInfoDetailResponse of(
             University university,
-            UnivApplyInfo univApplyInfo) {
+            UnivApplyInfo univApplyInfo,
+            String termName
+    ) {
         return new UnivApplyInfoDetailResponse(
                 univApplyInfo.getId(),
-                univApplyInfo.getTerm(),
+                termName,
                 univApplyInfo.getKoreanName(),
                 university.getEnglishName(),
                 university.getFormatName(),
