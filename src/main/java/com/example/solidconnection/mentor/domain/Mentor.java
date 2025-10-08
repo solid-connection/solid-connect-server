@@ -44,8 +44,8 @@ public class Mentor {
     @Column
     private long universityId;
 
-    @Column(length = 50, nullable = false)
-    private String term;
+    @Column(nullable = false, name = "term_id")
+    private long termId;
 
     @BatchSize(size = 10)
     @OrderBy("sequence ASC")
