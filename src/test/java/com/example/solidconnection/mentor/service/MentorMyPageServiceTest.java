@@ -19,6 +19,7 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.List;
@@ -45,6 +46,9 @@ class MentorMyPageServiceTest {
     private ChannelFixture channelFixture;
 
     @Autowired
+    private TermFixture termFixture;
+
+    @Autowired
     private MentorRepository mentorRepository;
 
     @Autowired
@@ -59,6 +63,7 @@ class MentorMyPageServiceTest {
 
     @BeforeEach
     void setUp() {
+        termFixture.현재_학기("2025-2");
         university = universityFixture.메이지_대학();
         mentorUser = siteUserFixture.멘토(1, "멘토");
         mentor = mentorFixture.멘토(mentorUser.getId(), university.getId());
