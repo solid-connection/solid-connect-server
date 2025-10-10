@@ -1,6 +1,5 @@
 package com.example.solidconnection.application.domain;
 
-import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Embeddable
 @EqualsAndHashCode(of = {"gpa", "gpaCriteria", "gpaReportUrl"})
-public class Gpa extends BaseEntity {
+public class Gpa {
 
     @Column(nullable = false, name = "gpa")
     private Double gpa;
