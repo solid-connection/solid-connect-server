@@ -1,6 +1,5 @@
 package com.example.solidconnection.location.region.domain;
 
-import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = {"code", "koreanName"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Region extends BaseEntity {
+public class Region {
 
     @Id
     @Column(length = 10)

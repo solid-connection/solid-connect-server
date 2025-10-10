@@ -10,10 +10,6 @@ ALTER TABLE language_test
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
 
-ALTER TABLE board
-    ADD COLUMN created_at DATETIME(6),
-    ADD COLUMN updated_at DATETIME(6);
-
 ALTER TABLE post_image
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
@@ -22,15 +18,7 @@ ALTER TABLE post_like
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
 
-ALTER TABLE country
-    ADD COLUMN created_at DATETIME(6),
-    ADD COLUMN updated_at DATETIME(6);
-
 ALTER TABLE interested_country
-    ADD COLUMN created_at DATETIME(6),
-    ADD COLUMN updated_at DATETIME(6);
-
-ALTER TABLE region
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
 
