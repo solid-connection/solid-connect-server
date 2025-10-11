@@ -1,5 +1,6 @@
 package com.example.solidconnection.news.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
                 columnNames = {"site_user_id", "news_id"}
         )
 })
-public class LikedNews {
+public class LikedNews extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

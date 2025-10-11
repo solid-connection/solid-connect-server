@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "university_info_for_apply")
-public class UnivApplyInfo {
+public class UnivApplyInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
