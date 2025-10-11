@@ -119,6 +119,7 @@ public enum ErrorCode {
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
+    MENTOR_APPLICATION_ALREADY_EXISTED(HttpStatus.BAD_REQUEST.value(),"이미 멘토 승격 신청이 존재해 중복 신청 할 수 없습니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
