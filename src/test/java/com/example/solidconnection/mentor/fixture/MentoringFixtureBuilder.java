@@ -25,11 +25,6 @@ public class MentoringFixtureBuilder {
         return new MentoringFixtureBuilder(mentoringRepository);
     }
 
-    public MentoringFixtureBuilder createdAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-        return this;
-    }
-
     public MentoringFixtureBuilder confirmedAt(ZonedDateTime confirmedAt) {
         this.confirmedAt = confirmedAt;
         return this;
@@ -63,7 +58,6 @@ public class MentoringFixtureBuilder {
     public Mentoring create() {
         Mentoring mentoring = new Mentoring(
                 null,
-                createdAt,
                 confirmedAt,
                 checkedAtByMentor,
                 checkedAtByMentee,
