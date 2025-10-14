@@ -2,14 +2,6 @@ ALTER TABLE application
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
 
-ALTER TABLE gpa
-    ADD COLUMN created_at DATETIME(6),
-    ADD COLUMN updated_at DATETIME(6);
-
-ALTER TABLE language_test
-    ADD COLUMN created_at DATETIME(6),
-    ADD COLUMN updated_at DATETIME(6);
-
 ALTER TABLE post_image
     ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
@@ -35,7 +27,6 @@ ALTER TABLE mentor
     ADD COLUMN updated_at DATETIME(6);
 
 ALTER TABLE mentoring
-    ADD COLUMN created_at DATETIME(6),
     ADD COLUMN updated_at DATETIME(6);
 
 ALTER TABLE liked_news

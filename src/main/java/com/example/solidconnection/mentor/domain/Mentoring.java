@@ -13,7 +13,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,9 +32,6 @@ public class Mentoring extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private ZonedDateTime createdAt;
 
     @Column
     private ZonedDateTime confirmedAt;
@@ -60,11 +56,6 @@ public class Mentoring extends BaseEntity {
         this.mentorId = mentorId;
         this.menteeId = menteeId;
         this.verifyStatus = verifyStatus;
-    }
-
-    @PrePersist
-    public void onPrePersist() {
-        this.createdAt = ZonedDateTime.now(UTC).truncatedTo(MICROS); // 나노초 6자리 까지만 저장
     }
 
     public void confirm(VerifyStatus status) {
