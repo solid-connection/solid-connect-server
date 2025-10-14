@@ -119,7 +119,11 @@ public enum ErrorCode {
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
-    MENTOR_APPLICATION_ALREADY_EXISTED(HttpStatus.BAD_REQUEST.value(),"이미 멘토 승격 신청이 존재해 중복 신청 할 수 없습니다."),
+    MENTOR_APPLICATION_ALREADY_EXISTED(HttpStatus.CONFLICT.value(),"이미 멘토 승격 신청이 존재해 중복 신청 할 수 없습니다."),
+    INVALID_EXCHANGE_STATUS_FOR_MENTOR(HttpStatus.BAD_REQUEST.value(), "멘토 승격 지원은 STUDYING_ABROAD 또는 AFTER_EXCHANGE 상태만 가능합니다."),
+    UNIVERSITY_ID_REQUIRED_FOR_CATALOG(HttpStatus.BAD_REQUEST.value(), "UniversitySelectType이 CATALOG이면 universityId가 필요합니다."),
+    UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER(HttpStatus.BAD_REQUEST.value(), "UniversitySelectType이 OTHER이면 universityId가 null 이어야 합니다."),
+    INVALID_UNIVERSITY_SELECT_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 UniversitySelectType 입니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),

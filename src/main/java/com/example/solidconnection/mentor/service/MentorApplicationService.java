@@ -43,10 +43,10 @@ public class MentorApplicationService {
         MentorApplication mentorApplication = new MentorApplication(
                 siteUser,
                 mentorApplicationRequest.country(),
-                mentorApplicationRequest.region(),
                 mentorApplicationRequest.universityId(),
+                mentorApplicationRequest.universitySelectType(),
                 uploadedFile.fileUrl(),
-                mentorApplicationRequest.exchangePhase()
+                mentorApplicationRequest.exchangeStatus()
         );
         mentorApplicationRepository.save(mentorApplication);
     }
