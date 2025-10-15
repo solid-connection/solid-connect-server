@@ -249,12 +249,23 @@ class ApplicationQueryServiceTest {
         }
 
         @Test
-        void 이전_학기_지원자는_조회되지_않는다() {
+        void 현재_학기_지원서만_조회되고_이전_학기_지원서는_제외된다() {
             // given
-            Application application = applicationFixture.지원서(
+            applicationFixture.지원서(
+                    user1,
+                    "nickname1_past",
+                    "1988-1",
+                    gpaScore1.getGpa(),
+                    languageTestScore1.getLanguageTest(),
+                    괌대학_A_지원_정보.getId(),
+                    null,
+                    null
+            );
+
+            Application currentApplication = applicationFixture.지원서(
                     user1,
                     "nickname1",
-                    "1988-1",
+                    term,
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
@@ -270,10 +281,11 @@ class ApplicationQueryServiceTest {
             );
 
             // then
-            assertThat(response.firstChoice()).doesNotContainAnyElementsOf(List.of(
-                    ApplicantsResponse.of(괌대학_A_지원_정보,
-                                          List.of(application), user1)
-            ));
+            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(currentApplication), user1),
+                    ApplicantsResponse.of(괌대학_B_지원_정보, List.of(), user1),
+                    ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(), user1)
+            );
         }
 
         @Test
