@@ -11,6 +11,8 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql_data_local:/var/lib/mysql
+    networks:
+      - solid-connection-local
 
   redis:
     image: redis:latest
@@ -19,3 +21,37 @@ services:
       - "6379:6379"
     volumes:
       - ./redis_data_local:/data
+    networks:
+      - solid-connection-local
+
+  prometheus:
+    image: prom/prometheus
+    container_name: solid_connection_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - solid-connection-local
+
+  grafana:
+    image: grafana/grafana
+    container_name: solid_connection_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - solid-connection-local
+
+
+volumes:
+  grafana_data:
+
+networks:
+  solid-connection-local:
