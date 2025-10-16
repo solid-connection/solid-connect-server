@@ -29,7 +29,7 @@ public class UpdateViewCountScheduler {
     @Scheduled(fixedDelayString = "${view.count.scheduling.delay}")
     public void updateViewCount() {
 
-        log.info("updateViewCount thread: {}", Thread.currentThread().getName());
+        //log.info("updateViewCount thread: {}", Thread.currentThread().getName());
         List<String> itemViewCountKeys = redisUtils.getKeysOrderByExpiration(VIEW_COUNT_KEY_PATTERN.getValue());
 
         itemViewCountKeys.forEach(key -> asyncExecutor.submit(() -> {

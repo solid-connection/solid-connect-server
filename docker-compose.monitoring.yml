@@ -1,0 +1,45 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: solid_connection_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - solid-connection-local
+
+  grafana:
+    image: grafana/grafana
+    container_name: solid_connection_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - solid-connection-local
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: solid_connection_loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml:ro
+    networks:
+      - solid-connection-local
+
+networks:
+  solid-connection-local:
+
+volumes:
+  grafana_data:

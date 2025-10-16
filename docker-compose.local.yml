@@ -24,34 +24,19 @@ services:
     networks:
       - solid-connection-local
 
-  prometheus:
-    image: prom/prometheus
-    container_name: solid_connection_prometheus
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
     ports:
-      - "9090:9090"
+      - "12345:12345"   # Alloy 상태/디버그 UI
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - solid-connection-local
-
-  grafana:
-    image: grafana/grafana
-    container_name: solid_connection_grafana
-    ports:
-      - "3000:3000"
+      - ./logs:/var/log/spring                 # 스프링 로컬 로그 → Alloy가 읽을 경로
+      - ./config-local.alloy:/etc/alloy/config.alloy:ro
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana_data:/var/lib/grafana
+      - ALLOY_ENV=local                        # 라벨로 들어감
+    command: ["run", "/etc/alloy/config.alloy"]
     networks:
       - solid-connection-local
-
-
-volumes:
-  grafana_data:
 
 networks:
   solid-connection-local:
