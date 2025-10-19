@@ -1,5 +1,7 @@
 package com.example.solidconnection.common.interceptor;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
     private static final String REQUEST_URI_ATTRIBUTE = "requestUri";
     private static final int RESPONSE_TIME_THRESHOLD = 3_000;
     private static final Logger API_PERF = LoggerFactory.getLogger("API_PERF");
+
+    private final MeterRegistry meterRegistry;
 
     @Override
     public boolean preHandle(
@@ -69,6 +73,15 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
                      responseTime,
                      response.getStatus()
             );
+
+            Timer.builder("app.api.time.per_request")
+                    .description("Total Api time per request")
+                    .tag("path", logUri)
+                    .tag("http_method", request.getMethod())
+                    .publishPercentiles(0.5, 0.95)
+                    .register(meterRegistry)
+                    .record(java.time.Duration.ofMillis(responseTime));
+
             return;
         }
 
@@ -76,12 +89,21 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
                 "type=API_Performance method_type={} uri={} response_time={} status={}",
                 request.getMethod(), logUri, responseTime, response.getStatus()
         );
+
         log.info("[API Performance]: {} {} - {}ms [Status: {}]",
                  request.getMethod(),
                  originalUri,
                  responseTime,
                  response.getStatus()
         );
+
+        Timer.builder("app.api.time.per_request")
+                .description("Total Api time per request")
+                .tag("path", logUri)
+                .tag("http_method", request.getMethod())
+                .publishPercentiles(0.5, 0.95)
+                .register(meterRegistry)
+                .record(java.time.Duration.ofMillis(responseTime));
     }
 
     private String extractOriginalUri(HttpServletRequest request) {
