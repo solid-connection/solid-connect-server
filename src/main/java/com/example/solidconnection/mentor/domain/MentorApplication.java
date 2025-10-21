@@ -4,17 +4,33 @@ import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
-import com.example.solidconnection.siteuser.domain.SiteUser;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Check;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Check(
+        name = "chk_ma_university_select_rule",
+        constraints = """ 
+                      (university_select_type = 'CATALOG' AND university_id IS NOT NULL) OR
+                      (university_select_type = 'OTHER' AND university_id IS NULL)
+                      """
+)
 public class MentorApplication extends BaseEntity {
 
     @Id
@@ -51,7 +67,7 @@ public class MentorApplication extends BaseEntity {
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
 
     public MentorApplication(
-            SiteUser siteUser,
+            long siteUserId,
             String countryCode,
             Long universityId,
             UniversitySelectType universitySelectType,
@@ -61,7 +77,7 @@ public class MentorApplication extends BaseEntity {
         validateExchangeStatus(exchangeStatus);
         validateUniversitySelection(universitySelectType, universityId);
 
-        this.siteUserId = siteUser.getId();
+        this.siteUserId = siteUserId;
         this.countryCode = countryCode;
         this.universityId = universityId;
         this.universitySelectType = universitySelectType;
