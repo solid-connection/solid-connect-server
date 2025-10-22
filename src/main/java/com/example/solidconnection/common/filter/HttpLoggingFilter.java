@@ -73,7 +73,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     }
 
     private String generateTraceId() {
-        // 16자 경량 traceId (UUID에서 하이픈 제거 후 앞부분)
         return java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16);
     }
 }
