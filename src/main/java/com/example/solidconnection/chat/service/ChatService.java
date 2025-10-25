@@ -15,6 +15,7 @@ import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
+import com.example.solidconnection.chat.dto.ChatRoomData;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
@@ -23,7 +24,8 @@ import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.chat.dto.ChatRoomData;
+import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Collections;
@@ -43,6 +45,7 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
+    private final MentorRepository mentorRepository;
 
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
@@ -51,12 +54,14 @@ public class ChatService {
                        ChatParticipantRepository chatParticipantRepository,
                        ChatReadStatusRepository chatReadStatusRepository,
                        SiteUserRepository siteUserRepository,
+                       MentorRepository mentorRepository,
                        @Lazy SimpMessageSendingOperations simpMessageSendingOperations) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.chatReadStatusRepository = chatReadStatusRepository;
         this.siteUserRepository = siteUserRepository;
+        this.mentorRepository = mentorRepository;
         this.simpMessageSendingOperations = simpMessageSendingOperations;
     }
 
@@ -128,7 +133,13 @@ public class ChatService {
         ChatParticipant partnerParticipant = findPartner(chatRoom, siteUserId);
         SiteUser siteUser = siteUserRepository.findById(partnerParticipant.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return ChatParticipantResponse.of(siteUser.getId(), siteUser.getNickname(), siteUser.getProfileImageUrl());
+
+        // 멘티는 siteUserId, 멘토는 mentorId
+        Long partnerId = mentorRepository.findBySiteUserId(siteUser.getId())
+                .map(Mentor::getId)
+                .orElse(siteUser.getId());
+
+        return ChatParticipantResponse.of(partnerId, siteUser.getNickname(), siteUser.getProfileImageUrl());
     }
 
     private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
