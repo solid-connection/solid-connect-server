@@ -30,6 +30,10 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -119,8 +123,31 @@ public class ChatService {
 
         Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdWithPaging(roomId, pageable);
 
+        // senderId(participantId) 조회
+        Set<Long> participantIds = chatMessages.getContent().stream()
+                .map(ChatMessage::getSenderId)
+                .collect(Collectors.toSet());
+
+        Map<Long, ChatParticipant> participantIdToParticipant = chatParticipantRepository.findAllById(participantIds).stream()
+                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
+
+        // participants의 siteUserId의 집합
+        Set<Long> siteUserIds = participantIdToParticipant.values().stream()
+                .map(ChatParticipant::getSiteUserId)
+                .collect(Collectors.toSet());
+
+        Map<Long, Long> siteUserIdToMentorId = mentorRepository.findAllBySiteUserIdIn(siteUserIds.stream().toList()).stream()
+                .collect(Collectors.toMap(Mentor::getSiteUserId, Mentor::getId));
+
         List<ChatMessageResponse> content = chatMessages.getContent().stream()
-                .map(this::toChatMessageResponse)
+                .map(message -> {
+                    ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
+                    long externalSenderId = siteUserIdToMentorId.getOrDefault(
+                            senderParticipant.getSiteUserId(),
+                            senderParticipant.getSiteUserId()
+                    );
+                    return toChatMessageResponse(message, externalSenderId);
+                })
                 .toList();
 
         return SliceResponse.of(content, chatMessages);
@@ -159,7 +186,7 @@ public class ChatService {
         }
     }
 
-    private ChatMessageResponse toChatMessageResponse(ChatMessage message) {
+    private ChatMessageResponse toChatMessageResponse(ChatMessage message, long externalSenderId) {
         List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
                 .map(attachment -> ChatAttachmentResponse.of(
                         attachment.getId(),
@@ -173,7 +200,7 @@ public class ChatService {
         return ChatMessageResponse.of(
                 message.getId(),
                 message.getContent(),
-                message.getSenderId(),
+                externalSenderId,
                 message.getCreatedAt(),
                 attachments
         );
