@@ -1,6 +1,8 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
@@ -9,9 +11,12 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
+import com.example.solidconnection.mentor.dto.MentorProfileCreateRequest;
+import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -35,6 +40,7 @@ public class MentorMyPageService {
     private final MentorRepository mentorRepository;
     private final SiteUserRepository siteUserRepository;
     private final UniversityRepository universityRepository;
+    private final MentorApplicationRepository mentorApplicationRepository;
     private final TermRepository termRepository;
 
     @Transactional(readOnly = true)
@@ -61,12 +67,6 @@ public class MentorMyPageService {
         updateChannel(request.channels(), mentor);
     }
 
-    private void validateChannelRegistrationLimit(List<ChannelRequest> channelRequests) {
-        if (channelRequests.size() > CHANNEL_REGISTRATION_LIMIT) {
-            throw new CustomException(CHANNEL_REGISTRATION_LIMIT_EXCEEDED);
-        }
-    }
-
     private void updateChannel(List<ChannelRequest> channelRequests, Mentor mentor) {
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
@@ -74,5 +74,48 @@ public class MentorMyPageService {
             newChannels.add(new Channel(sequence++, request.type(), request.url()));
         }
         mentor.updateChannels(newChannels);
+    }
+
+    public void createMentorMyPage(long siteUserId, MentorProfileCreateRequest request) {
+        validateUserCanCreateMentor(siteUserId);
+        validateChannelRegistrationLimit(request.channels());
+        MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserId(siteUserId)
+                .orElseThrow(()->new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED));
+
+        Mentor mentor = new Mentor(
+                request.introduction(),
+                request.passTip(),
+                siteUserId,
+                request.universityId(),
+                mentorApplication.getTerm()
+        );
+
+        createChannels(request.channels(), mentor);
+        mentorRepository.save(mentor);
+    }
+
+    private void validateUserCanCreateMentor(long siteUserId){
+        if(!siteUserRepository.existsById(siteUserId)) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
+
+        if(mentorRepository.existsBySiteUserId(siteUserId)) {
+            throw new CustomException(MENTOR_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateChannelRegistrationLimit(List<ChannelRequest> channelRequests) {
+        if (channelRequests.size() > CHANNEL_REGISTRATION_LIMIT) {
+            throw new CustomException(CHANNEL_REGISTRATION_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void createChannels(List<ChannelRequest> channelRequests, Mentor mentor) {
+        int sequence = CHANNEL_SEQUENCE_START_NUMBER;
+        List<Channel> newChannels = new ArrayList<>();
+        for (ChannelRequest request : channelRequests) {
+            newChannels.add(new Channel(sequence++, request.type(), request.url()));
+        }
+        mentor.createChannels(newChannels);
     }
 }

@@ -51,6 +51,7 @@ public class MentorApplicationService {
                 mentorApplicationRequest.universityId(),
                 mentorApplicationRequest.universitySelectType(),
                 uploadedFile.fileUrl(),
+                mentorApplicationRequest.term(),
                 mentorApplicationRequest.exchangeStatus()
         );
         mentorApplicationRepository.save(mentorApplication);

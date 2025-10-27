@@ -190,7 +190,8 @@ public class MentorApplicationServiceTest {
                 ExchangeStatus.AFTER_EXCHANGE,
                 universitySelectType,
                 "US",
-                universityId
+                universityId,
+                "2025-1"
         );
     }
 }

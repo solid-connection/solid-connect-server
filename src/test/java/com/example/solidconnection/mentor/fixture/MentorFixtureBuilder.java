@@ -67,7 +67,7 @@ public class MentorFixtureBuilder {
                 passTip,
                 siteUserId,
                 universityId,
-                termId,
+                term,
                 null
         );
         return mentorRepository.save(mentor);

@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
+import com.example.solidconnection.mentor.dto.MentorProfileCreateRequest;
 import com.example.solidconnection.mentor.service.MentorMyPageService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +40,15 @@ public class MentorMyPageController {
             @Valid @RequestBody MentorMyPageUpdateRequest mentorMyPageUpdateRequest
     ) {
         mentorMyPageService.updateMentorMyPage(siteUserId, mentorMyPageUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> createMentorMyPage(
+            @AuthorizedUser long siteUserId,
+            @Valid @RequestBody MentorProfileCreateRequest request
+    ) {
+        mentorMyPageService.createMentorMyPage(siteUserId, request);
         return ResponseEntity.ok().build();
     }
 }

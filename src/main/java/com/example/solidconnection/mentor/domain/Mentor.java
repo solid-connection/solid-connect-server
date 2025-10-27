@@ -4,6 +4,8 @@ import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,7 +45,7 @@ public class Mentor extends BaseEntity {
     private long siteUserId;
 
     @Column
-    private long universityId;
+    private Long universityId; // 임시 멘토일 때, null 가능
 
     @Column(nullable = false, name = "term_id")
     private long termId;
@@ -52,6 +54,25 @@ public class Mentor extends BaseEntity {
     @OrderBy("sequence ASC")
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Channel> channels = new ArrayList<>();
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MentorStatus mentorStatus;
+
+    public Mentor(
+            String introduction,
+            String passTip,
+            long siteUserId,
+            Long universityId,
+            String term
+    ) {
+        this.introduction = introduction;
+        this.passTip = passTip;
+        this.siteUserId = siteUserId;
+        this.universityId = universityId;
+        this.term = term;
+        this.mentorStatus = MentorStatus.TEMPORARY;
+    }
 
     public void increaseMenteeCount() {
         this.menteeCount++;
@@ -80,6 +101,13 @@ public class Mentor extends BaseEntity {
             } else if (i < originalChannelSize) { // 채널 갯수 줄어듦 - 기존 채널 삭제
                 this.channels.remove(this.channels.size() - 1);
             }
+        }
+    }
+
+    public void createChannels(List<Channel> channels) {
+        for(Channel channel : channels) {
+            channel.updateMentor(this);
+            this.channels.add(channel);
         }
     }
 }

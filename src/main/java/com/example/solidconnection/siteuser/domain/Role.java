@@ -4,5 +4,7 @@ public enum Role {
 
     ADMIN,
     MENTOR,
-    MENTEE;
+    MENTEE,
+    TEMP_MENTOR
+    ;
 }
