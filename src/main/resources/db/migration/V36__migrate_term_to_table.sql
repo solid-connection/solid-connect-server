@@ -1,10 +1,10 @@
 -- 1. Term 테이블 생성
 CREATE TABLE IF NOT EXISTS term (
-                                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                    name VARCHAR(20) NOT NULL,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
     is_current BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT uk_term_name UNIQUE (name)
-    );
+);
 
 -- 2. 기존에 사용하던 term 값들을 Term 테이블에 INSERT
 INSERT IGNORE INTO term (name, is_current)
@@ -26,6 +26,8 @@ WHERE term NOT IN (SELECT name FROM term);
 INSERT INTO term (name, is_current)
 VALUES ('2026-1', TRUE)
     ON DUPLICATE KEY UPDATE is_current = TRUE;
+
+UPDATE term SET is_current = FALSE WHERE name != '2026-1';
 
 -- 4. 각 테이블에 term_id 컬럼 추가 (임시로 nullable)
 ALTER TABLE application
