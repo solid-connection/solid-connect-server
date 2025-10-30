@@ -20,7 +20,12 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +41,7 @@ public class ApplicationSubmissionService {
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
 
     @Value("${university.term}")
     private String term;
@@ -50,7 +56,7 @@ public class ApplicationSubmissionService {
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
 
-        long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
+        Long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
         Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
         Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
@@ -78,7 +84,17 @@ public class ApplicationSubmissionService {
         newApplication.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(newApplication);
 
-        return ApplicationSubmissionResponse.from(newApplication);
+        List<Long> univApplyInfoIds = Stream.of(
+                        firstChoiceUnivApplyInfoId,
+                        secondChoiceUnivApplyInfoId,
+                        thirdChoiceUnivApplyInfoId
+                )
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<UnivApplyInfo> uniApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
+
+        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, uniApplyInfos);
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
