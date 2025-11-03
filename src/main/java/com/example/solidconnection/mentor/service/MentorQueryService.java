@@ -1,6 +1,7 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 
 import com.example.solidconnection.common.dto.SliceResponse;
@@ -16,6 +17,8 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.UniversityRepository;
 import java.util.ArrayList;
@@ -37,6 +40,7 @@ public class MentorQueryService {
     private final MentorBatchQueryRepository mentorBatchQueryRepository;
     private final UniversityRepository universityRepository;
     private final RegionRepository regionRepository;
+    private final TermRepository termRepository;
 
     @Transactional(readOnly = true)
     public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
@@ -46,9 +50,11 @@ public class MentorQueryService {
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+        Term term = termRepository.findById(mentor.getTermId())
+                .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
         boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUserId);
 
-        return MentorDetailResponse.of(mentor, mentorUser, university, isApplied);
+        return MentorDetailResponse.of(mentor, mentorUser, university, isApplied, term.getName());
     }
 
     @Transactional(readOnly = true)
@@ -73,13 +79,15 @@ public class MentorQueryService {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
         Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
+        Map<Long, String> termIdToName = mentorBatchQueryRepository.getTermIdToNameMap(mentors);
 
         List<MentorPreviewResponse> mentorPreviews = new ArrayList<>();
         for (Mentor mentor : mentors) {
             SiteUser mentorUser = mentorIdToSiteUser.get(mentor.getId());
             University university = mentorIdToUniversity.get(mentor.getId());
             boolean isApplied = mentorIdToIsApplied.get(mentor.getId());
-            MentorPreviewResponse response = MentorPreviewResponse.of(mentor, mentorUser, university, isApplied);
+            String termName = termIdToName.get(mentor.getTermId());
+            MentorPreviewResponse response = MentorPreviewResponse.of(mentor, mentorUser, university, isApplied, termName);
             mentorPreviews.add(response);
         }
         return mentorPreviews;

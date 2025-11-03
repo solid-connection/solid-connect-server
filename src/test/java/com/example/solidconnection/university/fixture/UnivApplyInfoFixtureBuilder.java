@@ -16,7 +16,7 @@ public class UnivApplyInfoFixtureBuilder {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
 
-    private String term;
+    private long termId;
     private String koreanName;
     private University university;
 
@@ -24,8 +24,8 @@ public class UnivApplyInfoFixtureBuilder {
         return new UnivApplyInfoFixtureBuilder(univApplyInfoRepository);
     }
 
-    public UnivApplyInfoFixtureBuilder term(String term) {
-        this.term = term;
+    public UnivApplyInfoFixtureBuilder termId(long termId) {
+        this.termId = termId;
         return this;
     }
 
@@ -41,7 +41,7 @@ public class UnivApplyInfoFixtureBuilder {
 
     public UnivApplyInfo create() {
         UnivApplyInfo univApplyInfo = new UnivApplyInfo(
-                null, term, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, termId, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",

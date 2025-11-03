@@ -20,14 +20,16 @@ public record MentorPreviewResponse(
 ) {
 
     public static MentorPreviewResponse of(Mentor mentor, SiteUser mentorUser,
-                                           University university, boolean isApplied) {
+                                           University university, boolean isApplied,
+                                           String termName
+    ) {
         return new MentorPreviewResponse(
                 mentor.getId(),
                 mentorUser.getNickname(),
                 mentorUser.getProfileImageUrl(),
                 university.getCountry().getKoreanName(),
                 university.getKoreanName(),
-                mentor.getTerm(),
+                termName,
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),

@@ -22,22 +22,22 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                OR a.secondChoiceUnivApplyInfoId IN :univApplyInfoIds
                OR a.thirdChoiceUnivApplyInfoId IN :univApplyInfoIds)
                AND a.verifyStatus = :status
-               AND a.term = :term
+               AND a.termId = :termId
                AND a.isDelete = false
            """)
-    List<Application> findAllByUnivApplyInfoIds(@Param("univApplyInfoIds") List<Long> univApplyInfoIds, @Param("status") VerifyStatus status, @Param("term") String term);
+    List<Application> findAllByUnivApplyInfoIds(@Param("univApplyInfoIds") List<Long> univApplyInfoIds, @Param("status") VerifyStatus status, @Param("termId") long termId);
 
     @Query("""
            SELECT a
            FROM Application a
            WHERE a.siteUserId = :siteUserId
-               AND a.term = :term
+               AND a.termId = :termId
                AND a.isDelete = false
            """)
-    Optional<Application> findBySiteUserIdAndTerm(@Param("siteUserId") long siteUserId, @Param("term") String term);
+    Optional<Application> findBySiteUserIdAndTermId(@Param("siteUserId") long siteUserId, @Param("termId") long termId);
 
-    default Application getApplicationBySiteUserIdAndTerm(long siteUserId, String term) {
-        return findBySiteUserIdAndTerm(siteUserId, term)
+    default Application getApplicationBySiteUserIdAndTermId(long siteUserId, long termId) {
+        return findBySiteUserIdAndTermId(siteUserId, termId)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 }

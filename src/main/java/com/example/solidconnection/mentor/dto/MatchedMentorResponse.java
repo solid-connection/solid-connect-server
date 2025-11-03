@@ -27,7 +27,9 @@ public record MatchedMentorResponse(
 ) {
 
     public static MatchedMentorResponse of(Mentor mentor, SiteUser mentorUser,
-                                           University university, boolean isApplied, Long roomId) {
+                                           University university, boolean isApplied, Long roomId,
+                                           String termName
+    ) {
         return new MatchedMentorResponse(
                 mentor.getId(),
                 roomId,
@@ -35,7 +37,7 @@ public record MatchedMentorResponse(
                 mentorUser.getProfileImageUrl(),
                 university.getCountry().getKoreanName(),
                 university.getKoreanName(),
-                mentor.getTerm(),
+                termName,
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),
