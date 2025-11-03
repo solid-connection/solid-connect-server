@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.BatchSize;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Mentor {
+public class Mentor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
