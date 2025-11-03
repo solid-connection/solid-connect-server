@@ -22,7 +22,7 @@ public class ApplicationFixtureBuilder {
     private Long thirdChoiceUnivApplyInfoId;
     private SiteUser siteUser;
     private String nicknameForApply;
-    private String term;
+    private long termId;
 
     public ApplicationFixtureBuilder application() {
         return new ApplicationFixtureBuilder(applicationRepository);
@@ -63,8 +63,8 @@ public class ApplicationFixtureBuilder {
         return this;
     }
 
-    public ApplicationFixtureBuilder term(String term) {
-        this.term = term;
+    public ApplicationFixtureBuilder termId(long termId) {
+        this.termId = termId;
         return this;
     }
 
@@ -73,7 +73,7 @@ public class ApplicationFixtureBuilder {
                 siteUser,
                 gpa,
                 languageTest,
-                term,
+                termId,
                 firstChoiceUnivApplyInfoId,
                 secondChoiceUnivApplyInfoId,
                 thirdChoiceUnivApplyInfoId,

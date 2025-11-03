@@ -13,7 +13,6 @@ import com.example.solidconnection.university.service.UnivApplyInfoRecommendServ
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +31,6 @@ public class UnivApplyInfoController {
     private final UnivApplyInfoQueryService univApplyInfoQueryService;
     private final LikedUnivApplyInfoService likedUnivApplyInfoService;
     private final UnivApplyInfoRecommendService univApplyInfoRecommendService;
-
-    @Value("${university.term}")
-    public String term;
 
     @GetMapping("/recommend")
     public ResponseEntity<UnivApplyInfoRecommendsResponse> getUnivApplyInfoRecommends(
@@ -95,7 +91,7 @@ public class UnivApplyInfoController {
     public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByFilter(
             @Valid @ModelAttribute UnivApplyInfoFilterSearchRequest request
     ) {
-        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request, term);
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request);
         return ResponseEntity.ok(response);
     }
 
@@ -103,7 +99,7 @@ public class UnivApplyInfoController {
     public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByText(
             @RequestParam(required = false) String value
     ) {
-        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(value, term);
+        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(value);
         return ResponseEntity.ok(response);
     }
 }

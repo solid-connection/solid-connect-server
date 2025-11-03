@@ -21,14 +21,16 @@ public record MentorDetailResponse(
 ) {
 
     public static MentorDetailResponse of(Mentor mentor, SiteUser mentorUser,
-                                          University university, boolean isApplied) {
+                                          University university, boolean isApplied,
+                                          String termName
+    ) {
         return new MentorDetailResponse(
                 mentor.getId(),
                 mentorUser.getNickname(),
                 mentorUser.getProfileImageUrl(),
                 university.getCountry().getKoreanName(),
                 university.getKoreanName(),
-                mentor.getTerm(),
+                termName,
                 mentor.getMenteeCount(),
                 mentor.isHasBadge(),
                 mentor.getIntroduction(),

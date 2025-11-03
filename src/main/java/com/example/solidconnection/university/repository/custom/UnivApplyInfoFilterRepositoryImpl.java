@@ -31,7 +31,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByRegionCodeAndKeywords(String regionCode, List<String> keywords) {
+    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QCountry country = QCountry.country;
@@ -45,6 +45,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .where(
                         regionCodeEq(country, regionCode)
                                 .and(countryOrUniversityContainsKeyword(country, university, keywords))
+                                .and(univApplyInfo.termId.eq(termId))
                 )
                 .distinct()
                 .fetch();
@@ -75,7 +76,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
 
     @Override
     public List<UnivApplyInfo> findAllByFilter(
-            LanguageTestType testType, String testScore, String term, List<String> countryCodes
+            LanguageTestType testType, String testScore, Long termId, List<String> countryCodes
     ) {
         QUniversity university = QUniversity.university;
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
@@ -89,7 +90,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .fetchJoin()
                 .where(
                         languageTestTypeEq(languageRequirement, testType),
-                        termEq(univApplyInfo, term),
+                        termIdEq(univApplyInfo, termId),
                         countryCodesIn(country, countryCodes)
                 )
                 .distinct()
@@ -118,11 +119,11 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         return languageRequirement.languageTestType.eq(givenTestType);
     }
 
-    private BooleanExpression termEq(QUnivApplyInfo univApplyInfo, String givenTerm) {
-        if (givenTerm == null || givenTerm.isBlank()) {
+    private BooleanExpression termIdEq(QUnivApplyInfo univApplyInfo, Long givenTermId) {
+        if (givenTermId == null) {
             return null;
         }
-        return univApplyInfo.term.eq(givenTerm);
+        return univApplyInfo.termId.eq(givenTermId);
     }
 
     private BooleanExpression countryCodesIn(QCountry country, List<String> givenCountryCodes) {
@@ -143,7 +144,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByText(String text, String term) {
+    public List<UnivApplyInfo> findAllByText(String text, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QUniversity university = QUniversity.university;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
@@ -155,7 +156,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(university.country, country).fetchJoin()
                 .join(region).on(country.regionCode.eq(region.code))
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
-                .where(termEq(univApplyInfo, term));
+                .where(termIdEq(univApplyInfo, termId));
 
         // text 가 비어있다면 모든 대학 지원 정보를 id 오름차순으로 정렬하여 반환
         if (text == null || text.isBlank()) {

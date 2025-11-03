@@ -16,7 +16,7 @@ public class ApplicationFixture {
     public Application 지원서(
             SiteUser siteUser,
             String nicknameForApply,
-            String term,
+            long termId,
             Gpa gpa,
             LanguageTest languageTest,
             Long firstChoiceUnivApplyInfoId,
@@ -28,7 +28,7 @@ public class ApplicationFixture {
                 .gpa(gpa)
                 .languageTest(languageTest)
                 .nicknameForApply(nicknameForApply)
-                .term(term)
+                .termId(termId)
                 .firstChoiceUnivApplyInfoId(firstChoiceUnivApplyInfoId)
                 .secondChoiceUnivApplyInfoId(secondChoiceUnivApplyInfoId)
                 .thirdChoiceUnivApplyInfoId(thirdChoiceUnivApplyInfoId)

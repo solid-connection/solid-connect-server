@@ -18,6 +18,7 @@ import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.Map;
@@ -52,10 +53,14 @@ class MentorQueryServiceTest {
     @Autowired
     private UniversityFixture universityFixture;
 
+    @Autowired
+    private TermFixture termFixture;
+
     private University university;
 
     @BeforeEach
     void setUp() {
+        termFixture.현재_학기("2025-2");
         university = universityFixture.그라츠_대학();
     }
 

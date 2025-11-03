@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import java.util.List;
@@ -12,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 @TestContainerSpringBootTest
 @DisplayName("대학 지원 정보 공통 추천 서비스 테스트")
@@ -24,21 +25,25 @@ class GeneralUnivApplyInfoRecommendServiceTest {
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
 
-    @Value("${university.term}")
-    private String term;
+    @Autowired
+    private TermFixture termFixture;
+
+    private Term term;
 
     @BeforeEach
     void setUp() {
-        univApplyInfoFixture.괌대학_A_지원_정보();
-        univApplyInfoFixture.괌대학_B_지원_정보();
-        univApplyInfoFixture.네바다주립대학_라스베이거스_지원_정보();
-        univApplyInfoFixture.메모리얼대학_세인트존스_A_지원_정보();
-        univApplyInfoFixture.서던덴마크대학교_지원_정보();
-        univApplyInfoFixture.코펜하겐IT대학_지원_정보();
-        univApplyInfoFixture.그라츠대학_지원_정보();
-        univApplyInfoFixture.그라츠공과대학_지원_정보();
-        univApplyInfoFixture.린츠_카톨릭대학_지원_정보();
-        univApplyInfoFixture.메이지대학_지원_정보();
+        term = termFixture.현재_학기("2025-2");
+
+        univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+        univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        univApplyInfoFixture.네바다주립대학_라스베이거스_지원_정보(term.getId());
+        univApplyInfoFixture.메모리얼대학_세인트존스_A_지원_정보(term.getId());
+        univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
+        univApplyInfoFixture.코펜하겐IT대학_지원_정보(term.getId());
+        univApplyInfoFixture.그라츠대학_지원_정보(term.getId());
+        univApplyInfoFixture.그라츠공과대학_지원_정보(term.getId());
+        univApplyInfoFixture.린츠_카톨릭대학_지원_정보(term.getId());
+        univApplyInfoFixture.메이지대학_지원_정보(term.getId());
         generalUnivApplyInfoRecommendService.init();
     }
 
@@ -50,8 +55,8 @@ class GeneralUnivApplyInfoRecommendServiceTest {
         // when & then
         assertAll(
                 () -> assertThat(universities)
-                        .extracting("term")
-                        .allMatch(term::equals),
+                        .extracting("termId")
+                        .allMatch(term.getId()::equals),
                 () -> assertThat(universities).hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
         );
     }
