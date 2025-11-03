@@ -91,8 +91,16 @@ class ApplicationSubmissionServiceTest {
         // then
         Application savedApplication = applicationRepository.findBySiteUserIdAndTermId(user.getId(), term.getId()).orElseThrow();
         assertAll(
+                () -> assertThat(response.totalApplyCount())
+                        .isEqualTo(APPLICATION_UPDATE_COUNT_LIMIT),
                 () -> assertThat(response.applyCount())
                         .isEqualTo(savedApplication.getUpdateCount()),
+                () -> assertThat(response.appliedUniversities().firstChoiceUnivApplyInfo())
+                        .isEqualTo(괌대학_A_지원_정보.getKoreanName()),
+                () -> assertThat(response.appliedUniversities().secondChoiceUnivApplyInfo())
+                        .isEqualTo(괌대학_B_지원_정보.getKoreanName()),
+                () -> assertThat(response.appliedUniversities().thirdChoiceUnivApplyInfo())
+                        .isEqualTo(서던덴마크대학교_지원_정보.getKoreanName()),
                 () -> assertThat(savedApplication.getVerifyStatus())
                         .isEqualTo(VerifyStatus.APPROVED),
                 () -> assertThat(savedApplication.isDelete())
