@@ -47,13 +47,14 @@ public class ApplicationQueryService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         List<String> keywords = StringUtils.isNotBlank(keyword) ? List.of(keyword) : List.of();
-        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywordsAndTerm(regionCode, keywords, term);
-        if (univApplyInfos.isEmpty()) {
-            return new ApplicationsResponse(List.of(), List.of(), List.of());
-        }
 
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywordsAndTermId(regionCode, keywords, term.getId());
+        if (univApplyInfos.isEmpty()) {
+            return new ApplicationsResponse(List.of(), List.of(), List.of());
+        }
 
         // 2. 조건에 맞는 모든 Application 한 번에 조회
         List<Long> univApplyInfoIds = univApplyInfos.stream()
