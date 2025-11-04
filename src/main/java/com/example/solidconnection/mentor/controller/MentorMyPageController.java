@@ -9,6 +9,7 @@ import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/mentor/my")
 @RestController
@@ -33,7 +35,7 @@ public class MentorMyPageController {
         return ResponseEntity.ok(mentorMyPageResponse);
     }
 
-    @RequireRoleAccess(roles = Role.MENTOR)
+    @RequireRoleAccess(roles = {Role.MENTOR, Role.TEMP_MENTOR})
     @PutMapping
     public ResponseEntity<Void> updateMentorMyPage(
             @AuthorizedUser long siteUserId,
@@ -43,11 +45,13 @@ public class MentorMyPageController {
         return ResponseEntity.ok().build();
     }
 
+    @RequireRoleAccess(roles = {Role.MENTOR, Role.TEMP_MENTOR})
     @PostMapping
     public ResponseEntity<Void> createMentorMyPage(
             @AuthorizedUser long siteUserId,
             @Valid @RequestBody MentorProfileCreateRequest request
     ) {
+        log.info("Creating mentor my page");
         mentorMyPageService.createMentorMyPage(siteUserId, request);
         return ResponseEntity.ok().build();
     }

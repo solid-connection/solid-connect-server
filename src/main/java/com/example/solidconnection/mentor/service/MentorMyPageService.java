@@ -27,9 +27,11 @@ import com.example.solidconnection.university.repository.UniversityRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MentorMyPageService {
@@ -76,7 +78,9 @@ public class MentorMyPageService {
         mentor.updateChannels(newChannels);
     }
 
+    @Transactional
     public void createMentorMyPage(long siteUserId, MentorProfileCreateRequest request) {
+        log.info("Creating mentor my page for site user id {}", siteUserId);
         validateUserCanCreateMentor(siteUserId);
         validateChannelRegistrationLimit(request.channels());
         MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserId(siteUserId)
@@ -111,6 +115,7 @@ public class MentorMyPageService {
     }
 
     private void createChannels(List<ChannelRequest> channelRequests, Mentor mentor) {
+        log.info("Channels creation");
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
         for (ChannelRequest request : channelRequests) {

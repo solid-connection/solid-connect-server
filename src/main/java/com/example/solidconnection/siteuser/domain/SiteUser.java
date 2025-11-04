@@ -120,4 +120,8 @@ public class SiteUser extends BaseEntity {
     public void updatePassword(String newEncodedPassword) {
         this.password = newEncodedPassword;
     }
+
+    public void changeRole(Role role){
+        this.role = role;
+    }
 }

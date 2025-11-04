@@ -8,6 +8,7 @@ import com.example.solidconnection.mentor.repository.MentorApplicationRepository
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.List;
@@ -55,5 +56,9 @@ public class MentorApplicationService {
                 mentorApplicationRequest.exchangeStatus()
         );
         mentorApplicationRepository.save(mentorApplication);
+
+        if(siteUser.getRole() == Role.MENTEE){
+            siteUser.changeRole(Role.TEMP_MENTOR);
+        }
     }
 }
