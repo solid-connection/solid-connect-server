@@ -1,5 +1,6 @@
 package com.example.solidconnection.location.country.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
                 columnNames = {"site_user_id", "country_code"}
         )
 })
-public class InterestedCountry {
+public class InterestedCountry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,11 @@
 package com.example.solidconnection.university.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
+
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
@@ -9,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +24,8 @@ public class UnivApplyInfoRecommendService {
     public static final int RECOMMEND_UNIV_APPLY_INFO_NUM = 6;
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final TermRepository termRepository;
     private final GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
-
-    @Value("${university.term}")
-    private String term;
 
     /*
      * 사용자 맞춤 추천 대학교를 불러온다.
@@ -33,9 +35,12 @@ public class UnivApplyInfoRecommendService {
      * */
     @Transactional(readOnly = true)
     public UnivApplyInfoRecommendsResponse getPersonalRecommends(long siteUserId) {
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
         // 맞춤 추천 대학교를 불러온다.
         List<UnivApplyInfo> personalRecommends = univApplyInfoRepository
-                .findAllBySiteUsersInterestedCountryOrRegionAndTerm(siteUserId, term);
+                .findAllBySiteUsersInterestedCountryOrRegionAndTermId(siteUserId, term.getId());
         List<UnivApplyInfo> trimmedRecommends
                 = personalRecommends.subList(0, Math.min(RECOMMEND_UNIV_APPLY_INFO_NUM, personalRecommends.size()));
         Collections.shuffle(trimmedRecommends);
@@ -46,7 +51,10 @@ public class UnivApplyInfoRecommendService {
         }
 
         return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
-                                                           .map(UnivApplyInfoPreviewResponse::from)
+                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                                                                   univApplyInfo,
+                                                                   term.getName()
+                                                           ))
                                                            .toList());
     }
 
@@ -64,9 +72,15 @@ public class UnivApplyInfoRecommendService {
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoRecommendsResponse getGeneralRecommends() {
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
         List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
         return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
-                                                           .map(UnivApplyInfoPreviewResponse::from)
+                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                                                                   univApplyInfo,
+                                                                   term.getName()
+                                                           ))
                                                            .toList());
     }
 }

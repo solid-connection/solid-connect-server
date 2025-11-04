@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.BatchSize;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Mentor {
+public class Mentor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +45,8 @@ public class Mentor {
     @Column
     private long universityId;
 
-    @Column(length = 50, nullable = false)
-    private String term;
+    @Column(nullable = false, name = "term_id")
+    private long termId;
 
     @BatchSize(size = 10)
     @OrderBy("sequence ASC")

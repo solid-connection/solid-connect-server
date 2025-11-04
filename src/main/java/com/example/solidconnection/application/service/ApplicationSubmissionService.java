@@ -1,6 +1,7 @@
 package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
+import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
@@ -20,9 +21,15 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +43,8 @@ public class ApplicationSubmissionService {
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
-
-    @Value("${university.term}")
-    private String term;
+    private final TermRepository termRepository;
+    private final UnivApplyInfoRepository univApplyInfoRepository;
 
     // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
     // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
@@ -49,12 +55,14 @@ public class ApplicationSubmissionService {
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
+        Long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
         Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
         Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
-        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTerm(siteUser.getId(), term);
+        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTermId(siteUser.getId(), term.getId());
         int updateCount = existingApplication
                 .map(application -> {
                     validateUpdateLimitNotExceed(application);
@@ -67,7 +75,7 @@ public class ApplicationSubmissionService {
                 siteUser,
                 gpaScore.getGpa(),
                 languageTestScore.getLanguageTest(),
-                term,
+                term.getId(),
                 updateCount,
                 firstChoiceUnivApplyInfoId,
                 secondChoiceUnivApplyInfoId,
@@ -78,7 +86,17 @@ public class ApplicationSubmissionService {
         newApplication.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(newApplication);
 
-        return ApplicationSubmissionResponse.from(newApplication);
+        List<Long> univApplyInfoIds = Stream.of(
+                        firstChoiceUnivApplyInfoId,
+                        secondChoiceUnivApplyInfoId,
+                        thirdChoiceUnivApplyInfoId
+                )
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<UnivApplyInfo> uniApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
+
+        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, uniApplyInfos);
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {

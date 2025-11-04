@@ -10,6 +10,8 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
@@ -39,20 +41,25 @@ class LikedUnivApplyInfoServiceTest {
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
 
+    @Autowired
+    private TermFixture termFixture;
+
     private SiteUser user;
+    private Term term;
     private UnivApplyInfo 괌대학_A_지원_정보;
 
     @BeforeEach
     void setUp() {
+        term = termFixture.현재_학기("2025-2");
         user = siteUserFixture.사용자();
-        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
     }
 
     @Test
     void 관심_대학_지원_정보_목록을_조회한다() {
         // given
-        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보();
-        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보();
+        UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보(term.getId());
+        UnivApplyInfo 그라츠대학_지원_정보 = univApplyInfoFixture.그라츠대학_지원_정보(term.getId());
         saveLikedUnivApplyInfo(user, 메이지대학_지원_정보);
         saveLikedUnivApplyInfo(user, 그라츠대학_지원_정보);
 

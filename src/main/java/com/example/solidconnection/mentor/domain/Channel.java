@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
                 columnNames = {"mentor_id", "sequence"}
         )
 })
-public class Channel {
+public class Channel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

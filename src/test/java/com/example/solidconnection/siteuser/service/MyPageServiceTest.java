@@ -37,6 +37,8 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixtureBuilder;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
@@ -90,16 +92,21 @@ class MyPageServiceTest {
     private RegionFixture regionFixture;
 
     @Autowired
+    private TermFixture termFixture;
+
+    @Autowired
     private SiteUserFixtureBuilder siteUserFixtureBuilder;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private SiteUser user;
+    private Term term;
 
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
+        term = termFixture.현재_학기("2025-2");
     }
 
     @Test
@@ -131,7 +138,7 @@ class MyPageServiceTest {
     void 멘토의_마이페이지_정보를_조회한다() {
         // given
         SiteUser mentorUser = siteUserFixture.멘토(1, "mentor");
-        University university = univApplyInfoFixture.괌대학_A_지원_정보().getUniversity();
+        University university = univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getUniversity();
         mentorFixture.멘토(mentorUser.getId(), university.getId());
         int likedUnivApplyInfoCount = createLikedUnivApplyInfos(mentorUser);
 
@@ -153,9 +160,9 @@ class MyPageServiceTest {
     }
 
     private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보().getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보().getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보(term.getId()).getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(term.getId()).getId(), testUser.getId());
 
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);

@@ -7,8 +7,11 @@ import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.Mentoring;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.University;
 import com.example.solidconnection.university.repository.UniversityRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +27,7 @@ public class MentorBatchQueryRepository { // 연관관계가 설정되지 않은
     private final SiteUserRepository siteUserRepository;
     private final MentoringRepository mentoringRepository;
     private final UniversityRepository universityRepository;
+    private final TermRepository termRepository;
 
     public Map<Long, SiteUser> getMentorIdToSiteUserMap(List<Mentor> mentors) {
         List<Long> mentorUserIds = mentors.stream().map(Mentor::getSiteUserId).toList();
@@ -72,5 +76,18 @@ public class MentorBatchQueryRepository { // 연관관계가 설정되지 않은
                 Mentor::getId,
                 mentor -> appliedMentorIds.contains(mentor.getId())
         ));
+    }
+
+    public Map<Long, String> getTermIdToNameMap(List<Mentor> mentors) {
+        if (mentors.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Set<Long> termIds = mentors.stream()
+                .map(Mentor::getTermId)
+                .collect(Collectors.toSet());
+
+        return termRepository.findAllById(termIds).stream()
+                .collect(Collectors.toMap(Term::getId, Term::getName));
     }
 }

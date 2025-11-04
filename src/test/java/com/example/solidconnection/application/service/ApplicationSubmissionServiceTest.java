@@ -22,13 +22,14 @@ import com.example.solidconnection.score.fixture.LanguageTestScoreFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 @TestContainerSpringBootTest
 @DisplayName("지원서 제출 서비스 테스트")
@@ -52,20 +53,24 @@ class ApplicationSubmissionServiceTest {
     @Autowired
     private LanguageTestScoreFixture languageTestScoreFixture;
 
-    @Value("${university.term}")
-    private String term;
+    @Autowired
+    private TermFixture termFixture;
 
     private SiteUser user;
     private UnivApplyInfo 괌대학_A_지원_정보;
     private UnivApplyInfo 괌대학_B_지원_정보;
     private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
+    private Term term;
+
     @BeforeEach
     void setUp() {
+        term = termFixture.현재_학기("2025-2");
+
         user = siteUserFixture.사용자();
-        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보();
-        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보();
-        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보();
+        괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
     }
 
     @Test
@@ -84,10 +89,18 @@ class ApplicationSubmissionServiceTest {
         ApplicationSubmissionResponse response = applicationSubmissionService.apply(user.getId(), request);
 
         // then
-        Application savedApplication = applicationRepository.findBySiteUserIdAndTerm(user.getId(), term).orElseThrow();
+        Application savedApplication = applicationRepository.findBySiteUserIdAndTermId(user.getId(), term.getId()).orElseThrow();
         assertAll(
+                () -> assertThat(response.totalApplyCount())
+                        .isEqualTo(APPLICATION_UPDATE_COUNT_LIMIT),
                 () -> assertThat(response.applyCount())
                         .isEqualTo(savedApplication.getUpdateCount()),
+                () -> assertThat(response.appliedUniversities().firstChoiceUnivApplyInfo())
+                        .isEqualTo(괌대학_A_지원_정보.getKoreanName()),
+                () -> assertThat(response.appliedUniversities().secondChoiceUnivApplyInfo())
+                        .isEqualTo(괌대학_B_지원_정보.getKoreanName()),
+                () -> assertThat(response.appliedUniversities().thirdChoiceUnivApplyInfo())
+                        .isEqualTo(서던덴마크대학교_지원_정보.getKoreanName()),
                 () -> assertThat(savedApplication.getVerifyStatus())
                         .isEqualTo(VerifyStatus.APPROVED),
                 () -> assertThat(savedApplication.isDelete())
