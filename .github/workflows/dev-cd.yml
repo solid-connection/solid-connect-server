@@ -130,7 +130,7 @@ jobs:
         if: success()
         uses: snok/container-retention-policy@v2
         with:
-          token: ${{ secrets.GHCR_DELETE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           image-names: solid-connection
           delete-untagged: true
           keep-n-tags: 5
