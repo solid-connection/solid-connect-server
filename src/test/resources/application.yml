@@ -75,8 +75,6 @@ sentry:
   send-default-pii: true
   traces-sample-rate: 1.0
   exception-resolver-order: -2147483647
-university:
-  term: 2024-1
 jwt:
   secret:
     1234567-1234-1234-1234-12345678901

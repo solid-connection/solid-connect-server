@@ -1,5 +1,6 @@
 package com.example.solidconnection.university.domain;
 
+import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.region.domain.Region;
 import jakarta.persistence.Column;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class University {
+public class University extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.example.solidconnection.community.post.fixture;
 
+import com.example.solidconnection.common.helper.TestTimeHelper;
 import com.example.solidconnection.community.board.domain.Board;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostCategory;
@@ -72,6 +73,22 @@ public class PostFixtureBuilder {
                 viewCount,
                 postCategory);
         post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
+        return postRepository.save(post);
+    }
+
+    public Post createWithDelaySeconds(long seconds) {
+        Post post = new Post(
+                title,
+                content,
+                isQuestion,
+                likeCount,
+                viewCount,
+                postCategory);
+        post.setBoardAndSiteUserId(board.getCode(), siteUser.getId());
+
+        Post saved = postRepository.save(post);
+
+        TestTimeHelper.setCreatedAt(saved, saved.getCreatedAt().plusSeconds(seconds));
         return postRepository.save(post);
     }
 }

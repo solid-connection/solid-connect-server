@@ -64,6 +64,7 @@ class PostQueryServiceTest {
     private Post post1;
     private Post post2;
     private Post post3;
+    private Post post4;
 
     @BeforeEach
     void setUp() {
@@ -76,28 +77,39 @@ class PostQueryServiceTest {
                 boardFixture.자유게시판(),
                 user
         );
-        post2 = postFixture.게시글(
+        post2 = postFixture.게시글_지연저장(
                 "제목2",
                 "내용2",
                 false,
                 PostCategory.자유,
                 boardFixture.미주권(),
-                user
+                user,
+                3
         );
-        post3 = postFixture.게시글(
+        post3 = postFixture.게시글_지연저장(
                 "제목3",
                 "내용3",
                 true,
                 PostCategory.질문,
                 boardFixture.자유게시판(),
-                user
+                user,
+                6
+        );
+        post4 = postFixture.게시글_지연저장(
+                "제목4",
+                "내용4",
+                false,
+                PostCategory.자유,
+                boardFixture.자유게시판(),
+                user,
+                9
         );
     }
 
     @Test
-    void 게시판_코드와_카테고리로_게시글_목록을_조회한다() {
+    void 게시판_코드와_카테고리로_게시글_목록을_최신순으로_조회한다() {
         // given
-        List<Post> posts = List.of(post1, post2, post3);
+        List<Post> posts = List.of(post4, post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getCategory().equals(PostCategory.자유)
                         && post.getBoardCode().equals(BoardCode.FREE.name()))
@@ -105,30 +117,35 @@ class PostQueryServiceTest {
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.자유.name(),
                 null
         );
 
         // then
-        assertThat(actualResponses)
-                .usingRecursiveComparison()
-                .ignoringFieldsOfTypes(ZonedDateTime.class)
-                .isEqualTo(expectedResponses);
+        assertAll(
+                () -> assertThat(actualResponses)
+                        .usingRecursiveComparison()
+                        .ignoringFieldsOfTypes(ZonedDateTime.class)
+                        .isEqualTo(expectedResponses),
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .containsExactly(post4.getId(), post1.getId())
+        );
     }
 
     @Test
     void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
         // given
-        List<Post> posts = List.of(post1, post2, post3);
+        List<Post> posts = List.of(post4, post3, post2, post1);
         List<Post> expectedPosts = posts.stream()
                 .filter(post -> post.getBoardCode().equals(BoardCode.FREE.name()))
                 .toList();
         List<PostListResponse> expectedResponses = PostListResponse.from(expectedPosts);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -200,7 +217,7 @@ class PostQueryServiceTest {
         postImageFixture.게시글_이미지(secondImageUrl, post1);
 
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -218,7 +235,7 @@ class PostQueryServiceTest {
     @Test
     void 게시글에_이미지가_없다면_썸네일로_null을_반환한다() {
         // when
-        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 null
@@ -244,7 +261,7 @@ class PostQueryServiceTest {
         Post notBlockedPost = postFixture.게시글(board, notBlockedUser);
 
         // when
-        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategory(
+        List<PostListResponse> response = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
                 BoardCode.FREE.name(),
                 PostCategory.전체.name(),
                 user.getId()
@@ -255,5 +272,37 @@ class PostQueryServiceTest {
                 () -> assertThat(response).extracting(PostListResponse::id).contains(notBlockedPost.getId()),
                 () -> assertThat(response).extracting(PostListResponse::id).doesNotContain(blockedPost.getId())
         );
+    }
+
+    @Test
+    void 차단한_사용자의_게시글은_제외하고_게시글_목록을_최신순으로_조회한다() {
+        // given
+        SiteUser blockedUser = siteUserFixture.사용자(1, "blockedUser");
+        userBlockFixture.유저_차단(user.getId(), blockedUser.getId());
+        Board board = boardFixture.자유게시판();
+        Post blockedPost = postFixture.게시글(board, blockedUser);
+        List<Post> expectedResponse = List.of(post4, post3, post1);
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
+                BoardCode.FREE.name(),
+                PostCategory.전체.name(),
+                user.getId()
+        );
+
+        // then
+        assertAll(
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .containsExactlyElementsOf(
+                                expectedResponse.stream()
+                                        .map(Post::getId)
+                                        .toList()
+                        ),
+                () -> assertThat(actualResponses)
+                        .extracting(PostListResponse::id)
+                        .doesNotContain(blockedPost.getId())
+        );
+
     }
 }

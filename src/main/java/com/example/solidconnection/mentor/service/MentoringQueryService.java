@@ -60,6 +60,7 @@ public class MentoringQueryService {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
         Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
+        Map<Long, String> termIdToName = mentorBatchQueryRepository.getTermIdToNameMap(mentors);
 
         Map<Long, Long> mentorIdToRoomId = getMentorIdToRoomIdMap(mentors, currentUserId);
 
@@ -69,7 +70,9 @@ public class MentoringQueryService {
             University university = mentorIdToUniversity.get(mentor.getId());
             boolean isApplied = mentorIdToIsApplied.get(mentor.getId());
             Long roomId = mentorIdToRoomId.get(mentor.getId());
-            MatchedMentorResponse response = MatchedMentorResponse.of(mentor, mentorUser, university, isApplied, roomId);
+            String termName = termIdToName.get(mentor.getTermId());
+
+            MatchedMentorResponse response = MatchedMentorResponse.of(mentor, mentorUser, university, isApplied, roomId, termName);
             matchedMentors.add(response);
         }
         return matchedMentors;

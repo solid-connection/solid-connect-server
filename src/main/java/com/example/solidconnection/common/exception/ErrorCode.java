@@ -48,6 +48,8 @@ public enum ErrorCode {
     CHAT_PARTNER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "채팅 상대를 찾을 수 없습니다."),
     CHAT_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "채팅 참여자를 찾을 수 없습니다."),
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
+    TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
+    CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -119,6 +121,11 @@ public enum ErrorCode {
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
+    MENTOR_APPLICATION_ALREADY_EXISTED(HttpStatus.CONFLICT.value(),"멘토 승격 요청이 이미 존재합니다."),
+    INVALID_EXCHANGE_STATUS_FOR_MENTOR(HttpStatus.BAD_REQUEST.value(), "멘토 승격 지원 가능한 교환학생 상태가 아닙니다."),
+    UNIVERSITY_ID_REQUIRED_FOR_CATALOG(HttpStatus.BAD_REQUEST.value(), "목록에서 학교를 선택한 경우 학교 정보가 필요합니다."),
+    UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER(HttpStatus.BAD_REQUEST.value(), "기타 학교를 선택한 경우 학교 정보를 입력할 수 없습니다."),
+    INVALID_UNIVERSITY_SELECT_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 선택 방식입니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),

@@ -23,10 +23,8 @@ public class UpdateViewCountService {
     @Transactional
     @Async
     public void updateViewCount(String key) {
-        log.info("updateViewCount Processing key: {} in thread: {}", key, Thread.currentThread().getName());
         Long postId = redisUtils.getPostIdFromPostViewCountRedisKey(key);
         Post post = postRepository.getById(postId);
         postRepository.increaseViewCount(postId, redisService.getAndDelete(key));
-        log.info("updateViewCount Updated post id: {} with view count from key: {}", postId, key);
     }
 }
