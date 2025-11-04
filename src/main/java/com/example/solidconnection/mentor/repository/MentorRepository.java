@@ -2,6 +2,8 @@ package com.example.solidconnection.mentor.repository;
 
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.domain.MentorStatus;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,12 +17,13 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     Optional<Mentor> findBySiteUserId(long siteUserId);
 
-    Slice<Mentor> findAllBy(Pageable pageable);
+    Slice<Mentor> findAllByMentorStatus(MentorStatus mentorStatus, Pageable pageable);
 
     @Query("""
            SELECT m FROM Mentor m
            JOIN University u ON m.universityId = u.id
            WHERE u.region = :region
+             AND m.mentorStatus = :mentorStatus
            """)
-    Slice<Mentor> findAllByRegion(@Param("region") Region region, Pageable pageable);
+    Slice<Mentor> findAllByRegionAndMentorStatus(@Param("region") Region region, @Param("mentorStatus") MentorStatus mentorStatus, Pageable pageable);
 }

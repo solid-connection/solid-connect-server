@@ -5,6 +5,7 @@ import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
+import com.example.solidconnection.term.domain.Term;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -20,7 +21,7 @@ public class MentorApplicationFixtureBuilder {
     private Long universityId = null;
     private UniversitySelectType universitySelectType = UniversitySelectType.OTHER;
     private String mentorProofUrl = "/mentor-proof.pdf";
-    private String term = "2025-1";
+    private long termId;
     private ExchangeStatus exchangeStatus = ExchangeStatus.AFTER_EXCHANGE;
     private MentorApplicationStatus mentorApplicationStatus = MentorApplicationStatus.PENDING;
 
@@ -53,8 +54,8 @@ public class MentorApplicationFixtureBuilder {
         return this;
     }
 
-    public MentorApplicationFixtureBuilder term(String term) {
-        this.term = term;
+    public MentorApplicationFixtureBuilder termId(long termId) {
+        this.termId = termId;
         return this;
     }
 
@@ -75,7 +76,7 @@ public class MentorApplicationFixtureBuilder {
                 universityId,
                 universitySelectType,
                 mentorProofUrl,
-                term,
+                termId,
                 exchangeStatus
         );
         ReflectionTestUtils.setField(mentorApplication, "mentorApplicationStatus", mentorApplicationStatus);

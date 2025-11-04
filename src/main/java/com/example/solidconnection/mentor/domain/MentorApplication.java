@@ -54,7 +54,7 @@ public class MentorApplication extends BaseEntity {
     private String mentorProofUrl;
 
     @Column(length = 50, nullable = false)
-    private String term;
+    private long termId;
 
     private String rejectedReason;
 
@@ -75,7 +75,7 @@ public class MentorApplication extends BaseEntity {
             Long universityId,
             UniversitySelectType universitySelectType,
             String mentorProofUrl,
-            String term,
+            long termId,
             ExchangeStatus exchangeStatus
     ) {
         validateExchangeStatus(exchangeStatus);
@@ -86,7 +86,7 @@ public class MentorApplication extends BaseEntity {
         this.universityId = universityId;
         this.universitySelectType = universitySelectType;
         this.mentorProofUrl = mentorProofUrl;
-        this.term = term;
+        this.termId = termId;
         this.exchangeStatus = exchangeStatus;
     }
 

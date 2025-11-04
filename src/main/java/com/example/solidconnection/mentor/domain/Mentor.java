@@ -64,13 +64,13 @@ public class Mentor extends BaseEntity {
             String passTip,
             long siteUserId,
             Long universityId,
-            String term
+            long termId
     ) {
         this.introduction = introduction;
         this.passTip = passTip;
         this.siteUserId = siteUserId;
         this.universityId = universityId;
-        this.term = term;
+        this.termId = termId;
         this.mentorStatus = MentorStatus.TEMPORARY;
     }
 

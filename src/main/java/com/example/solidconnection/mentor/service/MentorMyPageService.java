@@ -80,7 +80,6 @@ public class MentorMyPageService {
 
     @Transactional
     public void createMentorMyPage(long siteUserId, MentorProfileCreateRequest request) {
-        log.info("Creating mentor my page for site user id {}", siteUserId);
         validateUserCanCreateMentor(siteUserId);
         validateChannelRegistrationLimit(request.channels());
         MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserId(siteUserId)
@@ -91,7 +90,7 @@ public class MentorMyPageService {
                 request.passTip(),
                 siteUserId,
                 request.universityId(),
-                mentorApplication.getTerm()
+                mentorApplication.getTermId()
         );
 
         createChannels(request.channels(), mentor);
@@ -115,7 +114,6 @@ public class MentorMyPageService {
     }
 
     private void createChannels(List<ChannelRequest> channelRequests, Mentor mentor) {
-        log.info("Channels creation");
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
         for (ChannelRequest request : channelRequests) {

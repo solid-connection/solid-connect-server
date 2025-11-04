@@ -10,6 +10,7 @@ import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.domain.MentorStatus;
 import com.example.solidconnection.mentor.dto.MentorDetailResponse;
 import com.example.solidconnection.mentor.dto.MentorPreviewResponse;
 import com.example.solidconnection.mentor.repository.MentorBatchQueryRepository;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MentorQueryService {
 
     private final MentorRepository mentorRepository;
@@ -46,6 +49,9 @@ public class MentorQueryService {
     public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+        if(mentor.getMentorStatus() == MentorStatus.TEMPORARY){
+            throw new CustomException(MENTOR_NOT_FOUND);
+        }
         University university = universityRepository.findById(mentor.getUniversityId())
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
@@ -68,11 +74,11 @@ public class MentorQueryService {
 
     private Slice<Mentor> filterMentorsByRegion(String regionKoreanName, Pageable pageable) {
         if (regionKoreanName == null || regionKoreanName.isEmpty()) {
-            return mentorRepository.findAll(pageable);
+            return mentorRepository.findAllByMentorStatus(MentorStatus.APPROVED, pageable);
         }
         Region region = regionRepository.findByKoreanName(regionKoreanName)
                 .orElseThrow(() -> new CustomException(ErrorCode.REGION_NOT_FOUND_BY_KOREAN_NAME));
-        return mentorRepository.findAllByRegion(region, pageable);
+        return mentorRepository.findAllByRegionAndMentorStatus(region, MentorStatus.APPROVED, pageable);
     }
 
     private List<MentorPreviewResponse> buildMentorPreviewsWithBatchQuery(List<Mentor> mentors, long currentUserId) {

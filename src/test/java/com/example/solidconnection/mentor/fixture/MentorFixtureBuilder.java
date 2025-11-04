@@ -60,15 +60,11 @@ public class MentorFixtureBuilder {
 
     public Mentor create() {
         Mentor mentor = new Mentor(
-                null,
-                menteeCount,
-                hasBadge,
                 introduction,
                 passTip,
                 siteUserId,
                 universityId,
-                term,
-                null
+                termId
         );
         return mentorRepository.save(mentor);
     }
