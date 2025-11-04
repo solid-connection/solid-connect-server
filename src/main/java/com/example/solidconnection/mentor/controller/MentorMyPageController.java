@@ -3,7 +3,7 @@ package com.example.solidconnection.mentor.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
-import com.example.solidconnection.mentor.dto.MentorProfileCreateRequest;
+import com.example.solidconnection.mentor.dto.MentorMyPageCreateRequest;
 import com.example.solidconnection.mentor.service.MentorMyPageService;
 import com.example.solidconnection.security.annotation.RequireRoleAccess;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -49,9 +49,8 @@ public class MentorMyPageController {
     @PostMapping
     public ResponseEntity<Void> createMentorMyPage(
             @AuthorizedUser long siteUserId,
-            @Valid @RequestBody MentorProfileCreateRequest request
+            @Valid @RequestBody MentorMyPageCreateRequest request
     ) {
-        log.info("Creating mentor my page");
         mentorMyPageService.createMentorMyPage(siteUserId, request);
         return ResponseEntity.ok().build();
     }

@@ -40,18 +40,14 @@ public class MentorApplicationService {
             MentorApplicationRequest mentorApplicationRequest,
             MultipartFile file
     ) {
-        if (mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(
-                siteUserId,
-                List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))
-        ) {
-            throw new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED);
-        }
+        ensureNoPendingOrApprovedMentorApplication(siteUserId);
 
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Term term = termRepository.findByName(mentorApplicationRequest.term())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
         UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, ImgType.MENTOR_PROOF);
+
         MentorApplication mentorApplication = new MentorApplication(
                 siteUser.getId(),
                 mentorApplicationRequest.country(),
@@ -63,6 +59,19 @@ public class MentorApplicationService {
         );
         mentorApplicationRepository.save(mentorApplication);
 
+        promoteRoleMenteeToTempMentor(siteUser);
+    }
+
+    private void ensureNoPendingOrApprovedMentorApplication(long siteUserId) {
+        if (mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(
+                siteUserId,
+                List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))
+        ) {
+            throw new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED);
+        }
+    }
+
+    private void promoteRoleMenteeToTempMentor(SiteUser siteUser) {
         if(siteUser.getRole() == Role.MENTEE){
             siteUser.changeRole(Role.TEMP_MENTOR);
         }

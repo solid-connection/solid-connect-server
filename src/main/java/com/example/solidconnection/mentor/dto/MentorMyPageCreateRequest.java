@@ -4,8 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
-public record MentorProfileCreateRequest(
-        Long universityId,
+public record MentorMyPageCreateRequest(
 
         @NotBlank(message = "자기소개를 입력해주세요.")
         String introduction,

@@ -15,7 +15,7 @@ import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
-import com.example.solidconnection.mentor.dto.MentorProfileCreateRequest;
+import com.example.solidconnection.mentor.dto.MentorMyPageCreateRequest;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -79,17 +79,17 @@ public class MentorMyPageService {
     }
 
     @Transactional
-    public void createMentorMyPage(long siteUserId, MentorProfileCreateRequest request) {
+    public void createMentorMyPage(long siteUserId, MentorMyPageCreateRequest request) {
         validateUserCanCreateMentor(siteUserId);
         validateChannelRegistrationLimit(request.channels());
         MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserId(siteUserId)
-                .orElseThrow(()->new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED));
+                .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED));
 
         Mentor mentor = new Mentor(
                 request.introduction(),
                 request.passTip(),
                 siteUserId,
-                request.universityId(),
+                mentorApplication.getUniversityId(),
                 mentorApplication.getTermId()
         );
 
@@ -97,12 +97,12 @@ public class MentorMyPageService {
         mentorRepository.save(mentor);
     }
 
-    private void validateUserCanCreateMentor(long siteUserId){
-        if(!siteUserRepository.existsById(siteUserId)) {
+    private void validateUserCanCreateMentor(long siteUserId) {
+        if (!siteUserRepository.existsById(siteUserId)) {
             throw new CustomException(USER_NOT_FOUND);
         }
 
-        if(mentorRepository.existsBySiteUserId(siteUserId)) {
+        if (mentorRepository.existsBySiteUserId(siteUserId)) {
             throw new CustomException(MENTOR_ALREADY_EXISTS);
         }
     }
