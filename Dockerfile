@@ -1,5 +1,5 @@
 # JDK 버전 설정
-FROM openjdk:17-jdk
+FROM eclipse-temurin:17-jdk
 
 # JAR_FILE 변수 정의
 ARG JAR_FILE=./build/libs/solid-connection-0.0.1-SNAPSHOT.jar
