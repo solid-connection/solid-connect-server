@@ -110,4 +110,8 @@ public class Mentor extends BaseEntity {
             this.channels.add(channel);
         }
     }
+
+    public void approve(){
+        this.mentorStatus = MentorStatus.APPROVED;
+    }
 }

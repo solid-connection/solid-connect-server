@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.service;
 import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
@@ -83,7 +84,7 @@ public class MentorMyPageService {
         validateUserCanCreateMentor(siteUserId);
         validateChannelRegistrationLimit(request.channels());
         MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserId(siteUserId)
-                .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED));
+                .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
         Mentor mentor = new Mentor(
                 request.introduction(),

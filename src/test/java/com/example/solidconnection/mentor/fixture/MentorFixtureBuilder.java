@@ -66,6 +66,18 @@ public class MentorFixtureBuilder {
                 universityId,
                 termId
         );
+        mentor.approve();
         return mentorRepository.save(mentor);
+    }
+
+    public Mentor createTempMentor(){
+        Mentor tempMentor = new Mentor(
+                introduction,
+                passTip,
+                siteUserId,
+                universityId,
+                termId
+        );
+        return mentorRepository.save(tempMentor);
     }
 }

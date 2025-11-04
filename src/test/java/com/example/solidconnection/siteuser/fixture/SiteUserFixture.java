@@ -77,4 +77,15 @@ public class SiteUserFixture {
                 .password("admin123")
                 .create();
     }
+
+    public SiteUser 임시멘토(){
+        return siteUserFixtureBuilder.siteUser()
+                .email("temp-mentor@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname("임시멘토")
+                .profileImageUrl("profileImageUrl")
+                .role(Role.TEMP_MENTOR)
+                .password("temp-mentor123")
+                .create();
+    }
 }

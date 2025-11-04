@@ -60,12 +60,10 @@ public class MentorApplicationServiceTest {
 
     private SiteUser user;
 
-    private Term term;
-
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
-        term = termFixture.현재_학기("2025-1");
+        termFixture.현재_학기("2025-1");
     }
 
     @Test

@@ -1,18 +1,29 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
+import static com.example.solidconnection.mentor.domain.ChannelType.BRUNCH;
 import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
+import static com.example.solidconnection.mentor.domain.ChannelType.YOUTUBE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
+import com.example.solidconnection.mentor.domain.MentorStatus;
+import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
 import com.example.solidconnection.mentor.dto.ChannelResponse;
+import com.example.solidconnection.mentor.dto.MentorMyPageCreateRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.fixture.ChannelFixture;
+import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.repository.ChannelRepositoryForTest;
 import com.example.solidconnection.mentor.repository.MentorRepository;
@@ -57,9 +68,13 @@ class MentorMyPageServiceTest {
     @Autowired
     private ChannelRepositoryForTest channelRepositoryForTest;
 
+    @Autowired
+    private MentorApplicationFixture mentorApplicationFixture;
+
     private SiteUser mentorUser;
     private Mentor mentor;
     private University university;
+    private SiteUser tempMentorUser;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +82,7 @@ class MentorMyPageServiceTest {
         university = universityFixture.메이지_대학();
         mentorUser = siteUserFixture.멘토(1, "멘토");
         mentor = mentorFixture.멘토(mentorUser.getId(), university.getId());
+        tempMentorUser = siteUserFixture.임시멘토();
     }
 
     @Nested
@@ -153,6 +169,77 @@ class MentorMyPageServiceTest {
                             tuple(1, BLOG, "https://blog.com"),
                             tuple(2, INSTAGRAM, "https://instagram.com")
                     );
+        }
+    }
+
+    @Nested
+    class 멘토의_마이페이지를_생성한다 {
+
+        @Test
+        void 멘토_정보를_생성한다() {
+            // given
+            String introduction = "멘토 자기소개";
+            String passTip = "멘토의 합격 팁";
+            List<ChannelRequest> channels = List.of(
+                    new ChannelRequest(BLOG, "https://blog.com"),
+                    new ChannelRequest(INSTAGRAM, "https://instagram.com"),
+                    new ChannelRequest(YOUTUBE, "https://youtubr.com"),
+                    new ChannelRequest(BRUNCH, "https://brunch.com")
+            );
+            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest(introduction, passTip, channels);
+            mentorApplicationFixture.대기중_멘토신청(tempMentorUser.getId(), UniversitySelectType.CATALOG, university.getId());
+
+            // when
+            mentorMyPageService.createMentorMyPage(tempMentorUser.getId(), request);
+
+            // then
+            Mentor createTempMentor = mentorRepository.findById(tempMentorUser.getId()).get();
+            assertAll(
+                    () -> assertThat(createTempMentor.getIntroduction()).isEqualTo(introduction),
+                    () -> assertThat(createTempMentor.getPassTip()).isEqualTo(passTip),
+                    () -> assertThat(createTempMentor.getMentorStatus()).isEqualTo(MentorStatus.TEMPORARY)
+            );
+        }
+
+        @Test
+        void 이미_멘토_정보가_존재하는데_생성_요청_시_예외가_발생한다() {
+            // given
+            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
+            mentorFixture.멘토(tempMentorUser.getId(), university.getId());
+
+            // when & then
+            assertThatCode(() -> mentorMyPageService.createMentorMyPage(tempMentorUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_ALREADY_EXISTS.getMessage());
+        }
+
+        @Test
+        void 채널을_제한_이상_생성하면_예외가_발생한다() {
+            // given
+            List<ChannelRequest> newChannels = List.of(
+                    new ChannelRequest(BLOG, "https://blog.com"),
+                    new ChannelRequest(INSTAGRAM, "https://instagram.com"),
+                    new ChannelRequest(YOUTUBE, "https://youtubr.com"),
+                    new ChannelRequest(BRUNCH, "https://brunch.com"),
+                    new ChannelRequest(BLOG, "https://blog.com")
+            );
+            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", newChannels);
+
+            // when & then
+            assertThatCode(() -> mentorMyPageService.createMentorMyPage(tempMentorUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(CHANNEL_REGISTRATION_LIMIT_EXCEEDED.getMessage());
+        }
+
+        @Test
+        void 멘토_승격_요청_없이_멘토_정보_생성_시_예외가_발생한다() {
+            // given
+            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
+
+            // when & then
+            assertThatCode(() -> mentorMyPageService.createMentorMyPage(tempMentorUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
         }
     }
 }

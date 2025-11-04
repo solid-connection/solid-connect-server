@@ -21,4 +21,14 @@ public class MentorFixture {
                 .termId(termFixture.현재_학기("2025-1").getId())
                 .create();
     }
+
+    public Mentor 임시멘토(long siteUserId, long universityId) {
+        return mentorFixtureBuilder.mentor()
+                .siteUserId(siteUserId)
+                .universityId(universityId)
+                .introduction("멘토 소개")
+                .passTip("합격 팁")
+                .termId(termFixture.현재_학기("2025-1").getId())
+                .createTempMentor();
+    }
 }

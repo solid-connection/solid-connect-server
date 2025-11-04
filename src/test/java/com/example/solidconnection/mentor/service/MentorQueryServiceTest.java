@@ -125,6 +125,18 @@ class MentorQueryServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(ErrorCode.MENTOR_NOT_FOUND.getMessage());
         }
+
+        @Test
+        void 임시멘토를_조회하면_예외가_발생한다() {
+            // given
+            SiteUser tempMentorUser = siteUserFixture.임시멘토();
+            Mentor tempMentor = mentorFixture.임시멘토(tempMentorUser.getId(), university.getId());
+
+            // when & then
+            assertThatCode(() -> mentorQueryService.getMentorDetails(tempMentor.getId(), siteUserFixture.사용자().getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(ErrorCode.MENTOR_NOT_FOUND.getMessage());
+        }
     }
 
     @Nested
@@ -161,6 +173,38 @@ class MentorQueryServiceTest {
                     .collect(Collectors.toMap(MentorPreviewResponse::id, Function.identity()));
             MentorPreviewResponse mentor1Response = mentorPreviewMap.get(mentor1.getId());
             MentorPreviewResponse mentor2Response = mentorPreviewMap.get(mentor2.getId());
+            assertAll(
+                    () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
+                    () -> assertThat(mentor1Response.universityName()).isEqualTo(university1.getKoreanName()),
+                    () -> assertThat(mentor1Response.country()).isEqualTo(university1.getCountry().getKoreanName()),
+                    () -> assertThat(mentor1Response.channels()).extracting(ChannelResponse::url)
+                            .containsOnly(channel1.getUrl()),
+
+                    () -> assertThat(mentor2Response.nickname()).isEqualTo(mentorUser2.getNickname()),
+                    () -> assertThat(mentor2Response.universityName()).isEqualTo(university2.getKoreanName()),
+                    () -> assertThat(mentor2Response.country()).isEqualTo(university2.getCountry().getKoreanName()),
+                    () -> assertThat(mentor2Response.channels()).extracting(ChannelResponse::url)
+                            .containsOnly(channel2.getUrl())
+            );
+        }
+
+        @Test
+        void 임시멘토는_미리보기_목록에서_제외된다() {
+            // given
+            SiteUser tempMentorUser = siteUserFixture.임시멘토();
+            Mentor tempMentor = mentorFixture.임시멘토(tempMentorUser.getId(), university1.getId());
+            Channel channel1 = channelFixture.채널(1, mentor1);
+            Channel channel2 = channelFixture.채널(2, mentor2);
+
+            // when
+            SliceResponse<MentorPreviewResponse> response = mentorQueryService.getMentorPreviews("", currentUser.getId(), PageRequest.of(0, 10));
+
+            // then
+            Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
+                    .collect(Collectors.toMap(MentorPreviewResponse::id, Function.identity()));
+            MentorPreviewResponse mentor1Response = mentorPreviewMap.get(mentor1.getId());
+            MentorPreviewResponse mentor2Response = mentorPreviewMap.get(mentor2.getId());
+            assertThat(mentorPreviewMap.get(tempMentor.getId())).isNull();
             assertAll(
                     () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
                     () -> assertThat(mentor1Response.universityName()).isEqualTo(university1.getKoreanName()),
@@ -223,6 +267,32 @@ class MentorQueryServiceTest {
 
             // then
             assertAll(
+                    () -> assertThat(asiaFilteredResponse.content()).hasSize(1)
+                            .extracting(MentorPreviewResponse::id)
+                            .containsExactly(asiaMentor.getId()),
+                    () -> assertThat(europeFilteredResponse.content()).hasSize(1)
+                            .extracting(MentorPreviewResponse::id)
+                            .containsExactly(europeMentor.getId())
+            );
+        }
+
+        @Test
+        void 권역으로_멘토_목록을_필터링_할때_임시멘토는_제외된다() {
+            // when
+            University americaUniversity = universityFixture.네바다주립_대학_라스베이거스();
+            SiteUser tempMentorUser = siteUserFixture.임시멘토();
+            Mentor tempMentor = mentorFixture.임시멘토(tempMentorUser.getId(), americaUniversity.getId());
+
+            SliceResponse<MentorPreviewResponse> asiaFilteredResponse = mentorQueryService.getMentorPreviews(
+                    asiaUniversity.getRegion().getKoreanName(), currentUser.getId(), PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> europeFilteredResponse = mentorQueryService.getMentorPreviews(
+                    europeUniversity.getRegion().getKoreanName(), currentUser.getId(), PageRequest.of(0, 10));
+            SliceResponse<MentorPreviewResponse> americaFilteredResponse = mentorQueryService.getMentorPreviews(
+                    americaUniversity.getRegion().getKoreanName(), currentUser.getId(), PageRequest.of(0, 10));
+
+            // then
+            assertAll(
+                    () -> assertThat(americaFilteredResponse.content()).isEmpty(),
                     () -> assertThat(asiaFilteredResponse.content()).hasSize(1)
                             .extracting(MentorPreviewResponse::id)
                             .containsExactly(asiaMentor.getId()),
