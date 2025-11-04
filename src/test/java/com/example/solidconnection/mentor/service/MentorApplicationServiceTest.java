@@ -3,6 +3,7 @@ package com.example.solidconnection.mentor.service;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_ID_REQUIRED_FOR_CATALOG;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.BDDMockito.given;
@@ -17,9 +18,13 @@ import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +44,13 @@ public class MentorApplicationServiceTest {
     private MentorApplicationRepository mentorApplicationRepository;
 
     @Autowired
+    private SiteUserRepository siteUserRepository;
+
+    @Autowired
     private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private TermFixture termFixture;
 
     @Autowired
     private MentorApplicationFixture mentorApplicationFixture;
@@ -49,9 +60,12 @@ public class MentorApplicationServiceTest {
 
     private SiteUser user;
 
+    private Term term;
+
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
+        term = termFixture.현재_학기("2025-1");
     }
 
     @Test
@@ -69,6 +83,7 @@ public class MentorApplicationServiceTest {
         mentorApplicationService.submitMentorApplication(user.getId(), request, file);
 
         // then
+        assertThat(siteUserRepository.findById(user.getId()).get().getRole()).isEqualTo(Role.TEMP_MENTOR);
         assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(), List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
     }
 
@@ -87,6 +102,7 @@ public class MentorApplicationServiceTest {
         mentorApplicationService.submitMentorApplication(user.getId(), request, file);
 
         // then
+        assertThat(siteUserRepository.findById(user.getId()).get().getRole()).isEqualTo(Role.TEMP_MENTOR);
         assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(),List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
     }
 
@@ -173,6 +189,7 @@ public class MentorApplicationServiceTest {
         mentorApplicationService.submitMentorApplication(user.getId(), request, file);
 
         // then
+        assertThat(siteUserRepository.findById(user.getId()).get().getRole()).isEqualTo(Role.TEMP_MENTOR);
         assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(),List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
     }
 
