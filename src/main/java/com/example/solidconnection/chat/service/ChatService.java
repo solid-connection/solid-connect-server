@@ -136,7 +136,7 @@ public class ChatService {
                 .map(ChatParticipant::getSiteUserId)
                 .collect(Collectors.toSet());
 
-        Map<Long, Long> siteUserIdToMentorId = mentorRepository.findAllBySiteUserIdIn(siteUserIds.stream().toList()).stream()
+        Map<Long, Long> siteUserIdToMentorId = mentorRepository.findAllBySiteUserIdIn(siteUserIds).stream()
                 .collect(Collectors.toMap(Mentor::getSiteUserId, Mentor::getId));
 
         List<ChatMessageResponse> content = chatMessages.getContent().stream()
