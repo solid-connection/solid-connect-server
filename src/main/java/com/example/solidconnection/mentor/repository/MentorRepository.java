@@ -17,6 +17,8 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     Optional<Mentor> findBySiteUserId(long siteUserId);
 
+    Optional<Mentor> findByIdAndMentorStatus(long id, MentorStatus mentorStatus);
+
     Slice<Mentor> findAllByMentorStatus(MentorStatus mentorStatus, Pageable pageable);
 
     @Query("""

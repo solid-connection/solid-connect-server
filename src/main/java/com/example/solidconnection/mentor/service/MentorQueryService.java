@@ -47,11 +47,8 @@ public class MentorQueryService {
 
     @Transactional(readOnly = true)
     public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
-        Mentor mentor = mentorRepository.findById(mentorId)
-                .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-        if(mentor.getMentorStatus() == MentorStatus.TEMPORARY){
-            throw new CustomException(MENTOR_NOT_FOUND);
-        }
+        Mentor mentor = mentorRepository.findByIdAndMentorStatus(mentorId, MentorStatus.APPROVED)
+                .orElseThrow(()-> new CustomException(MENTOR_NOT_FOUND));
         University university = universityRepository.findById(mentor.getUniversityId())
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
