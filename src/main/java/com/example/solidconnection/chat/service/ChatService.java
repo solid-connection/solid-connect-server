@@ -142,6 +142,9 @@ public class ChatService {
         List<ChatMessageResponse> content = chatMessages.getContent().stream()
                 .map(message -> {
                     ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
+                    if (senderParticipant == null) {
+                        throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+                    }
                     long externalSenderId = siteUserIdToMentorId.getOrDefault(
                             senderParticipant.getSiteUserId(),
                             senderParticipant.getSiteUserId()
