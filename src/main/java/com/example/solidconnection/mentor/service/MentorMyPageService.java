@@ -70,11 +70,7 @@ public class MentorMyPageService {
     }
 
     private void updateChannel(List<ChannelRequest> channelRequests, Mentor mentor) {
-        int sequence = CHANNEL_SEQUENCE_START_NUMBER;
-        List<Channel> newChannels = new ArrayList<>();
-        for (ChannelRequest request : channelRequests) {
-            newChannels.add(new Channel(sequence++, request.type(), request.url()));
-        }
+        List<Channel> newChannels = buildChannels(channelRequests);
         mentor.updateChannels(newChannels);
     }
 
@@ -114,11 +110,16 @@ public class MentorMyPageService {
     }
 
     private void createChannels(List<ChannelRequest> channelRequests, Mentor mentor) {
+        List<Channel> newChannels = buildChannels(channelRequests);
+        mentor.createChannels(newChannels);
+    }
+
+    private List<Channel> buildChannels(List<ChannelRequest> channelRequests) {
         int sequence = CHANNEL_SEQUENCE_START_NUMBER;
         List<Channel> newChannels = new ArrayList<>();
         for (ChannelRequest request : channelRequests) {
             newChannels.add(new Channel(sequence++, request.type(), request.url()));
         }
-        mentor.createChannels(newChannels);
+        return newChannels;
     }
 }

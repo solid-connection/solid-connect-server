@@ -193,7 +193,7 @@ class MentorMyPageServiceTest {
             mentorMyPageService.createMentorMyPage(tempMentorUser.getId(), request);
 
             // then
-            Mentor createTempMentor = mentorRepository.findById(tempMentorUser.getId()).get();
+            Mentor createTempMentor = mentorRepository.findBySiteUserId(tempMentorUser.getId()).get();
             assertAll(
                     () -> assertThat(createTempMentor.getIntroduction()).isEqualTo(introduction),
                     () -> assertThat(createTempMentor.getPassTip()).isEqualTo(passTip),
