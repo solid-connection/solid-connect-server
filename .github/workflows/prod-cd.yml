@@ -71,7 +71,7 @@ jobs:
           chmod 600 deploy_key.pem
       
           scp -i deploy_key.pem \
-            -o StrictHostKeyChecking:no \
+            -o StrictHostKeyChecking=no \
             ./docker-compose.prod.yml \
             ./docs/infra-config/config.alloy \
             ./docs/infra-config/nginx.prod.conf \
