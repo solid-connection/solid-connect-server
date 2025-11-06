@@ -123,15 +123,27 @@ public class ChatService {
 
         Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdWithPaging(roomId, pageable);
 
-        // senderId(participantId) 조회
+        Map<Long, ChatParticipant> participantIdToParticipant = buildParticipantIdToParticipantMap(chatMessages);
+        List<ChatMessageResponse> content = buildChatMessageResponses(chatMessages, participantIdToParticipant);
+
+        return SliceResponse.of(content, chatMessages);
+    }
+
+    // senderId(chatParticipantId)로 chatParticipant 맵 생성
+    private Map<Long, ChatParticipant> buildParticipantIdToParticipantMap(Slice<ChatMessage> chatMessages) {
         Set<Long> participantIds = chatMessages.getContent().stream()
                 .map(ChatMessage::getSenderId)
                 .collect(Collectors.toSet());
 
-        Map<Long, ChatParticipant> participantIdToParticipant = chatParticipantRepository.findAllById(participantIds).stream()
+        return chatParticipantRepository.findAllById(participantIds).stream()
                 .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
+    }
 
-        List<ChatMessageResponse> content = chatMessages.getContent().stream()
+    private List<ChatMessageResponse> buildChatMessageResponses(
+            Slice<ChatMessage> chatMessages,
+            Map<Long, ChatParticipant> participantIdToParticipant
+    ) {
+        return chatMessages.getContent().stream()
                 .map(message -> {
                     ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
                     if (senderParticipant == null) {
@@ -141,8 +153,6 @@ public class ChatService {
                     return toChatMessageResponse(message, externalSenderId);
                 })
                 .toList();
-
-        return SliceResponse.of(content, chatMessages);
     }
 
     @Transactional(readOnly = true)
