@@ -131,7 +131,7 @@ jobs:
         uses: snok/container-retention-policy@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          image-names: solid-connection
+          image-names: solid-connection-dev
           delete-untagged: true
           keep-n-tags: 5
           account-type: org
