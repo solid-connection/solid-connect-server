@@ -84,7 +84,7 @@ jobs:
           chmod 600 deploy_key_ssh.pem
       
           ssh -i deploy_key_ssh.pem \
-           -o StrictHostKeyChecking:no \
+           -o StrictHostKeyChecking=no \
            ${{ secrets.USERNAME }}@${{ secrets.HOST }} \
            '
             set -e
