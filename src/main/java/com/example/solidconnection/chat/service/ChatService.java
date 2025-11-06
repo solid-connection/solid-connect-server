@@ -131,24 +131,13 @@ public class ChatService {
         Map<Long, ChatParticipant> participantIdToParticipant = chatParticipantRepository.findAllById(participantIds).stream()
                 .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
 
-        // participants의 siteUserId의 집합
-        Set<Long> siteUserIds = participantIdToParticipant.values().stream()
-                .map(ChatParticipant::getSiteUserId)
-                .collect(Collectors.toSet());
-
-        Map<Long, Long> siteUserIdToMentorId = mentorRepository.findAllBySiteUserIdIn(siteUserIds).stream()
-                .collect(Collectors.toMap(Mentor::getSiteUserId, Mentor::getId));
-
         List<ChatMessageResponse> content = chatMessages.getContent().stream()
                 .map(message -> {
                     ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
                     if (senderParticipant == null) {
                         throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
                     }
-                    long externalSenderId = siteUserIdToMentorId.getOrDefault(
-                            senderParticipant.getSiteUserId(),
-                            senderParticipant.getSiteUserId()
-                    );
+                    long externalSenderId = senderParticipant.getSiteUserId();
                     return toChatMessageResponse(message, externalSenderId);
                 })
                 .toList();

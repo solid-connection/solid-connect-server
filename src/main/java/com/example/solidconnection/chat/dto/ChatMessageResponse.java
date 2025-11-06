@@ -6,7 +6,7 @@ import java.util.List;
 public record ChatMessageResponse(
         long id,
         String content,
-        long senderId,
+        long senderId, // siteUserId
         ZonedDateTime createdAt,
         List<ChatAttachmentResponse> attachments
 ) {
