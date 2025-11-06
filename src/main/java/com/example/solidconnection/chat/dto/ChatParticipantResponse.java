@@ -1,7 +1,7 @@
 package com.example.solidconnection.chat.dto;
 
 public record ChatParticipantResponse(
-        long partnerId, // 멘티는 siteUserId, 멘토는 mentorId
+        long partnerId, // siteUserId
         String nickname,
         String profileUrl
 ) {

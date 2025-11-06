@@ -24,7 +24,6 @@ import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -163,12 +162,7 @@ public class ChatService {
         SiteUser siteUser = siteUserRepository.findById(partnerParticipant.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        // 멘티는 siteUserId, 멘토는 mentorId
-        Long partnerId = mentorRepository.findBySiteUserId(siteUser.getId())
-                .map(Mentor::getId)
-                .orElse(siteUser.getId());
-
-        return ChatParticipantResponse.of(partnerId, siteUser.getNickname(), siteUser.getProfileImageUrl());
+        return ChatParticipantResponse.of(siteUser.getId(), siteUser.getNickname(), siteUser.getProfileImageUrl());
     }
 
     private ChatParticipant findPartner(ChatRoom chatRoom, long siteUserId) {
