@@ -91,7 +91,7 @@ jobs:
            '
             set -e
           
-            # [수정] 1. 변수를 'image_meta' 단계의 출력값에서 가져옴
+            # 1. 변수를 'image_meta' 단계의 출력값에서 가져옴
             export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
             export IMAGE_TAG_ONLY=${{ steps.image_meta.outputs.image_tag }}
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
@@ -116,7 +116,7 @@ jobs:
             # 6. Docker Compose 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
             docker compose -f docker-compose.dev.yml down
-            OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
+            IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
           
             # 7. <none> 이미지 정리
             echo "Pruning dangling docker images..."
