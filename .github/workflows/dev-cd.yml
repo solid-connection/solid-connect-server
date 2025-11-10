@@ -82,7 +82,7 @@ jobs:
       # --- 5. 서버에서 'docker pull' 및 서비스 재시작 ---
       - name: Run docker compose and apply nginx config
         run: |
-          ssh -i deploy_key_ssh.pem \
+          ssh -i deploy_key.pem \
            -o StrictHostKeyChecking=no \
            ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }} \
            '
