@@ -118,6 +118,7 @@ public enum ErrorCode {
     CHANNEL_SEQUENCE_NOT_UNIQUE(HttpStatus.BAD_REQUEST.value(), "채널의 순서가 중복되었습니다."),
     CHANNEL_REGISTRATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "등록 가능한 채널 수를 초과하였습니다."),
     ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
+    ALREADY_EXIST_MENTORING(HttpStatus.BAD_REQUEST.value(), "이미 신청된 멘티, 멘토입니다."),
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),

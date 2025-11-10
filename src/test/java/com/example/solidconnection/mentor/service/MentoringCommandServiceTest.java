@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_EXIST_MENTORING;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNAUTHORIZED_MENTORING;
@@ -95,6 +96,18 @@ class MentoringCommandServiceTest {
                     () -> assertThat(mentoring.getMenteeId()).isEqualTo(menteeUser.getId()),
                     () -> assertThat(mentoring.getVerifyStatus()).isEqualTo(VerifyStatus.PENDING)
             );
+        }
+
+        @Test
+        void 동일_멘티_멘토끼리는_재신청되지않는다() {
+            // given
+            mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
+            MentoringApplyRequest request = new MentoringApplyRequest(mentor1.getId());
+
+            // when & then
+            assertThatThrownBy(() -> mentoringCommandService.applyMentoring(menteeUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ALREADY_EXIST_MENTORING.getMessage());
         }
     }
 

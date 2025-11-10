@@ -13,6 +13,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "mentoring", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_mentoring_mentor_id_mentee_id",
+                columnNames = {"mentorId", "menteeId"}
+        )
+})
 public class Mentoring extends BaseEntity {
 
     @Id
