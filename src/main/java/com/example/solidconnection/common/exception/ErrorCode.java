@@ -50,6 +50,7 @@ public enum ErrorCode {
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
     CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
+    MENTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멘토 지원서가 존재하지 않습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -127,6 +128,7 @@ public enum ErrorCode {
     UNIVERSITY_ID_REQUIRED_FOR_CATALOG(HttpStatus.BAD_REQUEST.value(), "목록에서 학교를 선택한 경우 학교 정보가 필요합니다."),
     UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER(HttpStatus.BAD_REQUEST.value(), "기타 학교를 선택한 경우 학교 정보를 입력할 수 없습니다."),
     INVALID_UNIVERSITY_SELECT_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 선택 방식입니다."),
+    MENTOR_ALREADY_EXISTS(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 멘토입니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),

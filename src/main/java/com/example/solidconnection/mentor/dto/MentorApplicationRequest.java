@@ -9,6 +9,7 @@ public record MentorApplicationRequest(
         ExchangeStatus exchangeStatus,
         UniversitySelectType universitySelectType,
         String country,
-        Long universityId
+        Long universityId,
+        String term
 ) {
 }

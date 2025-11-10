@@ -4,6 +4,7 @@ import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
+import com.example.solidconnection.term.fixture.TermFixture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.TestComponent;
 public class MentorApplicationFixture {
 
     private final MentorApplicationFixtureBuilder mentorApplicationFixtureBuilder;
+    private final TermFixture termFixture;
 
     private static final String DEFAULT_COUNTRY_CODE = "US";
     private static final String DEFAULT_PROOF_URL   = "/mentor-proof.pdf";
@@ -28,6 +30,7 @@ public class MentorApplicationFixture {
                 .universityId(universityId)
                 .universitySelectType(selectType)
                 .mentorProofUrl(DEFAULT_PROOF_URL)
+                .termId(termFixture.현재_학기("2025-1").getId())
                 .exchangeStatus(DEFAULT_EXCHANGE_STATUS)
                 .create();
     }
@@ -43,6 +46,7 @@ public class MentorApplicationFixture {
                 .universityId(universityId)
                 .universitySelectType(selectType)
                 .mentorProofUrl(DEFAULT_PROOF_URL)
+                .termId(termFixture.현재_학기("2025-1").getId())
                 .exchangeStatus(DEFAULT_EXCHANGE_STATUS)
                 .mentorApplicationStatus(MentorApplicationStatus.APPROVED)
                 .create();
@@ -59,6 +63,7 @@ public class MentorApplicationFixture {
                 .universityId(universityId)
                 .universitySelectType(selectType)
                 .mentorProofUrl(DEFAULT_PROOF_URL)
+                .termId(termFixture.현재_학기("2025-1").getId())
                 .exchangeStatus(DEFAULT_EXCHANGE_STATUS)
                 .mentorApplicationStatus(MentorApplicationStatus.REJECTED)
                 .create();
