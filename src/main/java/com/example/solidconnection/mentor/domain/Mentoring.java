@@ -32,7 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "mentoring", uniqueConstraints = {
         @UniqueConstraint(
                 name = "uk_mentoring_mentor_id_mentee_id",
-                columnNames = {"mentorId", "menteeId"}
+                columnNames = {"mentor_id", "mentee_id"}
         )
 })
 public class Mentoring extends BaseEntity {
