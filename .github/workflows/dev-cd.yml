@@ -122,6 +122,15 @@ jobs:
             echo "Pruning dangling docker images..."
             docker image prune -f
           
+            # 8. stage 인스턴스의 오래된 태그 이미지 정리 (최신 5개 유지)
+            echo "Cleaning up old tagged images on host, keeping last 5..."
+            IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
+          
+            docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
+            sort -r | \
+            tail -n +6 | \
+            xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" || true
+          
             echo "Deploy and Docker Compose restart finished."
            '
 
