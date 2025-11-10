@@ -41,23 +41,23 @@ public class Mentoring extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name="confirmed_at")
     private ZonedDateTime confirmedAt;
 
-    @Column
+    @Column(name = "checked_at_by_mentor")
     private ZonedDateTime checkedAtByMentor;
 
-    @Column
+    @Column(name = "checked_at_by_mentee")
     private ZonedDateTime checkedAtByMentee;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="verify_status")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
-    @Column
+    @Column(name = "mentor_id")
     private long mentorId;
 
-    @Column
+    @Column(name = "mentee_id")
     private long menteeId;
 
     public Mentoring(long mentorId, long menteeId, VerifyStatus verifyStatus) {
