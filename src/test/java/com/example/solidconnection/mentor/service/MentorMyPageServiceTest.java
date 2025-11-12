@@ -195,7 +195,7 @@ class MentorMyPageServiceTest {
 
             // then
             Mentor createMentor = mentorRepository.findBySiteUserId(siteUser.getId()).get();
-            List<Channel> createChannels = channelRepositoryForTest.findAllByMentorId(siteUser.getId());
+            List<Channel> createChannels = channelRepositoryForTest.findAllByMentorId(createMentor.getId());
             assertAll(
                     () -> assertThat(createMentor.getIntroduction()).isEqualTo(introduction),
                     () -> assertThat(createMentor.getPassTip()).isEqualTo(passTip),
