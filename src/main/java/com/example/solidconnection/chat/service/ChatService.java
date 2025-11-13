@@ -15,6 +15,7 @@ import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
+import com.example.solidconnection.chat.dto.ChatRoomData;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
@@ -23,11 +24,15 @@ import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
 import com.example.solidconnection.chat.repository.ChatRoomRepository;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.chat.dto.ChatRoomData;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -43,6 +48,7 @@ public class ChatService {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final SiteUserRepository siteUserRepository;
+    private final MentorRepository mentorRepository;
 
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
@@ -51,12 +57,14 @@ public class ChatService {
                        ChatParticipantRepository chatParticipantRepository,
                        ChatReadStatusRepository chatReadStatusRepository,
                        SiteUserRepository siteUserRepository,
+                       MentorRepository mentorRepository,
                        @Lazy SimpMessageSendingOperations simpMessageSendingOperations) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.chatReadStatusRepository = chatReadStatusRepository;
         this.siteUserRepository = siteUserRepository;
+        this.mentorRepository = mentorRepository;
         this.simpMessageSendingOperations = simpMessageSendingOperations;
     }
 
@@ -114,11 +122,36 @@ public class ChatService {
 
         Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdWithPaging(roomId, pageable);
 
-        List<ChatMessageResponse> content = chatMessages.getContent().stream()
-                .map(this::toChatMessageResponse)
-                .toList();
+        Map<Long, ChatParticipant> participantIdToParticipant = buildParticipantIdToParticipantMap(chatMessages);
+        List<ChatMessageResponse> content = buildChatMessageResponses(chatMessages, participantIdToParticipant);
 
         return SliceResponse.of(content, chatMessages);
+    }
+
+    // senderId(chatParticipantId)로 chatParticipant 맵 생성
+    private Map<Long, ChatParticipant> buildParticipantIdToParticipantMap(Slice<ChatMessage> chatMessages) {
+        Set<Long> participantIds = chatMessages.getContent().stream()
+                .map(ChatMessage::getSenderId)
+                .collect(Collectors.toSet());
+
+        return chatParticipantRepository.findAllById(participantIds).stream()
+                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
+    }
+
+    private List<ChatMessageResponse> buildChatMessageResponses(
+            Slice<ChatMessage> chatMessages,
+            Map<Long, ChatParticipant> participantIdToParticipant
+    ) {
+        return chatMessages.getContent().stream()
+                .map(message -> {
+                    ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
+                    if (senderParticipant == null) {
+                        throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
+                    }
+                    long externalSenderId = senderParticipant.getSiteUserId();
+                    return toChatMessageResponse(message, externalSenderId);
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -128,6 +161,7 @@ public class ChatService {
         ChatParticipant partnerParticipant = findPartner(chatRoom, siteUserId);
         SiteUser siteUser = siteUserRepository.findById(partnerParticipant.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         return ChatParticipantResponse.of(siteUser.getId(), siteUser.getNickname(), siteUser.getProfileImageUrl());
     }
 
@@ -148,7 +182,7 @@ public class ChatService {
         }
     }
 
-    private ChatMessageResponse toChatMessageResponse(ChatMessage message) {
+    private ChatMessageResponse toChatMessageResponse(ChatMessage message, long externalSenderId) {
         List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
                 .map(attachment -> ChatAttachmentResponse.of(
                         attachment.getId(),
@@ -162,7 +196,7 @@ public class ChatService {
         return ChatMessageResponse.of(
                 message.getId(),
                 message.getContent(),
-                message.getSenderId(),
+                externalSenderId,
                 message.getCreatedAt(),
                 attachments
         );

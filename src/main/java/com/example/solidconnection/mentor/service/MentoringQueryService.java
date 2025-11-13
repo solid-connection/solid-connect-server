@@ -121,17 +121,6 @@ public class MentoringQueryService {
         return SliceResponse.of(content, mentoringSlice);
     }
 
-    // N+1 을 해결하면서 멘토링의 채팅방 정보 조회
-    private Map<Long, Long> mapMentoringIdToChatRoomIdWithBatchQuery(List<Mentoring> mentorings) {
-        List<Long> mentoringIds = mentorings.stream()
-                .map(Mentoring::getId)
-                .distinct()
-                .toList();
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMentoringIdIn(mentoringIds);
-        return chatRooms.stream()
-                .collect(Collectors.toMap(ChatRoom::getMentoringId, ChatRoom::getId));
-    }
-
     @Transactional(readOnly = true)
     public SliceResponse<MentoringForMentorResponse> getMentoringsForMentor(long siteUserId, Pageable pageable) {
         Mentor mentor = mentorRepository.findBySiteUserId(siteUserId)
@@ -143,9 +132,15 @@ public class MentoringQueryService {
                 Mentoring::getMenteeId
         );
 
+        Map<Long, Long> mentoringIdToChatRoomId = mapMentoringIdToChatRoomIdWithBatchQuery(mentoringSlice.getContent());
+
         List<MentoringForMentorResponse> content = new ArrayList<>();
         for (Mentoring mentoring : mentoringSlice) {
-            content.add(MentoringForMentorResponse.of(mentoring, mentoringToPartnerUser.get(mentoring)));
+            content.add(MentoringForMentorResponse.of(
+                    mentoring,
+                    mentoringToPartnerUser.get(mentoring),
+                    mentoringIdToChatRoomId.get(mentoring.getId())
+            ));
         }
 
         return SliceResponse.of(content, mentoringSlice);
@@ -167,5 +162,16 @@ public class MentoringQueryService {
                 Function.identity(),
                 mentoring -> partnerIdToPartnerUsermap.get(getPartnerId.apply(mentoring))
         ));
+    }
+
+    // N+1 을 해결하면서 멘토링의 채팅방 정보 조회
+    private Map<Long, Long> mapMentoringIdToChatRoomIdWithBatchQuery(List<Mentoring> mentorings) {
+        List<Long> mentoringIds = mentorings.stream()
+                .map(Mentoring::getId)
+                .distinct()
+                .toList();
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMentoringIdIn(mentoringIds);
+        return chatRooms.stream()
+                .collect(Collectors.toMap(ChatRoom::getMentoringId, ChatRoom::getId));
     }
 }

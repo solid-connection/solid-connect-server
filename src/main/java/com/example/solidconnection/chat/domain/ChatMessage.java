@@ -28,7 +28,7 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    private long senderId;
+    private long senderId; // chat_participant의 id
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
