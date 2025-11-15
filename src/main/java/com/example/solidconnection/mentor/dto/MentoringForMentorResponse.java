@@ -6,7 +6,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import java.time.ZonedDateTime;
 
 public record MentoringForMentorResponse(
-        long mentoringId,
+        Long roomId,
         String profileImageUrl,
         String nickname,
         boolean isChecked,
@@ -14,9 +14,9 @@ public record MentoringForMentorResponse(
         ZonedDateTime createdAt
 ) {
 
-    public static MentoringForMentorResponse of(Mentoring mentoring, SiteUser partner) {
+    public static MentoringForMentorResponse of(Mentoring mentoring, SiteUser partner, Long roomId) {
         return new MentoringForMentorResponse(
-                mentoring.getId(),
+                roomId,
                 partner.getProfileImageUrl(),
                 partner.getNickname(),
                 mentoring.getCheckedAtByMentor() != null,
