@@ -2,7 +2,7 @@ name: "[DEV] Build Gradle and Deploy"
 
 on:
   push:
-    branches: [ "develop", "fix/564-github-app-token-permission" ]
+    branches: [ "develop" ]
   workflow_dispatch:
 
 jobs:
