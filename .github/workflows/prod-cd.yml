@@ -63,8 +63,16 @@ jobs:
           tags: ${{ format('{0}:{1}', steps.image_meta.outputs.image_name, steps.image_meta.outputs.image_tag) }}
           cache-from: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache
           cache-to: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache,mode=max
+
+      # --- 4. Github App으로 임시 토큰 생성 ---
+      - name: Create installation token
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           
-      # --- 4. 설정 파일들만 scp로 전송 ---
+      # --- 5. 설정 파일들만 scp로 전송 ---
       - name: Copy config files to remote
         run: |
           echo "${{ secrets.PRIVATE_KEY }}" > deploy_key.pem
@@ -77,7 +85,7 @@ jobs:
             ./docs/infra-config/nginx.prod.conf \
             ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/solid-connection-prod/
           
-      # --- 5. 서버에서 'docker pull' 및 서비스 재시작 ---
+      # --- 6. 서버에서 'docker pull' 및 서비스 재시작 ---
       - name: Run docker compose and apply nginx config
         run: |
           echo "${{ secrets.PRIVATE_KEY }}" > deploy_key_ssh.pem
@@ -95,7 +103,7 @@ jobs:
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG_ONLY}"
       
             # 2. 서버가 GHCR에 로그인 (pull 받기 위해)
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            echo "${{ steps.app.outputs.token }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
       
             # 3. docker pull (전체 이미지 이름 사용)
             echo "Pulling new image layer from GHCR..."
