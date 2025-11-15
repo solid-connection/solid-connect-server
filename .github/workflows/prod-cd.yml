@@ -71,6 +71,7 @@ jobs:
         with:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          permissions: "packages:read"
           
       # --- 5. 설정 파일들만 scp로 전송 ---
       - name: Copy config files to remote
