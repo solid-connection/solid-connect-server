@@ -18,9 +18,7 @@ services:
       - redis
 
   solid-connection-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG:-latest}
     container_name: solid-connection-server
     ports:
       - "8080:8080"
