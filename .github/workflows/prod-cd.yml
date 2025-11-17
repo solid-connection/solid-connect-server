@@ -106,7 +106,7 @@ jobs:
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG_ONLY}"
       
             # 2. 서버가 GHCR에 로그인 (pull 받기 위해)
-            echo "${{ steps.app.outputs.token }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            echo "${{ steps.app.outputs.token }}" | docker login ghcr.io -u x-access-token --password-stdin
       
             # 3. docker pull (전체 이미지 이름 사용)
             echo "Pulling new image layer from GHCR..."
