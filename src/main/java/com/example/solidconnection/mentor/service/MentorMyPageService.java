@@ -1,6 +1,5 @@
 package com.example.solidconnection.mentor.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_NULL_NOT_ALLOWED;
 import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
@@ -94,20 +93,12 @@ public class MentorMyPageService {
     }
 
     private void validateUserCanCreateMentor(long siteUserId) {
-        if (!siteUserRepository.existsById(siteUserId)) {
-            throw new CustomException(USER_NOT_FOUND);
-        }
-
         if (mentorRepository.existsBySiteUserId(siteUserId)) {
             throw new CustomException(MENTOR_ALREADY_EXISTS);
         }
     }
 
     private void validateChannelRegistrationLimit(List<ChannelRequest> channelRequests) {
-        if(channelRequests == null){
-            throw new CustomException(CHANNEL_NULL_NOT_ALLOWED);
-        }
-
         if (channelRequests.size() > CHANNEL_REGISTRATION_LIMIT) {
             throw new CustomException(CHANNEL_REGISTRATION_LIMIT_EXCEEDED);
         }
