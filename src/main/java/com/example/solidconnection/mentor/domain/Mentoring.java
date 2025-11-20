@@ -13,6 +13,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,29 +29,35 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "mentoring", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_mentoring_mentor_id_mentee_id",
+                columnNames = {"mentor_id", "mentee_id"}
+        )
+})
 public class Mentoring extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name="confirmed_at")
     private ZonedDateTime confirmedAt;
 
-    @Column
+    @Column(name = "checked_at_by_mentor")
     private ZonedDateTime checkedAtByMentor;
 
-    @Column
+    @Column(name = "checked_at_by_mentee")
     private ZonedDateTime checkedAtByMentee;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="verify_status")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
-    @Column
+    @Column(name = "mentor_id")
     private long mentorId;
 
-    @Column
+    @Column(name = "mentee_id")
     private long menteeId;
 
     public Mentoring(long mentorId, long menteeId, VerifyStatus verifyStatus) {
