@@ -6,11 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-gradle:
+  # --- Job 1: 빌드 및 이미지 푸시 (쓰기 권한 필요) ---
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
+    outputs:
+      image_tag: ${{ steps.image_meta.outputs.image_tag }}
 
     steps:
       - name: Checkout the code
@@ -27,7 +31,7 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Grant execute permission for Gradle wrapper(gradlew)
+      - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew bootJar
@@ -37,15 +41,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           platforms: linux/arm64
+
       - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # --- 2. 이미지 메타데이터(이름, 태그) 정의 ---
-      # 빌드/푸시 단계와 SSH 단계에서 공통으로 사용할 변수를 미리 정의합니다.
+      # --- 이미지 메타데이터 정의 ---
       - name: Define image name and tag
         id: image_meta
         run: |
@@ -54,8 +58,7 @@ jobs:
           echo "image_name=ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev" >> $GITHUB_OUTPUT
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
-      # --- 3. Docker 이미지 빌드, 푸시, 캐시 ---
-      # 'docker/build-push-action'을 사용하여 캐시 옵션을 적용합니다.
+      # --- Docker 빌드 및 푸시 ---
       - name: Build, push, and cache Docker image
         uses: docker/build-push-action@v5
         with:
@@ -66,17 +69,37 @@ jobs:
           cache-from: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache
           cache-to: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache,mode=max
 
-      # --- 4. Github App으로 임시 토큰 생성 ---
-      - name: Create installation token
-        id: app
-        uses: actions/create-github-app-token@v2
+      # --- 이미지 정리 (이전 Job에 있던 것) ---
+      - name: Clean up old image versions from GHCR
+        uses: snok/container-retention-policy@v2
         with:
-          app-id: ${{ secrets.GH_APP_ID }}
-          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-          owner: 'solid-connection'
-          permission-packages: "read"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: solid-connection-dev
+          delete-untagged: true
+          keep-n-tags: 5
+          account-type: org
+          org-name: ${{ github.repository_owner }}
+          cut-off: '7 days ago UTC'
 
-      # --- 5. 설정 파일들만 scp로 전송 ---
+  # --- Job 2: 배포 (읽기 권한만 필요) ---
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      # 설정 파일 전송을 위해 코드 체크아웃 (서브모듈 불필요)
+      - name: Checkout config files
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.dev.yml
+            docs/infra-config
+          sparse-checkout-cone-mode: false
+
+      # --- 설정 파일 전송 ---
       - name: Copy config files to remote
         run: |
           echo "${{ secrets.DEV_PRIVATE_KEY }}" > deploy_key.pem
@@ -89,67 +112,52 @@ jobs:
             ./docs/infra-config/nginx.dev.conf \
             ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}:/home/${{ secrets.DEV_USERNAME }}/solid-connection-dev/
 
-      # --- 6. 서버에서 'docker pull' 및 서비스 재시작 ---
+      # --- 서버에서 Docker Pull 및 재시작 ---
       - name: Run docker compose and apply nginx config
         run: |
+          # GITHUB_TOKEN을 이용해 서버에서 로그인 (App Token 불필요)
           ssh -i deploy_key.pem \
            -o StrictHostKeyChecking=no \
            ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }} \
            '
             set -e
           
-            # 1. 변수를 'image_meta' 단계의 출력값에서 가져옴
-            export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-            export IMAGE_TAG_ONLY=${{ steps.image_meta.outputs.image_tag }}
+            # 1. 환경 변수 설정 (이전 Job의 Output 사용)
+            export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")
+            export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
           
-            # 2. 서버가 GHCR에 로그인 (pull 받기 위해)
-            echo "${{ steps.app.outputs.token }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            # 2. 서버가 GHCR에 로그인 (GITHUB_TOKEN 사용)
+            # App Token 대신 현재 워크플로우의 임시 토큰을 넘겨줍니다.
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
-            # 3. docker pull (전체 이미지 이름 사용)
-            echo "Pulling new image layer from GHCR..."
+            # 3. Docker Pull
+            echo "Pulling new image: $FULL_IMAGE_NAME"
             docker pull $FULL_IMAGE_NAME
           
-            # 4. 작업 디렉토리로 이동 및 Nginx 설정 이동
+            # 4. 작업 및 Nginx 설정 적용
             cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
             mkdir -p ./nginx
             mv ./nginx.dev.conf ./nginx/default.conf
-          
-            # 5. Nginx 재시작
             sudo cp ./nginx/default.conf /etc/nginx/conf.d/default.conf
             sudo nginx -t
             sudo nginx -s reload
           
-            # 6. Docker Compose 재시작
+            # 5. Docker Compose 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
             docker compose -f docker-compose.dev.yml down
             IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
           
-            # 7. <none> 이미지 정리
-            echo "Pruning dangling docker images..."
+            # 6. 정리 작업
+            echo "Pruning dangling images..."
             docker image prune -f
           
-            # 8. stage 인스턴스의 오래된 태그 이미지 정리 (최신 5개 유지)
-            echo "Cleaning up old tagged images on host, keeping last 5..."
+            echo "Cleaning up old tagged images (keeping last 5)..."
             IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
-          
             docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
             sort -r | \
             tail -n +6 | \
             xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" || true
           
-            echo "Deploy and Docker Compose restart finished."
+            echo "Deployment finished successfully."
            '
-
-      # --- 6. 이미지 정리 ---
-      - name: Clean up old image versions from GHCR
-        if: success()
-        uses: snok/container-retention-policy@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          image-names: solid-connection-dev
-          delete-untagged: true
-          keep-n-tags: 5
-          account-type: org
-          org-name: ${{ github.repository_owner }}
-          cut-off: '7 days ago UTC'
