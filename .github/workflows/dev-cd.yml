@@ -73,7 +73,7 @@ jobs:
       - name: Clean up old image versions from GHCR
         uses: snok/container-retention-policy@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PACKAGE_DELETE_TOKEN }}
           image-names: solid-connection-dev
           delete-untagged: true
           keep-n-tags: 5
