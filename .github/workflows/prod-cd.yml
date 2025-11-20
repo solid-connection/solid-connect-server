@@ -19,7 +19,6 @@ jobs:
       contents: read
       packages: write
 
-    # 다음 Job(deploy)으로 이미지 태그 전달
     outputs:
       image_tag: ${{ steps.image_meta.outputs.image_tag }}
 
@@ -107,6 +106,7 @@ jobs:
       packages: read
 
     steps:
+      # 설정 파일 전송을 위해 코드 체크아웃 (서브모듈 불필요)
       - name: Checkout config files
         uses: actions/checkout@v4
         with:

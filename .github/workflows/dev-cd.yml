@@ -9,12 +9,10 @@ jobs:
   # --- Job 1: 빌드 및 이미지 푸시 (쓰기 권한 필요) ---
   build-and-push:
     runs-on: ubuntu-latest
-    # 이 Job은 이미지를 올려야 하므로 write 권한 부여
     permissions:
       contents: read
       packages: write
 
-    # 다음 Job(deploy)에서 사용할 이미지 태그를 output으로 내보냄
     outputs:
       image_tag: ${{ steps.image_meta.outputs.image_tag }}
 
@@ -87,7 +85,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # 배포 Job은 이미지를 읽기만 하면 되므로 read 권한만 부여 (최소 권한)
     permissions:
       contents: read
       packages: read
