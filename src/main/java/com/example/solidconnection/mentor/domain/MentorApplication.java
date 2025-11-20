@@ -53,7 +53,7 @@ public class MentorApplication extends BaseEntity {
     @Column(nullable = false, name = "mentor_proof_url", length = 500)
     private String mentorProofUrl;
 
-    @Column(length = 50, nullable = false)
+    @Column(nullable = false, name = "term_id")
     private long termId;
 
     private String rejectedReason;
