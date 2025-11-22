@@ -53,6 +53,20 @@ public class Mentor extends BaseEntity {
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Channel> channels = new ArrayList<>();
 
+    public Mentor(
+            String introduction,
+            String passTip,
+            long siteUserId,
+            Long universityId,
+            long termId
+    ) {
+        this.introduction = introduction;
+        this.passTip = passTip;
+        this.siteUserId = siteUserId;
+        this.universityId = universityId;
+        this.termId = termId;
+    }
+
     public void increaseMenteeCount() {
         this.menteeCount++;
     }
@@ -80,6 +94,13 @@ public class Mentor extends BaseEntity {
             } else if (i < originalChannelSize) { // 채널 갯수 줄어듦 - 기존 채널 삭제
                 this.channels.remove(this.channels.size() - 1);
             }
+        }
+    }
+
+    public void createChannels(List<Channel> channels) {
+        for(Channel channel : channels) {
+            channel.updateMentor(this);
+            this.channels.add(channel);
         }
     }
 }

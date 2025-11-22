@@ -53,6 +53,9 @@ public class MentorApplication extends BaseEntity {
     @Column(nullable = false, name = "mentor_proof_url", length = 500)
     private String mentorProofUrl;
 
+    @Column(nullable = false, name = "term_id")
+    private long termId;
+
     private String rejectedReason;
 
     @Column(nullable = false)
@@ -61,7 +64,7 @@ public class MentorApplication extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MentorApplicationStatus mentorApplicationStatus = MentorApplicationStatus.PENDING;
+    private MentorApplicationStatus mentorApplicationStatus;
 
     private static final Set<ExchangeStatus> ALLOWED =
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
@@ -72,6 +75,7 @@ public class MentorApplication extends BaseEntity {
             Long universityId,
             UniversitySelectType universitySelectType,
             String mentorProofUrl,
+            long termId,
             ExchangeStatus exchangeStatus
     ) {
         validateExchangeStatus(exchangeStatus);
@@ -82,7 +86,9 @@ public class MentorApplication extends BaseEntity {
         this.universityId = universityId;
         this.universitySelectType = universitySelectType;
         this.mentorProofUrl = mentorProofUrl;
+        this.termId = termId;
         this.exchangeStatus = exchangeStatus;
+        this.mentorApplicationStatus = MentorApplicationStatus.PENDING;
     }
 
     private void validateUniversitySelection(UniversitySelectType universitySelectType, Long universityId) {
