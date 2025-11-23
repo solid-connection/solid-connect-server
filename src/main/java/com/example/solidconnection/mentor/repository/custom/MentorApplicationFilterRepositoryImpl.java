@@ -15,6 +15,7 @@ import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
@@ -87,21 +88,30 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long totalCount = queryFactory
-                .select(mentorApplication.count())
-                .from(mentorApplication)
-                .join(siteUser).on(mentorApplication.siteUserId.eq(siteUser.id))
-                .leftJoin(university).on(mentorApplication.universityId.eq(university.id))
-                .leftJoin(region).on(university.region.eq(region))
-                .leftJoin(country).on(university.country.eq(country))
-                .where(
-                        verifyMentorStatusEq(condition.mentorApplicationStatus()),
-                        keywordContains(condition.keyword()),
-                        createdAtEq(condition.createdAt())
-                )
-                .fetchOne();
+        Long totalCount = createCountQuery(condition).fetchOne();
 
         return new PageImpl<>(content, pageable, totalCount != null ? totalCount : 0L);
+    }
+
+    private JPAQuery<Long> createCountQuery(MentorApplicationSearchCondition condition) {
+        JPAQuery<Long> query = queryFactory
+                .select(mentorApplication.count())
+                .from(mentorApplication);
+
+        String keyword = condition.keyword();
+
+        if (hasText(keyword)) {
+            query.join(siteUser).on(mentorApplication.siteUserId.eq(siteUser.id))
+                    .leftJoin(university).on(mentorApplication.universityId.eq(university.id))
+                    .leftJoin(region).on(university.region.eq(region))
+                    .leftJoin(country).on(university.country.eq(country));
+        }
+
+        return query.where(
+                verifyMentorStatusEq(condition.mentorApplicationStatus()),
+                keywordContains(condition.keyword()),
+                createdAtEq(condition.createdAt())
+        );
     }
 
     private BooleanExpression verifyMentorStatusEq(MentorApplicationStatus status) {
