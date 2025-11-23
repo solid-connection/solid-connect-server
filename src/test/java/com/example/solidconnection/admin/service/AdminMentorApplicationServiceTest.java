@@ -25,7 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @TestContainerSpringBootTest
-@DisplayName("어학 검증 관리자 서비스 테스트")
+@DisplayName("멘토 지원서 관리자 서비스 테스트")
 class AdminMentorApplicationServiceTest {
 
     @Autowired
@@ -166,7 +166,7 @@ class AdminMentorApplicationServiceTest {
             String countryKoreanName = "오스트리아";
             MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, countryKoreanName, null);
             Pageable pageable = PageRequest.of(0, 10);
-            List<MentorApplication> expectedMentorApplications = List.of(mentorApplication2, mentorApplication6);
+            List<MentorApplication> expectedMentorApplications = List.of(mentorApplication3, mentorApplication4);
 
             // when
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
