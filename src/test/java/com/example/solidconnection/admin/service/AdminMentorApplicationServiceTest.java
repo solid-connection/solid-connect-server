@@ -80,7 +80,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().mentorApplicationStatus())
                     .containsOnly(MentorApplicationStatus.PENDING);
@@ -98,7 +103,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.siteUserResponse().nickname())
                     .containsOnly(nickname);
@@ -116,7 +126,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().university())
                     .containsOnly(universityKoreanName);
@@ -134,7 +149,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().region())
                     .containsOnly(regionKoreanName);
@@ -152,7 +172,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().country())
                     .containsOnly(countryKoreanName);
@@ -170,7 +195,12 @@ class AdminMentorApplicationServiceTest {
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
 
             // then
-            assertThat(response.get()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().mentorApplicationStatus())
                     .containsOnly(MentorApplicationStatus.PENDING);
