@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.controller;
 
+import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
@@ -54,5 +55,11 @@ public class AdminMentorApplicationController {
     ) {
         adminMentorApplicationService.rejectMentorApplication(mentorApplicationId, request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<MentorApplicationCountResponse> getMentorApplicationCount() {
+        MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
+        return ResponseEntity.ok(response);
     }
 }
