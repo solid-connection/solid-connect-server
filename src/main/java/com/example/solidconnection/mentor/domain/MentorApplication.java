@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -65,6 +66,9 @@ public class MentorApplication extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MentorApplicationStatus mentorApplicationStatus;
+
+    @Column
+    private ZonedDateTime approvedAt;
 
     private static final Set<ExchangeStatus> ALLOWED =
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
