@@ -1,13 +1,19 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRM;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
+import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
+import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -39,6 +45,9 @@ class AdminMentorApplicationServiceTest {
 
     @Autowired
     private UniversityFixture universityFixture;
+
+    @Autowired
+    private MentorApplicationRepository mentorApplicationRepository;
 
     private MentorApplication mentorApplication1;
     private MentorApplication mentorApplication2;
@@ -207,6 +216,112 @@ class AdminMentorApplicationServiceTest {
             assertThat(response.getContent())
                     .extracting(content -> content.mentorApplicationResponse().region())
                     .containsOnly(regionKoreanName);
+        }
+    }
+
+    @Nested
+    class 멘토_승격_지원서_승인{
+
+        @Test
+        void 대기중인_멘토_지원서를_승인한다() {
+            // given
+            long pendingMentorApplicationId = mentorApplication2.getId();
+
+            // when
+            adminMentorApplicationService.approveMentorApplication(pendingMentorApplicationId);
+
+            // then
+            MentorApplication result = mentorApplicationRepository.findById(mentorApplication2.getId()).get();
+            assertThat(result.getMentorApplicationStatus()).isEqualTo(MentorApplicationStatus.APPROVED);
+            assertThat(result.getApprovedAt()).isNotNull();
+        }
+
+        @Test
+        void 이미_승인된_멘토_지원서를_승인하면_예외_응답을_반환한다() {
+            // given
+            long approvedMentorApplicationId = mentorApplication1.getId();
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(approvedMentorApplicationId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+        }
+
+        @Test
+        void 이미_거절된_멘토_지원서를_승인하면_예외_응답을_반환한다() {
+            // given
+            long rejectedMentorApplicationId = mentorApplication3.getId();
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(rejectedMentorApplicationId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_멘토_지원서를_승인하면_예외_응답을_반환한다() {
+            // given
+            long nonExistentId = 99999L;
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(nonExistentId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 멘토_승격_지원서_거절{
+
+        @Test
+        void 대기중인_멘토_지원서를_거절한다() {
+            // given
+            long pendingMentorApplicationId = mentorApplication2.getId();
+            MentorApplicationRejectRequest request = new MentorApplicationRejectRequest("파견학교 인증 자료 누락");
+
+            // when
+            adminMentorApplicationService.rejectMentorApplication(pendingMentorApplicationId, request);
+
+            // then
+            MentorApplication result = mentorApplicationRepository.findById(mentorApplication2.getId()).get();
+            assertThat(result.getMentorApplicationStatus()).isEqualTo(MentorApplicationStatus.REJECTED);
+            assertThat(result.getRejectedReason()).isEqualTo(request.rejectedReason());
+        }
+
+        @Test
+        void 이미_승인된_멘토_지원서를_거절하면_예외_응답을_반환한다() {
+            // given
+            long approvedMentorApplicationId = mentorApplication1.getId();
+            MentorApplicationRejectRequest request = new MentorApplicationRejectRequest("파견학교 인증 자료 누락");
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(approvedMentorApplicationId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+        }
+
+        @Test
+        void 이미_거절된_멘토_지원서를_거절하면_예외_응답을_반환한다() {
+            // given
+            long rejectedMentorApplicationId = mentorApplication3.getId();
+            MentorApplicationRejectRequest request = new MentorApplicationRejectRequest("파견학교 인증 자료 누락");
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(rejectedMentorApplicationId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_멘토_지원서를_거절하면_예외_응답을_반환한다() {
+            // given
+            long nonExistentId = 99999L;
+            MentorApplicationRejectRequest request = new MentorApplicationRejectRequest("파견학교 인증 자료 누락");
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(nonExistentId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
         }
     }
 }
