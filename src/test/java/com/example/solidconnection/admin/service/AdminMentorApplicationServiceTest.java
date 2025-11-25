@@ -2,6 +2,7 @@ package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRM;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
@@ -235,6 +236,18 @@ class AdminMentorApplicationServiceTest {
             MentorApplication result = mentorApplicationRepository.findById(mentorApplication2.getId()).get();
             assertThat(result.getMentorApplicationStatus()).isEqualTo(MentorApplicationStatus.APPROVED);
             assertThat(result.getApprovedAt()).isNotNull();
+        }
+
+        @Test
+        void 대학이_선택되지_않은_멘토_지원서를_승인하면_예외가_발생한다(){
+            // given
+            SiteUser user = siteUserFixture.사용자();
+            MentorApplication noUniversityIdMentorApplication = mentorApplicationFixture.대기중_멘토신청(user.getId(), UniversitySelectType.OTHER, null);
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(noUniversityIdMentorApplication.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED.getMessage());
         }
 
         @Test

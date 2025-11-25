@@ -1,6 +1,7 @@
 package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
@@ -30,11 +31,14 @@ public class AdminMentorApplicationService {
         return mentorApplicationRepository.searchMentorApplications(mentorApplicationSearchCondition, pageable);
     }
 
-
     @Transactional
     public void approveMentorApplication(Long mentorApplicationId) {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
+
+        if(mentorApplication.getUniversityId() == null){
+            throw new CustomException(MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED);
+        }
 
         mentorApplication.approve();
     }

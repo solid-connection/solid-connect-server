@@ -130,6 +130,7 @@ public enum ErrorCode {
     INVALID_UNIVERSITY_SELECT_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 선택 방식입니다."),
     MENTOR_ALREADY_EXISTS(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 멘토입니다."),
     MENTOR_APPLICATION_ALREADY_CONFIRM(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토 승격 요청 입니다."),
+    MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED(HttpStatus.BAD_REQUEST.value(), "승인하려는 멘토 신청에 대학교가 선택되지 않았습니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
