@@ -1,6 +1,6 @@
 package com.example.solidconnection.admin.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRM;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -258,7 +258,7 @@ class AdminMentorApplicationServiceTest {
             // when & then
             assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(approvedMentorApplicationId))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRMED.getMessage());
         }
 
         @Test
@@ -269,7 +269,7 @@ class AdminMentorApplicationServiceTest {
             // when & then
             assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(rejectedMentorApplicationId))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRMED.getMessage());
         }
 
         @Test
@@ -311,7 +311,7 @@ class AdminMentorApplicationServiceTest {
             // when & then
             assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(approvedMentorApplicationId, request))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRMED.getMessage());
         }
 
         @Test
@@ -323,7 +323,7 @@ class AdminMentorApplicationServiceTest {
             // when & then
             assertThatCode(() -> adminMentorApplicationService.rejectMentorApplication(rejectedMentorApplicationId, request))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRM.getMessage());
+                    .hasMessage(MENTOR_APPLICATION_ALREADY_CONFIRMED.getMessage());
         }
 
         @Test
