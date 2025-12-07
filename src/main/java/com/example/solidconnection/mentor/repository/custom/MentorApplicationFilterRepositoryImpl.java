@@ -49,6 +49,7 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                     region.koreanName,
                     country.koreanName,
                     university.koreanName,
+                    mentorApplication.universitySelectType,
                     mentorApplication.mentorProofUrl,
                     mentorApplication.mentorApplicationStatus,
                     mentorApplication.rejectedReason,
