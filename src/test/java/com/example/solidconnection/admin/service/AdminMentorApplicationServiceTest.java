@@ -58,6 +58,8 @@ class AdminMentorApplicationServiceTest {
     private MentorApplication mentorApplication4;
     private MentorApplication mentorApplication5;
     private MentorApplication mentorApplication6;
+    private MentorApplication mentorApplication7;
+    private MentorApplication mentorApplication8;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +69,8 @@ class AdminMentorApplicationServiceTest {
         SiteUser user4 = siteUserFixture.사용자(4, "test4");
         SiteUser user5 = siteUserFixture.사용자(5, "test5");
         SiteUser user6 = siteUserFixture.사용자(6, "test6");
+        SiteUser user7 = siteUserFixture.사용자(7, "test7");
+        SiteUser user8 = siteUserFixture.사용자(8, "test8");
         University university1 = universityFixture.메이지_대학();
         University university2 = universityFixture.괌_대학();
         University university3 = universityFixture.그라츠_대학();
@@ -76,6 +80,8 @@ class AdminMentorApplicationServiceTest {
         mentorApplication4 = mentorApplicationFixture.승인된_멘토신청(user4.getId(), UniversitySelectType.CATALOG, university3.getId());
         mentorApplication5 = mentorApplicationFixture.대기중_멘토신청(user5.getId(), UniversitySelectType.CATALOG, university1.getId());
         mentorApplication6 = mentorApplicationFixture.거절된_멘토신청(user6.getId(), UniversitySelectType.CATALOG, university2.getId());
+        mentorApplication7 = mentorApplicationFixture.대기중_멘토신청(user7.getId(), UniversitySelectType.OTHER, null);
+        mentorApplication8 = mentorApplicationFixture.거절된_멘토신청(user8.getId(), UniversitySelectType.OTHER, null);
     }
 
     @Nested
@@ -84,9 +90,9 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 멘토_승격_상태를_조건으로_페이징하여_조회한다() {
             // given
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING,null, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING,null, null, null);
             Pageable pageable = PageRequest.of(0, 10);
-            List<MentorApplication> expectedMentorApplications = List.of(mentorApplication2, mentorApplication5);
+            List<MentorApplication> expectedMentorApplications = List.of(mentorApplication2, mentorApplication5, mentorApplication7);
 
             // when
             Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
@@ -107,7 +113,7 @@ class AdminMentorApplicationServiceTest {
         void 닉네임_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
             // given
             String nickname = "test1";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, nickname, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, nickname, null, null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication1);
 
@@ -130,7 +136,7 @@ class AdminMentorApplicationServiceTest {
         void 대학명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
             // given
             String universityKoreanName = "메이지 대학";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, universityKoreanName, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, universityKoreanName, null, null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication1, mentorApplication5);
 
@@ -153,7 +159,7 @@ class AdminMentorApplicationServiceTest {
         void 지역명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
             // given
             String regionKoreanName = "유럽";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, regionKoreanName, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, regionKoreanName, null, null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication3, mentorApplication4);
 
@@ -176,7 +182,7 @@ class AdminMentorApplicationServiceTest {
         void 나라명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
             // given
             String countryKoreanName = "오스트리아";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, countryKoreanName, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, countryKoreanName, null,null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication3, mentorApplication4);
 
@@ -196,10 +202,57 @@ class AdminMentorApplicationServiceTest {
         }
 
         @Test
+        void CATALOG_타입의_멘토_지원서만_조회한다() {
+            // given
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, null, null, UniversitySelectType.CATALOG);
+            Pageable pageable = PageRequest.of(0, 10);
+            List<MentorApplication> expectedMentorApplications = List.of(
+                    mentorApplication1, mentorApplication2, mentorApplication3,
+                    mentorApplication4, mentorApplication5, mentorApplication6
+            );
+
+            // when
+            Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
+
+            // then
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().universitySelectType())
+                    .containsOnly(UniversitySelectType.CATALOG);
+        }
+
+        @Test
+        void OTHER_타입의_멘토_지원서만_조회한다() {
+            // given
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, null, null, UniversitySelectType.OTHER);
+            Pageable pageable = PageRequest.of(0, 10);
+            List<MentorApplication> expectedMentorApplications = List.of(mentorApplication7, mentorApplication8);
+
+            // when
+            Page<MentorApplicationSearchResponse> response = adminMentorApplicationService.searchMentorApplications(condition, pageable);
+
+            // then
+            assertThat(response.getContent()).hasSize(expectedMentorApplications.size());
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().id())
+                    .containsOnly(expectedMentorApplications.stream()
+                                          .map(MentorApplication::getId)
+                                          .toArray(Long[]::new));
+            assertThat(response.getContent())
+                    .extracting(content -> content.mentorApplicationResponse().universitySelectType())
+                    .containsOnly(UniversitySelectType.OTHER);
+        }
+
+        @Test
         void 모든_조건으로_페이징하여_조회한다() {
             // given
             String regionKoreanName = "영미권";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING, regionKoreanName, LocalDate.now());
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING, regionKoreanName, LocalDate.now(), UniversitySelectType.CATALOG);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication2);
 
@@ -347,8 +400,8 @@ class AdminMentorApplicationServiceTest {
         void 상태별_멘토_지원서_개수를_조회한다() {
             // given
             List<MentorApplication> expectedApprovedCount = List.of(mentorApplication1, mentorApplication4);
-            List<MentorApplication> expectedPendingCount = List.of(mentorApplication2, mentorApplication5);
-            List<MentorApplication> expectedRejectedCount = List.of(mentorApplication3, mentorApplication6);
+            List<MentorApplication> expectedPendingCount = List.of(mentorApplication2, mentorApplication5, mentorApplication7);
+            List<MentorApplication> expectedRejectedCount = List.of(mentorApplication3, mentorApplication6, mentorApplication8);
 
             // when
             MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
