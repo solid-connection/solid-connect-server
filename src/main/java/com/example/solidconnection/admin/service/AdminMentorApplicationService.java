@@ -1,7 +1,9 @@
 package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
@@ -10,7 +12,10 @@ import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
+import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
+import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.repository.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminMentorApplicationService {
 
     private final MentorApplicationRepository mentorApplicationRepository;
+    private final UniversityRepository universityRepository;
 
     @Transactional(readOnly = true)
     public Page<MentorApplicationSearchResponse> searchMentorApplications(
@@ -44,7 +50,10 @@ public class AdminMentorApplicationService {
     }
 
     @Transactional
-    public void rejectMentorApplication(long mentorApplicationId, MentorApplicationRejectRequest request) {
+    public void rejectMentorApplication(
+            long mentorApplicationId,
+            MentorApplicationRejectRequest request
+    ) {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
@@ -62,5 +71,22 @@ public class AdminMentorApplicationService {
                 pendingCount,
                 rejectedCount
         );
+    }
+
+    @Transactional
+    public void assignUniversity(
+            Long mentorApplicationId,
+            Long universityId
+    ) {
+        MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
+                .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
+
+        if(mentorApplication.getUniversitySelectType() != UniversitySelectType.OTHER){
+            throw new CustomException(MENTOR_APPLICATION_NOT_OTHER_STATUS);
+        }
+
+        University university = universityRepository.getUniversityById(universityId);
+
+        mentorApplication.assignUniversity(university.getId());
     }
 }

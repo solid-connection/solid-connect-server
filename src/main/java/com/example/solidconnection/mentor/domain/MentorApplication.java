@@ -8,6 +8,7 @@ import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
+import com.example.solidconnection.university.domain.University;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -135,5 +136,10 @@ public class MentorApplication extends BaseEntity {
         }
         this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
         this.rejectedReason = rejectedReason;
+    }
+
+    public void assignUniversity(long universityId) {
+        this.universityId = universityId;
+        this.universitySelectType = UniversitySelectType.CATALOG;
     }
 }
