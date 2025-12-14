@@ -2,7 +2,9 @@ package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -428,6 +430,61 @@ class AdminMentorApplicationServiceTest {
                     () -> assertThat(response.pendingCount()).isEqualTo(0L),
                     () -> assertThat(response.rejectedCount()).isEqualTo(0L)
             );
+        }
+    }
+
+    @Nested
+    class 멘토_지원서에_대학_매핑 {
+
+        @Test
+        void OTHER_타입의_멘토_지원서에_대학을_매핑하면_대학이_할당되고_타입이_CATALOG로_변경된다() {
+            // given
+            long otherTypeMentorApplicationId = mentorApplication7.getId();
+            University university = universityFixture.메이지_대학();
+
+            // when
+            adminMentorApplicationService.assignUniversity(otherTypeMentorApplicationId, university.getId());
+
+            // then
+            MentorApplication result = mentorApplicationRepository.findById(otherTypeMentorApplicationId).get();
+            assertThat(result.getUniversityId()).isEqualTo(university.getId());
+            assertThat(result.getUniversitySelectType()).isEqualTo(UniversitySelectType.CATALOG);
+        }
+
+        @Test
+        void 존재하지_않는_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
+            // given
+            long nonExistentId = 99999L;
+            University university = universityFixture.메이지_대학();
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.assignUniversity(nonExistentId, university.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void CATALOG_타입의_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
+            // given
+            long catalogTypeMentorApplicationId = mentorApplication2.getId();
+            University university = universityFixture.메이지_대학();
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.assignUniversity(catalogTypeMentorApplicationId, university.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_APPLICATION_NOT_OTHER_STATUS.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_대학을_매핑하면_예외_응답을_반환한다() {
+            // given
+            long otherTypeMentorApplicationId = mentorApplication7.getId();
+            long nonExistentUniversityId = 99999L;
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.assignUniversity(otherTypeMentorApplicationId, nonExistentUniversityId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(UNIVERSITY_NOT_FOUND.getMessage());
         }
     }
 }
