@@ -3,7 +3,6 @@ package com.example.solidconnection.admin.service;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
-import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;

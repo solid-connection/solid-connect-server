@@ -8,7 +8,6 @@ import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
-import com.example.solidconnection.university.domain.University;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
