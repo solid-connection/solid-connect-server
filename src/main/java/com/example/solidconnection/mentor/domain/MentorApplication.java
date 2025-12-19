@@ -1,5 +1,9 @@
 package com.example.solidconnection.mentor.domain;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.MICROS;
+
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
@@ -115,5 +119,21 @@ public class MentorApplication extends BaseEntity {
         if(!ALLOWED.contains(exchangeStatus)) {
             throw new CustomException(ErrorCode.INVALID_EXCHANGE_STATUS_FOR_MENTOR);
         }
+    }
+
+    public void approve(){
+        if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
+            throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
+        }
+        this.mentorApplicationStatus = MentorApplicationStatus.APPROVED;
+        this.approvedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+    }
+
+    public void reject(String rejectedReason){
+        if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
+            throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
+        }
+        this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
+        this.rejectedReason = rejectedReason;
     }
 }

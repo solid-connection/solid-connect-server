@@ -1,5 +1,7 @@
 package com.example.solidconnection.admin.controller;
 
+import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
+import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.admin.service.AdminMentorApplicationService;
@@ -12,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +38,28 @@ public class AdminMentorApplicationController {
         );
 
         return ResponseEntity.ok(PageResponse.of(page));
+    }
+
+    @PostMapping("/{mentorApplicationId}/approve")
+    public ResponseEntity<Void> approveMentorApplication(
+            @PathVariable("mentorApplicationId") Long mentorApplicationId
+    ) {
+        adminMentorApplicationService.approveMentorApplication(mentorApplicationId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{mentorApplicationId}/reject")
+    public ResponseEntity<Void> rejectMentorApplication(
+            @PathVariable("mentorApplicationId") Long mentorApplicationId,
+            @Valid @RequestBody MentorApplicationRejectRequest request
+    ) {
+        adminMentorApplicationService.rejectMentorApplication(mentorApplicationId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<MentorApplicationCountResponse> getMentorApplicationCount() {
+        MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
+        return ResponseEntity.ok(response);
     }
 }
