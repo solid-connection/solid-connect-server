@@ -334,7 +334,7 @@ class MyPageServiceTest {
 
         @ParameterizedTest
         @EnumSource(value = AuthType.class, names = {"KAKAO", "APPLE"})
-        void 소셜_로그인_사용자는_비밀번호를_변경할_수_없다(AuthType authType) {
+        void 소셜_로그인_사용자가_비밀번호를_변경하면_예외가_발생한다(AuthType authType) {
             // given
             SiteUser oauthUser = siteUserFixtureBuilder.siteUser()
                     .email("oauth@example.com")
