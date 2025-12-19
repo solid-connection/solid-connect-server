@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPL
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
@@ -353,9 +354,11 @@ class AdminMentorApplicationServiceTest {
             MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
 
             // then
-            assertThat(response.approved()).isEqualTo(expectedApprovedCount.size());
-            assertThat(response.pending()).isEqualTo(expectedPendingCount.size());
-            assertThat(response.rejected()).isEqualTo(expectedRejectedCount.size());
+            assertAll(
+                    () -> assertThat(response.approvedCount()).isEqualTo(expectedApprovedCount.size()),
+                    () -> assertThat(response.pendingCount()).isEqualTo(expectedPendingCount.size()),
+                    () -> assertThat(response.rejectedCount()).isEqualTo(expectedRejectedCount.size())
+            );
         }
 
         @Test
@@ -367,9 +370,11 @@ class AdminMentorApplicationServiceTest {
             MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
 
             // then
-            assertThat(response.approved()).isEqualTo(0L);
-            assertThat(response.pending()).isEqualTo(0L);
-            assertThat(response.rejected()).isEqualTo(0L);
+            assertAll(
+                    () -> assertThat(response.approvedCount()).isEqualTo(0L),
+                    () -> assertThat(response.pendingCount()).isEqualTo(0L),
+                    () -> assertThat(response.rejectedCount()).isEqualTo(0L)
+            );
         }
     }
 }
