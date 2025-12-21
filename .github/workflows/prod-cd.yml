@@ -150,8 +150,18 @@ jobs:
             echo "Pulling new image: $FULL_IMAGE_NAME"
             docker pull $FULL_IMAGE_NAME
           
-            # 4. Nginx 설정 적용
+            # 4. alloy 설정 및 Nginx 설정 적용
             cd /home/${{ secrets.USERNAME }}/solid-connection-prod
+          
+            mkdir -p ./docs/infra-config
+          
+            if [ -d "./docs/infra-config/config.alloy" ]; then
+              echo "Removing directory created by Docker..."
+              rm -rf ./docs/infra-config/config.alloy
+            fi
+          
+            mv -f ./config.alloy ./docs/infra-config/config.alloy
+          
             mkdir -p ./nginx
             mv ./nginx.prod.conf ./nginx/default.conf
             sudo cp ./nginx/default.conf /etc/nginx/conf.d/default.conf
