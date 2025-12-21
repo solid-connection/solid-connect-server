@@ -28,15 +28,8 @@ public class AdminRegionService {
 
     @Transactional
     public AdminRegionResponse createRegion(AdminRegionCreateRequest request) {
-        regionRepository.findById(request.code())
-                .ifPresent(region -> {
-                    throw new CustomException(ErrorCode.REGION_ALREADY_EXISTS);
-                });
-
-        regionRepository.findByKoreanName(request.koreanName())
-                .ifPresent(region -> {
-                    throw new CustomException(ErrorCode.REGION_ALREADY_EXISTS);
-                });
+        validateCodeNotExists(request.code());
+        validateKoreanNameNotExists(request.koreanName());
 
         Region region = new Region(request.code(), request.koreanName());
         Region savedRegion = regionRepository.save(region);
@@ -44,22 +37,38 @@ public class AdminRegionService {
         return AdminRegionResponse.from(savedRegion);
     }
 
+    private void validateCodeNotExists(String code) {
+        regionRepository.findById(code)
+                .ifPresent(region -> {
+                    throw new CustomException(ErrorCode.REGION_ALREADY_EXISTS);
+                });
+    }
+
+    private void validateKoreanNameNotExists(String koreanName) {
+        regionRepository.findByKoreanName(koreanName)
+                .ifPresent(region -> {
+                    throw new CustomException(ErrorCode.REGION_ALREADY_EXISTS);
+                });
+    }
+
     @Transactional
     public AdminRegionResponse updateRegion(String code, AdminRegionUpdateRequest request) {
         Region region = regionRepository.findById(code)
                 .orElseThrow(() -> new CustomException(ErrorCode.REGION_NOT_FOUND));
 
-        regionRepository.findByKoreanName(request.koreanName())
+        validateKoreanNameNotDuplicated(request.koreanName(), code);
+
+        region.updateKoreanName(request.koreanName());
+        return AdminRegionResponse.from(region);
+    }
+
+    private void validateKoreanNameNotDuplicated(String koreanName, String excludeCode) {
+        regionRepository.findByKoreanName(koreanName)
                 .ifPresent(existingRegion -> {
-                    if (!existingRegion.getCode().equals(code)) {
+                    if (!existingRegion.getCode().equals(excludeCode)) {
                         throw new CustomException(ErrorCode.REGION_ALREADY_EXISTS);
                     }
                 });
-
-        Region updatedRegion = new Region(region.getCode(), request.koreanName());
-        Region savedRegion = regionRepository.save(updatedRegion);
-
-        return AdminRegionResponse.from(savedRegion);
     }
 
     @Transactional

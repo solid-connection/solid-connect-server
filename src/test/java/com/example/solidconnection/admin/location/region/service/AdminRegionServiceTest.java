@@ -44,7 +44,6 @@ class AdminRegionServiceTest {
         }
 
         @Test
-        @DisplayName("저장된 모든 지역을 조회한다")
         void 저장된_모든_지역을_조회한다() {
             // given
             Region region1 = regionFixture.영미권();
