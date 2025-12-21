@@ -2,7 +2,10 @@ package com.example.solidconnection.database;
 
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_CLASS;
 
 @TestContainerSpringBootTest
 @TestPropertySource(properties = {
@@ -10,6 +13,7 @@ import org.springframework.test.context.TestPropertySource;
         "spring.flyway.baseline-on-migrate=true",
         "spring.jpa.hibernate.ddl-auto=validate"
 })
+@DirtiesContext(classMode = BEFORE_CLASS)
 class FlywayMigrationTest {
 
     @Test
