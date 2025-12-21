@@ -67,6 +67,7 @@ public enum ErrorCode {
     PASSWORD_NOT_CHANGED(HttpStatus.BAD_REQUEST.value(), "현재 비밀번호와 새 비밀번호가 동일합니다."),
     PASSWORD_NOT_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "새 비밀번호가 일치하지 않습니다."),
     SIGN_IN_FAILED(HttpStatus.UNAUTHORIZED.value(), "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."),
+    OAUTH_USER_CANNOT_CHANGE_PASSWORD(HttpStatus.BAD_REQUEST.value(), "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
 
     // s3
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),

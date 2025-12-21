@@ -3,6 +3,7 @@ package com.example.solidconnection.siteuser.service;
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.OAUTH_USER_CANNOT_CHANGE_PASSWORD;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -16,6 +17,7 @@ import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
@@ -125,6 +127,10 @@ public class MyPageService {
     public void updatePassword(long siteUserId, PasswordUpdateRequest request) {
         SiteUser user = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (!AuthType.isEmail(user.getAuthType())) {
+            throw new CustomException(OAUTH_USER_CANNOT_CHANGE_PASSWORD);
+        }
 
         // 사용자의 비밀번호와 request의 currentPassword가 동일한지 검증
         validatePasswordMatch(request.currentPassword(), user.getPassword());
