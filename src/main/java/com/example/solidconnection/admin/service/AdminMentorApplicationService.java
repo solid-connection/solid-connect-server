@@ -80,7 +80,7 @@ public class AdminMentorApplicationService {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
-        if(mentorApplication.getUniversitySelectType() != UniversitySelectType.OTHER){
+        if (mentorApplication.getUniversitySelectType() != UniversitySelectType.OTHER){
             throw new CustomException(MENTOR_APPLICATION_NOT_OTHER_STATUS);
         }
 
