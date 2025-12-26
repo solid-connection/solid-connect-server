@@ -133,7 +133,7 @@ jobs:
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
             cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
             docker compose -f docker-compose.dev.yml down || true
-            IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
+            OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
           
             # 4. 정리 작업
             echo "Pruning dangling images..."
