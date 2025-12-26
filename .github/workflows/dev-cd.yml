@@ -108,14 +108,11 @@ jobs:
           scp -i deploy_key.pem \
             -o StrictHostKeyChecking=no \
             ./docker-compose.dev.yml \
-            ./docs/infra-config/config.alloy \
-            ./docs/infra-config/nginx.dev.conf \
             ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}:/home/${{ secrets.DEV_USERNAME }}/solid-connection-dev/
 
       # --- 서버에서 Docker Pull 및 재시작 ---
-      - name: Run docker compose and apply nginx config
+      - name: Run deployment on server
         run: |
-          # GITHUB_TOKEN을 이용해 서버에서 로그인 (App Token 불필요)
           ssh -i deploy_key.pem \
            -o StrictHostKeyChecking=no \
            ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }} \
@@ -127,38 +124,18 @@ jobs:
             export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
           
-            # 2. 서버가 GHCR에 로그인 (GITHUB_TOKEN 사용)
-            # App Token 대신 현재 워크플로우의 임시 토큰을 넘겨줍니다.
+            # 2. GHCR 로그인 & Pull
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          
-            # 3. Docker Pull
             echo "Pulling new image: $FULL_IMAGE_NAME"
             docker pull $FULL_IMAGE_NAME
           
-            # 4. alloy 설정 및 Nginx 설정 적용
-            cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
-          
-            mkdir -p ./docs/infra-config
-            
-            if [ -d "./docs/infra-config/config.alloy" ]; then
-              echo "Removing directory created by Docker..."
-              rm -rf ./docs/infra-config/config.alloy
-            fi
-            
-            mv -f ./config.alloy ./docs/infra-config/config.alloy
-          
-            mkdir -p ./nginx
-            mv ./nginx.dev.conf ./nginx/default.conf
-            sudo cp ./nginx/default.conf /etc/nginx/conf.d/default.conf
-            sudo nginx -t
-            sudo nginx -s reload
-          
-            # 5. Docker Compose 재시작
+            # 3. Spring Boot 앱 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
+            cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
             docker compose -f docker-compose.dev.yml down
             IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
           
-            # 6. 정리 작업
+            # 4. 정리 작업
             echo "Pruning dangling images..."
             docker image prune -f
           
