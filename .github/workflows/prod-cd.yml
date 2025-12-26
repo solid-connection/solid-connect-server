@@ -149,7 +149,7 @@ jobs:
             # 3. Spring Boot 앱 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
             cd /home/${{ secrets.USERNAME }}/solid-connection-prod
-            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml down || true
             OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.prod.yml up -d
           
             # 6. 정리
