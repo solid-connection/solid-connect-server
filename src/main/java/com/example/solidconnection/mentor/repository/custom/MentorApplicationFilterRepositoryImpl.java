@@ -12,6 +12,7 @@ import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.admin.dto.SiteUserResponse;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
+import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -48,6 +49,7 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                     region.koreanName,
                     country.koreanName,
                     university.koreanName,
+                    mentorApplication.universitySelectType,
                     mentorApplication.mentorProofUrl,
                     mentorApplication.mentorApplicationStatus,
                     mentorApplication.rejectedReason,
@@ -81,7 +83,8 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                 .where(
                         verifyMentorStatusEq(condition.mentorApplicationStatus()),
                         keywordContains(condition.keyword()),
-                        createdAtEq(condition.createdAt())
+                        createdAtEq(condition.createdAt()),
+                        universitySelectTypeEq(condition.universitySelectType())
                 )
                 .orderBy(mentorApplication.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -110,7 +113,8 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
         return query.where(
                 verifyMentorStatusEq(condition.mentorApplicationStatus()),
                 keywordContains(condition.keyword()),
-                createdAtEq(condition.createdAt())
+                createdAtEq(condition.createdAt()),
+                universitySelectTypeEq(condition.universitySelectType())
         );
     }
 
@@ -141,5 +145,9 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                 startOfDay.atZone(SYSTEM_ZONE_ID),
                 endOfDay.atZone(SYSTEM_ZONE_ID)
         );
+    }
+
+    private BooleanExpression universitySelectTypeEq(UniversitySelectType universitySelectType) {
+        return universitySelectType != null ? mentorApplication.universitySelectType.eq(universitySelectType) : null;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.solidconnection.mentor.domain;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.MICROS;
 
@@ -122,18 +124,39 @@ public class MentorApplication extends BaseEntity {
     }
 
     public void approve(){
-        if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
-            throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
-        }
+        validatePending();
+        validateCanApprove();
         this.mentorApplicationStatus = MentorApplicationStatus.APPROVED;
         this.approvedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
 
+    private void validateCanApprove(){
+        if(this.universitySelectType != UniversitySelectType.CATALOG){
+            throw new CustomException(MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED);
+        }
+    }
+
     public void reject(String rejectedReason){
+        validatePending();
+        this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
+        this.rejectedReason = rejectedReason;
+    }
+
+    public void assignUniversity(long universityId) {
+        this.universityId = universityId;
+        this.universitySelectType = UniversitySelectType.CATALOG;
+    }
+    
+    public void validateCanAssignUniversity(){
+        validatePending();
+        if(this.universitySelectType != UniversitySelectType.OTHER){
+            throw new CustomException(MENTOR_APPLICATION_NOT_OTHER_STATUS);
+        }
+    }
+
+    private void validatePending(){
         if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
             throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
         }
-        this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
-        this.rejectedReason = rejectedReason;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.controller;
 
+import com.example.solidconnection.admin.dto.MentorApplicationAssignUniversityRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
@@ -40,17 +41,17 @@ public class AdminMentorApplicationController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PostMapping("/{mentorApplicationId}/approve")
+    @PostMapping("/{mentor-application-id}/approve")
     public ResponseEntity<Void> approveMentorApplication(
-            @PathVariable("mentorApplicationId") Long mentorApplicationId
+            @PathVariable("mentor-application-id") Long mentorApplicationId
     ) {
         adminMentorApplicationService.approveMentorApplication(mentorApplicationId);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{mentorApplicationId}/reject")
+    @PostMapping("/{mentor-application-id}/reject")
     public ResponseEntity<Void> rejectMentorApplication(
-            @PathVariable("mentorApplicationId") Long mentorApplicationId,
+            @PathVariable("mentor-application-id") Long mentorApplicationId,
             @Valid @RequestBody MentorApplicationRejectRequest request
     ) {
         adminMentorApplicationService.rejectMentorApplication(mentorApplicationId, request);
@@ -61,5 +62,15 @@ public class AdminMentorApplicationController {
     public ResponseEntity<MentorApplicationCountResponse> getMentorApplicationCount() {
         MentorApplicationCountResponse response = adminMentorApplicationService.getMentorApplicationCount();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{mentor-application-id}/assign-university")
+    public ResponseEntity<Void> assignUniversity(
+            @PathVariable("mentor-application-id") Long mentorApplicationId,
+            @Valid @RequestBody MentorApplicationAssignUniversityRequest request
+    ) {
+        Long universityId = request.universityId();
+        adminMentorApplicationService.assignUniversity(mentorApplicationId, universityId);
+        return ResponseEntity.ok().build();
     }
 }
