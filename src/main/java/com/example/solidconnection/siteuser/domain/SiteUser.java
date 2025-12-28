@@ -70,6 +70,10 @@ public class SiteUser extends BaseEntity {
     @Column(nullable = true)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
     public SiteUser(
             String email,
             String nickname,
@@ -119,5 +123,9 @@ public class SiteUser extends BaseEntity {
 
     public void updatePassword(String newEncodedPassword) {
         this.password = newEncodedPassword;
+    }
+
+    public void updateUserStatus(UserStatus status) {
+        this.userStatus = status;
     }
 }
