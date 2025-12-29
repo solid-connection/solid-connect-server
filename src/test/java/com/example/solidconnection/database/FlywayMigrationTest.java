@@ -41,5 +41,7 @@ class FlywayMigrationTest {
 
     @Test
     void flyway_스크립트가_정상적으로_수행되는지_확인한다() {
+        // Spring Boot 컨텍스트가 정상적으로 시작되면
+        // Flyway 마이그레이션과 ddl-auto=validate 검증이 성공한 것
     }
 }
