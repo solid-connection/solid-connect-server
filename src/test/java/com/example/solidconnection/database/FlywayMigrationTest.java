@@ -9,11 +9,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
-@Testcontainers
 @ContextConfiguration(initializers = {RedisTestContainer.class, FlywayMigrationTest.FlywayMySQLInitializer.class})
 @TestPropertySource(properties = {
         "spring.flyway.enabled=true",
@@ -22,20 +19,23 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 })
 class FlywayMigrationTest {
 
-    @Container
-    private static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.0")
+    private static final MySQLContainer<?> CONTAINER = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("flyway_test")
             .withUsername("flyway_user")
             .withPassword("flyway_password");
 
+    static {
+        CONTAINER.start();
+    }
+
     static class FlywayMySQLInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
-        public void initialize(ConfigurableApplicationContext ctx) {
+        public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues.of(
-                    "spring.datasource.url=" + MYSQL.getJdbcUrl(),
-                    "spring.datasource.username=" + MYSQL.getUsername(),
-                    "spring.datasource.password=" + MYSQL.getPassword()
-            ).applyTo(ctx.getEnvironment());
+                    "spring.datasource.url=" + CONTAINER.getJdbcUrl(),
+                    "spring.datasource.username=" + CONTAINER.getUsername(),
+                    "spring.datasource.password=" + CONTAINER.getPassword()
+            ).applyTo(applicationContext.getEnvironment());
         }
     }
 
