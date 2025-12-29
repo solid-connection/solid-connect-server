@@ -39,4 +39,6 @@ public interface MentoringRepository extends JpaRepository<Mentoring, Long> {
 
     @Query("SELECT m FROM Mentoring m WHERE m.menteeId = :menteeId AND m.verifyStatus = :verifyStatus")
     Slice<Mentoring> findApprovedMentoringsByMenteeId(long menteeId, @Param("verifyStatus") VerifyStatus verifyStatus, Pageable pageable);
+
+    void deleteAllByMenteeId(long menteeId);
 }

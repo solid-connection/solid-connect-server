@@ -9,4 +9,6 @@ public interface LikedNewsRepository extends JpaRepository<LikedNews, Long> {
     boolean existsByNewsIdAndSiteUserId(long newsId, long siteUserId);
 
     Optional<LikedNews> findByNewsIdAndSiteUserId(long newsId, long siteUserId);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

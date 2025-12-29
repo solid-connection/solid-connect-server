@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MentorApplicationRepository extends JpaRepository<MentorApplication, Long> {
 
     boolean existsBySiteUserIdAndMentorApplicationStatusIn(long siteUserId, List<MentorApplicationStatus> mentorApplicationStatuses);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }
