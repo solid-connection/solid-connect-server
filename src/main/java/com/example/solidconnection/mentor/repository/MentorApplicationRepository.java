@@ -14,4 +14,8 @@ public interface MentorApplicationRepository extends JpaRepository<MentorApplica
     Optional<MentorApplication> findBySiteUserIdAndMentorApplicationStatus(long siteUserId, MentorApplicationStatus mentorApplicationStatus);
 
     long countByMentorApplicationStatus(MentorApplicationStatus mentorApplicationStatus);
+
+    List<MentorApplication> findTop5BySiteUserIdOrderByCreatedAtDesc(long siteUserId);
+
+    long countBySiteUserId(long siteUserId);
 }
