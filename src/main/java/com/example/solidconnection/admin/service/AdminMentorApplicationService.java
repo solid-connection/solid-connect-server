@@ -50,7 +50,7 @@ public class AdminMentorApplicationService {
 
     @Transactional
     public void rejectMentorApplication(
-            long mentorApplicationId,
+            Long mentorApplicationId,
             MentorApplicationRejectRequest request
     ) {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
