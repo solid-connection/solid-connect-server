@@ -9,6 +9,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NOT_DEFINED
 import com.example.solidconnection.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CustomExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
-    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
-        log.error("커스텀 예외 발생 : {}", ex.getMessage());
+    protected ResponseEntity<ErrorResponse> handleCustomException(
+            CustomException ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
+        log.error("커스텀 예외 발생 userId : {} msg: {}", userId, ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(ex);
         return ResponseEntity
                 .status(ex.getCode())
@@ -33,9 +39,14 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(InvalidFormatException.class)
-    public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex) {
+    public ResponseEntity<Object> handleInvalidFormatException(
+            InvalidFormatException ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
         String errorMessage = ex.getValue() + " 은(는) 유효하지 않은 값입니다.";
-        log.error("JSON 파싱 예외 발생 : {}", errorMessage);
+        log.error("JSON 파싱 예외 발생 userId: {} msg: {}", userId, errorMessage);
         ErrorResponse errorResponse = new ErrorResponse(JSON_PARSING_FAILED, errorMessage);
         return ResponseEntity
                 .status(JSON_PARSING_FAILED.getCode())
@@ -43,14 +54,20 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
+
         List<String> errors = new ArrayList<>();
         ex.getBindingResult()
                 .getFieldErrors()
                 .forEach(fieldError -> errors.add(fieldError.getDefaultMessage()));
 
         String errorMessage = errors.toString();
-        log.error("입력값 검증 예외 발생 : {}", errorMessage);
+        log.error("입력값 검증 예외 발생 userId : {} msg: {}", userId, errorMessage);
         ErrorResponse errorResponse = new ErrorResponse(INVALID_INPUT, errorMessage);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -58,8 +75,14 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        log.error("데이터 무결성 제약조건 위반 예외 발생 : {}", ex.getMessage());
+    public ResponseEntity<Object> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
+
+        log.error("데이터 무결성 제약조건 위반 예외 발생 userId : {} msg : {}", userId, ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(DATA_INTEGRITY_VIOLATION, "데이터 무결성 제약조건 위반 예외 발생");
         return ResponseEntity
                 .status(DATA_INTEGRITY_VIOLATION.getCode())
@@ -67,9 +90,15 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<Object> handleJwtException(JwtException ex) {
+    public ResponseEntity<Object> handleJwtException(
+            JwtException ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
+
         String errorMessage = ex.getMessage();
-        log.error("JWT 예외 발생 : {}", errorMessage);
+        log.error("JWT 예외 발생 userId : {} msg : {}", userId, errorMessage);
         ErrorResponse errorResponse = new ErrorResponse(JWT_EXCEPTION, errorMessage);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -77,9 +106,15 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleOtherException(Exception ex) {
+    public ResponseEntity<Object> handleOtherException(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        request.setAttribute("exceptionHandlerLogged", true);
+        Long userId = (Long) request.getAttribute("userId");
+
         String errorMessage = ex.getMessage();
-        log.error("서버 내부 예외 발생 : {}", errorMessage);
+        log.error("서버 내부 예외 발생 userId : {} , msg : {}", userId, errorMessage);
         ErrorResponse errorResponse = new ErrorResponse(NOT_DEFINED_ERROR, errorMessage);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

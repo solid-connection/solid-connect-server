@@ -86,7 +86,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        Long userId = (Long) request.getAttribute("user_id");
+        Long userId = (Long) request.getAttribute("userId");
         String uri = buildDecodedRequestUri(request);
         HttpStatus status = HttpStatus.valueOf(response.getStatus());
 
