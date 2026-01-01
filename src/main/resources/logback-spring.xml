@@ -3,7 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <property name="FILE_PATTERN"
+    <property name="LOG_PATTERN"
       value="timestamp=%d{yyyy-MM-dd'T'HH:mm:ss,Asia/Seoul} level=%-5level traceId=%X{traceId} %msg%n"/>
 
     <!-- DEV + PROD 공통 -->
@@ -18,7 +18,7 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>${FILE_PATTERN}</pattern>
+                <pattern>${LOG_PATTERN}</pattern>
             </encoder>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>INFO</level>
@@ -35,7 +35,7 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>${FILE_PATTERN}</pattern>
+                <pattern>${LOG_PATTERN}</pattern>
             </encoder>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>WARN</level>
@@ -52,7 +52,7 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>${FILE_PATTERN}</pattern>
+                <pattern>${LOG_PATTERN}</pattern>
             </encoder>
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>ERROR</level>
@@ -69,7 +69,7 @@
                 <maxHistory>7</maxHistory>
             </rollingPolicy>
             <encoder>
-                <pattern>${FILE_PATTERN}</pattern>
+                <pattern>${LOG_PATTERN}</pattern>
             </encoder>
         </appender>
 
