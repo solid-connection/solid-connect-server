@@ -1,21 +1,29 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.admin.dto.UserBanRequest;
+import com.example.solidconnection.chat.repository.ChatMessageRepository;
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.report.repository.ReportRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.domain.UserBan;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import com.example.solidconnection.siteuser.repository.UserBanRepository;
+import static java.time.ZoneOffset.UTC;
+
 import java.time.ZonedDateTime;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.solidconnection.admin.dto.UserBanRequest;
-import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.common.exception.ErrorCode;
-import com.example.solidconnection.report.repository.ReportRepository;
-import com.example.solidconnection.siteuser.domain.UserBan;
-import com.example.solidconnection.siteuser.repository.UserBanRepository;
-
-import lombok.RequiredArgsConstructor;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AdminUserBanService {
@@ -23,25 +31,38 @@ public class AdminUserBanService {
     private final UserBanRepository userBanRepository;
     private final ReportRepository reportRepository;
     private final SiteUserRepository siteUserRepository;
+    private final PostRepository postRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
     public void banUser(long userId, UserBanRequest request) {
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(UTC); //TODO UTC 확인
         validateNotAlreadyBanned(userId, now);
         validateReportExists(userId);
 
-        deleteReportedContent();
+        updateReportedContentIsDeleted(userId, true);
         createUserBan(userId, request, now);
         updateUserStatus(userId, UserStatus.BANNED);
     }
 
     @Transactional
     public void unbanUser(long userId, long adminId) {
-        ZonedDateTime now = ZonedDateTime.now();
-
-        UserBan userBan = findBannedUser(userId, now);
+        UserBan userBan = findBannedUser(userId, ZonedDateTime.now(UTC));
         userBan.manuallyUnban(adminId);
+        processUnban(userId);
+    }
 
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void expireUserBans() {
+        List<UserBan> expiredBans = userBanRepository.findAllByIsUnbannedFalseAndExpiredAtBefore(ZonedDateTime.now(UTC));
+        for (UserBan userBan : expiredBans) {
+           processUnban(userBan.getBannedUserId());
+        }
+    }
+
+    public void processUnban(long userId) {
+        updateReportedContentIsDeleted(userId, false);
         updateUserStatus(userId, UserStatus.REPORTED);
     }
 
@@ -52,12 +73,14 @@ public class AdminUserBanService {
     }
 
     private void validateReportExists(long userId) {
-        reportRepository.findByTargetId(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.REPORT_NOT_FOUND));
+        if (!reportRepository.existsReportByUserId(userId)) {
+            throw new CustomException(ErrorCode.REPORT_NOT_FOUND);
+        }
     }
 
-    private void deleteReportedContent() {
-        //TODO report 타입에 따라서 콘텐츠 삭제 처리 로직 추가
+    private void updateReportedContentIsDeleted(long userId, boolean isDeleted) {
+        postRepository.updateReportedPostsIsDeleted(userId, isDeleted);
+        chatMessageRepository.updateReportedChatMessagesIsDeleted(userId, isDeleted);
     }
 
     private void createUserBan(long userId, UserBanRequest request, ZonedDateTime now) {

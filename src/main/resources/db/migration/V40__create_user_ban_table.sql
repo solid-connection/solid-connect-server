@@ -11,4 +11,7 @@ CREATE TABLE user_ban
     PRIMARY KEY (id),
     CONSTRAINT fk_user_ban_banned_user_id FOREIGN KEY (banned_user_id) REFERENCES site_user (id),
     CONSTRAINT fk_user_ban_unbanned_by_id FOREIGN KEY (unbanned_by) REFERENCES site_user (id)
-)
+);
+
+ALTER TABLE site_user
+    ADD COLUMN user_status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE';
