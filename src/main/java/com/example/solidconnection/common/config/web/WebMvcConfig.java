@@ -3,6 +3,7 @@ package com.example.solidconnection.common.config.web;
 import com.example.solidconnection.common.interceptor.BannedUserInterceptor;
 import com.example.solidconnection.common.filter.HttpLoggingFilter;
 import com.example.solidconnection.common.interceptor.ApiPerformanceInterceptor;
+import com.example.solidconnection.common.interceptor.RequestContextInterceptor;
 import com.example.solidconnection.common.resolver.AuthorizedUserResolver;
 import com.example.solidconnection.common.resolver.CustomPageableHandlerMethodArgumentResolver;
 import java.util.List;
@@ -24,6 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final BannedUserInterceptor bannedUserInterceptor;
     private final HttpLoggingFilter httpLoggingFilter;
     private final ApiPerformanceInterceptor apiPerformanceInterceptor;
+    private final RequestContextInterceptor requestContextInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -42,6 +44,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(apiPerformanceInterceptor)
+                .addPathPatterns("/**");
+
+        registry.addInterceptor(requestContextInterceptor)
                 .addPathPatterns("/**");
     }
 
