@@ -3,7 +3,6 @@ package com.example.solidconnection.common.listener;
 import com.example.solidconnection.common.interceptor.RequestContext;
 import com.example.solidconnection.common.interceptor.RequestContextHolder;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +33,11 @@ public class QueryMetricsListener implements QueryExecutionListener {
         String httpMethod = (rc != null && rc.getHttpMethod() != null) ? rc.getHttpMethod() : "-";
         String httpPath = (rc != null && rc.getBestMatchPath() != null) ? rc.getBestMatchPath() : "-";
 
-        Timer.builder("db.query")
-                .tag("sql_type", type)
-                .tag("http_method", httpMethod)
-                .tag("http_path", httpPath)
-                .register(meterRegistry)
+        meterRegistry.timer(
+                "db.query",
+                "sql_type", type,
+                "http_method", httpMethod,
+                "http_path", httpPath)
                 .record(elapsedMs, TimeUnit.MILLISECONDS);
     }
 
