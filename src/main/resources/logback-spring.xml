@@ -4,7 +4,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <property name="FILE_PATTERN"
-      value="timestamp=[%d{yyyy-MM-dd'T'HH:mm:ss, Asia/Seoul}] level=%-5level [%X{traceId}] message=%msg%n"/>
+      value="timestamp=%d{yyyy-MM-dd'T'HH:mm:ss,Asia/Seoul} level=%-5level traceId=%X{traceId} %msg%n"/>
 
     <!-- DEV + PROD 공통 -->
     <springProfile name="dev | prod">
