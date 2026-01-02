@@ -1,12 +1,17 @@
 package com.example.solidconnection.security.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
 
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.security.authentication.TokenAuthentication;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import com.example.solidconnection.security.userdetails.SiteUserDetailsService;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,6 +38,9 @@ class TokenAuthenticationFilterTest {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
     @MockBean // 이 테스트코드에서 사용자를 조회할 필요는 없으므로 MockBean 으로 대체
     private SiteUserDetailsService siteUserDetailsService;
 
@@ -45,6 +53,11 @@ class TokenAuthenticationFilterTest {
         response = new MockHttpServletResponse();
         filterChain = spy(FilterChain.class);
         SecurityContextHolder.clearContext();
+
+        SiteUser siteUser = siteUserFixture.사용자(1, "test");
+        SiteUserDetails userDetails = new SiteUserDetails(siteUser);
+        given(siteUserDetailsService.loadUserByUsername(anyString()))
+                .willReturn(userDetails);
     }
 
     @Test
@@ -73,6 +86,24 @@ class TokenAuthenticationFilterTest {
         // then
         assertThat(SecurityContextHolder.getContext().getAuthentication())
                 .isExactlyInstanceOf(TokenAuthentication.class);
+        then(filterChain).should().doFilter(request, response);
+    }
+
+    @Test
+    void 토큰이_있으면_컨텍스트에_저장하고_userId를_request에_설정한다() throws Exception {
+        // given
+        Long expectedUserId = 1L;
+        Date validExpiration = new Date(System.currentTimeMillis() + 1000);
+        String token = createTokenWithExpiration(validExpiration);
+        request = createRequestWithToken(token);
+
+        // when
+        tokenAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        assertThat(SecurityContextHolder.getContext().getAuthentication())
+                .isExactlyInstanceOf(TokenAuthentication.class);
+        assertThat(request.getAttribute("userId")).isEqualTo(expectedUserId);
         then(filterChain).should().doFilter(request, response);
     }
 
