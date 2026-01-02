@@ -74,22 +74,6 @@ class TokenAuthenticationFilterTest {
     }
 
     @Test
-    void 토큰이_있으면_컨텍스트에_저장한다() throws Exception {
-        // given
-        Date validExpiration = new Date(System.currentTimeMillis() + 1000);
-        String token = createTokenWithExpiration(validExpiration);
-        request = createRequestWithToken(token);
-
-        // when
-        tokenAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
-        // then
-        assertThat(SecurityContextHolder.getContext().getAuthentication())
-                .isExactlyInstanceOf(TokenAuthentication.class);
-        then(filterChain).should().doFilter(request, response);
-    }
-
-    @Test
     void 토큰이_있으면_컨텍스트에_저장하고_userId를_request에_설정한다() throws Exception {
         // given
         Long expectedUserId = 1L;

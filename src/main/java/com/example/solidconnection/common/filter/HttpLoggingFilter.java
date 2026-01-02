@@ -28,8 +28,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             "/actuator/**"
     );
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
