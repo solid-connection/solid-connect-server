@@ -111,7 +111,8 @@ public class SiteUser extends BaseEntity {
             ExchangeStatus exchangeStatus,
             Role role,
             AuthType authType,
-            String password) {
+            String password,
+            UserStatus userStatus) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -119,6 +120,7 @@ public class SiteUser extends BaseEntity {
         this.role = role;
         this.authType = authType;
         this.password = password;
+        this.userStatus = userStatus;
     }
 
     public void updatePassword(String newEncodedPassword) {
