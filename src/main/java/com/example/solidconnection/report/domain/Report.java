@@ -33,6 +33,9 @@ public class Report extends BaseEntity {
     @Column(name = "reporter_id")
     private long reporterId;
 
+    @Column(name = "reported_id")
+    private long reportedId;
+
     @Column(name = "report_type")
     @Enumerated(value = EnumType.STRING)
     private ReportType reportType;
@@ -44,9 +47,10 @@ public class Report extends BaseEntity {
     @Column(name = "target_id")
     private long targetId;
 
-    public Report(long reporterId, ReportType reportType, TargetType targetType, long targetId) {
+    public Report(long reporterId, long reportedId, ReportType reportType, TargetType targetType, long targetId) {
         this.reportType = reportType;
         this.reporterId = reporterId;
+        this.reportedId = reportedId;
         this.targetType = targetType;
         this.targetId = targetId;
     }

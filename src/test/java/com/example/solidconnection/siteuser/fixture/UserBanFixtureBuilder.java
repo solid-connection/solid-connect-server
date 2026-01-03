@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.fixture;
 
 import com.example.solidconnection.siteuser.domain.UserBan;
+import com.example.solidconnection.siteuser.domain.UserBanDuration;
 import com.example.solidconnection.siteuser.repository.UserBanRepository;
 import java.time.ZonedDateTime;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ public class UserBanFixtureBuilder {
     private final UserBanRepository userBanRepository;
 
     private Long bannedUserId;
+    private UserBanDuration duration;
     private ZonedDateTime expiredAt;
 
     public UserBanFixtureBuilder userBan() {
@@ -24,13 +26,18 @@ public class UserBanFixtureBuilder {
         return this;
     }
 
+    public UserBanFixtureBuilder duration(UserBanDuration duration) {
+        this.duration = duration;
+        return this;
+    }
+
     public UserBanFixtureBuilder expiredAt(ZonedDateTime expiredAt) {
         this.expiredAt = expiredAt;
         return this;
     }
 
     public UserBan create() {
-        UserBan userBan = new UserBan(bannedUserId, expiredAt);
+        UserBan userBan = new UserBan(bannedUserId, duration, expiredAt);
         return userBanRepository.save(userBan);
     }
 }

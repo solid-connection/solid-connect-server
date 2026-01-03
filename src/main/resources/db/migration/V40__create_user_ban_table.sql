@@ -2,6 +2,7 @@ CREATE TABLE user_ban
 (
     id              BIGINT       NOT NULL AUTO_INCREMENT,
     banned_user_id  BIGINT       NOT NULL,
+    duration        VARCHAR(30)  NOT NULL,
     expired_at      DATETIME(6)    NOT NULL,
     is_unbanned     TINYINT(1)   NOT NULL DEFAULT 0,
     unbanned_by     BIGINT       NULL,
@@ -14,4 +15,7 @@ CREATE TABLE user_ban
 );
 
 ALTER TABLE site_user
-    ADD COLUMN user_status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE';
+    ADD COLUMN user_status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE';
+
+ALTER TABLE report
+    ADD COLUMN reported_id BIGINT;

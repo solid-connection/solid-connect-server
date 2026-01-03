@@ -52,7 +52,7 @@ public class AdminUserBanService {
     }
 
     private void validateReportExists(long userId) {
-        if (!reportRepository.existsReportByUserId(userId)) {
+        if (!reportRepository.existsByReportedId(userId)) {
             throw new CustomException(ErrorCode.REPORT_NOT_FOUND);
         }
     }
@@ -64,7 +64,7 @@ public class AdminUserBanService {
 
     private void createUserBan(long userId, UserBanRequest request, ZonedDateTime now) {
         ZonedDateTime expiredAt = now.plusDays(request.duration().getDays());
-        UserBan userBan = new UserBan(userId, expiredAt);
+        UserBan userBan = new UserBan(userId, request.duration(), expiredAt);
         userBanRepository.save(userBan);
     }
 

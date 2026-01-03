@@ -85,6 +85,18 @@ public class SiteUserFixture {
                 .create();
     }
 
+    public SiteUser 신고된_사용자(String nickname) {
+        return siteUserFixtureBuilder.siteUser()
+                .email("reported@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname(nickname)
+                .profileImageUrl("profileImageUrl")
+                .role(Role.MENTEE)
+                .password("reported123")
+                .userStatus(UserStatus.REPORTED)
+                .create();
+    }
+
     public SiteUser 차단된_사용자(String nickname) {
         return siteUserFixtureBuilder.siteUser()
                 .email("banned@example.com")

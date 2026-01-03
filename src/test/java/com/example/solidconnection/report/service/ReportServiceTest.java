@@ -61,12 +61,14 @@ class ReportServiceTest {
     private ChatMessageFixture chatMessageFixture;
 
     private SiteUser siteUser;
+    private SiteUser reportedUser;
     private Post post;
     private ChatMessage chatMessage;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
+        reportedUser = siteUserFixture.신고된_사용자("신고된사용자");
         Board board = boardFixture.자유게시판();
         post = postFixture.게시글(board, siteUser);
         ChatRoom chatRoom = chatRoomFixture.채팅방(false);
@@ -106,7 +108,7 @@ class ReportServiceTest {
         @Test
         void 이미_신고한_경우_예외가_발생한다() {
             // given
-            reportFixture.신고(siteUser.getId(), TargetType.POST, post.getId());
+            reportFixture.신고(siteUser.getId(), reportedUser.getId(), TargetType.POST, post.getId());
             ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.POST, post.getId());
 
             // when & then
@@ -148,7 +150,7 @@ class ReportServiceTest {
         @Test
         void 이미_신고한_경우_예외가_발생한다() {
             // given
-            reportFixture.신고(siteUser.getId(), TargetType.CHAT, chatMessage.getId());
+            reportFixture.신고(siteUser.getId(), reportedUser.getId(), TargetType.CHAT, chatMessage.getId());
             ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.CHAT, chatMessage.getId());
 
             // when & then

@@ -4,7 +4,13 @@ import java.time.ZonedDateTime;
 
 import com.example.solidconnection.common.BaseEntity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +29,10 @@ public class UserBan extends BaseEntity {
     @Column(name = "banned_user_id", nullable = false)
     private Long bannedUserId;
 
+    @Column(name = "duration", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserBanDuration duration;
+
     @Column(name = "expired_at", nullable = false)
     private ZonedDateTime expiredAt;
 
@@ -35,8 +45,9 @@ public class UserBan extends BaseEntity {
     @Column(name = "unbanned_at")
     private ZonedDateTime unbannedAt;
 
-    public UserBan(Long bannedUserId, ZonedDateTime expiredAt) {
+    public UserBan(Long bannedUserId, UserBanDuration duration, ZonedDateTime expiredAt) {
         this.bannedUserId = bannedUserId;
+        this.duration = duration;
         this.expiredAt = expiredAt;
     }
 

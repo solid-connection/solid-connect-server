@@ -68,7 +68,7 @@ class AdminUserBanServiceTest {
     @BeforeEach
     void setUp() {
         admin = siteUserFixture.관리자();
-        reportedUser = siteUserFixture.사용자(1, "신고당한유저");
+        reportedUser = siteUserFixture.신고된_사용자("신고된사용자");
         reporter = siteUserFixture.사용자(2, "신고자");
         reportedPost = postFixture.게시글(
                 "신고될 게시글",
@@ -87,7 +87,7 @@ class AdminUserBanServiceTest {
         @Test
         void 사용자를_차단한다() {
             // given
-            reportFixture.신고(reporter.getId(), TargetType.POST, reportedPost.getId());
+            reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
             UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
 
             // when
@@ -101,7 +101,7 @@ class AdminUserBanServiceTest {
         @Test
         void 이미_차단된_사용자는_다시_차단할_수_없다() {
             // given
-            reportFixture.신고(reporter.getId(), TargetType.POST, reportedPost.getId());
+            reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
             UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
             adminUserBanService.banUser(reportedUser.getId(), request);
 
@@ -129,7 +129,7 @@ class AdminUserBanServiceTest {
             @Test
             void 차단된_사용자를_수동으로_해제한다() {
                 // given
-                reportFixture.신고(reporter.getId(), TargetType.POST, reportedPost.getId());
+                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
                 UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
                 adminUserBanService.banUser(reportedUser.getId(), request);
 
@@ -144,7 +144,7 @@ class AdminUserBanServiceTest {
             @Test
             void 차단_해제_정보가_올바르게_저장된다() {
                 // given
-                reportFixture.신고(reporter.getId(), TargetType.POST, reportedPost.getId());
+                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
                 UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
                 adminUserBanService.banUser(reportedUser.getId(), request);
                 ZonedDateTime beforeUnban = ZonedDateTime.now();
@@ -229,7 +229,7 @@ class AdminUserBanServiceTest {
                         boardFixture.자유게시판(),
                         reportedUser
                 );
-                reportFixture.신고(reporter.getId(), TargetType.POST, reportedPost.getId());
+                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
                 adminUserBanService.banUser(reportedUser.getId(), new UserBanRequest(UserBanDuration.SEVEN_DAYS));
 
                 // when

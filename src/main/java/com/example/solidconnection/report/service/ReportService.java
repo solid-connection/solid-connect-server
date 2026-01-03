@@ -31,17 +31,22 @@ public class ReportService {
 
     @Transactional
     public void createReport(long reporterId, ReportRequest request) {
-        validateReporterExists(reporterId);
+        long reportedId = findReportedId(request.targetType(), request.targetId());
+        validateReporterAndReportedExists(reporterId, reportedId);
         validateTargetExists(request.targetType(), request.targetId());
         validateFirstReportByUser(reporterId, request.targetType(), request.targetId());
-        updateReportedUserStatus(request.targetType(), request.targetId());
+        updateUserStatusToReported(reportedId);
 
-        Report report = new Report(reporterId, request.reportType(), request.targetType(), request.targetId());
+        Report report = new Report(reporterId, reportedId, request.reportType(), request.targetType(), request.targetId());
         reportRepository.save(report);
     }
 
-    private void validateReporterExists(long reporterId) {
+    private void validateReporterAndReportedExists(long reporterId, long reportedId) {
         if (!siteUserRepository.existsById(reporterId)) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (!siteUserRepository.existsById(reportedId)) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
@@ -63,12 +68,7 @@ public class ReportService {
         }
     }
 
-    private void updateReportedUserStatus(TargetType targetType, long targetId) {
-        long targetUserId = findTargetUserId(targetType, targetId);
-        updateUserStatusToReported(targetUserId);
-    }
-
-    private long findTargetUserId(TargetType targetType, long targetId) {
+    private long findReportedId(TargetType targetType, long targetId) {
         return switch (targetType) {
             case POST -> findPostAuthorId(targetId);
             case CHAT -> findChatMessageSenderId(targetId);
