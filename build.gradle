@@ -70,7 +70,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Database Proxy
-    implementation 'net.ttddyy:datasource-proxy:1.11.0'
     implementation 'net.ttddyy.observation:datasource-micrometer:1.2.0'
 }
 

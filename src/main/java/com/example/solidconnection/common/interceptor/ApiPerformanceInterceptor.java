@@ -14,7 +14,6 @@ import org.springframework.web.servlet.HandlerMapping;
 @RequiredArgsConstructor
 @Component
 public class ApiPerformanceInterceptor implements HandlerInterceptor {
-    private static final String ROUTE_PATTERN_ATTRIBUTE = "routePattern";
     private static final String START_TIME_ATTRIBUTE = "startTime";
     private static final String REQUEST_URI_ATTRIBUTE = "requestUri";
     private static final int RESPONSE_TIME_THRESHOLD = 3_000;
@@ -31,12 +30,6 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
 
         request.setAttribute(START_TIME_ATTRIBUTE, startTime);
         request.setAttribute(REQUEST_URI_ATTRIBUTE, request.getRequestURI());
-
-        Object bestMatchingPattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-
-        if(bestMatchingPattern instanceof String s) {
-            request.setAttribute(ROUTE_PATTERN_ATTRIBUTE, s);
-        }
 
         return true;
     }
@@ -69,16 +62,17 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
                      method, uri, responseTime, status
             );
 
-            return;
+        }
+        else {
+            API_PERF.info(
+                    "type=API_Performance method_type={} uri={} response_time={} status={}",
+                    method, uri, responseTime, status
+            );
+
+            log.info("[API Performance]: {} {} - {}ms [Status: {}]",
+                     method, uri, responseTime, status
+            );
         }
 
-        API_PERF.info(
-                "type=API_Performance method_type={} uri={} response_time={} status={}",
-                method, uri, responseTime, status
-        );
-
-        log.info("[API Performance]: {} {} - {}ms [Status: {}]",
-                 method, uri, responseTime, status
-        );
     }
 }
