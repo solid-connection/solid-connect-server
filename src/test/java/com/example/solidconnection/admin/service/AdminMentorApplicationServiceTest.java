@@ -65,6 +65,9 @@ class AdminMentorApplicationServiceTest {
     private MentorApplication mentorApplication7;
     private MentorApplication mentorApplication8;
 
+    private SiteUser user;
+    private University university;
+
     @BeforeEach
     void setUp() {
         SiteUser user1 = siteUserFixture.사용자(1, "test1");
@@ -86,6 +89,9 @@ class AdminMentorApplicationServiceTest {
         mentorApplication6 = mentorApplicationFixture.거절된_멘토신청(user6.getId(), UniversitySelectType.CATALOG, university2.getId());
         mentorApplication7 = mentorApplicationFixture.대기중_멘토신청(user7.getId(), UniversitySelectType.OTHER, null);
         mentorApplication8 = mentorApplicationFixture.거절된_멘토신청(user8.getId(), UniversitySelectType.OTHER, null);
+
+        user = siteUserFixture.사용자(9, "test9");
+        university = universityFixture.메이지_대학();
     }
 
     @Nested
@@ -518,8 +524,6 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 사용자의_멘토_지원서_이력을_최신_생성_내림차순으로_조회한다() {
             // given
-            SiteUser user = siteUserFixture.사용자();
-            University university = universityFixture.메이지_대학();
             MentorApplication app1 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             MentorApplication app2 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             MentorApplication app3 = mentorApplicationFixture.승인된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
@@ -542,8 +546,6 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 지원서가_5개를_초과하면_최신_5개만_최신_생성_내림차순으로_조회한다() {
             // given
-            SiteUser user = siteUserFixture.사용자();
-            University university = universityFixture.메이지_대학();
             MentorApplication app1 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             MentorApplication app2 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             MentorApplication app3 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
@@ -570,10 +572,10 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 지원서_이력이_없으면_빈_목록을_반환한다() {
             // given
-            SiteUser user = siteUserFixture.사용자();
+            long withoutApplicationUserId = user.getId();
 
             // when
-            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(user.getId());
+            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(withoutApplicationUserId);
 
             // then
             assertThat(response).isEmpty();
@@ -582,8 +584,6 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 응답에_지원서_상태와_거절_사유가_포함된다() {
             // given
-            SiteUser user = siteUserFixture.사용자();
-            University university = universityFixture.메이지_대학();
             mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             mentorApplicationFixture.승인된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
 

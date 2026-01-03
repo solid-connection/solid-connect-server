@@ -76,7 +76,7 @@ public class AdminMentorApplicationController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{site-user-id}/mentor-application-history")
+    @GetMapping("/{site-user-id}/history")
     public ResponseEntity<List<MentorApplicationHistoryResponse>> getMentorApplicationHistory(
             @PathVariable("site-user-id") Long siteUserId
     ){
