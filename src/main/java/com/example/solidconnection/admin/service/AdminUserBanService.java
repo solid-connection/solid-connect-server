@@ -36,34 +36,13 @@ public class AdminUserBanService {
 
     @Transactional
     public void banUser(long userId, UserBanRequest request) {
-        ZonedDateTime now = ZonedDateTime.now(UTC); //TODO UTC 확인
+        ZonedDateTime now = ZonedDateTime.now(UTC);
         validateNotAlreadyBanned(userId, now);
         validateReportExists(userId);
 
         updateReportedContentIsDeleted(userId, true);
         createUserBan(userId, request, now);
         updateUserStatus(userId, UserStatus.BANNED);
-    }
-
-    @Transactional
-    public void unbanUser(long userId, long adminId) {
-        UserBan userBan = findBannedUser(userId, ZonedDateTime.now(UTC));
-        userBan.manuallyUnban(adminId);
-        processUnban(userId);
-    }
-
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * *")
-    public void expireUserBans() {
-        List<UserBan> expiredBans = userBanRepository.findAllByIsUnbannedFalseAndExpiredAtBefore(ZonedDateTime.now(UTC));
-        for (UserBan userBan : expiredBans) {
-           processUnban(userBan.getBannedUserId());
-        }
-    }
-
-    public void processUnban(long userId) {
-        updateReportedContentIsDeleted(userId, false);
-        updateUserStatus(userId, UserStatus.REPORTED);
     }
 
     private void validateNotAlreadyBanned(long userId, ZonedDateTime now) {
@@ -89,15 +68,36 @@ public class AdminUserBanService {
         userBanRepository.save(userBan);
     }
 
+    private void updateUserStatus(long userId, UserStatus status) {
+        SiteUser user = siteUserRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.updateUserStatus(status);
+    }
+
+    @Transactional
+    public void unbanUser(long userId, long adminId) {
+        UserBan userBan = findBannedUser(userId, ZonedDateTime.now(UTC));
+        userBan.manuallyUnban(adminId);
+        processUnban(userId);
+    }
+
     private UserBan findBannedUser(long userId, ZonedDateTime now) {
         return userBanRepository
                 .findTopByBannedUserIdAndIsUnbannedFalseAndExpiredAtAfterOrderByCreatedAtDesc(userId, now)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_BANNED_USER));
     }
 
-    private void updateUserStatus(long userId, UserStatus status) {
-        SiteUser user = siteUserRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.updateUserStatus(status);
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void expireUserBans() {
+        List<UserBan> expiredBans = userBanRepository.findAllByIsUnbannedFalseAndExpiredAtBefore(ZonedDateTime.now(UTC));
+        for (UserBan userBan : expiredBans) {
+           processUnban(userBan.getBannedUserId());
+        }
+    }
+
+    private void processUnban(long userId) {
+        updateReportedContentIsDeleted(userId, false);
+        updateUserStatus(userId, UserStatus.REPORTED);
     }
 }

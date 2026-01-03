@@ -72,7 +72,7 @@ public class SiteUser extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus;
+    private UserStatus userStatus = UserStatus.ACTIVE;
 
     public SiteUser(
             String email,
