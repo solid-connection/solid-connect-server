@@ -1,5 +1,11 @@
 package com.example.solidconnection.mentor.domain;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
+import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.MICROS;
+
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
@@ -11,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -53,6 +60,9 @@ public class MentorApplication extends BaseEntity {
     @Column(nullable = false, name = "mentor_proof_url", length = 500)
     private String mentorProofUrl;
 
+    @Column(nullable = false, name = "term_id")
+    private long termId;
+
     private String rejectedReason;
 
     @Column(nullable = false)
@@ -61,7 +71,10 @@ public class MentorApplication extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MentorApplicationStatus mentorApplicationStatus = MentorApplicationStatus.PENDING;
+    private MentorApplicationStatus mentorApplicationStatus;
+
+    @Column
+    private ZonedDateTime approvedAt;
 
     private static final Set<ExchangeStatus> ALLOWED =
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
@@ -72,6 +85,7 @@ public class MentorApplication extends BaseEntity {
             Long universityId,
             UniversitySelectType universitySelectType,
             String mentorProofUrl,
+            long termId,
             ExchangeStatus exchangeStatus
     ) {
         validateExchangeStatus(exchangeStatus);
@@ -82,7 +96,9 @@ public class MentorApplication extends BaseEntity {
         this.universityId = universityId;
         this.universitySelectType = universitySelectType;
         this.mentorProofUrl = mentorProofUrl;
+        this.termId = termId;
         this.exchangeStatus = exchangeStatus;
+        this.mentorApplicationStatus = MentorApplicationStatus.PENDING;
     }
 
     private void validateUniversitySelection(UniversitySelectType universitySelectType, Long universityId) {
@@ -104,6 +120,43 @@ public class MentorApplication extends BaseEntity {
     private void validateExchangeStatus(ExchangeStatus exchangeStatus) {
         if(!ALLOWED.contains(exchangeStatus)) {
             throw new CustomException(ErrorCode.INVALID_EXCHANGE_STATUS_FOR_MENTOR);
+        }
+    }
+
+    public void approve(){
+        validatePending();
+        validateCanApprove();
+        this.mentorApplicationStatus = MentorApplicationStatus.APPROVED;
+        this.approvedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
+    }
+
+    private void validateCanApprove(){
+        if(this.universitySelectType != UniversitySelectType.CATALOG){
+            throw new CustomException(MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED);
+        }
+    }
+
+    public void reject(String rejectedReason){
+        validatePending();
+        this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
+        this.rejectedReason = rejectedReason;
+    }
+
+    public void assignUniversity(long universityId) {
+        this.universityId = universityId;
+        this.universitySelectType = UniversitySelectType.CATALOG;
+    }
+    
+    public void validateCanAssignUniversity(){
+        validatePending();
+        if(this.universitySelectType != UniversitySelectType.OTHER){
+            throw new CustomException(MENTOR_APPLICATION_NOT_OTHER_STATUS);
+        }
+    }
+
+    private void validatePending(){
+        if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
+            throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
         }
     }
 }

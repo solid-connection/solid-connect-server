@@ -1,44 +1,14 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-
-  redis-exporter:
-    image: oliver006/redis_exporter
-    container_name: redis-exporter
-    ports:
-      - "9121:9121"
-    environment:
-      REDIS_ADDR: "redis:6379"
-    depends_on:
-      - redis
-
   solid-connection-dev:
     image: ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG:-latest}
     container_name: solid-connection-dev
-    ports:
-      - "8080:8080"
-      - "8081:8081"
+    network_mode: "host"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_HOST=127.0.0.1
       - SPRING_DATA_REDIS_PORT=6379
     volumes:
       - ./logs:/var/log/spring
-    depends_on:
-      - redis
-
-  alloy:
-    image: grafana/alloy:latest
-    container_name: alloy
-    ports:
-      - "12345:12345"
-    volumes:
-      - ./logs:/var/log/spring
-      - ./docs/infra-config/config.alloy:/etc/alloy/config.alloy:ro
-    environment:
-      - ALLOY_ENV=dev
+    restart: always
