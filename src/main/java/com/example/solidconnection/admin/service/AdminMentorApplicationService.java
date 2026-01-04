@@ -92,8 +92,7 @@ public class AdminMentorApplicationService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        long totalCount = mentorApplicationRepository.countBySiteUserId(siteUserId);
-
+        long totalCount = mentorApplicationRepository.countBySiteUserId(siteUser.getId());
         List<MentorApplication> mentorApplications = mentorApplicationRepository.findTop5BySiteUserIdOrderByCreatedAtDesc(siteUser.getId());
 
         return IntStream.range(0, mentorApplications.size())
