@@ -33,7 +33,7 @@ public class AdminUserService {
     }
 
 	@Transactional(readOnly = true)
-    public Page<RestrictedUserSearchResponse> searchRestrictedUsers(RestrictedUserSearchCondition searchCondition, Pageable pageable) { //TODO 수정
+    public Page<RestrictedUserSearchResponse> searchRestrictedUsers(RestrictedUserSearchCondition searchCondition, Pageable pageable) {
         return siteUserFilterRepository.searchRestrictedUsers(searchCondition, pageable);
     }
 
