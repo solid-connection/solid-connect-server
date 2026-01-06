@@ -37,8 +37,8 @@ public class QueryMetricsListener implements QueryExecutionListener {
                 "db.query",
                 "sql_type", type,
                 "http_method", httpMethod,
-                "http_path", httpPath)
-                .record(elapsedMs, TimeUnit.MILLISECONDS);
+                "http_path", httpPath
+                ).record(elapsedMs, TimeUnit.MILLISECONDS);
     }
 
     private String guessType(String sql) {

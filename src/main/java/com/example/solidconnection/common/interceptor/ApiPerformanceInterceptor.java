@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.HandlerMapping;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -57,22 +56,12 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
                     "type=API_Performance method_type={} uri={} response_time={} status={}",
                     method, uri, responseTime, status
             );
-
-            log.warn("[API Performance] {} {} - {}ms [Status: {}]",
-                     method, uri, responseTime, status
-            );
-
         }
         else {
             API_PERF.info(
                     "type=API_Performance method_type={} uri={} response_time={} status={}",
                     method, uri, responseTime, status
             );
-
-            log.info("[API Performance]: {} {} - {}ms [Status: {}]",
-                     method, uri, responseTime, status
-            );
         }
-
     }
 }
