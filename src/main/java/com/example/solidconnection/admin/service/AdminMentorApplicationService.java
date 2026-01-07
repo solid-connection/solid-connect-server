@@ -103,7 +103,7 @@ public class AdminMentorApplicationService {
                             app.getMentorApplicationStatus(),
                             app.getRejectedReason(),
                             app.getCreatedAt(),
-                            (int) totalCount - index
+                            totalCount - index
                     );
                 }).toList();
     }
