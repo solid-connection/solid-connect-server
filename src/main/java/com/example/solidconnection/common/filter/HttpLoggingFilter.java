@@ -92,7 +92,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
     private String buildDecodedRequestUri(HttpServletRequest request) {
         String path = request.getRequestURI();
-        String query = decodeQuery(request.getQueryString());
+        String query = request.getQueryString();
 
         if(query == null || query.isBlank()){
             return path;
@@ -112,6 +112,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         try {
             return URLDecoder.decode(rawQuery, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
+            log.warn("Query 디코딩 실패 parameter: {}, msg: {}", rawQuery, e.getMessage());
             return rawQuery;
         }
     }
