@@ -8,7 +8,7 @@ public record MentorApplicationHistoryResponse(
         MentorApplicationStatus mentorApplicationStatus,
         String rejectedReason,
         ZonedDateTime createdAt,
-        long applicationOrder
+        int applicationOrder
 ) {
 
 }
