@@ -62,9 +62,11 @@ class RequestContextInterceptorTest {
             when(request.getAttribute(BEST_MATCHING_PATTERN_ATTRIBUTE)).thenReturn(null);
 
             // when
-            interceptor.preHandle(request, response, handler);
+            boolean result = interceptor.preHandle(request, response, handler);
 
             // then
+            assertThat(result).isTrue();
+
             RequestContext context = RequestContextHolder.getContext();
             assertThat(context.getBestMatchPath()).isNull();
         }

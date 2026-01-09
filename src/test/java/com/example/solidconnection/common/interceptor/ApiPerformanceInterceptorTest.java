@@ -191,7 +191,7 @@ class ApiPerformanceInterceptorTest {
                     .findFirst()
                     .orElseThrow();
             assertAll(
-                    () -> assertThat(logEvent.getLevel().toString()).contains("INFO"),
+                    () -> assertThat(logEvent.getLevel().toString()).isEqualTo("INFO"),
                     () -> assertThat(logEvent.getFormattedMessage()).contains("uri=/api/error"),
                     () -> assertThat(logEvent.getFormattedMessage()).contains("method_type=GET"),
                     () -> assertThat(logEvent.getFormattedMessage()).contains("status=500")
