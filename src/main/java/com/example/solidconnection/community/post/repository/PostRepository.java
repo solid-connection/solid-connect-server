@@ -58,6 +58,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
            """, nativeQuery = true)
     void updateReportedPostsIsDeleted(@Param("siteUserId") long siteUserId, @Param("isDeleted") boolean isDeleted);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+               UPDATE post p SET p.is_deleted = :isDeleted
+               WHERE p.site_user_id IN :siteUserIds
+               AND p.id IN (SELECT r.target_id FROM report r WHERE r.target_type = 'POST')
+           """, nativeQuery = true)
+    void bulkUpdateReportedPostsIsDeleted(@Param("siteUserIds") List<Long> siteUserIds, @Param("isDeleted") boolean isDeleted);
+
     default Post getByIdUsingEntityGraph(Long id) {
         return findPostById(id)
                 .orElseThrow(() -> new CustomException(INVALID_POST_ID));

@@ -1,5 +1,7 @@
 package com.example.solidconnection.admin.service;
 
+import static java.time.ZoneOffset.UTC;
+
 import com.example.solidconnection.admin.dto.UserBanRequest;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.common.exception.CustomException;
@@ -11,14 +13,10 @@ import com.example.solidconnection.siteuser.domain.UserBan;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.siteuser.repository.UserBanRepository;
-import static java.time.ZoneOffset.UTC;
-
 import java.time.ZonedDateTime;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,18 +33,19 @@ public class AdminUserBanService {
     private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
-    public void banUser(long userId, UserBanRequest request) {
-        ZonedDateTime now = ZonedDateTime.now(UTC);
-        validateNotAlreadyBanned(userId, now);
+    public void banUser(long userId, long adminId, UserBanRequest request) {
+        SiteUser user = siteUserRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        validateNotAlreadyBanned(userId);
         validateReportExists(userId);
 
+        user.updateUserStatus(UserStatus.BANNED);
         updateReportedContentIsDeleted(userId, true);
-        createUserBan(userId, request, now);
-        updateUserStatus(userId, UserStatus.BANNED);
+        createUserBan(userId, adminId, request);
     }
 
-    private void validateNotAlreadyBanned(long userId, ZonedDateTime now) {
-        if (userBanRepository.existsByBannedUserIdAndIsUnbannedFalseAndExpiredAtAfter(userId, now)) {
+    private void validateNotAlreadyBanned(long userId) {
+        if (userBanRepository.existsByBannedUserIdAndIsExpiredFalseAndExpiredAtAfter(userId, ZonedDateTime.now(UTC))) {
             throw new CustomException(ErrorCode.ALREADY_BANNED_USER);
         }
     }
@@ -62,42 +61,53 @@ public class AdminUserBanService {
         chatMessageRepository.updateReportedChatMessagesIsDeleted(userId, isDeleted);
     }
 
-    private void createUserBan(long userId, UserBanRequest request, ZonedDateTime now) {
+    private void createUserBan(long userId, long adminId, UserBanRequest request) {
+        ZonedDateTime now = ZonedDateTime.now(UTC);
         ZonedDateTime expiredAt = now.plusDays(request.duration().getDays());
-        UserBan userBan = new UserBan(userId, request.duration(), expiredAt);
+        UserBan userBan = new UserBan(userId, adminId, request.duration(), expiredAt);
         userBanRepository.save(userBan);
-    }
-
-    private void updateUserStatus(long userId, UserStatus status) {
-        SiteUser user = siteUserRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.updateUserStatus(status);
     }
 
     @Transactional
     public void unbanUser(long userId, long adminId) {
-        UserBan userBan = findBannedUser(userId, ZonedDateTime.now(UTC));
+        SiteUser user = siteUserRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserBan userBan = findActiveBan(userId);
         userBan.manuallyUnban(adminId);
-        processUnban(userId);
+
+        user.updateUserStatus(UserStatus.REPORTED);
+        updateReportedContentIsDeleted(userId, false);
     }
 
-    private UserBan findBannedUser(long userId, ZonedDateTime now) {
+    private UserBan findActiveBan(long userId) {
         return userBanRepository
-                .findTopByBannedUserIdAndIsUnbannedFalseAndExpiredAtAfterOrderByCreatedAtDesc(userId, now)
+                .findByBannedUserIdAndIsExpiredFalseAndExpiredAtAfter(userId, ZonedDateTime.now(UTC))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_BANNED_USER));
     }
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void expireUserBans() {
-        List<UserBan> expiredBans = userBanRepository.findAllByIsUnbannedFalseAndExpiredAtBefore(ZonedDateTime.now(UTC));
-        for (UserBan userBan : expiredBans) {
-           processUnban(userBan.getBannedUserId());
+        try {
+            ZonedDateTime now = ZonedDateTime.now(UTC);
+            List<Long> expiredUserIds = userBanRepository.findExpiredBannedUserIds(now);
+
+            if (expiredUserIds.isEmpty()) {
+                return;
+            }
+
+            userBanRepository.bulkExpireUserBans(now);
+            siteUserRepository.bulkUpdateUserStatus(expiredUserIds, UserStatus.REPORTED);
+            bulkUpdateReportedContentIsDeleted(expiredUserIds);
+            log.info("Finished processing expired blocks:: userIds={}", expiredUserIds);
+        } catch (Exception e) {
+            log.error("Failed to process expired blocks", e);
         }
     }
 
-    private void processUnban(long userId) {
-        updateReportedContentIsDeleted(userId, false);
-        updateUserStatus(userId, UserStatus.REPORTED);
+    private void bulkUpdateReportedContentIsDeleted(List<Long> expiredUserIds) {
+        postRepository.bulkUpdateReportedPostsIsDeleted(expiredUserIds, false);
+        chatMessageRepository.bulkUpdateReportedChatMessagesIsDeleted(expiredUserIds, false);
     }
+
 }

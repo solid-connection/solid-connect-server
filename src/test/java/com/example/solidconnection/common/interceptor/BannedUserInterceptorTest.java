@@ -33,8 +33,10 @@ class BannedUserInterceptorTest {
 
     @Autowired
     private SiteUserFixture siteUserFixture;
+
     @Autowired
     private PostFixture postFixture;
+
     @Autowired
     private BoardFixture boardFixture;
 

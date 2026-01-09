@@ -14,6 +14,7 @@ public class UserBanFixtureBuilder {
     private final UserBanRepository userBanRepository;
 
     private Long bannedUserId;
+    private Long bannedBy;
     private UserBanDuration duration;
     private ZonedDateTime expiredAt;
 
@@ -23,6 +24,11 @@ public class UserBanFixtureBuilder {
 
     public UserBanFixtureBuilder bannedUserId(Long bannedUserId) {
         this.bannedUserId = bannedUserId;
+        return this;
+    }
+
+    public UserBanFixtureBuilder bannedBy(Long bannedBy) {
+        this.bannedBy = bannedBy;
         return this;
     }
 
@@ -37,7 +43,7 @@ public class UserBanFixtureBuilder {
     }
 
     public UserBan create() {
-        UserBan userBan = new UserBan(bannedUserId, duration, expiredAt);
+        UserBan userBan = new UserBan(bannedUserId, bannedBy, duration, expiredAt);
         return userBanRepository.save(userBan);
     }
 }

@@ -14,28 +14,27 @@ import com.example.solidconnection.common.resolver.AuthorizedUser;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin/users")
 @RestController
-@Slf4j
 public class AdminUserBanController {
 	private final AdminUserBanService adminUserBanService;
 
-	@PostMapping("/{userId}/ban")
+	@PostMapping("/{user-id}/ban")
 	public ResponseEntity<Void> banUser(
-            @PathVariable long userId,
-		    @Valid @RequestBody UserBanRequest request
+			@AuthorizedUser long adminId,
+			@PathVariable(name = "user-id") long userId,
+			@Valid @RequestBody UserBanRequest request
 	) {
-		adminUserBanService.banUser(userId, request);
+		adminUserBanService.banUser(userId, adminId, request);
 		return ResponseEntity.ok().build();
 	}
 
-    @PatchMapping("/{userId}/unban")
+    @PatchMapping("/{user-id}/unban")
     public ResponseEntity<Void> unbanUser(
             @AuthorizedUser long adminId,
-            @PathVariable long userId
+            @PathVariable(name = "user-id") long userId
     ) {
         adminUserBanService.unbanUser(userId, adminId);
         return ResponseEntity.ok().build();

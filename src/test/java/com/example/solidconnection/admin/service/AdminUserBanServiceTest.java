@@ -81,7 +81,6 @@ class AdminUserBanServiceTest {
     }
 
     @Nested
-    @DisplayName("사용자 차단")
     class 사용자_차단 {
 
         @Test
@@ -91,7 +90,7 @@ class AdminUserBanServiceTest {
             UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
 
             // when
-            adminUserBanService.banUser(reportedUser.getId(), request);
+            adminUserBanService.banUser(reportedUser.getId(), admin.getId(), request);
 
             // then
             SiteUser bannedUser = siteUserRepository.findById(reportedUser.getId()).orElseThrow();
@@ -99,166 +98,165 @@ class AdminUserBanServiceTest {
         }
 
         @Test
-        void 이미_차단된_사용자는_다시_차단할_수_없다() {
+        void 이미_차단된_사용자일_경우_예외가_발생한다() {
             // given
             reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
             UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
-            adminUserBanService.banUser(reportedUser.getId(), request);
+            adminUserBanService.banUser(reportedUser.getId(), admin.getId(), request);
 
             // when & then
-            assertThatCode(() -> adminUserBanService.banUser(reportedUser.getId(), request))
+            assertThatCode(() -> adminUserBanService.banUser(reportedUser.getId(), admin.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ALREADY_BANNED_USER.getMessage());
         }
 
         @Test
-        void 신고가_없는_사용자는_차단할_수_없다() {
+        void 신고가_없는_사용자일_경우_예외가_발생한다() {
             // given
             SiteUser userWithoutReport = siteUserFixture.사용자(3, "신고없는유저");
             UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
 
             // when & then
-            assertThatCode(() -> adminUserBanService.banUser(userWithoutReport.getId(), request))
+            assertThatCode(() -> adminUserBanService.banUser(userWithoutReport.getId(), admin.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(REPORT_NOT_FOUND.getMessage());
         }
+    }
 
-        @Nested
-        class 사용자_차단_해제 {
+    @Nested
+    class 사용자_차단_해제 {
 
-            @Test
-            void 차단된_사용자를_수동으로_해제한다() {
-                // given
-                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
-                UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
-                adminUserBanService.banUser(reportedUser.getId(), request);
+        @Test
+        void 차단된_사용자를_수동으로_해제한다() {
+            // given
+            reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
+            UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
+            adminUserBanService.banUser(reportedUser.getId(), admin.getId(), request);
 
-                // when
-                adminUserBanService.unbanUser(reportedUser.getId(), admin.getId());
+            // when
+            adminUserBanService.unbanUser(reportedUser.getId(), admin.getId());
 
-                // then
-                SiteUser unbannedUser = siteUserRepository.findById(reportedUser.getId()).orElseThrow();
-                assertThat(unbannedUser.getUserStatus()).isEqualTo(UserStatus.REPORTED);
-            }
-
-            @Test
-            void 차단_해제_정보가_올바르게_저장된다() {
-                // given
-                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
-                UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
-                adminUserBanService.banUser(reportedUser.getId(), request);
-                ZonedDateTime beforeUnban = ZonedDateTime.now();
-
-                // when
-                adminUserBanService.unbanUser(reportedUser.getId(), admin.getId());
-
-                // then
-                List<UserBan> allBans = userBanRepository.findAll();
-                UserBan unbannedUserBan = allBans.stream()
-                        .filter(ban -> ban.getBannedUserId().equals(reportedUser.getId()))
-                        .findFirst()
-                        .orElseThrow();
-
-                assertAll(
-                        () -> assertThat(unbannedUserBan.isUnbanned()).isTrue(),
-                        () -> assertThat(unbannedUserBan.getUnbannedBy()).isEqualTo(admin.getId()),
-                        () -> assertThat(unbannedUserBan.getUnbannedAt()).isAfter(beforeUnban)
-                );
-            }
-
-            @Test
-            void 차단되지_않은_사용자는_차단_해제할_수_없다() {
-                // given
-                SiteUser notBannedUser = siteUserFixture.사용자(3, "차단안된유저");
-
-                // when & then
-                assertThatCode(() -> adminUserBanService.unbanUser(notBannedUser.getId(), admin.getId()))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(NOT_BANNED_USER.getMessage());
-            }
-
-            @Test
-            void 만료된_차단은_해제할_수_없다() {
-                // given
-                userBanFixture.만료된_차단(reportedUser.getId());
-
-                // when & then
-                assertThatCode(() -> adminUserBanService.unbanUser(reportedUser.getId(), admin.getId()))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(NOT_BANNED_USER.getMessage());
-            }
+            // then
+            SiteUser unbannedUser = siteUserRepository.findById(reportedUser.getId()).orElseThrow();
+            assertThat(unbannedUser.getUserStatus()).isEqualTo(UserStatus.REPORTED);
         }
 
-        @Nested
-        @DisplayName("만료된 차단 자동 해제")
-        class 만료된_차단_자동_해제 {
+        @Test
+        void 차단_해제_정보가_올바르게_저장된다() {
+            // given
+            reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
+            UserBanRequest request = new UserBanRequest(UserBanDuration.SEVEN_DAYS);
+            adminUserBanService.banUser(reportedUser.getId(), admin.getId(), request);
+            ZonedDateTime beforeUnban = ZonedDateTime.now();
 
-            @Test
-            void 만료된_차단들을_자동으로_해제한다() {
-                // given
-                SiteUser user1 = siteUserFixture.사용자(10, "유저1");
-                SiteUser user2 = siteUserFixture.사용자(11, "유저2");
+            // when
+            adminUserBanService.unbanUser(reportedUser.getId(), admin.getId());
 
-                userBanFixture.만료된_차단(user1.getId());
-                userBanFixture.만료된_차단(user2.getId());
+            // then
+            List<UserBan> allBans = userBanRepository.findAll();
+            UserBan unbannedUserBan = allBans.stream()
+                    .filter(ban -> ban.getBannedUserId().equals(reportedUser.getId()))
+                    .findFirst()
+                    .orElseThrow();
 
-                user1.updateUserStatus(UserStatus.BANNED);
-                user2.updateUserStatus(UserStatus.BANNED);
+            assertAll(
+                    () -> assertThat(unbannedUserBan.isExpired()).isTrue(),
+                    () -> assertThat(unbannedUserBan.getUnbannedBy()).isEqualTo(admin.getId()),
+                    () -> assertThat(unbannedUserBan.getUnbannedAt()).isAfter(beforeUnban)
+            );
+        }
 
-                // when
-                adminUserBanService.expireUserBans();
+        @Test
+        void 차단되지_않은_사용자일_경우_예외가_발생한다() {
+            // given
+            SiteUser notBannedUser = siteUserFixture.사용자(3, "차단안된유저");
 
-                // then
-                SiteUser unbannedUser1 = siteUserRepository.findById(user1.getId()).orElseThrow();
-                SiteUser unbannedUser2 = siteUserRepository.findById(user2.getId()).orElseThrow();
+            // when & then
+            assertThatCode(() -> adminUserBanService.unbanUser(notBannedUser.getId(), admin.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(NOT_BANNED_USER.getMessage());
+        }
 
-                assertAll(
-                        () -> assertThat(unbannedUser1.getUserStatus()).isEqualTo(UserStatus.REPORTED),
-                        () -> assertThat(unbannedUser2.getUserStatus()).isEqualTo(UserStatus.REPORTED)
-                );
-            }
+        @Test
+        void 만료된_차단일_경우_예외가_발생한다() {
+            // given
+            userBanFixture.만료된_차단(reportedUser.getId());
 
-            @Test
-            void 만료되지_않은_차단은_유지된다() {
-                // given
-                Post reportedPost = postFixture.게시글(
-                        "신고될 게시글",
-                        "신고될 내용",
-                        false,
-                        PostCategory.자유,
-                        boardFixture.자유게시판(),
-                        reportedUser
-                );
-                reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
-                adminUserBanService.banUser(reportedUser.getId(), new UserBanRequest(UserBanDuration.SEVEN_DAYS));
+            // when & then
+            assertThatCode(() -> adminUserBanService.unbanUser(reportedUser.getId(), admin.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(NOT_BANNED_USER.getMessage());
+        }
+    }
 
-                // when
-                adminUserBanService.expireUserBans();
+    @Nested
+    class 만료된_차단_자동_해제 {
 
-                // then
-                SiteUser stillBannedUser = siteUserRepository.findById(reportedUser.getId()).orElseThrow();
-                assertThat(stillBannedUser.getUserStatus()).isEqualTo(UserStatus.BANNED);
-            }
+        @Test
+        void 만료된_차단들을_자동으로_해제한다() {
+            // given
+            SiteUser user1 = siteUserFixture.사용자(10, "유저1");
+            SiteUser user2 = siteUserFixture.사용자(11, "유저2");
 
-            @Test
-            void 이미_수동으로_해제된_차단은_처리하지_않는다() {
-                // given
-                userBanFixture.수동_차단_해제(reportedUser.getId(), admin.getId());
-                reportedUser.updateUserStatus(UserStatus.REPORTED);
+            userBanFixture.만료된_차단(user1.getId());
+            userBanFixture.만료된_차단(user2.getId());
 
-                long beforeUnbannedCount = userBanRepository.findAll().stream()
-                        .filter(UserBan::isUnbanned)
-                        .count();
+            user1.updateUserStatus(UserStatus.BANNED);
+            user2.updateUserStatus(UserStatus.BANNED);
 
-                // when
-                adminUserBanService.expireUserBans();
+            // when
+            adminUserBanService.expireUserBans();
 
-                // then
-                long afterUnbannedCount = userBanRepository.findAll().stream()
-                        .filter(UserBan::isUnbanned)
-                        .count();
-                assertThat(afterUnbannedCount).isEqualTo(beforeUnbannedCount);
-            }
+            // then
+            SiteUser unbannedUser1 = siteUserRepository.findById(user1.getId()).orElseThrow();
+            SiteUser unbannedUser2 = siteUserRepository.findById(user2.getId()).orElseThrow();
+
+            assertAll(
+                    () -> assertThat(unbannedUser1.getUserStatus()).isEqualTo(UserStatus.REPORTED),
+                    () -> assertThat(unbannedUser2.getUserStatus()).isEqualTo(UserStatus.REPORTED)
+            );
+        }
+
+        @Test
+        void 만료되지_않은_차단은_유지된다() {
+            // given
+            Post reportedPost = postFixture.게시글(
+                    "신고될 게시글",
+                    "신고될 내용",
+                    false,
+                    PostCategory.자유,
+                    boardFixture.자유게시판(),
+                    reportedUser
+            );
+            reportFixture.신고(reporter.getId(), reportedUser.getId(), TargetType.POST, reportedPost.getId());
+            adminUserBanService.banUser(reportedUser.getId(), admin.getId(), new UserBanRequest(UserBanDuration.SEVEN_DAYS));
+
+            // when
+            adminUserBanService.expireUserBans();
+
+            // then
+            SiteUser stillBannedUser = siteUserRepository.findById(reportedUser.getId()).orElseThrow();
+            assertThat(stillBannedUser.getUserStatus()).isEqualTo(UserStatus.BANNED);
+        }
+
+        @Test
+        void 이미_수동으로_해제된_차단은_처리하지_않는다() {
+            // given
+            userBanFixture.수동_차단_해제(reportedUser.getId(), admin.getId());
+            reportedUser.updateUserStatus(UserStatus.REPORTED);
+
+            long beforeExpiredCount = userBanRepository.findAll().stream()
+                    .filter(UserBan::isExpired)
+                    .count();
+
+            // when
+            adminUserBanService.expireUserBans();
+
+            // then
+            long afterExpiredCount = userBanRepository.findAll().stream()
+                    .filter(UserBan::isExpired)
+                    .count();
+            assertThat(afterExpiredCount).isEqualTo(beforeExpiredCount);
         }
     }
 }
