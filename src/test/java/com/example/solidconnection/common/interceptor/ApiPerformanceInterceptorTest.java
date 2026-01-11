@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.example.solidconnection.support.TestContainerSpringBootTest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 
-@TestContainerSpringBootTest
 @DisplayName("ApiPerformanceInterceptor 테스트")
 class ApiPerformanceInterceptorTest {
 
