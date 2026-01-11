@@ -18,6 +18,7 @@ public class MentorApplicationFixture {
     private static final String DEFAULT_COUNTRY_CODE = "US";
     private static final String DEFAULT_PROOF_URL   = "/mentor-proof.pdf";
     private static final ExchangeStatus DEFAULT_EXCHANGE_STATUS = ExchangeStatus.AFTER_EXCHANGE;
+    private static final String REJECTED_REASON = "pdf 파일 안열림";
 
     public MentorApplication 대기중_멘토신청(
             long siteUserId,
@@ -64,6 +65,7 @@ public class MentorApplicationFixture {
                 .universitySelectType(selectType)
                 .mentorProofUrl(DEFAULT_PROOF_URL)
                 .termId(termFixture.현재_학기("2025-1").getId())
+                .rejectedReason(REJECTED_REASON)
                 .exchangeStatus(DEFAULT_EXCHANGE_STATUS)
                 .mentorApplicationStatus(MentorApplicationStatus.REJECTED)
                 .create();

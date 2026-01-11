@@ -5,11 +5,13 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPL
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
+import com.example.solidconnection.admin.dto.MentorApplicationHistoryResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
@@ -63,6 +65,9 @@ class AdminMentorApplicationServiceTest {
     private MentorApplication mentorApplication7;
     private MentorApplication mentorApplication8;
 
+    private SiteUser user;
+    private University university;
+
     @BeforeEach
     void setUp() {
         SiteUser user1 = siteUserFixture.사용자(1, "test1");
@@ -84,6 +89,9 @@ class AdminMentorApplicationServiceTest {
         mentorApplication6 = mentorApplicationFixture.거절된_멘토신청(user6.getId(), UniversitySelectType.CATALOG, university2.getId());
         mentorApplication7 = mentorApplicationFixture.대기중_멘토신청(user7.getId(), UniversitySelectType.OTHER, null);
         mentorApplication8 = mentorApplicationFixture.거절된_멘토신청(user8.getId(), UniversitySelectType.OTHER, null);
+
+        user = siteUserFixture.사용자(9, "test9");
+        university = universityFixture.메이지_대학();
     }
 
     @Nested
@@ -507,6 +515,102 @@ class AdminMentorApplicationServiceTest {
             assertThatCode(() -> adminMentorApplicationService.assignUniversity(otherTypeMentorApplicationId, nonExistentUniversityId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(UNIVERSITY_NOT_FOUND.getMessage());
+        }
+    }
+    
+    @Nested
+    class 멘토_지원서_이력_조회 {
+
+        @Test
+        void 사용자의_멘토_지원서_이력을_최신_생성_내림차순으로_조회한다() {
+            // given
+            MentorApplication app1 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app2 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app3 = mentorApplicationFixture.승인된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+
+            // when
+            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(user.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response).hasSize(3),
+                    () -> assertThat(response)
+                            .extracting(MentorApplicationHistoryResponse::id)
+                            .containsExactly(app3.getId(), app2.getId(), app1.getId()),
+                    () -> assertThat(response)
+                            .extracting(MentorApplicationHistoryResponse::applicationOrder)
+                            .containsExactly(3,2,1)
+            );
+        }
+
+        @Test
+        void 지원서가_5개를_초과하면_최신_5개만_최신_생성_내림차순으로_조회한다() {
+            // given
+            MentorApplication app1 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app2 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app3 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app4 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app5 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app6 = mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            MentorApplication app7 = mentorApplicationFixture.승인된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+
+            // when
+            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(user.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response).hasSize(5),
+                    () -> assertThat(response)
+                            .extracting(MentorApplicationHistoryResponse::id)
+                            .containsExactly(app7.getId(), app6.getId(), app5.getId(), app4.getId(), app3.getId()),
+                    () -> assertThat(response)
+                            .extracting(MentorApplicationHistoryResponse::applicationOrder)
+                            .containsExactly(7,6,5,4,3)
+            );
+        }
+
+        @Test
+        void 지원서_이력이_없으면_빈_목록을_반환한다() {
+            // given
+            long withoutApplicationUserId = user.getId();
+
+            // when
+            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(withoutApplicationUserId);
+
+            // then
+            assertThat(response).isEmpty();
+        }
+
+        @Test
+        void 응답에_지원서_상태와_거절_사유가_포함된다() {
+            // given
+            mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            mentorApplicationFixture.승인된_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+
+            // when
+            List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(user.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response).hasSize(2),
+                    () -> assertThat(response.get(0).mentorApplicationStatus()).isEqualTo(MentorApplicationStatus.APPROVED),
+                    () -> assertThat(response.get(0).rejectedReason()).isNull(),
+                    () -> assertThat(response.get(0).applicationOrder()).isEqualTo(2),
+                    () -> assertThat(response.get(1).mentorApplicationStatus()).isEqualTo(MentorApplicationStatus.REJECTED),
+                    () -> assertThat(response.get(1).rejectedReason()).isNotNull(),
+                    () -> assertThat(response.get(1).applicationOrder()).isEqualTo(1)
+            );
+        }
+
+        @Test
+        void 존재하지_않는_사용자_이력을_조회하면_예외_응답을_반환한다() {
+            // given
+            long nonExistentUserId = 99999L;
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.findMentorApplicationHistory(nonExistentUserId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(USER_NOT_FOUND.getMessage());
         }
     }
 }

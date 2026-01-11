@@ -2,12 +2,14 @@ package com.example.solidconnection.admin.controller;
 
 import com.example.solidconnection.admin.dto.MentorApplicationAssignUniversityRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationCountResponse;
+import com.example.solidconnection.admin.dto.MentorApplicationHistoryResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.admin.service.AdminMentorApplicationService;
 import com.example.solidconnection.common.response.PageResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -72,5 +74,13 @@ public class AdminMentorApplicationController {
         Long universityId = request.universityId();
         adminMentorApplicationService.assignUniversity(mentorApplicationId, universityId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{site-user-id}/history")
+    public ResponseEntity<List<MentorApplicationHistoryResponse>> getMentorApplicationHistory(
+            @PathVariable("site-user-id") Long siteUserId
+    ){
+        List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(siteUserId);
+        return ResponseEntity.ok(response);
     }
 }
