@@ -24,4 +24,6 @@ public interface UserBlockRepository extends JpaRepository<UserBlock, Long> {
            WHERE ub.blockerId = :blockerId
            """)
     Slice<UserBlockResponse> findBlockedUsersWithNickname(@Param("blockerId") long blockerId, Pageable pageable);
+
+    void deleteAllByBlockerIdOrBlockedId(long blockerId, long blockedId);
 }

@@ -27,4 +27,6 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
     Slice<Mentor> findAllByRegion(@Param("region") Region region, Pageable pageable);
 
     List<Mentor> findAllBySiteUserIdIn(Set<Long> siteUserIds);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }
