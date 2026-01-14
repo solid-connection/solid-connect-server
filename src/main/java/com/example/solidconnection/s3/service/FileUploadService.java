@@ -39,7 +39,10 @@
 
                 log.info("파일 업로드 정상 완료 thread: {}", Thread.currentThread().getName());
             } catch (S3Exception e) {
-                log.error("S3 서비스 예외 발생 : {}", e.awsErrorDetails().errorMessage());
+                String errorMessage = (e.awsErrorDetails() != null)
+                        ? e.awsErrorDetails().errorMessage()
+                        : e.getMessage();
+                log.error("S3 서비스 예외 발생 : {}", errorMessage);
                 throw new CustomException(S3_SERVICE_EXCEPTION);
             } catch (SdkException | IOException e) {
                 log.error("S3 클라이언트 또는 IO 예외 발생 : {}", e.getMessage());
