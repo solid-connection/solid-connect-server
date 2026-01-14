@@ -8,7 +8,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -52,13 +52,13 @@ public class S3Service {
      * - 5mb 이상의 파일은 /origin/ 경로로 업로드하여 lambda 함수로 리사이징 진행한다.
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
-    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, ImgType imageFile) {
+    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadType uploadType) {
         validateImgFile(multipartFile);
         UUID randomUUID = UUID.randomUUID();
         String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String baseFileName = randomUUID + "." + extension;
-        String fileName = imageFile.getType() + "/" + baseFileName;
-        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && imageFile != ImgType.CHAT;
+        String fileName = uploadType.getType() + "/" + baseFileName;
+        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && uploadType != UploadType.CHAT;
 
         final String uploadPath = isLargeFile ? "original/" + fileName : fileName;
         final String returnPath = isLargeFile
@@ -72,11 +72,11 @@ public class S3Service {
         return new UploadedFileUrlResponse(returnPath);
     }
 
-    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
+    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, UploadType uploadType) {
 
         List<UploadedFileUrlResponse> uploadedFileUrlResponseList = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
-            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, imageFile);
+            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, uploadType);
             uploadedFileUrlResponseList.add(uploadedFileUrlResponse);
         }
         return uploadedFileUrlResponseList;

@@ -18,7 +18,7 @@ import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.fixture.NewsFixture;
 import com.example.solidconnection.news.repository.NewsRepository;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -71,7 +71,7 @@ class NewsCommandServiceTest {
             NewsCreateRequest request = createNewsCreateRequest();
             MultipartFile imageFile = createImageFile();
             String expectedImageUrl = "news/5a02ba2f-38f5-4ae9-9a24-53d624a18233";
-            given(s3Service.uploadFile(any(), eq(ImgType.NEWS)))
+            given(s3Service.uploadFile(any(), eq(UploadType.NEWS)))
                     .willReturn(new UploadedFileUrlResponse(expectedImageUrl));
 
             // when
@@ -110,7 +110,7 @@ class NewsCommandServiceTest {
                 String expectedUrl = "https://youtu.be/test-edit";
                 MultipartFile expectedFile = createImageFile();
                 String expectedNewImageUrl = "news/5a02ba2f-38f5-4ae9-9a24-53d624a18233-edit";
-                given(s3Service.uploadFile(any(), eq(ImgType.NEWS)))
+                given(s3Service.uploadFile(any(), eq(UploadType.NEWS)))
                         .willReturn(new UploadedFileUrlResponse(expectedNewImageUrl));
                 NewsUpdateRequest request = createNewsUpdateRequest(
                         expectedTitle,
@@ -185,7 +185,7 @@ class NewsCommandServiceTest {
                 assertAll(
                         () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl()),
                         () -> then(s3Service).should().deletePostImage(CUSTOM_IMAGE_URL),
-                        () -> then(s3Service).should(never()).uploadFile(null, ImgType.NEWS)
+                        () -> then(s3Service).should(never()).uploadFile(null, UploadType.NEWS)
                 );
             }
 
@@ -194,7 +194,7 @@ class NewsCommandServiceTest {
                 // given
                 MultipartFile newImageFile = createImageFile();
                 String newImageUrl = "news/new-image-url";
-                given(s3Service.uploadFile(newImageFile, ImgType.NEWS))
+                given(s3Service.uploadFile(newImageFile, UploadType.NEWS))
                         .willReturn(new UploadedFileUrlResponse(newImageUrl));
                 NewsUpdateRequest request = createNewsUpdateRequest(
                         null,
@@ -248,7 +248,7 @@ class NewsCommandServiceTest {
                 assertAll(
                         () -> assertThat(savedNews.getThumbnailUrl()).isEqualTo(newsProperties.defaultThumbnailUrl()),
                         () -> then(s3Service).should(never()).deletePostImage(newsProperties.defaultThumbnailUrl()),
-                        () -> then(s3Service).should(never()).uploadFile(null, ImgType.NEWS)
+                        () -> then(s3Service).should(never()).uploadFile(null, UploadType.NEWS)
                 );
             }
 
@@ -257,7 +257,7 @@ class NewsCommandServiceTest {
                 // given
                 MultipartFile newImageFile = createImageFile();
                 String newImageUrl = "news/new-image-url";
-                given(s3Service.uploadFile(newImageFile, ImgType.NEWS))
+                given(s3Service.uploadFile(newImageFile, UploadType.NEWS))
                         .willReturn(new UploadedFileUrlResponse(newImageUrl));
                 NewsUpdateRequest request = createNewsUpdateRequest(null, null, null, null);
 

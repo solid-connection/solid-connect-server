@@ -25,7 +25,7 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -109,7 +109,7 @@ class PostCommandServiceTest {
             PostCreateRequest request = createPostCreateRequest(PostCategory.자유.name());
             List<MultipartFile> imageFiles = List.of(createImageFile());
             String expectedImageUrl = "test-image-url";
-            given(s3Service.uploadFiles(any(), eq(ImgType.COMMUNITY)))
+            given(s3Service.uploadFiles(any(), eq(UploadType.COMMUNITY)))
                     .willReturn(List.of(new UploadedFileUrlResponse(expectedImageUrl)));
 
             // when
@@ -179,7 +179,7 @@ class PostCommandServiceTest {
             PostUpdateRequest request = createPostUpdateRequest();
             List<MultipartFile> imageFiles = List.of(createImageFile());
 
-            given(s3Service.uploadFiles(any(), eq(ImgType.COMMUNITY)))
+            given(s3Service.uploadFiles(any(), eq(UploadType.COMMUNITY)))
                     .willReturn(List.of(new UploadedFileUrlResponse(expectedImageUrl)));
 
             // when
