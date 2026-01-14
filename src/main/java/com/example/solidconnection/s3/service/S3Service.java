@@ -65,9 +65,7 @@ public class S3Service {
                 ? "resize/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp"
                 : fileName;
 
-        asyncExecutor.submit(() -> {
-            fileUploadService.uploadFile(bucket, uploadPath, multipartFile);
-        });
+        fileUploadService.uploadFile(bucket, uploadPath, multipartFile);
 
         return new UploadedFileUrlResponse(returnPath);
     }
