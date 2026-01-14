@@ -65,8 +65,9 @@ dependencies {
     testImplementation 'org.awaitility:awaitility:4.2.0'
 
     // Etc
+    implementation platform('software.amazon.awssdk:bom:2.41.4')
+    implementation 'software.amazon.awssdk:s3'
     implementation 'org.hibernate.validator:hibernate-validator'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 

@@ -7,10 +7,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_E
 import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.ImgType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -23,21 +19,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
-    private static final Logger log = LoggerFactory.getLogger(S3Service.class);
     private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
 
-    private final AmazonS3Client amazonS3;
+    private final S3Client s3Client;
     private final SiteUserRepository siteUserRepository;
     private final FileUploadService fileUploadService;
     private final ThreadPoolTaskExecutor asyncExecutor;
@@ -56,22 +53,23 @@ public class S3Service {
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
     public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, ImgType imageFile) {
-        // 파일 검증
         validateImgFile(multipartFile);
-        // 파일 이름 생성
         UUID randomUUID = UUID.randomUUID();
-        String fileName = imageFile.getType() + "/" + randomUUID;
-        // 파일업로드 비동기로 진행
-        if (multipartFile.getSize() >= MAX_FILE_SIZE_MB) {
-            asyncExecutor.submit(() -> {
-                fileUploadService.uploadFile(bucket, "origin/" + fileName, multipartFile);
-            });
-        } else {
-            asyncExecutor.submit(() -> {
-                fileUploadService.uploadFile(bucket, fileName, multipartFile);
-            });
-        }
-        return new UploadedFileUrlResponse(fileName);
+        String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        String baseFileName = randomUUID + "." + extension;
+        String fileName = imageFile.getType() + "/" + baseFileName;
+        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && imageFile != ImgType.CHAT;
+
+        final String uploadPath = isLargeFile ? "original/" + fileName : fileName;
+        final String returnPath = isLargeFile
+                ? "resize/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp"
+                : fileName;
+
+        asyncExecutor.submit(() -> {
+            fileUploadService.uploadFile(bucket, uploadPath, multipartFile);
+        });
+
+        return new UploadedFileUrlResponse(returnPath);
     }
 
     public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
@@ -125,12 +123,14 @@ public class S3Service {
 
     private void deleteFile(String fileName) {
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-        } catch (AmazonServiceException e) {
-            log.error("파일 삭제 중 s3 서비스 예외 발생 : {}", e.getMessage());
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+        } catch (S3Exception e) {
             throw new CustomException(S3_SERVICE_EXCEPTION);
-        } catch (SdkClientException e) {
-            log.error("파일 삭제 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
+        } catch (SdkException e) {
             throw new CustomException(S3_CLIENT_EXCEPTION);
         }
     }
