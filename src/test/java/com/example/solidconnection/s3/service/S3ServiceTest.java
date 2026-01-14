@@ -8,18 +8,19 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.UploadType;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
-import com.example.solidconnection.support.TestContainerSpringBootTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @DisplayName("S3 서비스 테스트")
-@TestContainerSpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class S3ServiceTest {
 
     @InjectMocks

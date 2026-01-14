@@ -454,8 +454,8 @@ class ChatServiceTest {
         private SiteUser sender;
         private ChatParticipant senderParticipant;
         private ChatRoom chatRoom;
-        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example.jpg";
-        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example2.jpg";
+        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example.jpg";
+        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example2.jpg";
         private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
 
         @BeforeEach
