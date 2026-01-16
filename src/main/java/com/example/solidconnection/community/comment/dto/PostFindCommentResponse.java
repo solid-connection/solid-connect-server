@@ -10,6 +10,7 @@ public record PostFindCommentResponse(
         Long parentId,
         String content,
         Boolean isOwner,
+        Boolean isDeleted,
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt,
         PostFindSiteUserResponse postFindSiteUserResponse
@@ -21,6 +22,7 @@ public record PostFindCommentResponse(
                 getParentCommentId(comment),
                 getDisplayContent(comment),
                 isOwner,
+                comment.isDeleted(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
                 getDisplaySiteUserResponse(comment, siteUser)

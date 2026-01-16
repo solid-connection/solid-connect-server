@@ -75,4 +75,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         return findById(id)
                 .orElseThrow(() -> new CustomException(INVALID_POST_ID));
     }
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

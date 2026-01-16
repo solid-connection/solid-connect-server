@@ -16,4 +16,6 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
         return findPostLikeByPostAndSiteUserId(post, siteUserId)
                 .orElseThrow(() -> new CustomException(INVALID_POST_LIKE));
     }
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

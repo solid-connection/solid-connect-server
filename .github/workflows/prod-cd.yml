@@ -124,8 +124,6 @@ jobs:
           scp -i deploy_key.pem \
             -o StrictHostKeyChecking=no \
             ./docker-compose.prod.yml \
-            ./docs/infra-config/config.alloy \
-            ./docs/infra-config/nginx.prod.conf \
             ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/solid-connection-prod/
 
       # --- 서버에서 Docker Pull 및 재시작 ---
@@ -142,35 +140,16 @@ jobs:
             export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG_ONLY}"
           
-            # 2. 서버가 GHCR에 로그인 (GITHUB_TOKEN 사용)
+            # 2. GHCR 로그인 & Pull
             # App Token 대신 현재 워크플로우의 임시 토큰을 사용합니다.
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          
-            # 3. docker pull
             echo "Pulling new image: $FULL_IMAGE_NAME"
             docker pull $FULL_IMAGE_NAME
           
-            # 4. alloy 설정 및 Nginx 설정 적용
-            cd /home/${{ secrets.USERNAME }}/solid-connection-prod
-          
-            mkdir -p ./docs/infra-config
-          
-            if [ -d "./docs/infra-config/config.alloy" ]; then
-              echo "Removing directory created by Docker..."
-              rm -rf ./docs/infra-config/config.alloy
-            fi
-          
-            mv -f ./config.alloy ./docs/infra-config/config.alloy
-          
-            mkdir -p ./nginx
-            mv ./nginx.prod.conf ./nginx/default.conf
-            sudo cp ./nginx/default.conf /etc/nginx/conf.d/default.conf
-            sudo nginx -t
-            sudo nginx -s reload
-          
-            # 5. Docker Compose 재시작
+            # 3. Spring Boot 앱 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
-            docker compose -f docker-compose.prod.yml down
+            cd /home/${{ secrets.USERNAME }}/solid-connection-prod
+            docker compose -f docker-compose.prod.yml down || true
             OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.prod.yml up -d
           
             # 6. 정리
