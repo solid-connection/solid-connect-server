@@ -36,12 +36,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(bannedUserInterceptor)
-                .addPathPatterns("/posts/**", "/comments/**", "/chats/**", "/boards/**");
-    }
-
-    @Override
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(apiPerformanceInterceptor)
                 .addPathPatterns("/**")
@@ -50,6 +44,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(requestContextInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/actuator/**");
+
+        registry.addInterceptor(bannedUserInterceptor)
+                .addPathPatterns("/posts/**", "/comments/**", "/chats/**", "/boards/**");
     }
 
     @Bean
