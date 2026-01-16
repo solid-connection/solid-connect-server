@@ -53,6 +53,7 @@ public enum ErrorCode {
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
     CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
     MENTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멘토 지원서가 존재하지 않습니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신고 내역이 존재하지 않습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -149,6 +150,11 @@ public enum ErrorCode {
 
     // chat
     INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
+
+    // ban
+    ALREADY_BANNED_USER(HttpStatus.CONFLICT.value(), "이미 차단된 사용자입니다."),
+    NOT_BANNED_USER(HttpStatus.BAD_REQUEST.value(), "차단되지 않은 사용자입니다."),
+    BANNED_USER_ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "차단된 사용자는 커뮤니티 및 채팅을 이용할 수 없습니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

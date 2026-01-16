@@ -4,6 +4,7 @@ import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -22,6 +23,7 @@ public class SiteUserFixtureBuilder {
     private String profileImageUrl;
     private Role role;
     private String password;
+    private UserStatus userStatus;
 
     public SiteUserFixtureBuilder siteUser() {
         return new SiteUserFixtureBuilder(siteUserRepository, passwordEncoder);
@@ -57,6 +59,11 @@ public class SiteUserFixtureBuilder {
         return this;
     }
 
+    public SiteUserFixtureBuilder userStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+        return this;
+    }
+
     public SiteUser create() {
         SiteUser siteUser = new SiteUser(
                 email,
@@ -65,7 +72,8 @@ public class SiteUserFixtureBuilder {
                 ExchangeStatus.CONSIDERING,
                 role,
                 authType,
-                passwordEncoder.encode(password)
+                passwordEncoder.encode(password),
+                userStatus != null ? userStatus : UserStatus.ACTIVE
         );
         return siteUserRepository.save(siteUser);
     }
