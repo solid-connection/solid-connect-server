@@ -2,6 +2,7 @@ package com.example.solidconnection.security.filter;
 
 import com.example.solidconnection.security.authentication.TokenAuthentication;
 import com.example.solidconnection.security.infrastructure.AuthorizationHeaderParser;
+import com.example.solidconnection.security.userdetails.SiteUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             TokenAuthentication authToken = new TokenAuthentication(token);
             Authentication auth = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
+            extractIdFromAuthentication(request, auth);
         });
 
         filterChain.doFilter(request, response);
@@ -44,5 +46,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return Optional.ofNullable(request.getParameter("token"));
         }
         return authorizationHeaderParser.parseToken(request);
+    }
+
+    private void extractIdFromAuthentication(HttpServletRequest request, Authentication auth) {
+        SiteUserDetails principal = (SiteUserDetails) auth.getPrincipal();
+        Long id = principal.getSiteUser().getId();
+        request.setAttribute("userId", id);
     }
 }
