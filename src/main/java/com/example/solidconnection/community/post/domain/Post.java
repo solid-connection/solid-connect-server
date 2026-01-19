@@ -18,11 +18,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@Where(clause = "is_deleted = false")
 public class Post extends BaseEntity {
 
     @Id
@@ -50,6 +52,8 @@ public class Post extends BaseEntity {
     @Column
     private long siteUserId;
 
+    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    private boolean isDeleted = false;
 
     @BatchSize(size = 20)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

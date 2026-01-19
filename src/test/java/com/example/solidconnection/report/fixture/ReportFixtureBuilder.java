@@ -14,6 +14,7 @@ public class ReportFixtureBuilder {
     private final ReportRepository reportRepository;
 
     private long reporterId;
+    private long reportedId;
     private TargetType targetType;
     private long targetId;
     private ReportType reportType = ReportType.ADVERTISEMENT;
@@ -24,6 +25,11 @@ public class ReportFixtureBuilder {
 
     public ReportFixtureBuilder reporterId(long reporterId) {
         this.reporterId = reporterId;
+        return this;
+    }
+
+     public ReportFixtureBuilder reportedId(long reportedId) {
+        this.reportedId = reportedId;
         return this;
     }
 
@@ -45,6 +51,7 @@ public class ReportFixtureBuilder {
     public Report create() {
         Report report = new Report(
                 reporterId,
+                reportedId,
                 reportType,
                 targetType,
                 targetId

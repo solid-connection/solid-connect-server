@@ -8,5 +8,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     boolean existsByReporterIdAndTargetTypeAndTargetId(long reporterId, TargetType targetType, long targetId);
 
+    boolean existsByReportedId(long reportedId);
+  
     void deleteAllByReporterId(long reporterId);
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -48,4 +49,20 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
            GROUP BY cm.chatRoom.id
            """)
     List<UnreadCountDto> countUnreadMessagesBatch(@Param("chatRoomIds") List<Long> chatRoomIds, @Param("userId") long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+           UPDATE chat_message cm SET cm.is_deleted = :isDeleted
+           WHERE cm.id IN (SELECT r.target_id FROM report r WHERE r.target_type = 'CHAT')
+           AND cm.sender_id IN (SELECT cp.id FROM chat_participant cp WHERE cp.site_user_id = :siteUserId)
+           """, nativeQuery = true)
+    void updateReportedChatMessagesIsDeleted(@Param("siteUserId") long siteUserId, @Param("isDeleted") boolean isDeleted);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+           UPDATE chat_message cm SET cm.is_deleted = :isDeleted
+           WHERE cm.id IN (SELECT r.target_id FROM report r WHERE r.target_type = 'CHAT')
+           AND cm.sender_id IN (SELECT cp.id FROM chat_participant cp WHERE cp.site_user_id IN :siteUserIds)
+           """, nativeQuery = true)
+    void bulkUpdateReportedChatMessagesIsDeleted(@Param("siteUserIds") List<Long> siteUserIds, @Param("isDeleted") boolean isDeleted);
 }
