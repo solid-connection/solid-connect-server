@@ -35,15 +35,14 @@ public class DataSourceConfig {
     @FlywayDataSource
     public DataSource flywayDataSource(
             @Value("${spring.datasource.url}") String url,
-            @Value("${spring.flyway.user}") String username,
-            @Value("${spring.flyway.password}") String password,
-            @Value("${spring.datasource.driverClassName}") String driverClassName
+            @Value("${spring.flyway.user:${spring.datasource.username}}") String username,
+            @Value("${spring.flyway.password:${spring.datasource.password}}") String password
     ) {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        dataSource.setDriverClassName(driverClassName);
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setPoolName("FlywayPool");
 
         dataSource.setMinimumIdle(0);
