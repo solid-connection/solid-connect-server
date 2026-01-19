@@ -20,6 +20,8 @@ import com.example.solidconnection.siteuser.domain.ExchangeStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.term.domain.Term;
+import com.example.solidconnection.term.fixture.TermFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,16 +44,21 @@ public class MentorApplicationServiceTest {
     private SiteUserFixture siteUserFixture;
 
     @Autowired
+    private TermFixture termFixture;
+
+    @Autowired
     private MentorApplicationFixture mentorApplicationFixture;
 
     @MockBean
     private S3Service s3Service;
 
     private SiteUser user;
+    private Term term;
 
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
+        term = termFixture.현재_학기("2025-1");
     }
 
     @Test
@@ -190,7 +197,8 @@ public class MentorApplicationServiceTest {
                 ExchangeStatus.AFTER_EXCHANGE,
                 universitySelectType,
                 "US",
-                universityId
+                universityId,
+                term.getName()
         );
     }
 }

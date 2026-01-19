@@ -13,4 +13,6 @@ public interface GpaScoreRepository extends JpaRepository<GpaScore, Long>, GpaSc
     Optional<GpaScore> findGpaScoreBySiteUserIdAndId(long siteUserId, Long id);
 
     List<GpaScore> findBySiteUserId(long siteUserId);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

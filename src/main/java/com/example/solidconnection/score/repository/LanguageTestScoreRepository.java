@@ -14,4 +14,6 @@ public interface LanguageTestScoreRepository extends JpaRepository<LanguageTestS
     Optional<LanguageTestScore> findLanguageTestScoreBySiteUserIdAndId(long siteUserId, Long id);
 
     List<LanguageTestScore> findBySiteUserId(long siteUserId);
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

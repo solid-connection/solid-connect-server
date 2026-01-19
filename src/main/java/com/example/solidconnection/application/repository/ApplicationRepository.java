@@ -40,4 +40,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
         return findBySiteUserIdAndTermId(siteUserId, termId)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
+
+    void deleteAllBySiteUserId(long siteUserId);
 }
