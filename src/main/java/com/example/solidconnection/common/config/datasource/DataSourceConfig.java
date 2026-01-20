@@ -18,6 +18,19 @@ public class DataSourceConfig {
 
     private final QueryMetricsListener queryMetricsListener;
 
+    // Driver
+    public static final String FLYWAY_MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
+
+    // Pool Name
+    public static final String FLYWAY_POOL_NAME = "FlywayPool";
+
+    // Connection Pool Settings
+    public static final int FLYWAY_MINIMUM_IDLE = 0;            // 유휴 커넥션을 0으로 설정하면 사용하지 않을 때 커넥션을 즉시 반납
+    public static final int FLYWAY_MAXIMUM_POOL_SIZE = 2;
+    public static final long FLYWAY_CONNECTION_TIMEOUT = 10000L;
+    public static final long FLYWAY_IDLE_TIMEOUT = 60000L;      // 1분
+    public static final long FLYWAY_MAX_LIFETIME = 300000L;     // 5분
+
     @Bean
     @Primary
     public DataSource proxyDataSource(DataSourceProperties props) {
@@ -42,14 +55,14 @@ public class DataSourceConfig {
         dataSource.setJdbcUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setPoolName("FlywayPool");
+        dataSource.setDriverClassName(FLYWAY_MYSQL_DRIVER);
+        dataSource.setPoolName(FLYWAY_POOL_NAME);
 
-        dataSource.setMinimumIdle(0);
-        dataSource.setMaximumPoolSize(2);
-        dataSource.setConnectionTimeout(10000);
-        dataSource.setIdleTimeout(60000);       // 1분으로 단축
-        dataSource.setMaxLifetime(300000);      // 최대 5분
+        dataSource.setMinimumIdle(FLYWAY_MINIMUM_IDLE);
+        dataSource.setMaximumPoolSize(FLYWAY_MAXIMUM_POOL_SIZE);
+        dataSource.setConnectionTimeout(FLYWAY_CONNECTION_TIMEOUT);
+        dataSource.setIdleTimeout(FLYWAY_IDLE_TIMEOUT);       // 1분으로 단축
+        dataSource.setMaxLifetime(FLYWAY_MAX_LIFETIME);      // 최대 5분
 
         return dataSource;
     }
