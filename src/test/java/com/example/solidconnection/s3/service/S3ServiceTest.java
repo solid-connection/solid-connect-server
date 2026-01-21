@@ -6,18 +6,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import software.amazon.awssdk.services.s3.S3Client;
 
 @DisplayName("S3 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -25,15 +22,6 @@ public class S3ServiceTest {
 
     @InjectMocks
     private S3Service s3Service;
-
-    @Mock
-    private S3Client s3Client;
-
-    @Mock
-    private FileUploadService fileUploadService;
-
-    @Mock
-    private ThreadPoolTaskExecutor asyncExecutor;
 
     private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
 
@@ -50,7 +38,7 @@ public class S3ServiceTest {
             MockMultipartFile file = createMockFile("test.png", MAX_FILE_SIZE_MB - 100);
 
             // when
-            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadType.PROFILE);
+            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadPath.PROFILE);
 
             // then
             assertAll(
@@ -66,7 +54,7 @@ public class S3ServiceTest {
             MockMultipartFile file = createMockFile("test.jpg", MAX_FILE_SIZE_MB + 100);
 
             // when
-            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadType.PROFILE);
+            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadPath.PROFILE);
 
             // then
             assertAll(
@@ -81,7 +69,7 @@ public class S3ServiceTest {
             MockMultipartFile file = createMockFile("chat.jpg", MAX_FILE_SIZE_MB + 100);
 
             // when
-            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadType.CHAT);
+            UploadedFileUrlResponse response = s3Service.uploadFile(file, UploadPath.CHAT);
 
             // then
             assertAll(
@@ -101,7 +89,7 @@ public class S3ServiceTest {
             MockMultipartFile invalidFile = createMockFile("virus.exe", 100);
 
             // when & then
-            assertThatThrownBy(() -> s3Service.uploadFile(invalidFile, UploadType.PROFILE))
+            assertThatThrownBy(() -> s3Service.uploadFile(invalidFile, UploadPath.PROFILE))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining("허용된 형식");
         }
@@ -114,9 +102,9 @@ public class S3ServiceTest {
 
             // when & then
             assertAll(
-                    () -> assertThatCode(() -> s3Service.uploadFile(pdfFile, UploadType.CHAT))
+                    () -> assertThatCode(() -> s3Service.uploadFile(pdfFile, UploadPath.CHAT))
                             .doesNotThrowAnyException(),
-                    () -> assertThatCode(() -> s3Service.uploadFile(wordFile, UploadType.CHAT))
+                    () -> assertThatCode(() -> s3Service.uploadFile(wordFile, UploadPath.CHAT))
                             .doesNotThrowAnyException()
             );
         }

@@ -1,7 +1,7 @@
 package com.example.solidconnection.s3.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.dto.urlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -39,7 +39,7 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadPreProfileImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadType.PROFILE);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
         return ResponseEntity.ok(profileImageUrl);
     }
 
@@ -48,7 +48,7 @@ public class S3Controller {
             @AuthorizedUser long siteUserId,
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadType.PROFILE);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
         s3Service.deleteExProfile(siteUserId);
         return ResponseEntity.ok(profileImageUrl);
     }
@@ -57,7 +57,7 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadGpaImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadType.GPA);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.GPA);
         return ResponseEntity.ok(profileImageUrl);
     }
 
@@ -65,7 +65,7 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadLanguageImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadType.LANGUAGE_TEST);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.LANGUAGE_TEST);
         return ResponseEntity.ok(profileImageUrl);
     }
 
@@ -73,7 +73,7 @@ public class S3Controller {
     public ResponseEntity<List<UploadedFileUrlResponse>> uploadChatFile(
             @RequestParam("files") List<MultipartFile> files
     ) {
-        List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(files, UploadType.CHAT);
+        List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(files, UploadPath.CHAT);
         return ResponseEntity.ok(chatImageUrls);
     }
 

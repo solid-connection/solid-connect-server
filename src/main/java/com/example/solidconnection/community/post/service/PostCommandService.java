@@ -18,7 +18,7 @@ import com.example.solidconnection.community.post.dto.PostDeleteResponse;
 import com.example.solidconnection.community.post.dto.PostUpdateRequest;
 import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -88,7 +88,7 @@ public class PostCommandService {
         if (imageFile.isEmpty()) {
             return;
         }
-        List<UploadedFileUrlResponse> uploadedFileUrlResponseList = s3Service.uploadFiles(imageFile, UploadType.COMMUNITY);
+        List<UploadedFileUrlResponse> uploadedFileUrlResponseList = s3Service.uploadFiles(imageFile, UploadPath.COMMUNITY);
         for (UploadedFileUrlResponse uploadedFileUrlResponse : uploadedFileUrlResponseList) {
             PostImage postImage = new PostImage(uploadedFileUrlResponse.fileUrl());
             postImage.setPost(post);

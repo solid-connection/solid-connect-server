@@ -5,7 +5,7 @@ import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.dto.MentorApplicationRequest;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -45,7 +45,7 @@ public class MentorApplicationService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         Term term = termRepository.findByName(mentorApplicationRequest.term())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, UploadType.MENTOR_PROOF);
+        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, UploadPath.MENTOR_PROOF);
         MentorApplication mentorApplication = new MentorApplication(
                 siteUser.getId(),
                 mentorApplicationRequest.country(),

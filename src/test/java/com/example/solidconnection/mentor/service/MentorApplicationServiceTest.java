@@ -13,7 +13,7 @@ import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.dto.MentorApplicationRequest;
 import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.ExchangeStatus;
@@ -69,7 +69,7 @@ public class MentorApplicationServiceTest {
         MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
         MockMultipartFile file = createMentorProofFile();
         String fileUrl = "/mentor-proof.pdf";
-        given(s3Service.uploadFile(file, UploadType.MENTOR_PROOF))
+        given(s3Service.uploadFile(file, UploadPath.MENTOR_PROOF))
                 .willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
@@ -87,7 +87,7 @@ public class MentorApplicationServiceTest {
         MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
         MockMultipartFile file = createMentorProofFile();
         String fileUrl = "/mentor-proof.pdf";
-        given(s3Service.uploadFile(file, UploadType.MENTOR_PROOF))
+        given(s3Service.uploadFile(file, UploadPath.MENTOR_PROOF))
                 .willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
@@ -105,7 +105,7 @@ public class MentorApplicationServiceTest {
         MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
         MockMultipartFile file = createMentorProofFile();
         String fileUrl = "/mentor-proof.pdf";
-        given(s3Service.uploadFile(file, UploadType.MENTOR_PROOF))
+        given(s3Service.uploadFile(file, UploadPath.MENTOR_PROOF))
                 .willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when & then
@@ -122,7 +122,7 @@ public class MentorApplicationServiceTest {
         MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
         MockMultipartFile file = createMentorProofFile();
         String fileUrl = "/mentor-proof.pdf";
-        given(s3Service.uploadFile(file, UploadType.MENTOR_PROOF))
+        given(s3Service.uploadFile(file, UploadPath.MENTOR_PROOF))
                 .willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when & then
@@ -173,7 +173,7 @@ public class MentorApplicationServiceTest {
         MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
         MockMultipartFile file = createMentorProofFile();
         String fileUrl = "/mentor-proof.pdf";
-        given(s3Service.uploadFile(file, UploadType.MENTOR_PROOF))
+        given(s3Service.uploadFile(file, UploadPath.MENTOR_PROOF))
                 .willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when

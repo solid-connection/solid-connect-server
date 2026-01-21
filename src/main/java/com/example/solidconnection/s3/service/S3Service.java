@@ -8,7 +8,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.s3.domain.UploadType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -52,35 +52,35 @@ public class S3Service {
      * - 5mb 이상의 파일은 /origin/ 경로로 업로드하여 lambda 함수로 리사이징 진행한다.
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
-    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadType uploadType) {
-        validateImgFile(multipartFile);
+    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadPath uploadPath) {
+        validateFile(multipartFile);
         UUID randomUUID = UUID.randomUUID();
         String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String baseFileName = randomUUID + "." + extension;
-        String fileName = uploadType.getType() + "/" + baseFileName;
-        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && uploadType != UploadType.CHAT;
+        String fileName = uploadPath.getType() + "/" + baseFileName;
+        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && uploadPath != UploadPath.CHAT;
 
-        final String uploadPath = isLargeFile ? "original/" + fileName : fileName;
+        final String originalPath = isLargeFile ? "original/" + fileName : fileName;
         final String returnPath = isLargeFile
                 ? "resize/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp"
                 : fileName;
 
-        fileUploadService.uploadFile(bucket, uploadPath, multipartFile);
+        fileUploadService.uploadFile(bucket, originalPath, multipartFile);
 
         return new UploadedFileUrlResponse(returnPath);
     }
 
-    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, UploadType uploadType) {
+    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, UploadPath uploadPath) {
 
         List<UploadedFileUrlResponse> uploadedFileUrlResponseList = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
-            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, uploadType);
+            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, uploadPath);
             uploadedFileUrlResponseList.add(uploadedFileUrlResponse);
         }
         return uploadedFileUrlResponseList;
     }
 
-    private void validateImgFile(MultipartFile file) {
+    private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new CustomException(FILE_NOT_EXIST);
         }
