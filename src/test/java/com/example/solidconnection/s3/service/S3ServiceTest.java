@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -23,6 +24,7 @@ public class S3ServiceTest {
     @InjectMocks
     private S3Service s3Service;
 
+    @Mock private FileUploadService fileUploadService;
     private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
 
     private MockMultipartFile createMockFile(String originalName, long size) {
