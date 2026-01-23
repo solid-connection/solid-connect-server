@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Primary;
 
 @RequiredArgsConstructor
 @Configuration
-public class DataSourceConfig {
+public class DataSourceProxyConfig {
 
     private final QueryMetricsListener queryMetricsListener;
 
