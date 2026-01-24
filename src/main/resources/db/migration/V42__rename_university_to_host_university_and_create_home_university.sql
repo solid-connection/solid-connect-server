@@ -9,8 +9,10 @@ ALTER TABLE university_info_for_apply
 
 CREATE TABLE IF NOT EXISTS home_university
 (
-    id   BIGINT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(100)          NOT NULL,
+    id         BIGINT AUTO_INCREMENT NOT NULL,
+    name       VARCHAR(100)          NOT NULL,
+    created_at DATETIME(6),
+    updated_at DATETIME(6),
     CONSTRAINT `PRIMARY` PRIMARY KEY (id),
     CONSTRAINT uk_home_university_name UNIQUE (name)
 );
