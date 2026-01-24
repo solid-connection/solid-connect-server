@@ -51,8 +51,7 @@ public class UniversityFixtureBuilder {
                 "https://accommodation-url",
                 "https://logo-image-url",
                 "https://background-image-url",
-                null, country, region,
-                null
+                null, country, region
         );
         return hostUniversityRepository.save(university);
     }

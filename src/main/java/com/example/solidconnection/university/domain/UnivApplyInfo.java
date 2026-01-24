@@ -36,6 +36,9 @@ public class UnivApplyInfo extends BaseEntity {
     @Column(nullable = false, name = "term_id")
     private long termId;
 
+    @Column(name = "home_university_id")
+    private Long homeUniversityId;
+
     @Column(nullable = false, length = 100)
     private String koreanName;
 
