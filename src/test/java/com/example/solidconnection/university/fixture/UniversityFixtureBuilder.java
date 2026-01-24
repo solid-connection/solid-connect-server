@@ -2,8 +2,8 @@ package com.example.solidconnection.university.fixture;
 
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.region.domain.Region;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.TestComponent;
 @RequiredArgsConstructor
 public class UniversityFixtureBuilder {
 
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
 
     private String koreanName;
     private String englishName;
@@ -19,7 +19,7 @@ public class UniversityFixtureBuilder {
     private Region region;
 
     public UniversityFixtureBuilder university() {
-        return new UniversityFixtureBuilder(universityRepository);
+        return new UniversityFixtureBuilder(hostUniversityRepository);
     }
 
     public UniversityFixtureBuilder koreanName(String koreanName) {
@@ -42,8 +42,8 @@ public class UniversityFixtureBuilder {
         return this;
     }
 
-    public University create() {
-        University university = new University(
+    public HostUniversity create() {
+        HostUniversity university = new HostUniversity(
                 null, koreanName, englishName,
                 "formatName",
                 "https://homepage-url",
@@ -51,8 +51,9 @@ public class UniversityFixtureBuilder {
                 "https://accommodation-url",
                 "https://logo-image-url",
                 "https://background-image-url",
-                null, country, region
+                null, country, region,
+                null
         );
-        return universityRepository.save(university);
+        return hostUniversityRepository.save(university);
     }
 }

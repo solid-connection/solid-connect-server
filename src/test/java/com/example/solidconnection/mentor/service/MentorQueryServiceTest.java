@@ -19,7 +19,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.fixture.TermFixture;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.Map;
 import java.util.function.Function;
@@ -56,7 +56,7 @@ class MentorQueryServiceTest {
     @Autowired
     private TermFixture termFixture;
 
-    private University university;
+    private HostUniversity university;
 
     @BeforeEach
     void setUp() {
@@ -134,7 +134,7 @@ class MentorQueryServiceTest {
 
         private Mentor mentor1, mentor2;
         private SiteUser mentorUser1, mentorUser2, currentUser;
-        private University university1, university2;
+        private HostUniversity university1, university2;
 
         @BeforeEach
         void setUp() {
@@ -200,7 +200,7 @@ class MentorQueryServiceTest {
 
         private Mentor asiaMentor, europeMentor;
         private SiteUser currentUser;
-        private University asiaUniversity, europeUniversity;
+        private HostUniversity asiaUniversity, europeUniversity;
 
         @BeforeEach
         void setUp() {

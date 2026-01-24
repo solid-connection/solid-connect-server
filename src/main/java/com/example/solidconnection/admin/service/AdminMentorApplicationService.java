@@ -14,8 +14,8 @@ import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminMentorApplicationService {
 
     private final MentorApplicationRepository mentorApplicationRepository;
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
     private final SiteUserRepository siteUserRepository;
 
     @Transactional(readOnly = true)
@@ -82,7 +82,7 @@ public class AdminMentorApplicationService {
 
         mentorApplication.validateCanAssignUniversity();
 
-        University university = universityRepository.getUniversityById(universityId);
+        HostUniversity university = hostUniversityRepository.getHostUniversityById(universityId);
 
         mentorApplication.assignUniversity(university.getId());
     }

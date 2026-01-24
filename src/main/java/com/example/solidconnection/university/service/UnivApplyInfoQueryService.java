@@ -8,7 +8,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoFilterSearchRequest;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
@@ -35,7 +35,7 @@ public class UnivApplyInfoQueryService {
     public UnivApplyInfoDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
                 = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
-        University university = univApplyInfo.getUniversity();
+        HostUniversity university = univApplyInfo.getUniversity();
 
         Term term = termRepository.findById(univApplyInfo.getTermId())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));

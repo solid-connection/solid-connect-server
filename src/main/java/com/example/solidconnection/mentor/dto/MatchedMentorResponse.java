@@ -4,7 +4,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public record MatchedMentorResponse(
 ) {
 
     public static MatchedMentorResponse of(Mentor mentor, SiteUser mentorUser,
-                                           University university, boolean isApplied, Long roomId,
+                                           HostUniversity university, boolean isApplied, Long roomId,
                                            String termName
     ) {
         return new MatchedMentorResponse(

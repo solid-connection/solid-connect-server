@@ -24,7 +24,7 @@ import com.example.solidconnection.mentor.repository.MentorApplicationRepository
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.time.LocalDate;
 import java.util.List;
@@ -66,7 +66,7 @@ class AdminMentorApplicationServiceTest {
     private MentorApplication mentorApplication8;
 
     private SiteUser user;
-    private University university;
+    private HostUniversity university;
 
     @BeforeEach
     void setUp() {
@@ -78,9 +78,9 @@ class AdminMentorApplicationServiceTest {
         SiteUser user6 = siteUserFixture.사용자(6, "test6");
         SiteUser user7 = siteUserFixture.사용자(7, "test7");
         SiteUser user8 = siteUserFixture.사용자(8, "test8");
-        University university1 = universityFixture.메이지_대학();
-        University university2 = universityFixture.괌_대학();
-        University university3 = universityFixture.그라츠_대학();
+        HostUniversity university1 = universityFixture.메이지_대학();
+        HostUniversity university2 = universityFixture.괌_대학();
+        HostUniversity university3 = universityFixture.그라츠_대학();
         mentorApplication1 = mentorApplicationFixture.승인된_멘토신청(user1.getId(), UniversitySelectType.CATALOG, university1.getId());
         mentorApplication2 = mentorApplicationFixture.대기중_멘토신청(user2.getId(), UniversitySelectType.CATALOG, university2.getId());
         mentorApplication3 = mentorApplicationFixture.거절된_멘토신청(user3.getId(), UniversitySelectType.CATALOG, university3.getId());
@@ -468,7 +468,7 @@ class AdminMentorApplicationServiceTest {
         void OTHER_타입의_멘토_지원서에_대학을_매핑하면_대학이_할당되고_타입이_CATALOG로_변경된다() {
             // given
             long otherTypeMentorApplicationId = mentorApplication7.getId();
-            University university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.메이지_대학();
 
             // when
             adminMentorApplicationService.assignUniversity(otherTypeMentorApplicationId, university.getId());
@@ -485,7 +485,7 @@ class AdminMentorApplicationServiceTest {
         void 존재하지_않는_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
             // given
             long nonExistentId = 99999L;
-            University university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.메이지_대학();
 
             // when & then
             assertThatCode(() -> adminMentorApplicationService.assignUniversity(nonExistentId, university.getId()))
@@ -497,7 +497,7 @@ class AdminMentorApplicationServiceTest {
         void CATALOG_타입의_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
             // given
             long catalogTypeMentorApplicationId = mentorApplication2.getId();
-            University university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.메이지_대학();
 
             // when & then
             assertThatCode(() -> adminMentorApplicationService.assignUniversity(catalogTypeMentorApplicationId, university.getId()))
