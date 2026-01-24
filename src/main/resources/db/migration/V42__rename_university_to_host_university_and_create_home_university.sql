@@ -21,5 +21,3 @@ ALTER TABLE host_university
 ALTER TABLE host_university
     ADD CONSTRAINT fk_host_university_home_university
         FOREIGN KEY (home_university_id) REFERENCES home_university (id) ON DELETE NO ACTION;
-
-CREATE INDEX fk_host_university_home_university_idx ON host_university (home_university_id);
