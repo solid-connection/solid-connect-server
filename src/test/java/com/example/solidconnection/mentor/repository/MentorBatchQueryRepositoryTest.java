@@ -9,7 +9,7 @@ import com.example.solidconnection.mentor.fixture.MentoringFixture;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ class MentorBatchQueryRepositoryTest {
     @Autowired
     private UniversityFixture universityFixture;
 
-    private University university1, university2;
+    private HostUniversity university1, university2;
     private Mentor mentor1, mentor2;
     private SiteUser mentorUser1, mentorUser2, currentUser;
 
@@ -73,7 +73,7 @@ class MentorBatchQueryRepositoryTest {
         List<Mentor> mentors = List.of(mentor1, mentor2);
 
         // when
-        Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
+        Map<Long, HostUniversity> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
 
         // then
         assertAll(

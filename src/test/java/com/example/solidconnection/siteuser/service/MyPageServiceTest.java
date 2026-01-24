@@ -41,7 +41,7 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
@@ -141,7 +141,7 @@ class MyPageServiceTest {
     void 멘토의_마이페이지_정보를_조회한다() {
         // given
         SiteUser mentorUser = siteUserFixture.멘토(1, "mentor");
-        University university = univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getUniversity();
+        HostUniversity university = univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getUniversity();
         mentorFixture.멘토(mentorUser.getId(), university.getId());
         int likedUnivApplyInfoCount = createLikedUnivApplyInfos(mentorUser);
 

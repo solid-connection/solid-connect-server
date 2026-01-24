@@ -31,7 +31,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +73,7 @@ class MentorMyPageServiceTest {
 
     private SiteUser mentorUser;
     private Mentor mentor;
-    private University university;
+    private HostUniversity university;
     private SiteUser siteUser;
     private Term term;
 
