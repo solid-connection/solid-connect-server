@@ -41,7 +41,7 @@ public class UnivApplyInfoFixtureBuilder {
 
     public UnivApplyInfo create() {
         UnivApplyInfo univApplyInfo = new UnivApplyInfo(
-                null, termId, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, termId, null, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
