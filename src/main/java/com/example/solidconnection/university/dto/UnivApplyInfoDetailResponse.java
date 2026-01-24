@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.dto;
 
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import java.util.List;
 
 public record UnivApplyInfoDetailResponse(
@@ -33,7 +33,7 @@ public record UnivApplyInfoDetailResponse(
         String englishCourseUrl) {
 
     public static UnivApplyInfoDetailResponse of(
-            University university,
+            HostUniversity university,
             UnivApplyInfo univApplyInfo,
             String termName
     ) {

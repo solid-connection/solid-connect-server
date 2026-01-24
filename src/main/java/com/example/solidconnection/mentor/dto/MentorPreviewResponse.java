@@ -2,7 +2,7 @@ package com.example.solidconnection.mentor.dto;
 
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import java.util.List;
 
 public record MentorPreviewResponse(
@@ -20,7 +20,7 @@ public record MentorPreviewResponse(
 ) {
 
     public static MentorPreviewResponse of(Mentor mentor, SiteUser mentorUser,
-                                           University university, boolean isApplied,
+                                           HostUniversity university, boolean isApplied,
                                            String termName
     ) {
         return new MentorPreviewResponse(

@@ -5,7 +5,7 @@ import com.example.solidconnection.location.region.domain.QRegion;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
-import com.example.solidconnection.university.domain.QUniversity;
+import com.example.solidconnection.university.domain.QHostUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -33,7 +33,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     @Override
     public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
-        QUniversity university = QUniversity.university;
+        QHostUniversity university = QHostUniversity.hostUniversity;
         QCountry country = QCountry.country;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
@@ -58,7 +58,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         return country.regionCode.eq(regionCode);
     }
 
-    private BooleanExpression countryOrUniversityContainsKeyword(QCountry country, QUniversity university, List<String> keywords) {
+    private BooleanExpression countryOrUniversityContainsKeyword(QCountry country, QHostUniversity university, List<String> keywords) {
         if (keywords == null || keywords.isEmpty()) {
             return Expressions.TRUE;
         }
@@ -78,7 +78,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     public List<UnivApplyInfo> findAllByFilter(
             LanguageTestType testType, String testScore, Long termId, List<String> countryCodes
     ) {
-        QUniversity university = QUniversity.university;
+        QHostUniversity university = QHostUniversity.hostUniversity;
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QCountry country = QCountry.country;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
@@ -146,7 +146,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     @Override
     public List<UnivApplyInfo> findAllByText(String text, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
-        QUniversity university = QUniversity.university;
+        QHostUniversity university = QHostUniversity.hostUniversity;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;

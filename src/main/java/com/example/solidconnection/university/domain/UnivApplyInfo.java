@@ -81,7 +81,7 @@ public class UnivApplyInfo extends BaseEntity {
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private University university;
+    private HostUniversity university;
 
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
         this.languageRequirements.add(languageRequirements);
