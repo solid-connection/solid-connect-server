@@ -106,8 +106,8 @@ class UnivApplyInfoQueryServiceTest {
             // then
             assertThat(response.univApplyInfoPreviews())
                     .containsExactly(
-                            UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보, term.getName()),
-                            UnivApplyInfoPreviewResponse.from(메이지대학_지원_정보, term.getName())
+                            UnivApplyInfoPreviewResponse.of(괌대학_A_지원_정보, term.getName(), null),
+                            UnivApplyInfoPreviewResponse.of(메이지대학_지원_정보, term.getName(), null)
                     );
         }
 
@@ -128,8 +128,8 @@ class UnivApplyInfoQueryServiceTest {
                 // then
                 assertThat(response.univApplyInfoPreviews())
                         .containsExactly(
-                                UnivApplyInfoPreviewResponse.from(메이지대학_지원_정보, term.getName()),
-                                UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보, term.getName())
+                                UnivApplyInfoPreviewResponse.of(메이지대학_지원_정보, term.getName(), null),
+                                UnivApplyInfoPreviewResponse.of(메모리얼대학_세인트존스_A_지원_정보, term.getName(), null)
                         );
             }
 
@@ -147,8 +147,8 @@ class UnivApplyInfoQueryServiceTest {
                 // then
                 assertThat(response.univApplyInfoPreviews())
                         .containsExactly(
-                                UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보, term.getName()),
-                                UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보, term.getName())
+                                UnivApplyInfoPreviewResponse.of(괌대학_A_지원_정보, term.getName(), null),
+                                UnivApplyInfoPreviewResponse.of(괌대학_B_지원_정보, term.getName(), null)
                         );
             }
 
@@ -166,8 +166,8 @@ class UnivApplyInfoQueryServiceTest {
                 // then
                 assertThat(response.univApplyInfoPreviews())
                         .containsExactly(
-                                UnivApplyInfoPreviewResponse.from(린츠_카톨릭대학_지원_정보, term.getName()),
-                                UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보, term.getName())
+                                UnivApplyInfoPreviewResponse.of(린츠_카톨릭대학_지원_정보, term.getName(), null),
+                                UnivApplyInfoPreviewResponse.of(서던덴마크대학교_지원_정보, term.getName(), null)
                         );
             }
         }
@@ -186,9 +186,9 @@ class UnivApplyInfoQueryServiceTest {
             // then
             assertThat(response.univApplyInfoPreviews())
                     .containsExactly(
-                            UnivApplyInfoPreviewResponse.from(대학지원정보_아, term.getName()),
-                            UnivApplyInfoPreviewResponse.from(국가_아, term.getName()),
-                            UnivApplyInfoPreviewResponse.from(권역_아, term.getName())
+                            UnivApplyInfoPreviewResponse.of(대학지원정보_아, term.getName(), null),
+                            UnivApplyInfoPreviewResponse.of(국가_아, term.getName(), null),
+                            UnivApplyInfoPreviewResponse.of(권역_아, term.getName(), null)
                     );
         }
 

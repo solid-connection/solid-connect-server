@@ -93,10 +93,10 @@ class UnivApplyInfoRecommendServiceTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보, term.getName())
+                        UnivApplyInfoPreviewResponse.of(괌대학_A_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(괌대학_B_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(메모리얼대학_세인트존스_A_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(네바다주립대학_라스베이거스_지원_정보, term.getName(), null)
                 ));
     }
 
@@ -112,8 +112,8 @@ class UnivApplyInfoRecommendServiceTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsAll(List.of(
-                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보, term.getName())
+                        UnivApplyInfoPreviewResponse.of(서던덴마크대학교_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(코펜하겐IT대학_지원_정보, term.getName(), null)
                 ));
     }
 
@@ -130,12 +130,12 @@ class UnivApplyInfoRecommendServiceTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrder(
-                        UnivApplyInfoPreviewResponse.from(괌대학_A_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(괌대학_B_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(메모리얼대학_세인트존스_A_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(네바다주립대학_라스베이거스_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(서던덴마크대학교_지원_정보, term.getName()),
-                        UnivApplyInfoPreviewResponse.from(코펜하겐IT대학_지원_정보, term.getName())
+                        UnivApplyInfoPreviewResponse.of(괌대학_A_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(괌대학_B_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(메모리얼대학_세인트존스_A_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(네바다주립대학_라스베이거스_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(서던덴마크대학교_지원_정보, term.getName(), null),
+                        UnivApplyInfoPreviewResponse.of(코펜하겐IT대학_지원_정보, term.getName(), null)
                 );
     }
 
@@ -149,9 +149,10 @@ class UnivApplyInfoRecommendServiceTest {
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
                         generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(
                                         univApplyInfo,
-                                        term.getName()
+                                        term.getName(),
+                                        null
                                 ))
                                 .toList()
                 );
@@ -167,9 +168,10 @@ class UnivApplyInfoRecommendServiceTest {
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
                         generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
+                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(
                                         univApplyInfo,
-                                        term.getName()
+                                        term.getName(),
+                                        null
                                 ))
                                 .toList()
                 );
