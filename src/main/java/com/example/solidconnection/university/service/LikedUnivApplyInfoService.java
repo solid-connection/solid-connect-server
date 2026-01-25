@@ -6,19 +6,22 @@ import static com.example.solidconnection.common.exception.ErrorCode.NOT_LIKED_U
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikedUnivApplyInfoService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
     private final TermRepository termRepository;
 
@@ -42,13 +46,27 @@ public class LikedUnivApplyInfoService {
 
         Map<Long, String> termMap = termRepository.findAllById(termIds).stream()
                 .collect(Collectors.toMap(Term::getId, Term::getName));
+        Map<Long, HomeUniversity> homeUniversityMap = getHomeUniversityMap(univApplyInfos);
 
         return univApplyInfos.stream()
                 .map(univApplyInfo -> {
                     String termName = termMap.getOrDefault(univApplyInfo.getTermId(), "Unknown");
-                    return UnivApplyInfoPreviewResponse.from(univApplyInfo, termName);
+                    HomeUniversity homeUniversity = homeUniversityMap.get(univApplyInfo.getHomeUniversityId());
+                    String homeUniversityName = homeUniversity != null ? homeUniversity.getName() : null;
+                    return UnivApplyInfoPreviewResponse.of(univApplyInfo, termName, homeUniversityName);
                 })
                 .toList();
+    }
+
+    private Map<Long, HomeUniversity> getHomeUniversityMap(List<UnivApplyInfo> univApplyInfos) {
+        List<Long> homeUniversityIds = univApplyInfos.stream()
+                .map(UnivApplyInfo::getHomeUniversityId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        return homeUniversityRepository.findAllByIdIn(homeUniversityIds).stream()
+                .collect(Collectors.toMap(HomeUniversity::getId, Function.identity()));
     }
 
     /*

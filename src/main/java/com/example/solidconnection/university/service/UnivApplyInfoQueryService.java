@@ -7,13 +7,19 @@ import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
-import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UnivApplyInfoQueryService {
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
     private final TermRepository termRepository;
 
     /*
@@ -47,13 +54,27 @@ public class UnivApplyInfoQueryService {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository.findAllByText(text, term.getId())
-                .stream()
-                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                        univApplyInfo,
-                        term.getName()
-                ))
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByText(text, term.getId());
+        Map<Long, HomeUniversity> homeUniversityMap = getHomeUniversityMap(univApplyInfos);
+
+        List<UnivApplyInfoPreviewResponse> responses = univApplyInfos.stream()
+                .map(univApplyInfo -> {
+                    HomeUniversity homeUniversity = homeUniversityMap.get(univApplyInfo.getHomeUniversityId());
+                    String homeUniversityName = homeUniversity != null ? homeUniversity.getName() : null;
+                    return UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName(), homeUniversityName);
+                })
                 .toList();
         return new UnivApplyInfoPreviewResponses(responses);
+    }
+
+    private Map<Long, HomeUniversity> getHomeUniversityMap(List<UnivApplyInfo> univApplyInfos) {
+        List<Long> homeUniversityIds = univApplyInfos.stream()
+                .map(UnivApplyInfo::getHomeUniversityId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        return homeUniversityRepository.findAllByIdIn(homeUniversityIds).stream()
+                .collect(Collectors.toMap(HomeUniversity::getId, Function.identity()));
     }
 }

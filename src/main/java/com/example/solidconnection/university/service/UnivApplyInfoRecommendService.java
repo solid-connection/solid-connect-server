@@ -6,13 +6,19 @@ import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +30,7 @@ public class UnivApplyInfoRecommendService {
     public static final int RECOMMEND_UNIV_APPLY_INFO_NUM = 6;
 
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
     private final TermRepository termRepository;
     private final GeneralUnivApplyInfoRecommendService generalUnivApplyInfoRecommendService;
 
@@ -50,12 +57,15 @@ public class UnivApplyInfoRecommendService {
             trimmedRecommends.addAll(getGeneralRecommendsExcludingSelected(trimmedRecommends));
         }
 
+        Map<Long, HomeUniversity> homeUniversityMap = getHomeUniversityMap(trimmedRecommends);
+
         return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
-                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                                                                   univApplyInfo,
-                                                                   term.getName()
-                                                           ))
-                                                           .toList());
+                .map(univApplyInfo -> {
+                    HomeUniversity homeUniversity = homeUniversityMap.get(univApplyInfo.getHomeUniversityId());
+                    String homeUniversityName = homeUniversity != null ? homeUniversity.getName() : null;
+                    return UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName(), homeUniversityName);
+                })
+                .toList());
     }
 
     private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
@@ -76,11 +86,25 @@ public class UnivApplyInfoRecommendService {
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
         List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
+        Map<Long, HomeUniversity> homeUniversityMap = getHomeUniversityMap(generalRecommends);
+
         return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
-                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                                                                   univApplyInfo,
-                                                                   term.getName()
-                                                           ))
-                                                           .toList());
+                .map(univApplyInfo -> {
+                    HomeUniversity homeUniversity = homeUniversityMap.get(univApplyInfo.getHomeUniversityId());
+                    String homeUniversityName = homeUniversity != null ? homeUniversity.getName() : null;
+                    return UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName(), homeUniversityName);
+                })
+                .toList());
+    }
+
+    private Map<Long, HomeUniversity> getHomeUniversityMap(List<UnivApplyInfo> univApplyInfos) {
+        List<Long> homeUniversityIds = univApplyInfos.stream()
+                .map(UnivApplyInfo::getHomeUniversityId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        return homeUniversityRepository.findAllByIdIn(homeUniversityIds).stream()
+                .collect(Collectors.toMap(HomeUniversity::getId, Function.identity()));
     }
 }

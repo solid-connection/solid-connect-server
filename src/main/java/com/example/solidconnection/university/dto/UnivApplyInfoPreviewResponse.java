@@ -9,6 +9,7 @@ public record UnivApplyInfoPreviewResponse(
         long id,
         String term,
         String koreanName,
+        String homeUniversityName,
         String region,
         String country,
         String logoImageUrl,
@@ -16,7 +17,11 @@ public record UnivApplyInfoPreviewResponse(
         int studentCapacity,
         List<LanguageRequirementResponse> languageRequirements) {
 
-    public static UnivApplyInfoPreviewResponse from(UnivApplyInfo univApplyInfo, String termName) {
+    public static UnivApplyInfoPreviewResponse of(
+            UnivApplyInfo univApplyInfo,
+            String termName,
+            String homeUniversityName
+    ) {
         List<LanguageRequirementResponse> languageRequirementResponses = new ArrayList<>(
                 univApplyInfo.getLanguageRequirements().stream()
                         .map(LanguageRequirementResponse::from)
@@ -27,6 +32,7 @@ public record UnivApplyInfoPreviewResponse(
                 univApplyInfo.getId(),
                 termName,
                 univApplyInfo.getKoreanName(),
+                homeUniversityName,
                 univApplyInfo.getUniversity().getRegion().getKoreanName(),
                 univApplyInfo.getUniversity().getCountry().getKoreanName(),
                 univApplyInfo.getUniversity().getLogoImageUrl(),
