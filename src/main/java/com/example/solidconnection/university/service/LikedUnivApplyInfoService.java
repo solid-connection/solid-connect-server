@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +45,7 @@ public class LikedUnivApplyInfoService {
         return univApplyInfos.stream()
                 .map(univApplyInfo -> {
                     String termName = termMap.getOrDefault(univApplyInfo.getTermId(), "Unknown");
-                    return UnivApplyInfoPreviewResponse.from(univApplyInfo, termName);
+                    return UnivApplyInfoPreviewResponse.of(univApplyInfo, termName);
                 })
                 .toList();
     }
