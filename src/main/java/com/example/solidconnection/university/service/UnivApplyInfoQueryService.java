@@ -10,7 +10,6 @@ import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
-import com.example.solidconnection.university.dto.UnivApplyInfoFilterSearchRequest;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
@@ -40,22 +39,6 @@ public class UnivApplyInfoQueryService {
         Term term = termRepository.findById(univApplyInfo.getTermId())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
         return UnivApplyInfoDetailResponse.of(university, univApplyInfo, term.getName());
-    }
-
-    @Transactional(readOnly = true)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByFilter(UnivApplyInfoFilterSearchRequest request) {
-        Term term = termRepository.findByIsCurrentTrue()
-                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
-
-        List<UnivApplyInfoPreviewResponse> responses = univApplyInfoRepository
-                .findAllByFilter(request.languageTestType(), request.testScore(), term.getId(), request.countryCode())
-                .stream()
-                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                        univApplyInfo,
-                        term.getName()
-                ))
-                .toList();
-        return new UnivApplyInfoPreviewResponses(responses);
     }
 
     @Transactional(readOnly = true)
