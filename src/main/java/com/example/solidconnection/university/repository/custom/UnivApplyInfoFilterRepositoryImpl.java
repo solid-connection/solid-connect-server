@@ -2,9 +2,10 @@ package com.example.solidconnection.university.repository.custom;
 
 import com.example.solidconnection.location.country.domain.QCountry;
 import com.example.solidconnection.location.region.domain.QRegion;
+import com.example.solidconnection.university.domain.QHomeUniversity;
+import com.example.solidconnection.university.domain.QHostUniversity;
 import com.example.solidconnection.university.domain.QLanguageRequirement;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
-import com.example.solidconnection.university.domain.QHostUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -33,6 +34,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
+        QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
         QCountry country = QCountry.country;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
 
@@ -40,6 +42,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .selectFrom(univApplyInfo)
                 .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
+                .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         regionCodeEq(country, regionCode)
@@ -84,6 +87,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     public List<UnivApplyInfo> findAllByText(String text, Long termId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
+        QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
         QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
@@ -92,6 +96,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
                 .join(region).on(country.regionCode.eq(region.code))
+                .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(termIdEq(univApplyInfo, termId));
 

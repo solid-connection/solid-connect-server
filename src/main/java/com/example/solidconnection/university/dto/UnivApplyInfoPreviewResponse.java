@@ -17,16 +17,16 @@ public record UnivApplyInfoPreviewResponse(
         int studentCapacity,
         List<LanguageRequirementResponse> languageRequirements) {
 
-    public static UnivApplyInfoPreviewResponse of(
-            UnivApplyInfo univApplyInfo,
-            String termName,
-            String homeUniversityName
-    ) {
+    public static UnivApplyInfoPreviewResponse of(UnivApplyInfo univApplyInfo, String termName) {
         List<LanguageRequirementResponse> languageRequirementResponses = new ArrayList<>(
                 univApplyInfo.getLanguageRequirements().stream()
                         .map(LanguageRequirementResponse::from)
                         .toList());
         Collections.sort(languageRequirementResponses);
+
+        String homeUniversityName = univApplyInfo.getHomeUniversity() != null
+                ? univApplyInfo.getHomeUniversity().getName()
+                : null;
 
         return new UnivApplyInfoPreviewResponse(
                 univApplyInfo.getId(),
