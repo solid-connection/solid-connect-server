@@ -3,20 +3,17 @@ package com.example.solidconnection.university.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.university.dto.IsLikeResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoDetailResponse;
-import com.example.solidconnection.university.dto.UnivApplyInfoFilterSearchRequest;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponse;
 import com.example.solidconnection.university.dto.UnivApplyInfoPreviewResponses;
 import com.example.solidconnection.university.dto.UnivApplyInfoRecommendsResponse;
 import com.example.solidconnection.university.service.LikedUnivApplyInfoService;
 import com.example.solidconnection.university.service.UnivApplyInfoQueryService;
 import com.example.solidconnection.university.service.UnivApplyInfoRecommendService;
-import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,14 +82,6 @@ public class UnivApplyInfoController {
     ) {
         UnivApplyInfoDetailResponse univApplyInfoDetailResponse = univApplyInfoQueryService.getUnivApplyInfoDetail(univApplyInfoId);
         return ResponseEntity.ok(univApplyInfoDetailResponse);
-    }
-
-    @GetMapping("/search/filter")
-    public ResponseEntity<UnivApplyInfoPreviewResponses> searchUnivApplyInfoByFilter(
-            @Valid @ModelAttribute UnivApplyInfoFilterSearchRequest request
-    ) {
-        UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByFilter(request);
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search/text")
