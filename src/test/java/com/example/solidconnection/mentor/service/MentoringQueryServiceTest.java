@@ -97,15 +97,18 @@ class MentoringQueryServiceTest {
             Mentoring mentoring2 = mentoringFixture.승인된_멘토링(mentor1.getId(), menteeUser2.getId());
             Mentoring mentoring3 = mentoringFixture.거절된_멘토링(mentor1.getId(), menteeUser3.getId());
 
+            ChatRoom chatRoom2 = chatRoomFixture.멘토링_채팅방(mentoring2.getId());
+
             // when
             SliceResponse<MentoringForMentorResponse> response = mentoringQueryService.getMentoringsForMentor(mentorUser1.getId(), pageable);
 
             // then
-            assertThat(response.content()).extracting(MentoringForMentorResponse::mentoringId)
+            assertThat(response.content())
+                    .extracting(MentoringForMentorResponse::verifyStatus, MentoringForMentorResponse::roomId)
                     .containsExactlyInAnyOrder(
-                            mentoring1.getId(),
-                            mentoring2.getId(),
-                            mentoring3.getId()
+                            tuple(VerifyStatus.PENDING, null),
+                            tuple(VerifyStatus.APPROVED, chatRoom2.getId()),
+                            tuple(VerifyStatus.REJECTED, null)
                     );
         }
 
@@ -137,10 +140,10 @@ class MentoringQueryServiceTest {
 
             // then
             assertThat(response.content())
-                    .extracting(MentoringForMentorResponse::mentoringId, MentoringForMentorResponse::isChecked)
+                    .extracting(MentoringForMentorResponse::nickname, MentoringForMentorResponse::isChecked)
                     .containsExactlyInAnyOrder(
-                            tuple(mentoring1.getId(), false),
-                            tuple(mentoring2.getId(), true)
+                            tuple(menteeUser1.getNickname(), false),
+                            tuple(menteeUser2.getNickname(), true)
                     );
         }
 

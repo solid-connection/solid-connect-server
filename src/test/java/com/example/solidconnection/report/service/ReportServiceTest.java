@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.example.solidconnection.chat.domain.ChatMessage;
+import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
@@ -53,19 +55,25 @@ class ReportServiceTest {
     private ChatRoomFixture chatRoomFixture;
 
     @Autowired
+    private ChatParticipantFixture chatParticipantFixture;
+
+    @Autowired
     private ChatMessageFixture chatMessageFixture;
 
     private SiteUser siteUser;
+    private SiteUser reportedUser;
     private Post post;
     private ChatMessage chatMessage;
 
     @BeforeEach
     void setUp() {
         siteUser = siteUserFixture.사용자();
+        reportedUser = siteUserFixture.신고된_사용자("신고된사용자");
         Board board = boardFixture.자유게시판();
         post = postFixture.게시글(board, siteUser);
         ChatRoom chatRoom = chatRoomFixture.채팅방(false);
-        chatMessage = chatMessageFixture.메시지("채팅", siteUser.getId(), chatRoom);
+        ChatParticipant chatParticipant = chatParticipantFixture.참여자(siteUser.getId(), chatRoom);
+        chatMessage = chatMessageFixture.메시지("채팅", chatParticipant.getId(), chatRoom);
     }
 
     @Nested
@@ -100,7 +108,7 @@ class ReportServiceTest {
         @Test
         void 이미_신고한_경우_예외가_발생한다() {
             // given
-            reportFixture.신고(siteUser.getId(), TargetType.POST, post.getId());
+            reportFixture.신고(siteUser.getId(), reportedUser.getId(), TargetType.POST, post.getId());
             ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.POST, post.getId());
 
             // when & then
@@ -142,7 +150,7 @@ class ReportServiceTest {
         @Test
         void 이미_신고한_경우_예외가_발생한다() {
             // given
-            reportFixture.신고(siteUser.getId(), TargetType.CHAT, chatMessage.getId());
+            reportFixture.신고(siteUser.getId(), reportedUser.getId(), TargetType.CHAT, chatMessage.getId());
             ReportRequest request = new ReportRequest(ReportType.INSULT, TargetType.CHAT, chatMessage.getId());
 
             // when & then

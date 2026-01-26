@@ -11,9 +11,10 @@ public class ReportFixture {
 
     private final ReportFixtureBuilder reportFixtureBuilder;
 
-    public Report 신고(long reporterId, TargetType targetType, long targetId) {
+    public Report 신고(long reporterId, long reportedId, TargetType targetType, long targetId) {
         return reportFixtureBuilder.report()
                 .reporterId(reporterId)
+                .reportedId(reportedId)
                 .targetType(targetType)
                 .targetId(targetId)
                 .create();

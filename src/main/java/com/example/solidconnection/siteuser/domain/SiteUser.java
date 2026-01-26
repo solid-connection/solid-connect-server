@@ -70,6 +70,10 @@ public class SiteUser extends BaseEntity {
     @Column(nullable = true)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus = UserStatus.ACTIVE;
+
     public SiteUser(
             String email,
             String nickname,
@@ -107,7 +111,8 @@ public class SiteUser extends BaseEntity {
             ExchangeStatus exchangeStatus,
             Role role,
             AuthType authType,
-            String password) {
+            String password,
+            UserStatus userStatus) {
         this.email = email;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -115,9 +120,14 @@ public class SiteUser extends BaseEntity {
         this.role = role;
         this.authType = authType;
         this.password = password;
+        this.userStatus = userStatus;
     }
 
     public void updatePassword(String newEncodedPassword) {
         this.password = newEncodedPassword;
+    }
+
+    public void updateUserStatus(UserStatus status) {
+        this.userStatus = status;
     }
 }

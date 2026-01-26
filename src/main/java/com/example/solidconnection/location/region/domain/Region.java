@@ -25,4 +25,8 @@ public class Region {
         this.code = code;
         this.koreanName = koreanName;
     }
+
+    public void updateKoreanName(String koreanName) {
+        this.koreanName = koreanName;
+    }
 }

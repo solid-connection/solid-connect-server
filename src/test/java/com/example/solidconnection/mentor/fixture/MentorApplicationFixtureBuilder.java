@@ -20,6 +20,8 @@ public class MentorApplicationFixtureBuilder {
     private Long universityId = null;
     private UniversitySelectType universitySelectType = UniversitySelectType.OTHER;
     private String mentorProofUrl = "/mentor-proof.pdf";
+    private long termId;
+    private String rejectedReason = null;
     private ExchangeStatus exchangeStatus = ExchangeStatus.AFTER_EXCHANGE;
     private MentorApplicationStatus mentorApplicationStatus = MentorApplicationStatus.PENDING;
 
@@ -52,6 +54,16 @@ public class MentorApplicationFixtureBuilder {
         return this;
     }
 
+    public MentorApplicationFixtureBuilder termId(long termId) {
+        this.termId = termId;
+        return this;
+    }
+
+    public MentorApplicationFixtureBuilder rejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
+        return this;
+    }
+
     public MentorApplicationFixtureBuilder exchangeStatus(ExchangeStatus exchangeStatus) {
         this.exchangeStatus = exchangeStatus;
         return this;
@@ -69,9 +81,13 @@ public class MentorApplicationFixtureBuilder {
                 universityId,
                 universitySelectType,
                 mentorProofUrl,
+                termId,
                 exchangeStatus
         );
         ReflectionTestUtils.setField(mentorApplication, "mentorApplicationStatus", mentorApplicationStatus);
+        if(rejectedReason != null) {
+            ReflectionTestUtils.setField(mentorApplication, "rejectedReason", rejectedReason);
+        }
         return mentorApplicationRepository.save(mentorApplication);
     }
 }

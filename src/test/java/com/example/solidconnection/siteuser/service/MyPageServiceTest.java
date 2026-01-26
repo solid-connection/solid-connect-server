@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_CHANGE_NICKNAME_YET;
+import static com.example.solidconnection.common.exception.ErrorCode.OAUTH_USER_CANNOT_CHANGE_PASSWORD;
 import static com.example.solidconnection.common.exception.ErrorCode.PASSWORD_MISMATCH;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 import static com.example.solidconnection.siteuser.service.MyPageService.NICKNAME_LAST_CHANGE_DATE_FORMAT;
@@ -49,6 +50,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
@@ -327,6 +330,27 @@ class MyPageServiceTest {
             assertThatThrownBy(() -> myPageService.updatePassword(user.getId(), request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PASSWORD_MISMATCH.getMessage());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = AuthType.class, names = {"KAKAO", "APPLE"})
+        void 소셜_로그인_사용자가_비밀번호를_변경하면_예외가_발생한다(AuthType authType) {
+            // given
+            SiteUser oauthUser = siteUserFixtureBuilder.siteUser()
+                    .email("oauth@example.com")
+                    .authType(authType)
+                    .nickname("소셜로그인사용자")
+                    .profileImageUrl("profileImageUrl")
+                    .role(Role.MENTEE)
+                    .password("randomPassword")
+                    .create();
+
+            PasswordUpdateRequest request = new PasswordUpdateRequest("anyPassword", "newPassword", "newPassword");
+
+            // when & then
+            assertThatThrownBy(() -> myPageService.updatePassword(oauthUser.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(OAUTH_USER_CANNOT_CHANGE_PASSWORD.getMessage());
         }
     }
 

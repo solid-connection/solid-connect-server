@@ -13,6 +13,7 @@ import com.example.solidconnection.location.region.service.InterestedRegionServi
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,8 @@ public class SignUpService {
                 signUpRequest.exchangeStatus(),
                 Role.MENTEE,
                 authType,
-                password
+                password,
+                UserStatus.ACTIVE
         ));
 
         // 관심 지역, 국가 저장

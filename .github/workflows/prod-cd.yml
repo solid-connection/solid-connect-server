@@ -1,98 +1,158 @@
 name: "[PROD] Build Gradle and Deploy"
 
 on:
-  push:
-    branches: [ "master" ]
+  release:
+    types: [published]
+
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Docker Tag Name (e.g., v1.0.0)'
+        required: true
+        default: 'latest'
 
 jobs:
-  build-gradle:
+  # --- Job 1: 빌드 및 이미지 푸시 (쓰기 권한) ---
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.image_meta.outputs.image_tag }}
 
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
-        submodules: true
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
+          submodules: true
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      # --- Java, Gradle 설정 ---
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew bootJar
 
-    # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      # --- Docker 설정 ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/arm64
 
-    - name: Grant execute permission for Gradle wrapper(gradlew)
-      run: chmod +x ./gradlew
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build with Gradle
-      run: ./gradlew bootJar
-      
-    - name: Copy jar file to remote
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        source: "./build/libs/*.jar"
-        target: "/home/${{ secrets.USERNAME }}/solid-connect-server/"
-
-    - name: Copy docker file to remote
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        source: "./Dockerfile"
-        target: "/home/${{ secrets.USERNAME }}/solid-connect-server/"
-
-    - name: Copy docker compose file to remote
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        source: "./docker-compose.prod.yml"
-        target: "/home/${{ secrets.USERNAME }}/solid-connect-server/"
-
-    - name: Copy alloy config file to remote
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        source: "./docs/infra-config/config.alloy"
-        target: "/home/${{ secrets.USERNAME }}/solid-connect-server/"
-
-    - name: Copy nginx config to remote
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        source: "./docs/infra-config/nginx.prod.conf"
-        target: "/home/${{ secrets.USERNAME }}/solid-connection-prod/nginx"
-        rename: "default.conf"
-
-    - name: Run docker compose and apply nginx config
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        script_stop: true
-        script: |
-          sudo cp /home/${{ secrets.USERNAME }}/solid-connection-prod/nginx/default.conf /etc/nginx/conf.d/default.conf
-          sudo nginx -t
-          sudo nginx -s reload
+      # --- 이미지 메타데이터 정의 (Prod용 이미지 이름) ---
+      - name: Define image name and tag
+        id: image_meta
+        run: |
+          OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           
-          cd /home/${{ secrets.USERNAME }}/solid-connect-server
-          docker compose -f docker-compose.prod.yml down
-          docker compose -f docker-compose.prod.yml up -d --build
+          # Trigger가 Release인 경우: Release의 Tag Name (예: v1.0.0) 사용
+          if [ "${{ github.event_name }}" == "release" ]; then
+            IMAGE_TAG="${{ github.ref_name }}"
+          # Trigger가 수동(workflow_dispatch)인 경우: 입력받은 tag_name 사용
+          else
+            IMAGE_TAG="${{ inputs.tag_name }}"
+          fi
+          
+          echo "Docker Image Tag: $IMAGE_TAG"
+          
+          echo "image_name=ghcr.io/${OWNER_LOWERCASE}/solid-connection-server" >> $GITHUB_OUTPUT
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      # --- Docker 빌드 및 푸시 ---
+      - name: Build, push, and cache Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ format('{0}:{1}', steps.image_meta.outputs.image_name, steps.image_meta.outputs.image_tag) }}
+          cache-from: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache
+          cache-to: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache,mode=max
+
+      # --- 이미지 정리 ---
+      - name: Clean up old image versions from GHCR
+        uses: snok/container-retention-policy@v2
+        with:
+          token: ${{ secrets.PACKAGE_DELETE_TOKEN }}
+          image-names: solid-connection-server
+          delete-untagged: true
+          keep-n-tags: 5
+          account-type: org
+          org-name: ${{ github.repository_owner }}
+          cut-off: '7 days ago UTC'
+
+  # --- Job 2: 배포 (읽기 권한) ---
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      # 설정 파일 전송을 위해 코드 체크아웃 (서브모듈 불필요)
+      - name: Checkout config files
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.prod.yml
+            docs/infra-config
+          sparse-checkout-cone-mode: false
+
+      # --- 설정 파일 전송 ---
+      - name: Copy config files to remote
+        run: |
+          echo "${{ secrets.PRIVATE_KEY }}" > deploy_key.pem
+          chmod 600 deploy_key.pem
+          
+          scp -i deploy_key.pem \
+            -o StrictHostKeyChecking=no \
+            ./docker-compose.prod.yml \
+            ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/solid-connection-prod/
+
+      # --- 서버에서 Docker Pull 및 재시작 ---
+      - name: Run docker compose and apply nginx config
+        run: |
+          ssh -i deploy_key.pem \
+           -o StrictHostKeyChecking=no \
+           ${{ secrets.USERNAME }}@${{ secrets.HOST }} \
+           '
+            set -e
+          
+            # 1. 변수 설정 (이전 Job의 Output 사용)
+            export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")
+            export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
+            export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG_ONLY}"
+          
+            # 2. GHCR 로그인 & Pull
+            # App Token 대신 현재 워크플로우의 임시 토큰을 사용합니다.
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "Pulling new image: $FULL_IMAGE_NAME"
+            docker pull $FULL_IMAGE_NAME
+          
+            # 3. Spring Boot 앱 재시작
+            echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
+            cd /home/${{ secrets.USERNAME }}/solid-connection-prod
+            docker compose -f docker-compose.prod.yml down || true
+            OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.prod.yml up -d
+          
+            # 6. 정리
+            docker image prune -f
+            echo "Deployment finished successfully."
+           '

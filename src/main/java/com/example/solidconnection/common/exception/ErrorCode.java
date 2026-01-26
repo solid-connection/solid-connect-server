@@ -38,7 +38,9 @@ public enum ErrorCode {
     APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "사용자의 대학 지원 정보를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원을 찾을 수 없습니다."),
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "대학교를 찾을 수 없습니다."),
+    REGION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "지역을 찾을 수 없습니다."),
     REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
+    REGION_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 지역입니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
@@ -50,6 +52,8 @@ public enum ErrorCode {
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
     CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
+    MENTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멘토 지원서가 존재하지 않습니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신고 내역이 존재하지 않습니다."),
 
     // auth
     USER_ALREADY_SIGN_OUT(HttpStatus.UNAUTHORIZED.value(), "로그아웃 되었습니다."),
@@ -64,6 +68,7 @@ public enum ErrorCode {
     PASSWORD_NOT_CHANGED(HttpStatus.BAD_REQUEST.value(), "현재 비밀번호와 새 비밀번호가 동일합니다."),
     PASSWORD_NOT_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "새 비밀번호가 일치하지 않습니다."),
     SIGN_IN_FAILED(HttpStatus.UNAUTHORIZED.value(), "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."),
+    OAUTH_USER_CANNOT_CHANGE_PASSWORD(HttpStatus.BAD_REQUEST.value(), "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
 
     // s3
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),
@@ -118,6 +123,7 @@ public enum ErrorCode {
     CHANNEL_SEQUENCE_NOT_UNIQUE(HttpStatus.BAD_REQUEST.value(), "채널의 순서가 중복되었습니다."),
     CHANNEL_REGISTRATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "등록 가능한 채널 수를 초과하였습니다."),
     ALREADY_MENTOR(HttpStatus.BAD_REQUEST.value(), "이미 멘토로 등록된 사용자입니다."),
+    ALREADY_EXIST_MENTORING(HttpStatus.BAD_REQUEST.value(), "이미 신청된 멘티, 멘토입니다."),
     MENTORING_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "해당 멘토링 신청을 찾을 수 없습니다."),
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
@@ -126,6 +132,10 @@ public enum ErrorCode {
     UNIVERSITY_ID_REQUIRED_FOR_CATALOG(HttpStatus.BAD_REQUEST.value(), "목록에서 학교를 선택한 경우 학교 정보가 필요합니다."),
     UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER(HttpStatus.BAD_REQUEST.value(), "기타 학교를 선택한 경우 학교 정보를 입력할 수 없습니다."),
     INVALID_UNIVERSITY_SELECT_TYPE(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 선택 방식입니다."),
+    MENTOR_ALREADY_EXISTS(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 멘토입니다."),
+    MENTOR_APPLICATION_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토 승격 요청 입니다."),
+    MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED(HttpStatus.BAD_REQUEST.value(), "승인하려는 멘토 신청에 대학교가 선택되지 않았습니다."),
+    MENTOR_APPLICATION_NOT_OTHER_STATUS(HttpStatus.BAD_REQUEST.value(), "대학 선택 타입이 OTHER이 아닌 멘토 지원서 입니다."),
 
     // socket
     UNAUTHORIZED_SUBSCRIBE(HttpStatus.FORBIDDEN.value(), "구독 권한이 없습니다."),
@@ -140,6 +150,11 @@ public enum ErrorCode {
 
     // chat
     INVALID_CHAT_ROOM_STATE(HttpStatus.BAD_REQUEST.value(), "잘못된 채팅방 상태입니다."),
+
+    // ban
+    ALREADY_BANNED_USER(HttpStatus.CONFLICT.value(), "이미 차단된 사용자입니다."),
+    NOT_BANNED_USER(HttpStatus.BAD_REQUEST.value(), "차단되지 않은 사용자입니다."),
+    BANNED_USER_ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "차단된 사용자는 커뮤니티 및 채팅을 이용할 수 없습니다."),
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),

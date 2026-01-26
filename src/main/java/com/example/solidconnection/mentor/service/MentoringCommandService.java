@@ -1,5 +1,6 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ALREADY_EXIST_MENTORING;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTORING_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
@@ -30,8 +31,13 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        Mentoring mentoring = new Mentoring(mentoringApplyRequest.mentorId(), siteUserId, VerifyStatus.PENDING);
+        long mentorId = mentoringApplyRequest.mentorId();
 
+        if (mentoringRepository.existsByMentorIdAndMenteeId(mentorId, siteUserId)) {
+            throw new CustomException(ALREADY_EXIST_MENTORING);
+        }
+
+        Mentoring mentoring = new Mentoring(mentoringApplyRequest.mentorId(), siteUserId, VerifyStatus.PENDING);
         return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
     }
 

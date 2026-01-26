@@ -42,4 +42,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         return findById(id)
                 .orElseThrow(() -> new CustomException(INVALID_COMMENT_ID));
     }
+
+    void deleteAllBySiteUserId(long siteUserId);
 }

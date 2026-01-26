@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.repository;
 
 import com.example.solidconnection.chat.domain.ChatReadStatus;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface ChatReadStatusRepository extends JpaRepository<ChatReadStatus, 
                    ON DUPLICATE KEY UPDATE updated_at = NOW(6)
                    """, nativeQuery = true)
     void upsertReadStatus(@Param("chatRoomId") long chatRoomId, @Param("chatParticipantId") long chatParticipantId);
+
+    void deleteAllByChatParticipantIdIn(List<Long> chatParticipantIds);
 }
