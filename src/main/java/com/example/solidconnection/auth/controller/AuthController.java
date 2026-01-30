@@ -118,11 +118,19 @@ public class AuthController {
 
     @PostMapping("/reissue")
     public ResponseEntity<ReissueResponse> reissueToken(
-            HttpServletRequest request
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         String refreshToken = refreshTokenCookieManager.getRefreshToken(request);
-        ReissueResponse reissueResponse = authService.reissue(refreshToken);
-        return ResponseEntity.ok(reissueResponse);
+        try {
+            ReissueResponse reissueResponse = authService.reissue(refreshToken);
+            return ResponseEntity.ok(reissueResponse);
+        } catch (CustomException e) {
+            if (e.getErrorCode().equals(ErrorCode.REFRESH_TOKEN_EXPIRED)) {
+                refreshTokenCookieManager.deleteCookie(response);
+            }
+            throw e;
+        }
     }
 
     private String getAccessToken(Authentication authentication) {
