@@ -4,12 +4,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_E
 import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 
 import com.example.solidconnection.common.exception.CustomException;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;

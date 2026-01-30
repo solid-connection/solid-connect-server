@@ -3,7 +3,6 @@ package com.example.solidconnection.s3.domain;
 import com.example.solidconnection.common.constant.FileConstants;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
-import java.util.List;
 import lombok.Getter;
 
 @Getter
