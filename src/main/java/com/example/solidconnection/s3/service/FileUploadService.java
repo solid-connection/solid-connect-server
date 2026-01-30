@@ -24,17 +24,16 @@ public class FileUploadService {
     private final S3Client s3Client;
 
     @Async
-    public void uploadFile(String bucket, String fileName, MultipartFile multipartFile) {
+    public void uploadFile(String bucket, String fileName, byte[] content, String contentType) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)
                     .key(fileName)
-                    .contentType(multipartFile.getContentType())
-                    .contentLength(multipartFile.getSize())
+                    .contentType(contentType)
+                    .contentLength((long) content.length)
                     .build();
 
-            s3Client.putObject(putObjectRequest,
-                               RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
 
             log.info("파일 업로드 정상 완료 thread: {}", Thread.currentThread().getName());
         } catch (S3Exception e) {
@@ -43,8 +42,8 @@ public class FileUploadService {
                     : e.getMessage();
             log.error("S3 서비스 예외 발생 : {}", errorMessage);
             throw new CustomException(S3_SERVICE_EXCEPTION);
-        } catch (SdkException | IOException e) {
-            log.error("S3 클라이언트 또는 IO 예외 발생 : {}", e.getMessage());
+        } catch (SdkException e) {
+            log.error("S3 클라이언트 또는 SDK 예외 발생 : {}", e.getMessage());
             throw new CustomException(S3_CLIENT_EXCEPTION);
         }
     }

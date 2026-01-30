@@ -3,7 +3,7 @@ package com.example.solidconnection.s3.controller;
 import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
-import com.example.solidconnection.s3.dto.urlPrefixResponse;
+import com.example.solidconnection.s3.dto.UrlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +78,7 @@ public class S3Controller {
     }
 
     @GetMapping("/s3-url-prefix")
-    public ResponseEntity<urlPrefixResponse> getS3UrlPrefix() {
-        return ResponseEntity.ok(new urlPrefixResponse(s3Default, s3Uploaded, cloudFrontDefault, cloudFrontUploaded));
+    public ResponseEntity<UrlPrefixResponse> getS3UrlPrefix() {
+        return ResponseEntity.ok(new UrlPrefixResponse(s3Default, s3Uploaded, cloudFrontDefault, cloudFrontUploaded));
     }
 }

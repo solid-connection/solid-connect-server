@@ -2,7 +2,6 @@ package com.example.solidconnection.s3.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -13,14 +12,13 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -37,7 +35,6 @@ public class S3Service {
     private final S3Client s3Client;
     private final SiteUserRepository siteUserRepository;
     private final FileUploadService fileUploadService;
-    private final ThreadPoolTaskExecutor asyncExecutor;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -53,21 +50,35 @@ public class S3Service {
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
     public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadPath uploadPath) {
-        validateFile(multipartFile);
+        validateFile(multipartFile, uploadPath);
+
         UUID randomUUID = UUID.randomUUID();
         String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String baseFileName = randomUUID + "." + extension;
         String fileName = uploadPath.getType() + "/" + baseFileName;
-        final boolean isLargeFile = multipartFile.getSize() >= MAX_FILE_SIZE_MB && uploadPath != UploadPath.CHAT;
 
-        final String originalPath = isLargeFile ? "original/" + fileName : fileName;
-        final String returnPath = isLargeFile
+        final boolean shouldResize = uploadPath.isResizable(
+                multipartFile.getSize(), extension, MAX_FILE_SIZE_MB);
+
+        final String originalPath = shouldResize ? "original/" + fileName : fileName;
+        final String returnPath = shouldResize
                 ? "resize/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp"
                 : fileName;
 
-        fileUploadService.uploadFile(bucket, originalPath, multipartFile);
+        byte[] bytes = extractBytes(multipartFile);
+        String contentType = multipartFile.getContentType();
+
+        fileUploadService.uploadFile(bucket, originalPath, bytes, contentType);
 
         return new UploadedFileUrlResponse(returnPath);
+    }
+
+    private byte[] extractBytes(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            throw new CustomException(S3_CLIENT_EXCEPTION);
+        }
     }
 
     public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, UploadPath uploadPath) {
@@ -80,18 +91,14 @@ public class S3Service {
         return uploadedFileUrlResponseList;
     }
 
-    private void validateFile(MultipartFile file) {
+    private void validateFile(MultipartFile file, UploadPath uploadPath) {
         if (file == null || file.isEmpty()) {
             throw new CustomException(FILE_NOT_EXIST);
         }
 
         String fileName = Objects.requireNonNull(file.getOriginalFilename());
         String fileExtension = getFileExtension(fileName).toLowerCase();
-
-        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "webp", "pdf", "word", "docx");
-        if (!allowedExtensions.contains(fileExtension)) {
-            throw new CustomException(NOT_ALLOWED_FILE_EXTENSIONS, "허용된 형식: " + allowedExtensions);
-        }
+        uploadPath.validateExtension(fileExtension);
     }
 
     private String getFileExtension(String fileName) {
