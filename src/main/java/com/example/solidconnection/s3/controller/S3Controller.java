@@ -1,9 +1,9 @@
 package com.example.solidconnection.s3.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
-import com.example.solidconnection.s3.dto.urlPrefixResponse;
+import com.example.solidconnection.s3.dto.UrlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadPreProfileImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
         return ResponseEntity.ok(profileImageUrl);
     }
 
@@ -48,7 +48,7 @@ public class S3Controller {
             @AuthorizedUser long siteUserId,
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
         s3Service.deleteExProfile(siteUserId);
         return ResponseEntity.ok(profileImageUrl);
     }
@@ -57,7 +57,7 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadGpaImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.GPA);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.GPA);
         return ResponseEntity.ok(profileImageUrl);
     }
 
@@ -65,20 +65,20 @@ public class S3Controller {
     public ResponseEntity<UploadedFileUrlResponse> uploadLanguageImage(
             @RequestParam("file") MultipartFile imageFile
     ) {
-        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, ImgType.LANGUAGE_TEST);
+        UploadedFileUrlResponse profileImageUrl = s3Service.uploadFile(imageFile, UploadPath.LANGUAGE_TEST);
         return ResponseEntity.ok(profileImageUrl);
     }
 
     @PostMapping("/chat")
-    public ResponseEntity<List<UploadedFileUrlResponse>> uploadChatImage(
-            @RequestParam("files") List<MultipartFile> imageFiles
+    public ResponseEntity<List<UploadedFileUrlResponse>> uploadChatFile(
+            @RequestParam("files") List<MultipartFile> files
     ) {
-        List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(imageFiles, ImgType.CHAT);
+        List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(files, UploadPath.CHAT);
         return ResponseEntity.ok(chatImageUrls);
     }
 
     @GetMapping("/s3-url-prefix")
-    public ResponseEntity<urlPrefixResponse> getS3UrlPrefix() {
-        return ResponseEntity.ok(new urlPrefixResponse(s3Default, s3Uploaded, cloudFrontDefault, cloudFrontUploaded));
+    public ResponseEntity<UrlPrefixResponse> getS3UrlPrefix() {
+        return ResponseEntity.ok(new UrlPrefixResponse(s3Default, s3Uploaded, cloudFrontDefault, cloudFrontUploaded));
     }
 }

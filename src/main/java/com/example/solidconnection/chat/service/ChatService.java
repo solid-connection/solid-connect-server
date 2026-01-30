@@ -27,6 +27,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class ChatService {
@@ -240,16 +242,19 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_STATE));
 
-        ChatMessage chatMessage = new ChatMessage(
-                "",
-                senderId,
-                chatRoom
-        );
+        ChatMessage chatMessage = new ChatMessage("", senderId, chatRoom);
+
+        // 이미지 판별을 위한 확장자 리스트
+        List<String> imageExtensions = Arrays.asList("jpg", "jpeg", "png", "webp");
 
         for (String imageUrl : chatImageSendRequest.imageUrls()) {
-            String thumbnailUrl = generateThumbnailUrl(imageUrl);
+            String extension = StringUtils.getFilenameExtension(imageUrl);
 
-            ChatAttachment attachment = new ChatAttachment(true, imageUrl, thumbnailUrl, null);
+            boolean isImage = extension != null && imageExtensions.contains(extension.toLowerCase());
+
+            String thumbnailUrl = isImage ? generateThumbnailUrl(imageUrl) : null;
+
+            ChatAttachment attachment = new ChatAttachment(isImage, imageUrl, thumbnailUrl, null);
             chatMessage.addAttachment(attachment);
         }
 
@@ -268,10 +273,8 @@ public class ChatService {
 
             String thumbnailFileName = nameWithoutExt + "_thumb" + extension;
 
-            String thumbnailUrl = originalUrl.replace("chat/images/", "chat/thumbnails/")
+            return originalUrl.replace("chat/files/", "chat/thumbnails/")
                     .replace(fileName, thumbnailFileName);
-
-            return thumbnailUrl;
 
         } catch (Exception e) {
             return originalUrl;

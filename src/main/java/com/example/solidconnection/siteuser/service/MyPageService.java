@@ -14,7 +14,7 @@ import com.example.solidconnection.location.region.service.InterestedRegionServi
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.repository.MentorRepository;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -90,9 +90,8 @@ public class MyPageService {
             user.setNickname(nickname);
             user.setNicknameModifiedAt(LocalDateTime.now());
         }
-
         if (imageFile != null && !imageFile.isEmpty()) {
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
             if (!isDefaultProfileImage(user.getProfileImageUrl())) {
                 s3Service.deleteExProfile(user.getId());
             }

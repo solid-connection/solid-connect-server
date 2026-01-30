@@ -2,45 +2,39 @@ package com.example.solidconnection.s3.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_FILE_EXTENSIONS;
-import static com.example.solidconnection.common.exception.ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_CLIENT_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.S3_SERVICE_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
-    private static final Logger log = LoggerFactory.getLogger(S3Service.class);
     private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
 
-    private final AmazonS3Client amazonS3;
+    private final S3Client s3Client;
     private final SiteUserRepository siteUserRepository;
     private final FileUploadService fileUploadService;
-    private final ThreadPoolTaskExecutor asyncExecutor;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -55,47 +49,56 @@ public class S3Service {
      * - 5mb 이상의 파일은 /origin/ 경로로 업로드하여 lambda 함수로 리사이징 진행한다.
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
-    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, ImgType imageFile) {
-        // 파일 검증
-        validateImgFile(multipartFile);
-        // 파일 이름 생성
+    public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadPath uploadPath) {
+        validateFile(multipartFile, uploadPath);
+
         UUID randomUUID = UUID.randomUUID();
-        String fileName = imageFile.getType() + "/" + randomUUID;
-        // 파일업로드 비동기로 진행
-        if (multipartFile.getSize() >= MAX_FILE_SIZE_MB) {
-            asyncExecutor.submit(() -> {
-                fileUploadService.uploadFile(bucket, "origin/" + fileName, multipartFile);
-            });
-        } else {
-            asyncExecutor.submit(() -> {
-                fileUploadService.uploadFile(bucket, fileName, multipartFile);
-            });
-        }
-        return new UploadedFileUrlResponse(fileName);
+        String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        String baseFileName = randomUUID + "." + extension;
+        String fileName = uploadPath.getType() + "/" + baseFileName;
+
+        final boolean shouldResize = uploadPath.isResizable(
+                multipartFile.getSize(), extension, MAX_FILE_SIZE_MB);
+
+        final String originalPath = shouldResize ? "original/" + fileName : fileName;
+        final String returnPath = shouldResize
+                ? "resize/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp"
+                : fileName;
+
+        byte[] bytes = extractBytes(multipartFile);
+        String contentType = multipartFile.getContentType();
+
+        fileUploadService.uploadFile(bucket, originalPath, bytes, contentType);
+
+        return new UploadedFileUrlResponse(returnPath);
     }
 
-    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, ImgType imageFile) {
+    private byte[] extractBytes(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            throw new CustomException(S3_CLIENT_EXCEPTION);
+        }
+    }
+
+    public List<UploadedFileUrlResponse> uploadFiles(List<MultipartFile> multipartFile, UploadPath uploadPath) {
 
         List<UploadedFileUrlResponse> uploadedFileUrlResponseList = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
-            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, imageFile);
+            UploadedFileUrlResponse uploadedFileUrlResponse = uploadFile(file, uploadPath);
             uploadedFileUrlResponseList.add(uploadedFileUrlResponse);
         }
         return uploadedFileUrlResponseList;
     }
 
-    private void validateImgFile(MultipartFile file) {
+    private void validateFile(MultipartFile file, UploadPath uploadPath) {
         if (file == null || file.isEmpty()) {
             throw new CustomException(FILE_NOT_EXIST);
         }
 
         String fileName = Objects.requireNonNull(file.getOriginalFilename());
         String fileExtension = getFileExtension(fileName).toLowerCase();
-
-        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "webp", "pdf", "word", "docx");
-        if (!allowedExtensions.contains(fileExtension)) {
-            throw new CustomException(NOT_ALLOWED_FILE_EXTENSIONS, "허용된 형식: " + allowedExtensions);
-        }
+        uploadPath.validateExtension(fileExtension);
     }
 
     private String getFileExtension(String fileName) {
@@ -125,12 +128,14 @@ public class S3Service {
 
     private void deleteFile(String fileName) {
         try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-        } catch (AmazonServiceException e) {
-            log.error("파일 삭제 중 s3 서비스 예외 발생 : {}", e.getMessage());
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+        } catch (S3Exception e) {
             throw new CustomException(S3_SERVICE_EXCEPTION);
-        } catch (SdkClientException e) {
-            log.error("파일 삭제 중 s3 클라이언트 예외 발생 : {}", e.getMessage());
+        } catch (SdkException e) {
             throw new CustomException(S3_CLIENT_EXCEPTION);
         }
     }
