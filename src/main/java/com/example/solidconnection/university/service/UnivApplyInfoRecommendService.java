@@ -51,11 +51,8 @@ public class UnivApplyInfoRecommendService {
         }
 
         return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
-                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                                                                   univApplyInfo,
-                                                                   term.getName()
-                                                           ))
-                                                           .toList());
+                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
+                .toList());
     }
 
     private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
@@ -76,11 +73,9 @@ public class UnivApplyInfoRecommendService {
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
         List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
+
         return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
-                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.from(
-                                                                   univApplyInfo,
-                                                                   term.getName()
-                                                           ))
-                                                           .toList());
+                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
+                .toList());
     }
 }

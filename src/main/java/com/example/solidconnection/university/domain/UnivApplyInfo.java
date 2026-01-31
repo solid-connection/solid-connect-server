@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -36,8 +37,9 @@ public class UnivApplyInfo extends BaseEntity {
     @Column(nullable = false, name = "term_id")
     private long termId;
 
-    @Column(name = "home_university_id")
-    private Long homeUniversityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "home_university_id")
+    private HomeUniversity homeUniversity;
 
     @Column(nullable = false, length = 100)
     private String koreanName;

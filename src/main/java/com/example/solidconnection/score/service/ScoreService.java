@@ -5,7 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.score.domain.GpaScore;
@@ -40,7 +40,7 @@ public class ScoreService {
     public Long submitGpaScore(long siteUserId, GpaScoreRequest gpaScoreRequest, MultipartFile file) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, ImgType.GPA);
+        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, UploadPath.GPA);
         Gpa gpa = new Gpa(gpaScoreRequest.gpa(), gpaScoreRequest.gpaCriteria(), uploadedFile.fileUrl());
         GpaScore newGpaScore = new GpaScore(gpa, siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);
@@ -51,7 +51,7 @@ public class ScoreService {
     public Long submitLanguageTestScore(long siteUserId, LanguageTestScoreRequest languageTestScoreRequest, MultipartFile file) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, ImgType.LANGUAGE_TEST);
+        UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(file, UploadPath.LANGUAGE_TEST);
         LanguageTest languageTest = new LanguageTest(languageTestScoreRequest.languageTestType(),
                                                      languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
         LanguageTestScore newScore = new LanguageTestScore(languageTest, siteUser);

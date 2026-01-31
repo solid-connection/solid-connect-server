@@ -17,8 +17,13 @@ public interface LikedUnivApplyInfoRepository extends JpaRepository<LikedUnivApp
     Optional<LikedUnivApplyInfo> findBySiteUserIdAndUnivApplyInfoId(long siteUserId, long univApplyInfoId);
 
     @Query("""
-           SELECT u
+           SELECT DISTINCT u
            FROM UnivApplyInfo u
+           LEFT JOIN FETCH u.languageRequirements lr
+           LEFT JOIN FETCH u.homeUniversity hu
+           LEFT JOIN FETCH u.university univ
+           LEFT JOIN FETCH univ.country c
+           LEFT JOIN FETCH univ.region r
            JOIN LikedUnivApplyInfo l ON u.id = l.univApplyInfoId
            WHERE l.siteUserId = :siteUserId
            """)

@@ -25,7 +25,7 @@ import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -209,7 +209,7 @@ class MyPageServiceTest {
             // given
             String expectedUrl = "newProfileImageUrl";
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
@@ -224,7 +224,7 @@ class MyPageServiceTest {
         void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
             // given
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
@@ -239,7 +239,7 @@ class MyPageServiceTest {
             // given
             SiteUser 커스텀_프로필_사용자 = createSiteUserWithCustomProfile();
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
@@ -255,7 +255,7 @@ class MyPageServiceTest {
 
         @BeforeEach
         void setUp() {
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
         }
 
