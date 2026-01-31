@@ -43,6 +43,7 @@ public enum ErrorCode {
     REGION_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 지역입니다."),
     HOST_UNIVERSITY_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 파견 대학입니다."),
     HOST_UNIVERSITY_HAS_REFERENCES(HttpStatus.CONFLICT.value(), "해당 파견 대학을 참조하는 대학 지원 정보가 존재합니다."),
+    COUNTRY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "국가를 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
