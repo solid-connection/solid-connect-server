@@ -5,6 +5,7 @@ import com.example.solidconnection.chat.config.StompProperties.InboundProperties
 import com.example.solidconnection.chat.config.StompProperties.OutboundProperties;
 import com.example.solidconnection.security.config.CorsProperties;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -24,6 +25,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CorsProperties corsProperties;
     private final WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
     private final CustomHandshakeHandler customHandshakeHandler;
+    private final Optional<WebSocketLoggingInterceptor> webSocketLoggingInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -39,7 +41,12 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         InboundProperties inboundProperties = stompProperties.threadPool().inbound();
-        registration.interceptors(stompHandler).taskExecutor().corePoolSize(inboundProperties.corePoolSize()).maxPoolSize(inboundProperties.maxPoolSize()).queueCapacity(inboundProperties.queueCapacity());
+        webSocketLoggingInterceptor.ifPresent(registration::interceptors);
+        registration.interceptors(stompHandler)
+                .taskExecutor()
+                .corePoolSize(inboundProperties.corePoolSize())
+                .maxPoolSize(inboundProperties.maxPoolSize())
+                .queueCapacity(inboundProperties.queueCapacity());
     }
 
     @Override
