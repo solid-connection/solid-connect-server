@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.dto.ReissueResponse;
+import com.example.solidconnection.auth.exception.AuthException;
 import com.example.solidconnection.auth.token.TokenBlackListService;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -55,7 +56,7 @@ public class AuthService {
     public ReissueResponse reissue(String requestedRefreshToken) {
         // 리프레시 토큰 확인
         if (!authTokenProvider.isValidRefreshToken(requestedRefreshToken)) {
-            throw new CustomException(REFRESH_TOKEN_EXPIRED);
+            throw new AuthException(REFRESH_TOKEN_EXPIRED);
         }
         // 액세스 토큰 재발급
         SiteUser siteUser = authTokenProvider.parseSiteUser(requestedRefreshToken);
