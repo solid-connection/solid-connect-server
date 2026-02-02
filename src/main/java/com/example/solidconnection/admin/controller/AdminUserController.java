@@ -20,12 +20,10 @@ import com.example.solidconnection.common.response.PageResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin/users")
 @RestController
-@Slf4j
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
@@ -39,9 +37,9 @@ public class AdminUserController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{user-id}")
     public ResponseEntity<UserInfoDetailResponse> getUserInfoDetail(
-		    @PathVariable long userId
+		    @PathVariable(name = "user-id") long userId
     ) {
         UserInfoDetailResponse response = adminUserService.getUserInfoDetail(userId);
         return ResponseEntity.ok(response);
@@ -57,9 +55,9 @@ public class AdminUserController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @GetMapping("/restricted/{userId}")
+    @GetMapping("/restricted/{user-id}")
     public ResponseEntity<RestrictedUserInfoDetailResponse> getRestrictedUserInfoDetail(
-		    @PathVariable long userId
+		    @PathVariable(name = "user-id") long userId
     ) {
         RestrictedUserInfoDetailResponse response = adminUserService.getRestrictedUserInfoDetail(userId);
         return ResponseEntity.ok(response);

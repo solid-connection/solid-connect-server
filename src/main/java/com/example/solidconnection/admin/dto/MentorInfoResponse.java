@@ -4,6 +4,6 @@ import java.util.List;
 
 public record MentorInfoResponse(
 	List<MatchedInfoResponse> menteeInfos,
-	List<MentorApplicationHistoryResponse> mentorApplicationHistory
+	List<MentorApplicationHistoryInfoResponse> mentorApplicationHistory
 ) {
 }

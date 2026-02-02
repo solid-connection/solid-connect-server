@@ -13,7 +13,10 @@ import com.example.solidconnection.admin.dto.UserSearchResponse;
 public interface SiteUserFilterRepository {
 
 	Page<UserSearchResponse> searchAllUsers(UserSearchCondition searchCondition, Pageable pageable);
+
 	Page<RestrictedUserSearchResponse> searchRestrictedUsers(RestrictedUserSearchCondition searchCondition, Pageable pageable);
+
 	UserInfoDetailResponse getUserInfoDetailByUserId(long userId);
+
 	RestrictedUserInfoDetailResponse getRestrictedUserInfoDetail(long userId);
 }

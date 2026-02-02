@@ -1,6 +1,6 @@
 package com.example.solidconnection.admin.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.*;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

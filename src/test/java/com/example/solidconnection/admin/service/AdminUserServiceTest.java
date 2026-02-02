@@ -262,7 +262,7 @@ public class AdminUserServiceTest {
         }
 
         @Test
-        void 존재하지_않는_유저_조회_시_예외_응답을_반환한다() {
+        void 존재하지_않는_유저_조회_시_예외가_발생한다() {
             // given
             long notExistUserId = 999999L;
 
@@ -274,7 +274,6 @@ public class AdminUserServiceTest {
     }
 
     @Nested
-    @DisplayName("신고/차단된 유저 검색")
     class 신고_차단된_유저_검색 {
 
         @Test
@@ -360,7 +359,6 @@ public class AdminUserServiceTest {
     }
 
     @Nested
-    @DisplayName("신고/차단된 유저 상세 정보 조회")
     class 신고_차단된_유저_상세_정보_조회 {
 
         @Test
@@ -434,7 +432,7 @@ public class AdminUserServiceTest {
         }
 
         @Test
-        void 존재하지_않는_유저_조회_시_예외_응답을_반환한다() {
+        void 존재하지_않는_유저_조회_시_예외가_발생한다() {
             // given
             long notExistUserId = 999999L;
 

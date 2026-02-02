@@ -7,28 +7,24 @@ import static com.example.solidconnection.mentor.domain.QMentoring.mentoring;
 import static com.example.solidconnection.report.domain.QReport.report;
 import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
 import static com.example.solidconnection.siteuser.domain.QUserBan.userBan;
-import static com.example.solidconnection.university.domain.QUnivApplyInfo.univApplyInfo;
+import static java.time.ZoneOffset.UTC;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.example.solidconnection.admin.dto.MentorApplicationHistoryInfoResponse;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.university.domain.QUnivApplyInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
 import com.example.solidconnection.admin.dto.BannedHistoryResponse;
 import com.example.solidconnection.admin.dto.BannedInfoResponse;
 import com.example.solidconnection.admin.dto.MatchedInfoResponse;
 import com.example.solidconnection.admin.dto.MenteeInfoResponse;
-import com.example.solidconnection.admin.dto.MentorApplicationHistoryResponse;
 import com.example.solidconnection.admin.dto.MentorInfoResponse;
 import com.example.solidconnection.admin.dto.ReportedHistoryResponse;
 import com.example.solidconnection.admin.dto.ReportedInfoResponse;
@@ -47,7 +43,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import jakarta.persistence.EntityManager;
 
 @Repository
@@ -101,9 +96,9 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     mentoring.confirmedAt
             );
 
-    private static final ConstructorExpression<MentorApplicationHistoryResponse> MENTOR_APPLICATION_HISTORY_RESPONSE_PROJECTION =
+    private static final ConstructorExpression<MentorApplicationHistoryInfoResponse> MENTOR_APPLICATION_HISTORY_RESPONSE_PROJECTION =
             Projections.constructor(
-                    MentorApplicationHistoryResponse.class,
+                    MentorApplicationHistoryInfoResponse.class,
                     mentorApplication.mentorApplicationStatus,
                     mentorApplication.rejectedReason,
                     mentorApplication.createdAt
@@ -187,14 +182,8 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 // 최신 차단 내역 조회
                 .leftJoin(userBan).on(
                         userBan.bannedUserId.eq(siteUser.id)
-                                .and(
-                                        userBan.id.eq(
-                                                JPAExpressions
-                                                        .select(userBan.id.max())
-                                                        .from(userBan)
-                                                        .where(userBan.bannedUserId.eq(siteUser.id))
-                                        )
-                                )
+                                .and(userBan.isExpired.eq(false))
+                                .and(userBan.expiredAt.after(ZonedDateTime.now(UTC)))
                 )
 
                 .where(
@@ -316,7 +305,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     .fetch();
         }
 
-        List<MentorApplicationHistoryResponse> mentorApplicationHistory = queryFactory
+        List<MentorApplicationHistoryInfoResponse> mentorApplicationHistory = queryFactory
                 .select(MENTOR_APPLICATION_HISTORY_RESPONSE_PROJECTION)
                 .from(mentorApplication)
                 .where(mentorApplication.siteUserId.eq(userId))
