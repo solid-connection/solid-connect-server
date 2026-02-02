@@ -46,6 +46,11 @@ public class AdminMentorApplicationService {
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
         mentorApplication.approve();
+
+        SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        siteUser.becomeMentor();
     }
 
     @Transactional
