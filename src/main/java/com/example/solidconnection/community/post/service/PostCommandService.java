@@ -2,6 +2,7 @@ package com.example.solidconnection.community.post.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_CREATE_REQUEST;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -46,6 +47,12 @@ public class PostCommandService {
                                          List<MultipartFile> imageFile) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        // 중복 생성 방지
+        if (!postRedisManager.isPostCreationAllowed(siteUserId)) {
+            throw new CustomException(DUPLICATE_POST_CREATE_REQUEST);
+        }
+
         // 유효성 검증
         validatePostCategory(postCreateRequest.postCategory());
         validateFileSize(imageFile);

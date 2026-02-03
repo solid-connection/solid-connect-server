@@ -122,7 +122,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()), VALIDATE_VIEW_COUNT_TTL.getValue());
                     if (isFirstTime) {
                         redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
                     }
@@ -135,7 +135,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()), VALIDATE_VIEW_COUNT_TTL.getValue());
                     if (isFirstTime) {
                         redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
                     }

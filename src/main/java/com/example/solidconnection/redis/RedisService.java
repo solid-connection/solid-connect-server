@@ -37,9 +37,9 @@ public class RedisService { // todo: 정말 필요한지 고민 필요
         return Long.valueOf(redisTemplate.opsForValue().getAndDelete(key));
     }
 
-    public boolean isPresent(String key) {
+    public boolean isPresent(String key, String ttl) {
         return Boolean.TRUE.equals(redisTemplate.opsForValue()
-                                           .setIfAbsent(key, "1", Long.parseLong(VALIDATE_VIEW_COUNT_TTL.getValue()), TimeUnit.SECONDS));
+                                           .setIfAbsent(key, "1", Long.parseLong(ttl), TimeUnit.SECONDS));
     }
 
     public boolean isKeyExists(String key) {

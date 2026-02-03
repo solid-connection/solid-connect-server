@@ -15,7 +15,10 @@ public enum RedisConstants {
     REFRESH_LOCK_PREFIX("refresh_lock:"),
     LOCK_TIMEOUT_MS("10000"),
     MAX_WAIT_TIME_MS("3000"),
-    CREATE_CHANNEL("create_channel");
+    CREATE_CHANNEL("create_channel"),
+
+    POST_CREATE_PREFIX("post_create_lock:"),
+    VALIDATE_POST_CREATE_TTL("5");
 
     private final String value;
 
