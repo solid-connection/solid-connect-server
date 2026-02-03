@@ -36,11 +36,11 @@ public class AdminHostUniversityController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{host-university-id}")
     public ResponseEntity<AdminHostUniversityDetailResponse> getHostUniversity(
-            @PathVariable Long id
+            @PathVariable("host-university-id") Long hostUniversityId
     ) {
-        AdminHostUniversityDetailResponse response = adminHostUniversityService.getHostUniversity(id);
+        AdminHostUniversityDetailResponse response = adminHostUniversityService.getHostUniversity(hostUniversityId);
         return ResponseEntity.ok(response);
     }
 
@@ -52,20 +52,20 @@ public class AdminHostUniversityController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{host-university-id}")
     public ResponseEntity<AdminHostUniversityDetailResponse> updateHostUniversity(
-            @PathVariable Long id,
+            @PathVariable("host-university-id") Long hostUniversityId,
             @Valid @RequestBody AdminHostUniversityUpdateRequest request
     ) {
-        AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(id, request);
+        AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(hostUniversityId, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{host-university-id}")
     public ResponseEntity<Void> deleteHostUniversity(
-            @PathVariable Long id
+            @PathVariable("host-university-id") Long hostUniversityId
     ) {
-        adminHostUniversityService.deleteHostUniversity(id);
+        adminHostUniversityService.deleteHostUniversity(hostUniversityId);
         return ResponseEntity.ok().build();
     }
 }
