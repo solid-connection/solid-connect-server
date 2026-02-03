@@ -1,6 +1,6 @@
 package com.example.solidconnection.concurrency;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
+import static com.example.solidconnection.redis.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.solidconnection.community.board.domain.Board;
@@ -8,11 +8,11 @@ import com.example.solidconnection.community.board.repository.BoardRepository;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.community.post.service.RedisService;
+import com.example.solidconnection.community.post.service.PostRedisManager;
+import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.util.RedisUtils;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +37,7 @@ class PostViewCountConcurrencyTest {
     private BoardRepository boardRepository;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private PostRedisManager postRedisManager;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -84,7 +84,7 @@ class PostViewCountConcurrencyTest {
     @Test
     void 게시글을_조회할_때_조회수_동시성_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+        redisService.deleteKey(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -92,7 +92,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
+                    redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
                 } finally {
                     doneSignal.countDown();
                 }
@@ -114,7 +114,7 @@ class PostViewCountConcurrencyTest {
     @Test
     void 게시글을_조회할_때_조회수_조작_문제를_해결한다() throws InterruptedException {
 
-        redisService.deleteKey(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+        redisService.deleteKey(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         CountDownLatch doneSignal = new CountDownLatch(THREAD_NUMS);
@@ -122,9 +122,9 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
                     if (isFirstTime) {
-                        redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
+                        redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
                     }
                 } finally {
                     doneSignal.countDown();
@@ -135,9 +135,9 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    boolean isFirstTime = redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
+                    boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()));
                     if (isFirstTime) {
-                        redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(post.getId()));
+                        redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
                     }
                 } finally {
                     doneSignal.countDown();

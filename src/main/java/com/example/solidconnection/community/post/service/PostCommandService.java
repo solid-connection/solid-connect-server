@@ -23,7 +23,6 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +39,7 @@ public class PostCommandService {
     private final BoardRepository boardRepository;
     private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
-    private final RedisService redisService;
-    private final RedisUtils redisUtils;
+    private final PostRedisManager postRedisManager;
 
     @Transactional
     public PostCreateResponse createPost(long siteUserId, PostCreateRequest postCreateRequest,
@@ -104,8 +102,7 @@ public class PostCommandService {
         validateQuestion(post);
 
         removePostImages(post);
-        // cache out
-        redisService.deleteKey(redisUtils.getPostViewCountRedisKey(postId));
+        postRedisManager.deleteViewCountCache(postId);
         postRepository.deleteById(post.getId());
 
         return new PostDeleteResponse(postId);

@@ -1,4 +1,4 @@
-package com.example.solidconnection.community.post.service;
+package com.example.solidconnection.redis;
 
 import lombok.Getter;
 

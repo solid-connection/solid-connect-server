@@ -1,7 +1,7 @@
-package com.example.solidconnection.community.post.service;
+package com.example.solidconnection.redis;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
-import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_TTL;
+import static com.example.solidconnection.redis.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
+import static com.example.solidconnection.redis.RedisConstants.VIEW_COUNT_TTL;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;

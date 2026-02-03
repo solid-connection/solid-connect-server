@@ -1,9 +1,7 @@
 package com.example.solidconnection.util;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_LOCK_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LOCK_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
-import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PREFIX;
+import static com.example.solidconnection.redis.RedisConstants.CREATE_LOCK_PREFIX;
+import static com.example.solidconnection.redis.RedisConstants.REFRESH_LOCK_PREFIX;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,18 +35,6 @@ public class RedisUtils {
 
     public Long getExpirationTime(String key) {
         return redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
-    }
-
-    public String getPostViewCountRedisKey(Long postId) {
-        return VIEW_COUNT_KEY_PREFIX.getValue() + postId;
-    }
-
-    public String getValidatePostViewCountRedisKey(long siteUserId, Long postId) {
-        return VALIDATE_VIEW_COUNT_KEY_PREFIX.getValue() + postId + ":" + siteUserId;
-    }
-
-    public Long getPostIdFromPostViewCountRedisKey(String key) {
-        return Long.parseLong(key.substring(VIEW_COUNT_KEY_PREFIX.getValue().length()));
     }
 
     public String generateCacheKey(String keyPattern, Object[] args) {

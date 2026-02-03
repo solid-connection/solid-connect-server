@@ -17,11 +17,11 @@ import com.example.solidconnection.community.post.dto.PostFindResponse;
 import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
+import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.UserBlockFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.util.RedisUtils;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ class PostQueryServiceTest {
     private RedisService redisService;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private PostRedisManager postRedisManager;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -176,8 +176,8 @@ class PostQueryServiceTest {
         Comment comment2 = commentFixture.부모_댓글("댓글2", post, user);
         List<Comment> comments = List.of(comment1, comment2);
 
-        String validateKey = redisUtils.getValidatePostViewCountRedisKey(user.getId(), post.getId());
-        String viewCountKey = redisUtils.getPostViewCountRedisKey(post.getId());
+        String validateKey = postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId());
+        String viewCountKey = postRedisManager.getPostViewCountRedisKey(post.getId());
 
         // when
         PostFindResponse response = postQueryService.findPostById(user.getId(), post.getId());

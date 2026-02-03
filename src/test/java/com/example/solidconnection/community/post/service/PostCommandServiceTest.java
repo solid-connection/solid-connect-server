@@ -25,13 +25,13 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.util.RedisUtils;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class PostCommandServiceTest {
     private RedisService redisService;
 
     @Autowired
-    private RedisUtils redisUtils;
+    private PostRedisManager postRedisManager;
 
     @Autowired
     private PostRepository postRepository;
@@ -266,7 +266,7 @@ class PostCommandServiceTest {
             // given
             String originImageUrl = "origin-image-url";
             postImageFixture.게시글_이미지(originImageUrl, post);
-            String viewCountKey = redisUtils.getPostViewCountRedisKey(post.getId());
+            String viewCountKey = postRedisManager.getPostViewCountRedisKey(post.getId());
             redisService.increaseViewCount(viewCountKey);
 
             // when
