@@ -8,7 +8,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_
 
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityCreateRequest;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityDetailResponse;
-import com.example.solidconnection.admin.university.dto.AdminHostUniversityListResponse;
+import com.example.solidconnection.admin.university.dto.AdminHostUniversityResponse;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversitySearchCondition;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityUpdateRequest;
 import com.example.solidconnection.common.exception.CustomException;
@@ -35,7 +35,7 @@ public class AdminHostUniversityService {
     private final UnivApplyInfoRepository univApplyInfoRepository;
 
     @Transactional(readOnly = true)
-    public AdminHostUniversityListResponse getHostUniversities(
+    public Page<AdminHostUniversityResponse> getHostUniversities(
             AdminHostUniversitySearchCondition condition,
             Pageable pageable
     ) {
@@ -45,7 +45,7 @@ public class AdminHostUniversityService {
                 condition.regionCode(),
                 pageable
         );
-        return AdminHostUniversityListResponse.from(hostUniversityPage);
+        return hostUniversityPage.map(AdminHostUniversityResponse::from);
     }
 
     @Transactional(readOnly = true)

@@ -2,10 +2,11 @@ package com.example.solidconnection.admin.university.controller;
 
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityCreateRequest;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityDetailResponse;
-import com.example.solidconnection.admin.university.dto.AdminHostUniversityListResponse;
+import com.example.solidconnection.admin.university.dto.AdminHostUniversityResponse;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversitySearchCondition;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityUpdateRequest;
 import com.example.solidconnection.admin.university.service.AdminHostUniversityService;
+import com.example.solidconnection.common.response.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +29,11 @@ public class AdminHostUniversityController {
     private final AdminHostUniversityService adminHostUniversityService;
 
     @GetMapping
-    public ResponseEntity<AdminHostUniversityListResponse> getHostUniversities(
+    public ResponseEntity<PageResponse<AdminHostUniversityResponse>> getHostUniversities(
             AdminHostUniversitySearchCondition condition,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(condition, pageable);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(PageResponse.of(adminHostUniversityService.getHostUniversities(condition, pageable)));
     }
 
     @GetMapping("/{host-university-id}")
