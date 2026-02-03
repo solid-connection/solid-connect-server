@@ -45,8 +45,10 @@ public class WebSocketLoggingInterceptor implements ChannelInterceptor {
     private Long extractUserId(StompHeaderAccessor accessor) {
         Principal user = accessor.getUser();
         if (user instanceof TokenAuthentication tokenAuth) {
-            SiteUserDetails details = (SiteUserDetails) tokenAuth.getPrincipal();
-            return details.getSiteUser().getId();
+            Object principal = tokenAuth.getPrincipal();
+            if (principal instanceof SiteUserDetails details) {
+                return details.getSiteUser().getId();
+            }
         }
         return null;
     }
