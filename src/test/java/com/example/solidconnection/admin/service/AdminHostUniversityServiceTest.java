@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityCreateRequest;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityDetailResponse;
-import com.example.solidconnection.admin.university.dto.AdminHostUniversityListResponse;
+import com.example.solidconnection.admin.university.dto.AdminHostUniversityResponse;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversitySearchCondition;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityUpdateRequest;
 import com.example.solidconnection.admin.university.service.AdminHostUniversityService;
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 @TestContainerSpringBootTest
@@ -57,12 +58,12 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition(null, null, null);
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 20));
 
             // then
-            assertThat(response.hostUniversities()).isEmpty();
-            assertThat(response.totalElements()).isZero();
+            assertThat(response.getContent()).isEmpty();
+            assertThat(response.getTotalElements()).isZero();
         }
 
         @Test
@@ -74,12 +75,12 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition("메이지", null, null);
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 20));
 
             // then
-            assertThat(response.hostUniversities()).hasSize(1);
-            assertThat(response.hostUniversities().get(0).koreanName()).isEqualTo(target.getKoreanName());
+            assertThat(response.getContent()).hasSize(1);
+            assertThat(response.getContent().get(0).koreanName()).isEqualTo(target.getKoreanName());
         }
 
         @Test
@@ -91,12 +92,12 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition("Meiji", null, null);
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 20));
 
             // then
-            assertThat(response.hostUniversities()).hasSize(1);
-            assertThat(response.hostUniversities().get(0).englishName()).isEqualTo(target.getEnglishName());
+            assertThat(response.getContent()).hasSize(1);
+            assertThat(response.getContent().get(0).englishName()).isEqualTo(target.getEnglishName());
         }
 
         @Test
@@ -110,12 +111,12 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition(null, usa.getCode(), null);
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 20));
 
             // then
-            assertThat(response.hostUniversities()).hasSize(2);
-            assertThat(response.hostUniversities())
+            assertThat(response.getContent()).hasSize(2);
+            assertThat(response.getContent())
                     .extracting(r -> r.countryCode())
                     .containsOnly(usa.getCode());
         }
@@ -131,12 +132,12 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition(null, null, europe.getCode());
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 20));
 
             // then
-            assertThat(response.hostUniversities()).hasSize(2);
-            assertThat(response.hostUniversities())
+            assertThat(response.getContent()).hasSize(2);
+            assertThat(response.getContent())
                     .extracting(r -> r.regionCode())
                     .containsOnly(europe.getCode());
         }
@@ -151,13 +152,13 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversitySearchCondition condition = new AdminHostUniversitySearchCondition(null, null, null);
 
             // when
-            AdminHostUniversityListResponse response = adminHostUniversityService.getHostUniversities(
+            Page<AdminHostUniversityResponse> response = adminHostUniversityService.getHostUniversities(
                     condition, PageRequest.of(0, 2));
 
             // then
-            assertThat(response.hostUniversities()).hasSize(2);
-            assertThat(response.totalElements()).isEqualTo(3);
-            assertThat(response.totalPages()).isEqualTo(2);
+            assertThat(response.getContent()).hasSize(2);
+            assertThat(response.getTotalElements()).isEqualTo(3);
+            assertThat(response.getTotalPages()).isEqualTo(2);
             assertThat(response.hasNext()).isTrue();
         }
     }
