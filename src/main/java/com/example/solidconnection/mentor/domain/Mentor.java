@@ -33,10 +33,10 @@ public class Mentor extends BaseEntity {
     @Column
     private boolean hasBadge = false;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000)
     private String introduction;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000)
     private String passTip;
 
     @Column
