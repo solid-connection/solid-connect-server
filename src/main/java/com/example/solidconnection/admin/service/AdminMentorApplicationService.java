@@ -9,9 +9,11 @@ import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.HostUniversity;
@@ -31,6 +33,7 @@ public class AdminMentorApplicationService {
     private final MentorApplicationRepository mentorApplicationRepository;
     private final HostUniversityRepository hostUniversityRepository;
     private final SiteUserRepository siteUserRepository;
+    private final MentorRepository mentorRepository;
 
     @Transactional(readOnly = true)
     public Page<MentorApplicationSearchResponse> searchMentorApplications(
@@ -51,6 +54,16 @@ public class AdminMentorApplicationService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         siteUser.becomeMentor();
+
+        Mentor mentor = new Mentor(
+                "",
+                "",
+                siteUser.getId(),
+                mentorApplication.getUniversityId(),
+                mentorApplication.getTermId()
+        );
+
+        mentorRepository.save(mentor);
     }
 
     @Transactional

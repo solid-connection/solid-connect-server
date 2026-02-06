@@ -16,11 +16,13 @@ import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -60,6 +62,9 @@ class AdminMentorApplicationServiceTest {
 
     @Autowired
     private SiteUserRepository siteUserRepository;
+
+    @Autowired
+    private MentorRepository mentorRepository;
 
     private MentorApplication mentorApplication1;
     private MentorApplication mentorApplication2;
@@ -319,11 +324,16 @@ class AdminMentorApplicationServiceTest {
 
             // then
             MentorApplication result = mentorApplicationRepository.findById(mentorApplication2.getId()).get();
-            SiteUser mentor = siteUserRepository.findById(result.getSiteUserId()).get();
+            SiteUser mentorUser = siteUserRepository.findById(result.getSiteUserId()).get();
+            Mentor mentor = mentorRepository.findBySiteUserId(result.getSiteUserId()).get();
             assertAll(
                     () -> assertThat(result.getMentorApplicationStatus()).isEqualTo(MentorApplicationStatus.APPROVED),
                     () -> assertThat(result.getApprovedAt()).isNotNull(),
-                    () -> assertThat(mentor.getRole()).isEqualTo(Role.MENTOR)
+                    () -> assertThat(mentorUser.getRole()).isEqualTo(Role.MENTOR),
+                    () -> assertThat(mentor).isNotNull(),
+                    () -> assertThat(mentor.getSiteUserId()).isEqualTo(result.getSiteUserId()),
+                    () -> assertThat(mentor.getUniversityId()).isEqualTo(result.getUniversityId()),
+                    () -> assertThat(mentor.getTermId()).isEqualTo(result.getTermId())
             );
         }
 
