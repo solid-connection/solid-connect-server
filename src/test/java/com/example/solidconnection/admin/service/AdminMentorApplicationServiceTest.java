@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
@@ -21,6 +22,7 @@ import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
+import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -53,6 +55,9 @@ class AdminMentorApplicationServiceTest {
 
     @Autowired
     private MentorApplicationFixture mentorApplicationFixture;
+
+    @Autowired
+    private MentorFixture mentorFixture;
 
     @Autowired
     private UniversityFixture universityFixture;
@@ -380,6 +385,20 @@ class AdminMentorApplicationServiceTest {
             assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(nonExistentId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 이미_멘토인_사용자의_지원서를_승인하면_예외가_발생한다() {
+            // given
+            SiteUser user = siteUserFixture.사용자();
+            HostUniversity university = universityFixture.메이지_대학();
+            MentorApplication pendingApplication = mentorApplicationFixture.대기중_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            mentorFixture.멘토(user.getId(), university.getId());
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(pendingApplication.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_ALREADY_EXISTS.getMessage());
         }
     }
 

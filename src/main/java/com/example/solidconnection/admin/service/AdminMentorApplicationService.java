@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -47,14 +48,13 @@ public class AdminMentorApplicationService {
     public void approveMentorApplication(Long mentorApplicationId) {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
-
         mentorApplication.approve();
 
         SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        validateUserCanCreateMentor(siteUser.getId());
 
         siteUser.becomeMentor();
-
         Mentor mentor = new Mentor(
                 null,
                 null,
@@ -64,6 +64,12 @@ public class AdminMentorApplicationService {
         );
 
         mentorRepository.save(mentor);
+    }
+
+    private void validateUserCanCreateMentor(long siteUserId) {
+        if (mentorRepository.existsBySiteUserId(siteUserId)) {
+            throw new CustomException(MENTOR_ALREADY_EXISTS);
+        }
     }
 
     @Transactional
