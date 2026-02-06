@@ -20,7 +20,7 @@ public final class UniversityFixture {
                 .englishName("University of Guam")
                 .country(countryFixture.미국())
                 .region(regionFixture.영미권())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 네바다주립_대학_라스베이거스() {
@@ -29,7 +29,7 @@ public final class UniversityFixture {
                 .englishName("University of Nevada, Las Vegas")
                 .country(countryFixture.미국())
                 .region(regionFixture.영미권())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 아칸소_주립_대학() {
@@ -38,7 +38,7 @@ public final class UniversityFixture {
                 .englishName("Arkansas State University")
                 .country(countryFixture.미국())
                 .region(regionFixture.영미권())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 메모리얼_대학_세인트존스() {
@@ -47,7 +47,7 @@ public final class UniversityFixture {
                 .englishName("Memorial University of Newfoundland St. John's")
                 .country(countryFixture.캐나다())
                 .region(regionFixture.영미권())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 서던덴마크_대학() {
@@ -56,7 +56,7 @@ public final class UniversityFixture {
                 .englishName("University of Southern Denmark")
                 .country(countryFixture.덴마크())
                 .region(regionFixture.유럽())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 코펜하겐IT_대학() {
@@ -65,7 +65,7 @@ public final class UniversityFixture {
                 .englishName("IT University of Copenhagen")
                 .country(countryFixture.덴마크())
                 .region(regionFixture.유럽())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 그라츠_대학() {
@@ -74,7 +74,7 @@ public final class UniversityFixture {
                 .englishName("University of Graz")
                 .country(countryFixture.오스트리아())
                 .region(regionFixture.유럽())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 그라츠공과_대학() {
@@ -83,7 +83,7 @@ public final class UniversityFixture {
                 .englishName("Graz University of Technology")
                 .country(countryFixture.오스트리아())
                 .region(regionFixture.유럽())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 린츠_카톨릭_대학() {
@@ -92,7 +92,7 @@ public final class UniversityFixture {
                 .englishName("Catholic Private University Linz")
                 .country(countryFixture.오스트리아())
                 .region(regionFixture.유럽())
-                .create();
+                .findOrCreate();
     }
 
     public HostUniversity 메이지_대학() {
@@ -101,6 +101,6 @@ public final class UniversityFixture {
                 .englishName("Meiji University")
                 .country(countryFixture.일본())
                 .region(regionFixture.아시아())
-                .create();
+                .findOrCreate();
     }
 }
