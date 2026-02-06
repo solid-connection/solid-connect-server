@@ -96,11 +96,4 @@ public class Mentor extends BaseEntity {
             }
         }
     }
-
-    public void createChannels(List<Channel> channels) {
-        for(Channel channel : channels) {
-            channel.updateMentor(this);
-            this.channels.add(channel);
-        }
-    }
 }
