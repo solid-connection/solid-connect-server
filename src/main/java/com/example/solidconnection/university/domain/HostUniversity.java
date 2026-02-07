@@ -56,4 +56,30 @@ public class HostUniversity extends BaseEntity {
 
     @ManyToOne
     private Region region;
+
+    public void update(
+            String koreanName,
+            String englishName,
+            String formatName,
+            String homepageUrl,
+            String englishCourseUrl,
+            String accommodationUrl,
+            String logoImageUrl,
+            String backgroundImageUrl,
+            String detailsForLocal,
+            Country country,
+            Region region
+    ) {
+        this.koreanName = koreanName;
+        this.englishName = englishName;
+        this.formatName = formatName;
+        this.homepageUrl = homepageUrl;
+        this.englishCourseUrl = englishCourseUrl;
+        this.accommodationUrl = accommodationUrl;
+        this.logoImageUrl = logoImageUrl;
+        this.backgroundImageUrl = backgroundImageUrl;
+        this.detailsForLocal = detailsForLocal;
+        this.country = country;
+        this.region = region;
+    }
 }
