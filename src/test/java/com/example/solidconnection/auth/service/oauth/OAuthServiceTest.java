@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthResult;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
 import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
@@ -57,30 +58,33 @@ class OAuthServiceTest {
         siteUserFixture.사용자(email, authType);
 
         // when
-        OAuthResponse response = oAuthService.processOAuth(authType, new OAuthCodeRequest(oauthCode));
+        OAuthResult oAuthResult = oAuthService.processOAuth(authType, new OAuthCodeRequest(oauthCode));
 
         // then
+        OAuthResponse response = oAuthResult.response();
         assertThat(response).isInstanceOf(OAuthSignInResponse.class);
         OAuthSignInResponse signInResponse = (OAuthSignInResponse) response;
         assertAll(
                 () -> assertThat(signInResponse.accessToken()).isNotBlank(),
-                () -> assertThat(signInResponse.refreshToken()).isNotBlank()
+                () -> assertThat(oAuthResult.refreshToken()).isNotBlank()
         );
     }
 
     @Test
     void 신규_회원이라면_회원가입에_필요한_정보를_응답한다() {
         // when
-        OAuthResponse response = oAuthService.processOAuth(authType, new OAuthCodeRequest(oauthCode));
+        OAuthResult oAuthResult = oAuthService.processOAuth(authType, new OAuthCodeRequest(oauthCode));
 
         // then
+        OAuthResponse response = oAuthResult.response();
         assertThat(response).isInstanceOf(SignUpPrepareResponse.class);
         SignUpPrepareResponse signUpPrepareResponse = (SignUpPrepareResponse) response;
         assertAll(
                 () -> assertThat(signUpPrepareResponse.signUpToken()).isNotBlank(),
                 () -> assertThat(signUpPrepareResponse.email()).isEqualTo(email),
                 () -> assertThat(signUpPrepareResponse.profileImageUrl()).isEqualTo(profileImageUrl),
-                () -> assertThat(signUpPrepareResponse.nickname()).isEqualTo(nickname)
+                () -> assertThat(signUpPrepareResponse.nickname()).isEqualTo(nickname),
+                () -> assertThat(oAuthResult.refreshToken()).isNull()
         );
     }
 }
