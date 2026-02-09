@@ -48,13 +48,14 @@ public class AdminMentorApplicationService {
     public void approveMentorApplication(Long mentorApplicationId) {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
-        mentorApplication.approve();
 
         SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         validateUserCanCreateMentor(siteUser.getId());
 
+        mentorApplication.approve();
         siteUser.becomeMentor();
+
         Mentor mentor = new Mentor(
                 siteUser.getId(),
                 mentorApplication.getUniversityId(),
