@@ -1,9 +1,9 @@
 package com.example.solidconnection.auth.service.oauth;
 
 import com.example.solidconnection.auth.domain.SignUpToken;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
-import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthResult;
 import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
 import com.example.solidconnection.auth.dto.oauth.OAuthUserInfoDto;
 import com.example.solidconnection.auth.dto.oauth.SignUpPrepareResponse;
@@ -32,26 +32,26 @@ public class OAuthService {
     private final OAuthClientMap oauthClientMap;
 
     @Transactional
-    public OAuthResponse processOAuth(AuthType authType, OAuthCodeRequest codeRequest) {
+    public OAuthResult processOAuth(AuthType authType, OAuthCodeRequest codeRequest) {
         OAuthClient oauthClient = oauthClientMap.getOAuthClient(authType);
         OAuthUserInfoDto userInfo = oauthClient.getUserInfo(codeRequest.code());
         Optional<SiteUser> optionalSiteUser = siteUserRepository.findByEmailAndAuthType(userInfo.getEmail(), authType);
 
         if (optionalSiteUser.isPresent()) {
             SiteUser siteUser = optionalSiteUser.get();
-            return getSignInResponse(siteUser);
+            return getSignInResult(siteUser);
         }
 
-        return getSignUpPrepareResponse(userInfo, authType);
+        return getSignUpPrepareResult(userInfo, authType);
     }
 
-    private OAuthSignInResponse getSignInResponse(SiteUser siteUser) {
-        SignInResponse signInResponse = signInService.signIn(siteUser);
-        return new OAuthSignInResponse(signInResponse.accessToken(), signInResponse.refreshToken());
+    private OAuthResult getSignInResult(SiteUser siteUser) {
+        SignInResult signInResult = signInService.signIn(siteUser);
+        return new OAuthResult(OAuthSignInResponse.from(signInResult), signInResult.refreshToken());
     }
 
-    private SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto, AuthType authType) {
+    private OAuthResult getSignUpPrepareResult(OAuthUserInfoDto userInfoDto, AuthType authType) {
         SignUpToken signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(userInfoDto.getEmail(), authType);
-        return SignUpPrepareResponse.of(userInfoDto, signUpToken.token());
+        return new OAuthResult(SignUpPrepareResponse.of(userInfoDto, signUpToken.token()), null);
     }
 }
