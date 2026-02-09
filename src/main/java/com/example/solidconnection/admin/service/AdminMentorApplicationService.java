@@ -56,8 +56,6 @@ public class AdminMentorApplicationService {
 
         siteUser.becomeMentor();
         Mentor mentor = new Mentor(
-                null,
-                null,
                 siteUser.getId(),
                 mentorApplication.getUniversityId(),
                 mentorApplication.getTermId()

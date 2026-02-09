@@ -67,6 +67,16 @@ public class Mentor extends BaseEntity {
         this.termId = termId;
     }
 
+    public Mentor(
+            long siteUserId,
+            Long universityId,
+            long termId
+    ) {
+        this.siteUserId = siteUserId;
+        this.universityId = universityId;
+        this.termId = termId;
+    }
+
     public void increaseMenteeCount() {
         this.menteeCount++;
     }
