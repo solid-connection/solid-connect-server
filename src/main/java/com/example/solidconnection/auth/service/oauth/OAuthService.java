@@ -47,7 +47,7 @@ public class OAuthService {
 
     private OAuthSignInResponse getSignInResponse(SiteUser siteUser) {
         SignInResponse signInResponse = signInService.signIn(siteUser);
-        return new OAuthSignInResponse(true, signInResponse.accessToken(), signInResponse.refreshToken());
+        return new OAuthSignInResponse(signInResponse.accessToken(), signInResponse.refreshToken());
     }
 
     private SignUpPrepareResponse getSignUpPrepareResponse(OAuthUserInfoDto userInfoDto, AuthType authType) {
