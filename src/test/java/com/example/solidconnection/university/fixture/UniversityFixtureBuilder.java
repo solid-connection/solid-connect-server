@@ -55,9 +55,4 @@ public class UniversityFixtureBuilder {
         );
         return hostUniversityRepositoryForTest.save(university);
     }
-
-    public HostUniversity findOrCreate() {
-        return hostUniversityRepositoryForTest.findByKoreanName(koreanName)
-                .orElseGet(this::create);
-    }
 }

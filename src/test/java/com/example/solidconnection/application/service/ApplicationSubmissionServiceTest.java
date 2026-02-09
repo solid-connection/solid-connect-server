@@ -58,7 +58,7 @@ class ApplicationSubmissionServiceTest {
 
     private SiteUser user;
     private UnivApplyInfo 괌대학_A_지원_정보;
-    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 버지니아공과대학_지원_정보;
     private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
     private Term term;
@@ -69,7 +69,7 @@ class ApplicationSubmissionServiceTest {
 
         user = siteUserFixture.사용자();
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
-        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        버지니아공과대학_지원_정보 = univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
         서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
     }
 
@@ -80,7 +80,7 @@ class ApplicationSubmissionServiceTest {
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
                 괌대학_A_지원_정보.getId(),
-                괌대학_B_지원_정보.getId(),
+                버지니아공과대학_지원_정보.getId(),
                 서던덴마크대학교_지원_정보.getId()
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
@@ -98,7 +98,7 @@ class ApplicationSubmissionServiceTest {
                 () -> assertThat(response.appliedUniversities().firstChoiceUnivApplyInfo())
                         .isEqualTo(괌대학_A_지원_정보.getKoreanName()),
                 () -> assertThat(response.appliedUniversities().secondChoiceUnivApplyInfo())
-                        .isEqualTo(괌대학_B_지원_정보.getKoreanName()),
+                        .isEqualTo(버지니아공과대학_지원_정보.getKoreanName()),
                 () -> assertThat(response.appliedUniversities().thirdChoiceUnivApplyInfo())
                         .isEqualTo(서던덴마크대학교_지원_정보.getKoreanName()),
                 () -> assertThat(savedApplication.getVerifyStatus())
@@ -108,7 +108,7 @@ class ApplicationSubmissionServiceTest {
                 () -> assertThat(savedApplication.getFirstChoiceUnivApplyInfoId())
                         .isEqualTo(괌대학_A_지원_정보.getId()),
                 () -> assertThat(savedApplication.getSecondChoiceUnivApplyInfoId())
-                        .isEqualTo(괌대학_B_지원_정보.getId()),
+                        .isEqualTo(버지니아공과대학_지원_정보.getId()),
                 () -> assertThat(savedApplication.getThirdChoiceUnivApplyInfoId())
                         .isEqualTo(서던덴마크대학교_지원_정보.getId())
         );

@@ -21,11 +21,11 @@ public class UnivApplyInfoFixture {
                 .create();
     }
 
-    public UnivApplyInfo 괌대학_B_지원_정보(long termId) {
+    public UnivApplyInfo 버지니아공과대학_지원_정보(long termId) {
         return univApplyInfoFixtureBuilder.univApplyInfo()
                 .termId(termId)
-                .koreanName("괌대학(B형)")
-                .university(universityFixture.괌_대학())
+                .koreanName("버지니아공과대학")
+                .university(universityFixture.버지니아_공과_대학())
                 .homeUniversity(homeUniversityFixture.인하대학교())
                 .create();
     }

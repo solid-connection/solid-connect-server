@@ -138,7 +138,7 @@ class UnivApplyInfoQueryServiceTest {
                 // given
                 String text = "미국";
                 UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
-                UnivApplyInfo 괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+                UnivApplyInfo 버지니아공과대학_지원_정보 = univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
                 univApplyInfoFixture.메이지대학_지원_정보(term.getId());
 
                 // when
@@ -148,7 +148,7 @@ class UnivApplyInfoQueryServiceTest {
                 assertThat(response.univApplyInfoPreviews())
                         .containsExactly(
                                 UnivApplyInfoPreviewResponse.of(괌대학_A_지원_정보, term.getName()),
-                                UnivApplyInfoPreviewResponse.of(괌대학_B_지원_정보, term.getName())
+                                UnivApplyInfoPreviewResponse.of(버지니아공과대학_지원_정보, term.getName())
                         );
             }
 

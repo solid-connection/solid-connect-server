@@ -91,7 +91,7 @@ class AdminMentorApplicationServiceTest {
         mentorApplication8 = mentorApplicationFixture.거절된_멘토신청(user8.getId(), UniversitySelectType.OTHER, null);
 
         user = siteUserFixture.사용자(9, "test9");
-        university = universityFixture.메이지_대학();
+        university = universityFixture.네바다주립_대학_라스베이거스();
     }
 
     @Nested
@@ -468,7 +468,7 @@ class AdminMentorApplicationServiceTest {
         void OTHER_타입의_멘토_지원서에_대학을_매핑하면_대학이_할당되고_타입이_CATALOG로_변경된다() {
             // given
             long otherTypeMentorApplicationId = mentorApplication7.getId();
-            HostUniversity university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.아칸소_주립_대학();
 
             // when
             adminMentorApplicationService.assignUniversity(otherTypeMentorApplicationId, university.getId());
@@ -485,7 +485,7 @@ class AdminMentorApplicationServiceTest {
         void 존재하지_않는_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
             // given
             long nonExistentId = 99999L;
-            HostUniversity university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.메모리얼_대학_세인트존스();
 
             // when & then
             assertThatCode(() -> adminMentorApplicationService.assignUniversity(nonExistentId, university.getId()))
@@ -497,7 +497,7 @@ class AdminMentorApplicationServiceTest {
         void CATALOG_타입의_멘토_지원서에_대학을_매핑하면_예외_응답을_반환한다() {
             // given
             long catalogTypeMentorApplicationId = mentorApplication2.getId();
-            HostUniversity university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.서던덴마크_대학();
 
             // when & then
             assertThatCode(() -> adminMentorApplicationService.assignUniversity(catalogTypeMentorApplicationId, university.getId()))
