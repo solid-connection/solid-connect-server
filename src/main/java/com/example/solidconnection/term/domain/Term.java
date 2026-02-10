@@ -38,12 +38,4 @@ public class Term {
         this.name = name;
         this.isCurrent = isCurrent ? true : null;
     }
-
-    public void setAsCurrent() {
-        this.isCurrent = true;
-    }
-
-    public void setAsNotCurrent() {
-        this.isCurrent = null;
-    }
 }
