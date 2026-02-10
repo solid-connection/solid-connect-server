@@ -1,24 +1,15 @@
 package com.example.solidconnection.mentor.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.mentor.domain.ChannelType.BLOG;
-import static com.example.solidconnection.mentor.domain.ChannelType.BRUNCH;
 import static com.example.solidconnection.mentor.domain.ChannelType.INSTAGRAM;
-import static com.example.solidconnection.mentor.domain.ChannelType.YOUTUBE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
-import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
 import com.example.solidconnection.mentor.dto.ChannelResponse;
-import com.example.solidconnection.mentor.dto.MentorMyPageCreateRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.fixture.ChannelFixture;
@@ -170,113 +161,6 @@ class MentorMyPageServiceTest {
                             tuple(1, BLOG, "https://blog.com"),
                             tuple(2, INSTAGRAM, "https://instagram.com")
                     );
-        }
-    }
-
-    @Nested
-    class 멘토의_마이페이지를_생성한다 {
-
-        @Test
-        void 멘토_정보를_생성한다() {
-            // given
-            String introduction = "멘토 자기소개";
-            String passTip = "멘토의 합격 팁";
-            List<ChannelRequest> channels = List.of(
-                    new ChannelRequest(BLOG, "https://blog.com"),
-                    new ChannelRequest(INSTAGRAM, "https://instagram.com"),
-                    new ChannelRequest(YOUTUBE, "https://youtubr.com"),
-                    new ChannelRequest(BRUNCH, "https://brunch.com")
-            );
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest(introduction, passTip, channels);
-            mentorApplicationFixture.승인된_멘토신청(siteUser.getId(), UniversitySelectType.CATALOG, university.getId());
-
-            // when
-            mentorMyPageService.createMentorMyPage(siteUser.getId(), request);
-
-            // then
-            Mentor createMentor = mentorRepository.findBySiteUserId(siteUser.getId()).get();
-            List<Channel> createChannels = channelRepositoryForTest.findAllByMentorId(createMentor.getId());
-            assertAll(
-                    () -> assertThat(createMentor.getIntroduction()).isEqualTo(introduction),
-                    () -> assertThat(createMentor.getPassTip()).isEqualTo(passTip),
-                    () -> assertThat(createMentor.getTermId()).isEqualTo(term.getId()),
-                    () -> assertThat(createMentor.getUniversityId()).isEqualTo(university.getId()),
-                    () -> assertThat(createMentor.getSiteUserId()).isEqualTo(siteUser.getId()),
-                    () -> assertThat(createMentor.getMenteeCount()).isEqualTo(0),
-                    () -> assertThat(createMentor.isHasBadge()).isFalse(),
-                    () -> assertThat(createChannels).extracting(Channel::getSequence, Channel::getType, Channel::getUrl)
-                            .containsExactlyInAnyOrder(
-                                    tuple(1, BLOG, "https://blog.com"),
-                                    tuple(2, INSTAGRAM, "https://instagram.com"),
-                                    tuple(3, YOUTUBE, "https://youtubr.com"),
-                                    tuple(4, BRUNCH, "https://brunch.com")
-                            )
-            );
-        }
-
-        @Test
-        void 이미_멘토_정보가_존재하는데_생성_요청_시_예외가_발생한다() {
-            // given
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
-            mentorFixture.멘토(siteUser.getId(), university.getId());
-
-            // when & then
-            assertThatCode(() -> mentorMyPageService.createMentorMyPage(siteUser.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_ALREADY_EXISTS.getMessage());
-        }
-
-        @Test
-        void 채널을_제한_이상_생성하면_예외가_발생한다() {
-            // given
-            List<ChannelRequest> newChannels = List.of(
-                    new ChannelRequest(BLOG, "https://blog.com"),
-                    new ChannelRequest(INSTAGRAM, "https://instagram.com"),
-                    new ChannelRequest(YOUTUBE, "https://youtubr.com"),
-                    new ChannelRequest(BRUNCH, "https://brunch.com"),
-                    new ChannelRequest(BLOG, "https://blog.com")
-            );
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", newChannels);
-
-            // when & then
-            assertThatCode(() -> mentorMyPageService.createMentorMyPage(siteUser.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(CHANNEL_REGISTRATION_LIMIT_EXCEEDED.getMessage());
-        }
-
-        @Test
-        void 멘토_승격_요청_없이_멘토_정보_생성_시_예외가_발생한다() {
-            // given
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
-
-            // when & then
-            assertThatCode(() -> mentorMyPageService.createMentorMyPage(siteUser.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        void 멘토_승격_요청_상태가_REJECTED_면_예외가_발생한다() {
-            // given
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
-            mentorApplicationFixture.거절된_멘토신청(siteUser.getId(), UniversitySelectType.CATALOG, university.getId());
-
-            // when & then
-            assertThatCode(() -> mentorMyPageService.createMentorMyPage(siteUser.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        void 멘토_승격_요청_상태가_PENDING_면_예외가_발생한다() {
-            // given
-            MentorMyPageCreateRequest request = new MentorMyPageCreateRequest("introduction", "passTip", List.of());
-            mentorApplicationFixture.대기중_멘토신청(siteUser.getId(), UniversitySelectType.CATALOG, university.getId());
-
-            // when & then
-            assertThatCode(() -> mentorMyPageService.createMentorMyPage(siteUser.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
         }
     }
 }

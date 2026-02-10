@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_OTHER_STATUS;
@@ -16,13 +17,18 @@ import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
 import com.example.solidconnection.mentor.fixture.MentorApplicationFixture;
+import com.example.solidconnection.mentor.fixture.MentorFixture;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
+import com.example.solidconnection.mentor.repository.MentorRepository;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
@@ -51,10 +57,19 @@ class AdminMentorApplicationServiceTest {
     private MentorApplicationFixture mentorApplicationFixture;
 
     @Autowired
+    private MentorFixture mentorFixture;
+
+    @Autowired
     private UniversityFixture universityFixture;
 
     @Autowired
     private MentorApplicationRepository mentorApplicationRepository;
+
+    @Autowired
+    private SiteUserRepository siteUserRepository;
+
+    @Autowired
+    private MentorRepository mentorRepository;
 
     private MentorApplication mentorApplication1;
     private MentorApplication mentorApplication2;
@@ -100,7 +115,7 @@ class AdminMentorApplicationServiceTest {
         @Test
         void 멘토_승격_상태를_조건으로_페이징하여_조회한다() {
             // given
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING,null, null, null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(MentorApplicationStatus.PENDING, null, null, null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication2, mentorApplication5, mentorApplication7);
 
@@ -122,7 +137,7 @@ class AdminMentorApplicationServiceTest {
         }
 
         @Test
-        void 닉네임_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
+        void 닉네임_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다() {
             // given
             String nickname = "test1";
             MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, nickname, null, null);
@@ -147,7 +162,7 @@ class AdminMentorApplicationServiceTest {
         }
 
         @Test
-        void 대학명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
+        void 대학명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다() {
             // given
             String universityKoreanName = "메이지 대학";
             MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, universityKoreanName, null, null);
@@ -172,7 +187,7 @@ class AdminMentorApplicationServiceTest {
         }
 
         @Test
-        void 지역명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
+        void 지역명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다() {
             // given
             String regionKoreanName = "유럽";
             MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, regionKoreanName, null, null);
@@ -197,10 +212,10 @@ class AdminMentorApplicationServiceTest {
         }
 
         @Test
-        void 나라명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다(){
+        void 나라명_keyword_에_맞는_멘토_지원서를_페이징하여_조회한다() {
             // given
             String countryKoreanName = "오스트리아";
-            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, countryKoreanName, null,null);
+            MentorApplicationSearchCondition condition = new MentorApplicationSearchCondition(null, countryKoreanName, null, null);
             Pageable pageable = PageRequest.of(0, 10);
             List<MentorApplication> expectedMentorApplications = List.of(mentorApplication3, mentorApplication4);
 
@@ -302,7 +317,7 @@ class AdminMentorApplicationServiceTest {
     }
 
     @Nested
-    class 멘토_승격_지원서_승인{
+    class 멘토_승격_지원서_승인 {
 
         @Test
         void 대기중인_멘토_지원서를_승인한다() {
@@ -314,14 +329,21 @@ class AdminMentorApplicationServiceTest {
 
             // then
             MentorApplication result = mentorApplicationRepository.findById(mentorApplication2.getId()).get();
+            SiteUser mentorUser = siteUserRepository.findById(result.getSiteUserId()).get();
+            Mentor mentor = mentorRepository.findBySiteUserId(result.getSiteUserId()).get();
             assertAll(
                     () -> assertThat(result.getMentorApplicationStatus()).isEqualTo(MentorApplicationStatus.APPROVED),
-                    () -> assertThat(result.getApprovedAt()).isNotNull()
+                    () -> assertThat(result.getApprovedAt()).isNotNull(),
+                    () -> assertThat(mentorUser.getRole()).isEqualTo(Role.MENTOR),
+                    () -> assertThat(mentor).isNotNull(),
+                    () -> assertThat(mentor.getSiteUserId()).isEqualTo(result.getSiteUserId()),
+                    () -> assertThat(mentor.getUniversityId()).isEqualTo(result.getUniversityId()),
+                    () -> assertThat(mentor.getTermId()).isEqualTo(result.getTermId())
             );
         }
 
         @Test
-        void 대학이_선택되지_않은_멘토_지원서를_승인하면_예외가_발생한다(){
+        void 대학이_선택되지_않은_멘토_지원서를_승인하면_예외가_발생한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
             MentorApplication noUniversityIdMentorApplication = mentorApplicationFixture.대기중_멘토신청(user.getId(), UniversitySelectType.OTHER, null);
@@ -364,10 +386,24 @@ class AdminMentorApplicationServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MENTOR_APPLICATION_NOT_FOUND.getMessage());
         }
+
+        @Test
+        void 이미_멘토인_사용자의_지원서를_승인하면_예외가_발생한다() {
+            // given
+            SiteUser user = siteUserFixture.사용자();
+            HostUniversity university = universityFixture.메이지_대학();
+            MentorApplication pendingApplication = mentorApplicationFixture.대기중_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
+            mentorFixture.멘토(user.getId(), university.getId());
+
+            // when & then
+            assertThatCode(() -> adminMentorApplicationService.approveMentorApplication(pendingApplication.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MENTOR_ALREADY_EXISTS.getMessage());
+        }
     }
 
     @Nested
-    class 멘토_승격_지원서_거절{
+    class 멘토_승격_지원서_거절 {
 
         @Test
         void 대기중인_멘토_지원서를_거절한다() {
@@ -517,7 +553,7 @@ class AdminMentorApplicationServiceTest {
                     .hasMessage(UNIVERSITY_NOT_FOUND.getMessage());
         }
     }
-    
+
     @Nested
     class 멘토_지원서_이력_조회 {
 
@@ -539,7 +575,7 @@ class AdminMentorApplicationServiceTest {
                             .containsExactly(app3.getId(), app2.getId(), app1.getId()),
                     () -> assertThat(response)
                             .extracting(MentorApplicationHistoryResponse::applicationOrder)
-                            .containsExactly(3,2,1)
+                            .containsExactly(3, 2, 1)
             );
         }
 
@@ -565,7 +601,7 @@ class AdminMentorApplicationServiceTest {
                             .containsExactly(app7.getId(), app6.getId(), app5.getId(), app4.getId(), app3.getId()),
                     () -> assertThat(response)
                             .extracting(MentorApplicationHistoryResponse::applicationOrder)
-                            .containsExactly(7,6,5,4,3)
+                            .containsExactly(7, 6, 5, 4, 3)
             );
         }
 

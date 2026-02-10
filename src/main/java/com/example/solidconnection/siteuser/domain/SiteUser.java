@@ -130,4 +130,8 @@ public class SiteUser extends BaseEntity {
     public void updateUserStatus(UserStatus status) {
         this.userStatus = status;
     }
+
+    public void becomeMentor() {
+        this.role = Role.MENTOR;
+    }
 }
