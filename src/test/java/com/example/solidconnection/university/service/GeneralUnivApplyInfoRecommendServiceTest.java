@@ -35,7 +35,7 @@ class GeneralUnivApplyInfoRecommendServiceTest {
         term = termFixture.현재_학기("2025-2");
 
         univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
-        univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
         univApplyInfoFixture.네바다주립대학_라스베이거스_지원_정보(term.getId());
         univApplyInfoFixture.메모리얼대학_세인트존스_A_지원_정보(term.getId());
         univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());

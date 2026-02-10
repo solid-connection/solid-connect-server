@@ -208,7 +208,7 @@ class MentorQueryServiceTest {
             SiteUser mentorUser1 = siteUserFixture.사용자(2, "멘토1");
             SiteUser mentorUser2 = siteUserFixture.사용자(3, "멘토2");
             asiaUniversity = universityFixture.메이지_대학();
-            europeUniversity = universityFixture.린츠_카톨릭_대학();
+            europeUniversity = universityFixture.그라츠공과_대학();
             asiaMentor = mentorFixture.멘토(mentorUser1.getId(), asiaUniversity.getId());
             europeMentor = mentorFixture.멘토(mentorUser2.getId(), europeUniversity.getId());
         }

@@ -3,7 +3,7 @@ package com.example.solidconnection.university.fixture;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.university.domain.HostUniversity;
-import com.example.solidconnection.university.repository.HostUniversityRepository;
+import com.example.solidconnection.university.repository.HostUniversityRepositoryForTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.TestComponent;
 @RequiredArgsConstructor
 public class UniversityFixtureBuilder {
 
-    private final HostUniversityRepository hostUniversityRepository;
+    private final HostUniversityRepositoryForTest hostUniversityRepositoryForTest;
 
     private String koreanName;
     private String englishName;
@@ -19,7 +19,7 @@ public class UniversityFixtureBuilder {
     private Region region;
 
     public UniversityFixtureBuilder university() {
-        return new UniversityFixtureBuilder(hostUniversityRepository);
+        return new UniversityFixtureBuilder(hostUniversityRepositoryForTest);
     }
 
     public UniversityFixtureBuilder koreanName(String koreanName) {
@@ -53,6 +53,6 @@ public class UniversityFixtureBuilder {
                 "https://background-image-url",
                 null, country, region
         );
-        return hostUniversityRepository.save(university);
+        return hostUniversityRepositoryForTest.save(university);
     }
 }

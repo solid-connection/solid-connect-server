@@ -103,4 +103,13 @@ public final class UniversityFixture {
                 .region(regionFixture.아시아())
                 .create();
     }
+
+    public HostUniversity 버지니아_공과_대학() {
+        return universityFixtureBuilder.university()
+                .koreanName("버지니아 공과 대학")
+                .englishName("Virginia Tech")
+                .country(countryFixture.미국())
+                .region(regionFixture.영미권())
+                .create();
+    }
 }
