@@ -391,7 +391,7 @@ class AdminMentorApplicationServiceTest {
         void 이미_멘토인_사용자의_지원서를_승인하면_예외가_발생한다() {
             // given
             SiteUser user = siteUserFixture.사용자();
-            HostUniversity university = universityFixture.메이지_대학();
+            HostUniversity university = universityFixture.버지니아_공과_대학();
             MentorApplication pendingApplication = mentorApplicationFixture.대기중_멘토신청(user.getId(), UniversitySelectType.CATALOG, university.getId());
             mentorFixture.멘토(user.getId(), university.getId());
 
