@@ -31,12 +31,12 @@ public class Term {
     @Column(length = 20)
     private String name;
 
-    @Column(name = "is_current", nullable = false)
-    private boolean isCurrent = false;
+    @Column(name = "is_current", unique = true)
+    private Boolean isCurrent;
 
     public Term(String name, boolean isCurrent) {
         this.name = name;
-        this.isCurrent = isCurrent;
+        this.isCurrent = isCurrent ? true : null;
     }
 
     public void setAsCurrent() {
@@ -44,6 +44,6 @@ public class Term {
     }
 
     public void setAsNotCurrent() {
-        this.isCurrent = false;
+        this.isCurrent = null;
     }
 }
