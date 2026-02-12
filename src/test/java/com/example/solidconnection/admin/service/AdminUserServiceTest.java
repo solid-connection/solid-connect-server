@@ -35,7 +35,7 @@ import com.example.solidconnection.siteuser.fixture.UserBanFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -213,7 +213,7 @@ public class AdminUserServiceTest {
         void 멘토_유저_상세_정보를_조회한다() {
             // given
             SiteUser mentorUser = siteUserFixture.멘토(1, "멘토유저");
-            University university = universityFixture.괌_대학();
+            HostUniversity university = universityFixture.괌_대학();
 
             Mentor mentor = mentorFixture.멘토(mentorUser.getId(), university.getId());
             mentorApplicationFixture.승인된_멘토신청(

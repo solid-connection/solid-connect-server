@@ -9,4 +9,5 @@ public record UserSearchResponse(
 	Role role,
 	UserStatus userStatus
 ) {
+
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchCondition;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchResponse;
@@ -17,7 +16,6 @@ import com.example.solidconnection.admin.dto.UserSearchCondition;
 import com.example.solidconnection.admin.dto.UserSearchResponse;
 import com.example.solidconnection.admin.service.AdminUserService;
 import com.example.solidconnection.common.response.PageResponse;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +41,6 @@ public class AdminUserController {
     ) {
         UserInfoDetailResponse response = adminUserService.getUserInfoDetail(userId);
         return ResponseEntity.ok(response);
-
     }
 
     @GetMapping("/restricted")
@@ -61,6 +58,5 @@ public class AdminUserController {
     ) {
         RestrictedUserInfoDetailResponse response = adminUserService.getRestrictedUserInfoDetail(userId);
         return ResponseEntity.ok(response);
-
     }
 }

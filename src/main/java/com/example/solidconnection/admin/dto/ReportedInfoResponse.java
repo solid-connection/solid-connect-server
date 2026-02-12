@@ -10,4 +10,5 @@ public record ReportedInfoResponse(
 	TargetType targetType,
 	ReportType reportType
 ) {
+
 }

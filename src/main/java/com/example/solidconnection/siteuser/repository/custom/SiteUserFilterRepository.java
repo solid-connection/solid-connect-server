@@ -2,7 +2,6 @@ package com.example.solidconnection.siteuser.repository.custom;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchCondition;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchResponse;

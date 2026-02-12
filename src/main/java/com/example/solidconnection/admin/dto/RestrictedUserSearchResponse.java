@@ -10,4 +10,5 @@ public record RestrictedUserSearchResponse(
 	ReportedInfoResponse reportedInfoResponse,
 	BannedInfoResponse bannedInfoResponse
 ) {
+
 }

@@ -8,4 +8,5 @@ public record ReportedHistoryResponse(
 	ZonedDateTime reportedDate,
 	ReportType reportType
 ) {
+
 }

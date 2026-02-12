@@ -6,4 +6,5 @@ public record UserSearchCondition(
 	Role role,
 	String keyword
 ) {
+    
 }

@@ -6,4 +6,5 @@ public record BannedInfoResponse(
 	boolean isBanned,
 	UserBanDuration duration
 ) {
+
 }

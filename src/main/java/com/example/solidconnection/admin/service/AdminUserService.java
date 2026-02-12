@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchCondition;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchResponse;
@@ -17,7 +16,6 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.siteuser.repository.custom.SiteUserFilterRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

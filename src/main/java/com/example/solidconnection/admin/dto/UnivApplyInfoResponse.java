@@ -5,4 +5,5 @@ public record UnivApplyInfoResponse(
 	String secondChoiceUnivName,
 	String thirdChoiceUnivName
 ) {
+
 }

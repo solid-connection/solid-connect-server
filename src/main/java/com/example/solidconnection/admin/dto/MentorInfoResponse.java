@@ -6,4 +6,5 @@ public record MentorInfoResponse(
 	List<MatchedInfoResponse> menteeInfos,
 	List<MentorApplicationHistoryInfoResponse> mentorApplicationHistory
 ) {
+
 }

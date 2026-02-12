@@ -6,4 +6,5 @@ public record MenteeInfoResponse(
 	UnivApplyInfoResponse univApplyInfos,
 	List<MatchedInfoResponse> mentorInfos
 ) {
+
 }

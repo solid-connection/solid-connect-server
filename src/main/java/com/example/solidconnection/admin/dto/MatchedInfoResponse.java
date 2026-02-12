@@ -6,4 +6,5 @@ public record MatchedInfoResponse(
 	String nickname,
 	ZonedDateTime matchedDate
 ) {
+
 }

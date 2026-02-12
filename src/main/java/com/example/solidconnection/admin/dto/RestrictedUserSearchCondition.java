@@ -8,4 +8,5 @@ public record RestrictedUserSearchCondition(
 	UserStatus userStatus,
 	String keyword
 ) {
+
 }
