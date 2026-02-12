@@ -1,6 +1,5 @@
 package com.example.solidconnection.redis;
 
-import static com.example.solidconnection.redis.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
 import static com.example.solidconnection.redis.RedisConstants.VIEW_COUNT_TTL;
 
 import java.util.Collections;
@@ -34,7 +33,8 @@ public class RedisService { // todo: 정말 필요한지 고민 필요
     }
 
     public Long getAndDelete(String key) {
-        return Long.valueOf(redisTemplate.opsForValue().getAndDelete(key));
+        String value = redisTemplate.opsForValue().getAndDelete(key);
+        return value != null ? Long.valueOf(value) : null;
     }
 
     public boolean isPresent(String key, String ttl) {

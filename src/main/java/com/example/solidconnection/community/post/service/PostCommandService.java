@@ -48,14 +48,14 @@ public class PostCommandService {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        // 유효성 검증
+        validatePostCategory(postCreateRequest.postCategory());
+        validateFileSize(imageFile);
+
         // 중복 생성 방지
         if (!postRedisManager.isPostCreationAllowed(siteUserId)) {
             throw new CustomException(DUPLICATE_POST_CREATE_REQUEST);
         }
-
-        // 유효성 검증
-        validatePostCategory(postCreateRequest.postCategory());
-        validateFileSize(imageFile);
 
         // 객체 생성
         Board board = boardRepository.getByCode(postCreateRequest.boardCode());

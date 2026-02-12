@@ -22,7 +22,6 @@ public class UpdateViewCountService {
     @Async
     public void updateViewCount(String key) {
         Long postId = postRedisManager.getPostIdFromPostViewCountRedisKey(key);
-        Post post = postRepository.getById(postId);
         Long viewCount = postRedisManager.getAndDeleteViewCount(key);
         postRepository.increaseViewCount(postId, viewCount);
     }
