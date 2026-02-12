@@ -1,9 +1,9 @@
 package com.example.solidconnection.cache;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
-import static com.example.solidconnection.community.post.service.RedisConstants.LOCK_TIMEOUT_MS;
-import static com.example.solidconnection.community.post.service.RedisConstants.MAX_WAIT_TIME_MS;
-import static com.example.solidconnection.community.post.service.RedisConstants.REFRESH_LIMIT_PERCENT;
+import static com.example.solidconnection.redis.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.redis.RedisConstants.LOCK_TIMEOUT_MS;
+import static com.example.solidconnection.redis.RedisConstants.MAX_WAIT_TIME_MS;
+import static com.example.solidconnection.redis.RedisConstants.REFRESH_LIMIT_PERCENT;
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.cache.manager.CacheManager;

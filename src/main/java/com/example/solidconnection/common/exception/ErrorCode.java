@@ -99,6 +99,7 @@ public enum ErrorCode {
     INVALID_BOARD_CODE(HttpStatus.BAD_REQUEST.value(), "잘못된 게시판 코드입니다."),
     INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글입니다."), // todo: NOT_FOUND로 통일 필요
     INVALID_POST_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 게시글만 제어할 수 있습니다."),
+    DUPLICATE_POST_CREATE_REQUEST(HttpStatus.BAD_REQUEST.value(), "게시글이 이미 생성 중입니다."),
     CAN_NOT_DELETE_OR_UPDATE_QUESTION(HttpStatus.BAD_REQUEST.value(), "질문글은 수정이나 삭제할 수 없습니다."),
     CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES(HttpStatus.BAD_REQUEST.value(), "5개 이상의 파일을 업로드할 수 없습니다."),
     INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 댓글입니다."),

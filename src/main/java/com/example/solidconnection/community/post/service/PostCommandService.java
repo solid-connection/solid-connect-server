@@ -2,6 +2,7 @@ package com.example.solidconnection.community.post.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_DELETE_OR_UPDATE_QUESTION;
 import static com.example.solidconnection.common.exception.ErrorCode.CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES;
+import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_POST_CREATE_REQUEST;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_ACCESS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POST_CATEGORY;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
@@ -23,7 +24,6 @@ import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -40,17 +40,22 @@ public class PostCommandService {
     private final BoardRepository boardRepository;
     private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
-    private final RedisService redisService;
-    private final RedisUtils redisUtils;
+    private final PostRedisManager postRedisManager;
 
     @Transactional
     public PostCreateResponse createPost(long siteUserId, PostCreateRequest postCreateRequest,
                                          List<MultipartFile> imageFile) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         // 유효성 검증
         validatePostCategory(postCreateRequest.postCategory());
         validateFileSize(imageFile);
+
+        // 중복 생성 방지
+        if (!postRedisManager.isPostCreationAllowed(siteUserId)) {
+            throw new CustomException(DUPLICATE_POST_CREATE_REQUEST);
+        }
 
         // 객체 생성
         Board board = boardRepository.getByCode(postCreateRequest.boardCode());
@@ -104,8 +109,7 @@ public class PostCommandService {
         validateQuestion(post);
 
         removePostImages(post);
-        // cache out
-        redisService.deleteKey(redisUtils.getPostViewCountRedisKey(postId));
+        postRedisManager.deleteViewCountCache(postId);
         postRepository.deleteById(post.getId());
 
         return new PostDeleteResponse(postId);
