@@ -31,7 +31,7 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        long mentorSiteUserId = mentoringApplyRequest.siteUserId();
+        long mentorSiteUserId = mentoringApplyRequest.mentorId();
 
         Mentor mentor = mentorRepository.findBySiteUserId(mentorSiteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));

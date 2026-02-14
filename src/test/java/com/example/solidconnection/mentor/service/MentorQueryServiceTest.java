@@ -77,11 +77,11 @@ class MentorQueryServiceTest {
             Channel channel2 = channelFixture.채널(2, mentor);
 
             // when
-            MentorDetailResponse response = mentorQueryService.getMentorDetails(mentor.getId(), siteUser.getId());
+            MentorDetailResponse response = mentorQueryService.getMentorDetails(mentor.getSiteUserId(), siteUser.getId());
 
             // then
             assertAll(
-                    () -> assertThat(response.id()).isEqualTo(mentor.getId()),
+                    () -> assertThat(response.id()).isEqualTo(mentor.getSiteUserId()),
                     () -> assertThat(response.nickname()).isEqualTo(mentorUser.getNickname()),
                     () -> assertThat(response.universityName()).isEqualTo(university.getKoreanName()),
                     () -> assertThat(response.country()).isEqualTo(university.getCountry().getKoreanName()),
@@ -101,8 +101,8 @@ class MentorQueryServiceTest {
             mentoringFixture.대기중_멘토링(mentor.getId(), appliedUser.getId());
 
             // when
-            MentorDetailResponse notAppliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), notAppliedUser.getId());
-            MentorDetailResponse appliedResponse = mentorQueryService.getMentorDetails(mentor.getId(), appliedUser.getId());
+            MentorDetailResponse notAppliedResponse = mentorQueryService.getMentorDetails(mentor.getSiteUserId(), notAppliedUser.getId());
+            MentorDetailResponse appliedResponse = mentorQueryService.getMentorDetails(mentor.getSiteUserId(), appliedUser.getId());
 
             // then
             assertAll(
@@ -159,8 +159,8 @@ class MentorQueryServiceTest {
             // then
             Map<Long, MentorPreviewResponse> mentorPreviewMap = response.content().stream()
                     .collect(Collectors.toMap(MentorPreviewResponse::id, Function.identity()));
-            MentorPreviewResponse mentor1Response = mentorPreviewMap.get(mentor1.getId());
-            MentorPreviewResponse mentor2Response = mentorPreviewMap.get(mentor2.getId());
+            MentorPreviewResponse mentor1Response = mentorPreviewMap.get(mentor1.getSiteUserId());
+            MentorPreviewResponse mentor2Response = mentorPreviewMap.get(mentor2.getSiteUserId());
             assertAll(
                     () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
                     () -> assertThat(mentor1Response.universityName()).isEqualTo(university1.getKoreanName()),
@@ -225,10 +225,10 @@ class MentorQueryServiceTest {
             assertAll(
                     () -> assertThat(asiaFilteredResponse.content()).hasSize(1)
                             .extracting(MentorPreviewResponse::id)
-                            .containsExactly(asiaMentor.getId()),
+                            .containsExactly(asiaMentor.getSiteUserId()),
                     () -> assertThat(europeFilteredResponse.content()).hasSize(1)
                             .extracting(MentorPreviewResponse::id)
-                            .containsExactly(europeMentor.getId())
+                            .containsExactly(europeMentor.getSiteUserId())
             );
         }
 
@@ -240,7 +240,7 @@ class MentorQueryServiceTest {
             // then
             assertThat(response.content()).hasSize(2)
                     .extracting(MentorPreviewResponse::id)
-                    .containsExactlyInAnyOrder(asiaMentor.getId(), europeMentor.getId());
+                    .containsExactlyInAnyOrder(asiaMentor.getSiteUserId(), europeMentor.getSiteUserId());
         }
     }
 }

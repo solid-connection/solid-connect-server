@@ -290,8 +290,8 @@ class MentoringQueryServiceTest {
             // then
             Map<Long, MatchedMentorResponse> matchMentorMap = response.content().stream()
                     .collect(Collectors.toMap(MatchedMentorResponse::id, Function.identity()));
-            MatchedMentorResponse mentor1Response = matchMentorMap.get(mentor1.getId());
-            MatchedMentorResponse mentor2Response = matchMentorMap.get(mentor2.getId());
+            MatchedMentorResponse mentor1Response = matchMentorMap.get(mentor1.getSiteUserId());
+            MatchedMentorResponse mentor2Response = matchMentorMap.get(mentor2.getSiteUserId());
             assertAll(
                     () -> assertThat(mentor1Response.roomId()).isEqualTo(chatRoom1.getId()),
                     () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),
