@@ -2,6 +2,8 @@ package com.example.solidconnection.admin.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityCreateRequest;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityDetailResponse;
@@ -9,6 +11,7 @@ import com.example.solidconnection.admin.university.dto.AdminHostUniversityRespo
 import com.example.solidconnection.admin.university.dto.AdminHostUniversitySearchCondition;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityUpdateRequest;
 import com.example.solidconnection.admin.university.service.AdminHostUniversityService;
+import com.example.solidconnection.cache.manager.CustomCacheManager;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.location.country.domain.Country;
@@ -17,13 +20,16 @@ import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixtureBuilder;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -48,6 +54,9 @@ class AdminHostUniversityServiceTest {
 
     @Autowired
     private UnivApplyInfoFixtureBuilder univApplyInfoFixtureBuilder;
+
+    @SpyBean
+    private CustomCacheManager cacheManager;
 
     @Nested
     class 목록_조회 {
@@ -396,6 +405,84 @@ class AdminHostUniversityServiceTest {
             assertThatCode(() -> adminHostUniversityService.deleteHostUniversity(university.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.HOST_UNIVERSITY_HAS_REFERENCES.getMessage());
+        }
+    }
+
+    @Nested
+    class 캐시_무효화 {
+
+        @Test
+        void 대학_생성_시_캐시가_무효화된다() {
+            // given
+            Country country = countryFixture.미국();
+            Region region = regionFixture.영미권();
+
+            AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
+                    "캐시 테스트 대학",
+                    "Cache Test University",
+                    "캐시 테스트 대학",
+                    "https://homepage.com",
+                    null, null,
+                    "https://logo.com/image.png",
+                    "https://background.com/image.png",
+                    null,
+                    country.getCode(),
+                    region.getCode()
+            );
+
+            // when
+            adminHostUniversityService.createHostUniversity(request);
+
+            // then
+            then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");
+            then(cacheManager).should(times(1)).evictUsingPrefix("university:recommend:general");
+        }
+
+        @Test
+        void 대학_수정_시_캐시가_무효화된다() {
+            // given
+            HostUniversity university = universityFixture.괌_대학();
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(1L)
+                    .koreanName("괌 대학 지원 정보")
+                    .university(university)
+                    .create();
+
+            Country country = countryFixture.일본();
+            Region region = regionFixture.아시아();
+
+            AdminHostUniversityUpdateRequest request = new AdminHostUniversityUpdateRequest(
+                    "수정된 대학명",
+                    "Updated University",
+                    "수정된 표시명",
+                    null, null, null,
+                    "https://logo.com/image.png",
+                    "https://background.com/image.png",
+                    null,
+                    country.getCode(),
+                    region.getCode()
+            );
+
+            // when
+            adminHostUniversityService.updateHostUniversity(university.getId(), request);
+
+            // then
+            then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");
+            then(cacheManager).should(times(1)).evictUsingPrefix("university:recommend:general");
+            then(cacheManager).should(times(1)).evictMultiple(List.of("univApplyInfo:" + univApplyInfo.getId()));
+        }
+
+        @Test
+        void 대학_삭제_시_캐시가_무효화된다() {
+            // given
+            HostUniversity university = universityFixture.괌_대학();
+
+            // when
+            adminHostUniversityService.deleteHostUniversity(university.getId());
+
+            // then
+            then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");
+            then(cacheManager).should(times(1)).evictUsingPrefix("university:recommend:general");
         }
     }
 }
