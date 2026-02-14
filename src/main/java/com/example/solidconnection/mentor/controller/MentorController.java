@@ -25,12 +25,12 @@ public class MentorController {
 
     private final MentorQueryService mentorQueryService;
 
-    @GetMapping("/{mentor-id}")
+    @GetMapping("/{site-user-id}")
     public ResponseEntity<MentorDetailResponse> getMentorDetails(
             @AuthorizedUser long siteUserId,
-            @PathVariable("mentor-id") Long mentorId
+            @PathVariable("site-user-id") Long mentorSiteUserId
     ) {
-        MentorDetailResponse response = mentorQueryService.getMentorDetails(mentorId, siteUserId);
+        MentorDetailResponse response = mentorQueryService.getMentorDetails(mentorSiteUserId, siteUserId);
         return ResponseEntity.ok(response);
     }
 

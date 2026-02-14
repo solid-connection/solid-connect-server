@@ -31,7 +31,7 @@ public record MatchedMentorResponse(
                                            String termName
     ) {
         return new MatchedMentorResponse(
-                mentor.getId(),
+                mentor.getSiteUserId(),
                 roomId,
                 mentorUser.getNickname(),
                 mentorUser.getProfileImageUrl(),

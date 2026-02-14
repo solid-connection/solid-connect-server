@@ -43,8 +43,8 @@ public class MentorQueryService {
     private final TermRepository termRepository;
 
     @Transactional(readOnly = true)
-    public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
-        Mentor mentor = mentorRepository.findById(mentorId)
+    public MentorDetailResponse getMentorDetails(long mentorSiteUserId, long currentUserId) {
+        Mentor mentor = mentorRepository.findBySiteUserId(mentorSiteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         HostUniversity university = hostUniversityRepository.findById(mentor.getUniversityId())
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
@@ -52,7 +52,7 @@ public class MentorQueryService {
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         Term term = termRepository.findById(mentor.getTermId())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUserId);
+        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentor.getId(), currentUserId);
 
         return MentorDetailResponse.of(mentor, mentorUser, university, isApplied, term.getName());
     }
