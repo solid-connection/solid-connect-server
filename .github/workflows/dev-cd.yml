@@ -76,7 +76,7 @@ jobs:
           token: ${{ secrets.PACKAGE_DELETE_TOKEN }}
           image-names: solid-connection-dev
           delete-untagged: true
-          keep-n-tags: 5
+          keep-n-tags: 2
           account-type: org
           org-name: ${{ github.repository_owner }}
           cut-off: '7 days ago UTC'
@@ -123,28 +123,28 @@ jobs:
             export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")
             export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
             export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
-          
-            # 2. GHCR 로그인 & Pull
+            export IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
+
+            # 2. Pull 전 정리 (디스크 공간 확보)
+            echo "Cleaning up old tagged images (keeping last 2)..."
+            docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
+            sort -r | \
+            tail -n +3 | \
+            xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" || true
+
+            echo "Pruning dangling images..."
+            docker image prune -f
+
+            # 3. GHCR 로그인 & Pull
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             echo "Pulling new image: $FULL_IMAGE_NAME"
             docker pull $FULL_IMAGE_NAME
-          
-            # 3. Spring Boot 앱 재시작
+
+            # 4. Spring Boot 앱 재시작
             echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
             cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
             docker compose -f docker-compose.dev.yml down || true
             OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
-          
-            # 4. 정리 작업
-            echo "Pruning dangling images..."
-            docker image prune -f
-          
-            echo "Cleaning up old tagged images (keeping last 5)..."
-            IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
-            docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
-            sort -r | \
-            tail -n +6 | \
-            xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" || true
-          
+
             echo "Deployment finished successfully."
-           '
+            '     
