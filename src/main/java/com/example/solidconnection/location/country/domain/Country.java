@@ -29,4 +29,12 @@ public class Country {
         this.koreanName = koreanName;
         this.regionCode = regionCode;
     }
+
+    public void updateKoreanName(String koreanName) {
+        this.koreanName = koreanName;
+    }
+
+    public void updateRegionCode(String regionCode) {
+        this.regionCode = regionCode;
+    }
 }
