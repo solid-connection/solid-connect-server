@@ -1,6 +1,7 @@
 package com.example.solidconnection.cache.manager;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,6 +35,12 @@ public class CustomCacheManager implements CacheManager {
 
     public void evictUsingPrefix(String key) {
         Set<String> keys = redisTemplate.keys(key + "*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+    public void evictMultiple(List<String> keys) {
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
         }

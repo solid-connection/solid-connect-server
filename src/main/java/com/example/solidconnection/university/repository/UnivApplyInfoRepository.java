@@ -68,4 +68,11 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     List<UnivApplyInfo> findAllByIds(@Param("ids") List<Long> ids);
 
     boolean existsByUniversityId(Long universityId);
+
+    @Query("""
+           SELECT uai.id
+           FROM UnivApplyInfo uai
+           WHERE uai.university.id = :universityId
+           """)
+    List<Long> findIdsByUniversityId(@Param("universityId") Long universityId);
 }
