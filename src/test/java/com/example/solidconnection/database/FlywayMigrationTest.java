@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 
 @SpringBootTest
 @ContextConfiguration(initializers = {RedisTestContainer.class, FlywayMigrationTest.FlywayMySQLInitializer.class})
@@ -19,7 +19,7 @@ import org.testcontainers.containers.MySQLContainer;
 })
 class FlywayMigrationTest {
 
-    private static final MySQLContainer<?> CONTAINER = new MySQLContainer<>("mysql:8.0")
+    private static final MySQLContainer CONTAINER = new MySQLContainer("mysql:8.0")
             .withDatabaseName("flyway_test")
             .withUsername("flyway_user")
             .withPassword("flyway_password");
