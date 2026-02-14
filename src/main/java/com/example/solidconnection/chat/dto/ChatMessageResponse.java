@@ -6,13 +6,13 @@ import java.util.List;
 public record ChatMessageResponse(
         long id,
         String content,
-        long senderId, // siteUserId
+        long siteUserId,
         ZonedDateTime createdAt,
         List<ChatAttachmentResponse> attachments
 ) {
 
-    public static ChatMessageResponse of(long id, String content, long senderId,
+    public static ChatMessageResponse of(long id, String content, long siteUserId,
                                          ZonedDateTime createdAt, List<ChatAttachmentResponse> attachments) {
-        return new ChatMessageResponse(id, content, senderId, createdAt, attachments);
+        return new ChatMessageResponse(id, content, siteUserId, createdAt, attachments);
     }
 }
