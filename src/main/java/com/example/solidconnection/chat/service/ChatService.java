@@ -228,7 +228,7 @@ public class ChatService {
 
         chatMessageRepository.save(chatMessage);
 
-        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
+        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.of(chatMessage, siteUserId);
 
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
@@ -260,7 +260,7 @@ public class ChatService {
 
         chatMessageRepository.save(chatMessage);
 
-        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.from(chatMessage);
+        ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.of(chatMessage, siteUserId);
         simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
     }
 
