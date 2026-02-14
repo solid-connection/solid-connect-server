@@ -21,7 +21,7 @@ public record MentorMyPageResponse(
 
     public static MentorMyPageResponse of(Mentor mentor, SiteUser siteUser, HostUniversity university, String termName) {
         return new MentorMyPageResponse(
-                mentor.getId(),
+                mentor.getSiteUserId(),
                 siteUser.getProfileImageUrl(),
                 siteUser.getNickname(),
                 university.getCountry().getKoreanName(),

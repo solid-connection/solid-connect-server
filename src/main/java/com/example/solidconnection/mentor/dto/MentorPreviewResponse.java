@@ -24,7 +24,7 @@ public record MentorPreviewResponse(
                                            String termName
     ) {
         return new MentorPreviewResponse(
-                mentor.getId(),
+                mentor.getSiteUserId(),
                 mentorUser.getNickname(),
                 mentorUser.getProfileImageUrl(),
                 university.getCountry().getKoreanName(),

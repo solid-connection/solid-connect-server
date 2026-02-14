@@ -31,13 +31,17 @@ public class MentoringCommandService {
 
     @Transactional
     public MentoringApplyResponse applyMentoring(long siteUserId, MentoringApplyRequest mentoringApplyRequest) {
-        long mentorId = mentoringApplyRequest.mentorId();
+        long mentorSiteUserId = mentoringApplyRequest.siteUserId();
+
+        Mentor mentor = mentorRepository.findBySiteUserId(mentorSiteUserId)
+                .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
+        long mentorId = mentor.getId();
 
         if (mentoringRepository.existsByMentorIdAndMenteeId(mentorId, siteUserId)) {
             throw new CustomException(ALREADY_EXIST_MENTORING);
         }
 
-        Mentoring mentoring = new Mentoring(mentoringApplyRequest.mentorId(), siteUserId, VerifyStatus.PENDING);
+        Mentoring mentoring = new Mentoring(mentorId, siteUserId, VerifyStatus.PENDING);
         return MentoringApplyResponse.from(mentoringRepository.save(mentoring));
     }
 
