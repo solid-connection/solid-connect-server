@@ -23,6 +23,7 @@ websocket:
     outbound:
       core-pool-size: 24
       max-pool-size: 48
+      queue-capacity: 4000
   heartbeat:
     server-interval: 10000
     client-interval: 10000

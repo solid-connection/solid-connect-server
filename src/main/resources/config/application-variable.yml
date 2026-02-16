@@ -188,4 +188,4 @@ sentry:
 
 token:
   refresh:
-    cookie-domain: ".stage.solid-connection.com"
+    cookie-domain: "localhost"
