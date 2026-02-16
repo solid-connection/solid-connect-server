@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: loadtest
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 24
+      max-pool-size: 48
+      queue-capacity: 4000
+    outbound:
+      core-pool-size: 24
+      max-pool-size: 48
+  heartbeat:
+    server-interval: 10000
+    client-interval: 10000
