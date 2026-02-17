@@ -39,11 +39,7 @@ public class NewsController {
             @AuthorizedUser(required = false) Long siteUserId,
             @RequestParam(value = "author-id", required = false) Long authorId
     ) {
-        if (authorId == null) {
-            NewsListResponse newsListResponse = newsQueryService.findAllNews(siteUserId);
-            return ResponseEntity.ok(newsListResponse);
-        }
-        NewsListResponse newsListResponse = newsQueryService.findNewsByAuthorId(siteUserId, authorId);
+        NewsListResponse newsListResponse = newsQueryService.findNews(siteUserId, authorId);
         return ResponseEntity.ok(newsListResponse);
     }
 
