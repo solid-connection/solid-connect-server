@@ -12,7 +12,6 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +50,7 @@ class NewsQueryServiceTest {
             News news3 = newsFixture.소식지(author2.getId());
 
             // when
-            NewsListResponse response = newsQueryService.findAllNews(null);
+            NewsListResponse response = newsQueryService.findNews(null, null);
 
             // then
             assertAll(
@@ -82,7 +81,7 @@ class NewsQueryServiceTest {
             likedNewsFixture.소식지_좋아요(news3.getId(), loginUser.getId());
 
             // when
-            NewsListResponse response = newsQueryService.findAllNews(loginUser.getId());
+            NewsListResponse response = newsQueryService.findNews(loginUser.getId(), null);
 
             // then
             assertAll(
@@ -105,7 +104,7 @@ class NewsQueryServiceTest {
         @Test
         void 소식지가_없으면_빈_목록을_반환한다() {
             // when
-            NewsListResponse response = newsQueryService.findAllNews(null);
+            NewsListResponse response = newsQueryService.findNews(null, null);
 
             // then
             assertThat(response.newsResponseList()).isEmpty();
@@ -127,7 +126,7 @@ class NewsQueryServiceTest {
             newsFixture.소식지(otherUser.getId());
 
             // when
-            NewsListResponse response = newsQueryService.findNewsByAuthorId(null, author.getId());
+            NewsListResponse response = newsQueryService.findNews(null, author.getId());
 
             // then
             assertAll(
@@ -157,7 +156,7 @@ class NewsQueryServiceTest {
             likedNewsFixture.소식지_좋아요(news3.getId(), loginUser.getId());
 
             // when
-            NewsListResponse response = newsQueryService.findNewsByAuthorId(loginUser.getId(), author.getId());
+            NewsListResponse response = newsQueryService.findNews(loginUser.getId(), author.getId());
 
             // then
             assertAll(
