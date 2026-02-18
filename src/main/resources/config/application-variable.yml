@@ -22,30 +22,18 @@ oauth:
     token-url: "https://appleid.apple.com/auth/token"
     client-secret-audience-url: "https://appleid.apple.com"
     public-key-url: "https://appleid.apple.com/auth/keys"
-    client-id: ${OAUTH_APPLE_CLIENT_ID}
-    team-id: ${OAUTH_APPLE_TEAM_ID}
-    key-id: ${OAUTH_APPLE_KEY_ID}
-    secret-key: ${OAUTH_APPLE_SECRET_KEY}
   kakao:
     token-url: "https://kauth.kakao.com/oauth/token"
-    user-info_url: "https://kapi.kakao.com/v2/user/me"
+    user-info-url: "https://kapi.kakao.com/v2/user/me"
 
 sentry:
-  dsn: ${SENTRY_DSN}
-  send-default-pii: true
+  send-default-pii: false
   traces-sample-rate: 1.0
   exception-resolver-order: -2147483647
-
-logging:
-  loki:
-    url: ${LOKI_URL:http://localhost:3100/loki/api/v1/push}
 
 management:
   server:
     port: 8081
-
-news:
-  default-thumbnail-url: ${NEWS_DEFAULT_THUMBNAIL_URL}
 
 token:
   access:
@@ -81,16 +69,6 @@ websocket:
     server-interval: 10000
     client-interval: 10000
 
-oauth:
-  apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
-  kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID}
-
-jwt:
-  secret: ${JWT_SECRET}
-
 cors:
   allowed-origins:
     - "https://www.solid-connection.com"
@@ -99,6 +77,7 @@ cors:
 
 sentry:
   environment: "production"
+  traces-sample-rate: 0.1
 
 token:
   refresh:
@@ -124,21 +103,11 @@ websocket:
     server-interval: 15000
     client-interval: 15000
 
-oauth:
-  apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
-  kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID}
-
-jwt:
-  secret: ${JWT_SECRET}
-
 cors:
   allowed-origins:
     - "https://www.stage.solid-connection.com"
     - "https://api.stage.solid-connection.com"
-    - "https://stage.admins.solid-connection.com"
+    - "https://www.stage.admins.solid-connection.com/"
     - "http://localhost:3000"
     - "https://localhost:3000"
     - "http://localhost:5173"
@@ -169,16 +138,6 @@ websocket:
   heartbeat:
     server-interval: 15000
     client-interval: 15000
-
-oauth:
-  apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
-  kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID}
-
-jwt:
-  secret: ${JWT_SECRET}
 
 cors:
   allowed-origins:
