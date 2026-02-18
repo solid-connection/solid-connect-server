@@ -7,7 +7,7 @@ spring:
       - optional:classpath:/config/application-cloud.yml
       - optional:classpath:/config/application-db.yml
       - optional:classpath:/config/application-variable.yml
-      - optional:aws-parameterstore:/solid-connection/common/
+      - aws-parameterstore:/solid-connection/common/
 
   tomcat:
     threads:
@@ -33,25 +33,25 @@ spring:
   config:
     activate:
       on-profile: local
-    import: optional:aws-parameterstore:/solid-connection/local/
+    import: aws-parameterstore:/solid-connection/local/
 
 ---
 spring:
   config:
     activate:
       on-profile: dev
-    import: optional:aws-parameterstore:/solid-connection/dev/
+    import: aws-parameterstore:/solid-connection/dev/
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-    import: optional:aws-parameterstore:/solid-connection/prod/
+    import: aws-parameterstore:/solid-connection/prod/
 
 ---
 spring:
   config:
     activate:
       on-profile: loadtest
-    import: optional:aws-parameterstore:/solid-connection/loadtest/
+    import: aws-parameterstore:/solid-connection/loadtest/
