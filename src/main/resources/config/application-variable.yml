@@ -12,6 +12,7 @@ websocket:
     outbound:
       core-pool-size: 6
       max-pool-size: 12
+      queue-capacity: 1000
   heartbeat:
     server-interval: 15000
     client-interval: 15000
@@ -21,16 +22,16 @@ oauth:
     token-url: "https://appleid.apple.com/auth/token"
     client-secret-audience-url: "https://appleid.apple.com"
     public-key-url: "https://appleid.apple.com/auth/keys"
-    client-id: ${OAUTH_APPLE_CLIENT_ID:}
-    team-id: ${OAUTH_APPLE_TEAM_ID:}
-    key-id: ${OAUTH_APPLE_KEY_ID:}
-    secret-key: ${OAUTH_APPLE_SECRET_KEY:}
+    client-id: ${OAUTH_APPLE_CLIENT_ID}
+    team-id: ${OAUTH_APPLE_TEAM_ID}
+    key-id: ${OAUTH_APPLE_KEY_ID}
+    secret-key: ${OAUTH_APPLE_SECRET_KEY}
   kakao:
     token-url: "https://kauth.kakao.com/oauth/token"
     user-info_url: "https://kapi.kakao.com/v2/user/me"
 
 sentry:
-  dsn: ${SENTRY_DSN:}
+  dsn: ${SENTRY_DSN}
   send-default-pii: true
   traces-sample-rate: 1.0
   exception-resolver-order: -2147483647
@@ -44,7 +45,7 @@ management:
     port: 8081
 
 news:
-  default-thumbnail-url: ${NEWS_DEFAULT_THUMBNAIL_URL:}
+  default-thumbnail-url: ${NEWS_DEFAULT_THUMBNAIL_URL}
 
 token:
   access:
@@ -75,19 +76,20 @@ websocket:
     outbound:
       core-pool-size: 16
       max-pool-size: 32
+      queue-capacity: 2000
   heartbeat:
     server-interval: 10000
     client-interval: 10000
 
 oauth:
   apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL:https://www.solid-connection.com/login/apple/callback}
+    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
   kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL:https://www.solid-connection.com/login/kakao/callback}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID:}
+    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
+    client-id: ${OAUTH_KAKAO_CLIENT_ID}
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET}
 
 cors:
   allowed-origins:
@@ -117,25 +119,26 @@ websocket:
     outbound:
       core-pool-size: 4
       max-pool-size: 8
+      queue-capacity: 500
   heartbeat:
     server-interval: 15000
     client-interval: 15000
 
 oauth:
   apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL:https://www.stage.solid-connection.com/login/apple/callback}
+    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
   kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL:https://www.stage.solid-connection.com/login/kakao/callback}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID:}
+    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
+    client-id: ${OAUTH_KAKAO_CLIENT_ID}
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET}
 
 cors:
   allowed-origins:
     - "https://www.stage.solid-connection.com"
     - "https://api.stage.solid-connection.com"
-    - "https://admin.solid-connection.com"
+    - "https://stage.admins.solid-connection.com"
     - "http://localhost:3000"
     - "https://localhost:3000"
     - "http://localhost:5173"
@@ -162,19 +165,20 @@ websocket:
     outbound:
       core-pool-size: 4
       max-pool-size: 8
+      queue-capacity: 500
   heartbeat:
     server-interval: 15000
     client-interval: 15000
 
 oauth:
   apple:
-    redirect-url: ${OAUTH_APPLE_REDIRECT_URL:http://localhost:8080/auth/apple}
+    redirect-url: ${OAUTH_APPLE_REDIRECT_URL}
   kakao:
-    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL:http://localhost:8080/auth/kakao}
-    client-id: ${OAUTH_KAKAO_CLIENT_ID:}
+    redirect-url: ${OAUTH_KAKAO_REDIRECT_URL}
+    client-id: ${OAUTH_KAKAO_CLIENT_ID}
 
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET}
 
 cors:
   allowed-origins:

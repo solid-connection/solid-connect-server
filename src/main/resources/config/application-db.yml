@@ -20,16 +20,16 @@ spring:
 
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL:}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
-    user: ${FLYWAY_DB_USERNAME:}
-    password: ${FLYWAY_DB_PASSWORD:}
+    user: ${FLYWAY_DB_USERNAME}
+    password: ${FLYWAY_DB_PASSWORD}
 
 ---
 spring:
@@ -47,16 +47,16 @@ spring:
 
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL:}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
-    user: ${FLYWAY_DB_USERNAME:}
-    password: ${FLYWAY_DB_PASSWORD:}
+    user: ${FLYWAY_DB_USERNAME}
+    password: ${FLYWAY_DB_PASSWORD}
 
 ---
 spring:
@@ -82,8 +82,8 @@ spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: ${LOCAL_DB_URL:jdbc:mysql://localhost/solid_connection?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${LOCAL_DB_USERNAME:}
-    password: ${LOCAL_DB_PASSWORD:}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
 
   flyway:
     enabled: false
