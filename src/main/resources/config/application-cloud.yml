@@ -5,16 +5,5 @@ spring:
 
 cloud:
   aws:
-    region:
-      static: ${CLOUD_AWS_REGION:ap-northeast-2}
     stack:
       auto: false
-    s3:
-      bucket: ${CLOUD_AWS_S3_BUCKET}
-      url:
-        default: ${CLOUD_AWS_S3_URL_DEFAULT}
-        uploaded: ${CLOUD_AWS_S3_URL_UPLOADED}
-    cloudFront:
-      url:
-        default: ${CLOUD_AWS_CLOUDFRONT_URL_DEFAULT}
-        uploaded: ${CLOUD_AWS_CLOUDFRONT_URL_UPLOADED}
