@@ -6,4 +6,6 @@ import java.util.List;
 public interface NewsCustomRepository {
 
     List<NewsResponse> findNewsByAuthorIdWithLikeStatus(long authorId, Long siteUserId);
+
+    List<NewsResponse> findAllNewsWithLikeStatus(Long siteUserId);
 }

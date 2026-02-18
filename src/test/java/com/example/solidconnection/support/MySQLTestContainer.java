@@ -3,11 +3,11 @@ package com.example.solidconnection.support;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.mysql.MySQLContainer;
 
 public class MySQLTestContainer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static final MySQLContainer<?> CONTAINER = new MySQLContainer<>("mysql:8.0");
+    private static final MySQLContainer CONTAINER = new MySQLContainer("mysql:8.0");
 
     static {
         CONTAINER.start();
