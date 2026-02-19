@@ -60,7 +60,7 @@ class MentorQueryServiceTest {
 
     @BeforeEach
     void setUp() {
-        termFixture.현재_학기("2025-2");
+        termFixture.현재_학기("2025-1");
         university = universityFixture.그라츠_대학();
     }
 
