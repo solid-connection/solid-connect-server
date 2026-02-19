@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -35,12 +35,12 @@ class EmailSignInServiceTest {
         EmailSignInRequest signInRequest = new EmailSignInRequest(user.getEmail(), rawPassword);
 
         // when
-        SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
+        SignInResult signInResult = emailSignInService.signIn(signInRequest);
 
         // then
         assertAll(
-                () -> Assertions.assertThat(signInResponse.accessToken()).isNotNull(),
-                () -> Assertions.assertThat(signInResponse.refreshToken()).isNotNull()
+                () -> Assertions.assertThat(signInResult.accessToken()).isNotNull(),
+                () -> Assertions.assertThat(signInResult.refreshToken()).isNotNull()
         );
     }
 

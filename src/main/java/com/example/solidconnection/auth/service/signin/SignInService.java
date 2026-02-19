@@ -2,7 +2,7 @@ package com.example.solidconnection.auth.service.signin;
 
 import com.example.solidconnection.auth.domain.AccessToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.auth.service.AuthTokenProvider;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +16,11 @@ public class SignInService {
     private final AuthTokenProvider authTokenProvider;
 
     @Transactional
-    public SignInResponse signIn(SiteUser siteUser) {
+    public SignInResult signIn(SiteUser siteUser) {
         resetQuitedAt(siteUser);
         AccessToken accessToken = authTokenProvider.generateAccessToken(siteUser);
         RefreshToken refreshToken = authTokenProvider.generateAndSaveRefreshToken(siteUser);
-        return SignInResponse.of(accessToken, refreshToken);
+        return SignInResult.of(accessToken, refreshToken);
     }
 
     private void resetQuitedAt(SiteUser siteUser) {

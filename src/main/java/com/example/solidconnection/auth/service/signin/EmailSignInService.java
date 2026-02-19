@@ -3,7 +3,7 @@ package com.example.solidconnection.auth.service.signin;
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_IN_FAILED;
 
 import com.example.solidconnection.auth.dto.EmailSignInRequest;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -22,7 +22,7 @@ public class EmailSignInService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public SignInResponse signIn(EmailSignInRequest signInRequest) {
+    public SignInResult signIn(EmailSignInRequest signInRequest) {
         SiteUser siteUser = getEmailMatchingUserOrThrow(signInRequest.email());
         validatePassword(signInRequest.password(), siteUser.getPassword());
         return signInService.signIn(siteUser);
