@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: local, dev, prod, loadtest
+
+cloud:
+  aws:
+    stack:
+      auto: false

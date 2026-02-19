@@ -1,0 +1,154 @@
+view:
+  count:
+    scheduling:
+      delay: 3000
+
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 6
+      max-pool-size: 12
+      queue-capacity: 1000
+    outbound:
+      core-pool-size: 6
+      max-pool-size: 12
+      queue-capacity: 1000
+  heartbeat:
+    server-interval: 15000
+    client-interval: 15000
+
+oauth:
+  apple:
+    token-url: "https://appleid.apple.com/auth/token"
+    client-secret-audience-url: "https://appleid.apple.com"
+    public-key-url: "https://appleid.apple.com/auth/keys"
+  kakao:
+    token-url: "https://kauth.kakao.com/oauth/token"
+    user-info-url: "https://kapi.kakao.com/v2/user/me"
+
+sentry:
+  send-default-pii: false
+  traces-sample-rate: 1.0
+  exception-resolver-order: -2147483647
+
+management:
+  server:
+    port: 8081
+
+token:
+  access:
+    storage-key-prefix: "ACCESS"
+    expire-time: 1h
+  refresh:
+    storage-key-prefix: "REFRESH"
+    expire-time: 90d
+  sign-up:
+    storage-key-prefix: "SIGN_UP"
+    expire-time: 10m
+  black-list:
+    storage-key-prefix: "BLACKLIST"
+    expire-time: 1h
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 16
+      max-pool-size: 32
+      queue-capacity: 2000
+    outbound:
+      core-pool-size: 16
+      max-pool-size: 32
+      queue-capacity: 2000
+  heartbeat:
+    server-interval: 10000
+    client-interval: 10000
+
+cors:
+  allowed-origins:
+    - "https://www.solid-connection.com"
+    - "https://api.solid-connection.com"
+    - "https://admin.solid-connection.com"
+
+sentry:
+  environment: "production"
+  traces-sample-rate: 0.1
+
+token:
+  refresh:
+    cookie-domain: ".solid-connection.com"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 500
+    outbound:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 500
+  heartbeat:
+    server-interval: 15000
+    client-interval: 15000
+
+cors:
+  allowed-origins:
+    - "https://www.stage.solid-connection.com"
+    - "https://api.stage.solid-connection.com"
+    - "https://www.stage.admins.solid-connection.com"
+    - "http://localhost:3000"
+    - "https://localhost:3000"
+    - "http://localhost:5173"
+
+sentry:
+  environment: "dev"
+
+token:
+  refresh:
+    cookie-domain: ".stage.solid-connection.com"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+websocket:
+  thread-pool:
+    inbound:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 500
+    outbound:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 500
+  heartbeat:
+    server-interval: 15000
+    client-interval: 15000
+
+cors:
+  allowed-origins:
+    - "http://localhost:8080"
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+    - "https://localhost:3000"
+
+sentry:
+  environment: "development"
+
+token:
+  refresh:
+    cookie-domain: "localhost"
