@@ -72,7 +72,7 @@ class ApplicationQueryServiceTest {
     private LanguageTestScore languageTestScore3;
 
     private UnivApplyInfo 괌대학_A_지원_정보;
-    private UnivApplyInfo 괌대학_B_지원_정보;
+    private UnivApplyInfo 버지니아공과대학_지원_정보;
     private UnivApplyInfo 서던덴마크대학교_지원_정보;
 
     private Term term;
@@ -94,7 +94,7 @@ class ApplicationQueryServiceTest {
         languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
 
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
-        괌대학_B_지원_정보 = univApplyInfoFixture.괌대학_B_지원_정보(term.getId());
+        버지니아공과대학_지원_정보 = univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
         서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
     }
 
@@ -120,7 +120,7 @@ class ApplicationQueryServiceTest {
                     term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보.getId(),
+                    버지니아공과대학_지원_정보.getId(),
                     null,
                     null
             );
@@ -146,7 +146,7 @@ class ApplicationQueryServiceTest {
             assertThat(response.firstChoice()).containsAll(List.of(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
                                           List.of(application1), user1),
-                    ApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
                                           List.of(application2), user1),
                     ApplicantsResponse.of(서던덴마크대학교_지원_정보,
                                           List.of(application3), user1)
@@ -172,7 +172,7 @@ class ApplicationQueryServiceTest {
                     term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보.getId(),
+                    버지니아공과대학_지원_정보.getId(),
                     null,
                     null
             );
@@ -198,7 +198,7 @@ class ApplicationQueryServiceTest {
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
                                           List.of(application1), user1),
-                    ApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
                                           List.of(application2), user1)
             );
         }
@@ -222,7 +222,7 @@ class ApplicationQueryServiceTest {
                     term.getId(),
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
-                    괌대학_B_지원_정보.getId(),
+                    버지니아공과대학_지원_정보.getId(),
                     null,
                     null
             );
@@ -241,14 +241,14 @@ class ApplicationQueryServiceTest {
             ApplicationsResponse response = applicationQueryService.getApplicants(
                     user1.getId(),
                     null,
-                    "괌"
+                    "미국"
             );
 
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보,
                                           List.of(application1), user1),
-                    ApplicantsResponse.of(괌대학_B_지원_정보,
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
                                           List.of(application2), user1)
             );
         }
@@ -289,7 +289,7 @@ class ApplicationQueryServiceTest {
             // then
             assertThat(response.firstChoice()).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보, List.of(currentApplication), user1),
-                    ApplicantsResponse.of(괌대학_B_지원_정보, List.of(), user1),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(), user1),
                     ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(), user1)
             );
         }
@@ -315,7 +315,7 @@ class ApplicationQueryServiceTest {
                     term.getId(),
                     gpaScore1.getGpa(),
                     languageTestScore1.getLanguageTest(),
-                    괌대학_B_지원_정보.getId(),
+                    버지니아공과대학_지원_정보.getId(),
                     null,
                     null
             );
@@ -401,7 +401,7 @@ class ApplicationQueryServiceTest {
                     gpaScore2.getGpa(),
                     languageTestScore2.getLanguageTest(),
                     괌대학_A_지원_정보.getId(),
-                    괌대학_B_지원_정보.getId(),
+                    버지니아공과대학_지원_정보.getId(),
                     서던덴마크대학교_지원_정보.getId()
             );
             Application application3 = applicationFixture.지원서(

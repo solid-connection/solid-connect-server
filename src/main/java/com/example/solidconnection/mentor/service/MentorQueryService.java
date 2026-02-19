@@ -19,8 +19,8 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,21 +38,21 @@ public class MentorQueryService {
     private final MentoringRepository mentoringRepository;
     private final SiteUserRepository siteUserRepository;
     private final MentorBatchQueryRepository mentorBatchQueryRepository;
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
     private final RegionRepository regionRepository;
     private final TermRepository termRepository;
 
     @Transactional(readOnly = true)
-    public MentorDetailResponse getMentorDetails(long mentorId, long currentUserId) {
-        Mentor mentor = mentorRepository.findById(mentorId)
+    public MentorDetailResponse getMentorDetails(long mentorSiteUserId, long currentUserId) {
+        Mentor mentor = mentorRepository.findBySiteUserId(mentorSiteUserId)
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-        University university = universityRepository.findById(mentor.getUniversityId())
+        HostUniversity university = hostUniversityRepository.findById(mentor.getUniversityId())
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         SiteUser mentorUser = siteUserRepository.findById(mentor.getSiteUserId())
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         Term term = termRepository.findById(mentor.getTermId())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentorId, currentUserId);
+        boolean isApplied = mentoringRepository.existsByMentorIdAndMenteeId(mentor.getId(), currentUserId);
 
         return MentorDetailResponse.of(mentor, mentorUser, university, isApplied, term.getName());
     }
@@ -77,14 +77,14 @@ public class MentorQueryService {
 
     private List<MentorPreviewResponse> buildMentorPreviewsWithBatchQuery(List<Mentor> mentors, long currentUserId) {
         Map<Long, SiteUser> mentorIdToSiteUser = mentorBatchQueryRepository.getMentorIdToSiteUserMap(mentors);
-        Map<Long, University> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
+        Map<Long, HostUniversity> mentorIdToUniversity = mentorBatchQueryRepository.getMentorIdToUniversityMap(mentors);
         Map<Long, Boolean> mentorIdToIsApplied = mentorBatchQueryRepository.getMentorIdToIsApplied(mentors, currentUserId);
         Map<Long, String> termIdToName = mentorBatchQueryRepository.getTermIdToNameMap(mentors);
 
         List<MentorPreviewResponse> mentorPreviews = new ArrayList<>();
         for (Mentor mentor : mentors) {
             SiteUser mentorUser = mentorIdToSiteUser.get(mentor.getId());
-            University university = mentorIdToUniversity.get(mentor.getId());
+            HostUniversity university = mentorIdToUniversity.get(mentor.getId());
             boolean isApplied = mentorIdToIsApplied.get(mentor.getId());
             String termName = termIdToName.get(mentor.getTermId());
             MentorPreviewResponse response = MentorPreviewResponse.of(mentor, mentorUser, university, isApplied, termName);

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import com.example.solidconnection.common.VerifyStatus;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.score.domain.GpaScore;
@@ -115,7 +115,7 @@ class ScoreServiceTest {
         GpaScoreRequest request = createGpaScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
-        given(s3Service.uploadFile(file, ImgType.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
+        given(s3Service.uploadFile(file, UploadPath.GPA)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
         long scoreId = scoreService.submitGpaScore(user.getId(), request, file);
@@ -131,7 +131,7 @@ class ScoreServiceTest {
         LanguageTestScoreRequest request = createLanguageTestScoreRequest();
         MockMultipartFile file = createFile();
         String fileUrl = "/gpa-report.pdf";
-        given(s3Service.uploadFile(file, ImgType.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
+        given(s3Service.uploadFile(file, UploadPath.LANGUAGE_TEST)).willReturn(new UploadedFileUrlResponse(fileUrl));
 
         // when
         long scoreId = scoreService.submitLanguageTestScore(user.getId(), request, file);

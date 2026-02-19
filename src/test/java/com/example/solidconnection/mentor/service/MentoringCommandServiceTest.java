@@ -83,7 +83,7 @@ class MentoringCommandServiceTest {
         @Test
         void 멘토링을_성공적으로_신청한다() {
             // given
-            MentoringApplyRequest request = new MentoringApplyRequest(mentor1.getId());
+            MentoringApplyRequest request = new MentoringApplyRequest(mentor1.getSiteUserId());
 
             // when
             MentoringApplyResponse response = mentoringCommandService.applyMentoring(menteeUser.getId(), request);
@@ -102,7 +102,7 @@ class MentoringCommandServiceTest {
         void 동일_멘티_멘토끼리는_재신청되지않는다() {
             // given
             mentoringFixture.대기중_멘토링(mentor1.getId(), menteeUser.getId());
-            MentoringApplyRequest request = new MentoringApplyRequest(mentor1.getId());
+            MentoringApplyRequest request = new MentoringApplyRequest(mentor1.getSiteUserId());
 
             // when & then
             assertThatThrownBy(() -> mentoringCommandService.applyMentoring(menteeUser.getId(), request))

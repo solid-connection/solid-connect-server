@@ -37,6 +37,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### Claude Code ###
+.claude/settings.local.json
+
 ### YML ###
 application-secret.yml
 application-prod.yml

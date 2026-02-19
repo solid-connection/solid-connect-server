@@ -33,10 +33,10 @@ public class Mentor extends BaseEntity {
     @Column
     private boolean hasBadge = false;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000)
     private String introduction;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000)
     private String passTip;
 
     @Column
@@ -62,6 +62,16 @@ public class Mentor extends BaseEntity {
     ) {
         this.introduction = introduction;
         this.passTip = passTip;
+        this.siteUserId = siteUserId;
+        this.universityId = universityId;
+        this.termId = termId;
+    }
+
+    public Mentor(
+            long siteUserId,
+            Long universityId,
+            long termId
+    ) {
         this.siteUserId = siteUserId;
         this.universityId = universityId;
         this.termId = termId;
@@ -94,13 +104,6 @@ public class Mentor extends BaseEntity {
             } else if (i < originalChannelSize) { // 채널 갯수 줄어듦 - 기존 채널 삭제
                 this.channels.remove(this.channels.size() - 1);
             }
-        }
-    }
-
-    public void createChannels(List<Channel> channels) {
-        for(Channel channel : channels) {
-            channel.updateMentor(this);
-            this.channels.add(channel);
         }
     }
 }

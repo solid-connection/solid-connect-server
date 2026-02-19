@@ -2,7 +2,7 @@ package com.example.solidconnection.mentor.dto;
 
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.siteuser.domain.SiteUser;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import java.util.List;
 
 public record MentorMyPageResponse(
@@ -19,9 +19,9 @@ public record MentorMyPageResponse(
         List<ChannelResponse> channels
 ) {
 
-    public static MentorMyPageResponse of(Mentor mentor, SiteUser siteUser, University university, String termName) {
+    public static MentorMyPageResponse of(Mentor mentor, SiteUser siteUser, HostUniversity university, String termName) {
         return new MentorMyPageResponse(
-                mentor.getId(),
+                mentor.getSiteUserId(),
                 siteUser.getProfileImageUrl(),
                 siteUser.getNickname(),
                 university.getCountry().getKoreanName(),

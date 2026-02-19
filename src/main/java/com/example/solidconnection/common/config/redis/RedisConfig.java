@@ -1,6 +1,6 @@
 package com.example.solidconnection.common.config.redis;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.CREATE_CHANNEL;
+import static com.example.solidconnection.redis.RedisConstants.CREATE_CHANNEL;
 
 import com.example.solidconnection.cache.CacheUpdateListener;
 import org.springframework.beans.factory.annotation.Value;

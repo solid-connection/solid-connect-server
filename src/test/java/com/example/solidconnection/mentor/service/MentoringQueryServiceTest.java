@@ -25,7 +25,7 @@ import com.example.solidconnection.mentor.repository.MentoringRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import java.util.Map;
 import java.util.function.Function;
@@ -69,7 +69,7 @@ class MentoringQueryServiceTest {
     private SiteUser mentorUser1, mentorUser2;
     private SiteUser menteeUser1, menteeUser2, menteeUser3;
     private Mentor mentor1, mentor2, mentor3;
-    private University university;
+    private HostUniversity university;
     private Pageable pageable;
 
     @BeforeEach
@@ -290,8 +290,8 @@ class MentoringQueryServiceTest {
             // then
             Map<Long, MatchedMentorResponse> matchMentorMap = response.content().stream()
                     .collect(Collectors.toMap(MatchedMentorResponse::id, Function.identity()));
-            MatchedMentorResponse mentor1Response = matchMentorMap.get(mentor1.getId());
-            MatchedMentorResponse mentor2Response = matchMentorMap.get(mentor2.getId());
+            MatchedMentorResponse mentor1Response = matchMentorMap.get(mentor1.getSiteUserId());
+            MatchedMentorResponse mentor2Response = matchMentorMap.get(mentor2.getSiteUserId());
             assertAll(
                     () -> assertThat(mentor1Response.roomId()).isEqualTo(chatRoom1.getId()),
                     () -> assertThat(mentor1Response.nickname()).isEqualTo(mentorUser1.getNickname()),

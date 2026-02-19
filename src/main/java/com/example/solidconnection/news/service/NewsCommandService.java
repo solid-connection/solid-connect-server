@@ -11,7 +11,7 @@ import com.example.solidconnection.news.dto.NewsCommandResponse;
 import com.example.solidconnection.news.dto.NewsCreateRequest;
 import com.example.solidconnection.news.dto.NewsUpdateRequest;
 import com.example.solidconnection.news.repository.NewsRepository;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.Role;
@@ -41,7 +41,7 @@ public class NewsCommandService {
 
     private String getImageUrl(MultipartFile imageFile) {
         if (imageFile != null && !imageFile.isEmpty()) {
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, UploadPath.NEWS);
             return uploadedFile.fileUrl();
         }
         return newsProperties.defaultThumbnailUrl();
@@ -73,7 +73,7 @@ public class NewsCommandService {
             deleteCustomImage(news.getThumbnailUrl());
             news.updateThumbnailUrl(newsProperties.defaultThumbnailUrl());
         } else if (imageFile != null && !imageFile.isEmpty()) {
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.NEWS);
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, UploadPath.NEWS);
             deleteCustomImage(news.getThumbnailUrl());
             news.updateThumbnailUrl(uploadedFile.fileUrl());
         }

@@ -25,7 +25,7 @@ import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.location.region.repository.InterestedRegionRepository;
 import com.example.solidconnection.mentor.fixture.MentorFixture;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -41,7 +41,8 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
@@ -105,11 +106,20 @@ class MyPageServiceTest {
 
     private SiteUser user;
     private Term term;
+    private Long 괌대학_A_지원_정보_ID;
+    private Long 메이지대학_지원_정보_ID;
+    private Long 코펜하겐IT대학_지원_정보_ID;
+    private HostUniversity 괌대학;
 
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
         term = termFixture.현재_학기("2025-2");
+        UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+        괌대학_A_지원_정보_ID = 괌대학_A_지원_정보.getId();
+        괌대학 = 괌대학_A_지원_정보.getUniversity();
+        메이지대학_지원_정보_ID = univApplyInfoFixture.메이지대학_지원_정보(term.getId()).getId();
+        코펜하겐IT대학_지원_정보_ID = univApplyInfoFixture.코펜하겐IT대학_지원_정보(term.getId()).getId();
     }
 
     @Test
@@ -141,8 +151,7 @@ class MyPageServiceTest {
     void 멘토의_마이페이지_정보를_조회한다() {
         // given
         SiteUser mentorUser = siteUserFixture.멘토(1, "mentor");
-        University university = univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getUniversity();
-        mentorFixture.멘토(mentorUser.getId(), university.getId());
+        mentorFixture.멘토(mentorUser.getId(), 괌대학.getId());
         int likedUnivApplyInfoCount = createLikedUnivApplyInfos(mentorUser);
 
         // when
@@ -157,15 +166,15 @@ class MyPageServiceTest {
                 // () -> assertThat(response.likedPostCount()).isEqualTo(user.getLikedPostList().size()),
                 // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount),
-                () -> assertThat(response.attendedUniversity()).isEqualTo(university.getKoreanName()),
+                () -> assertThat(response.attendedUniversity()).isEqualTo(괌대학.getKoreanName()),
                 () -> assertThat(response.interestedCountries()).isNull()
         );
     }
 
     private int createLikedUnivApplyInfos(SiteUser testUser) {
-        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, univApplyInfoFixture.괌대학_A_지원_정보(term.getId()).getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, univApplyInfoFixture.메이지대학_지원_정보(term.getId()).getId(), testUser.getId());
-        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, univApplyInfoFixture.코펜하겐IT대학_지원_정보(term.getId()).getId(), testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo1 = new LikedUnivApplyInfo(null, 괌대학_A_지원_정보_ID, testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo2 = new LikedUnivApplyInfo(null, 메이지대학_지원_정보_ID, testUser.getId());
+        LikedUnivApplyInfo likedUnivApplyInfo3 = new LikedUnivApplyInfo(null, 코펜하겐IT대학_지원_정보_ID, testUser.getId());
 
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo1);
         likedUnivApplyInfoRepository.save(likedUnivApplyInfo2);
@@ -209,7 +218,7 @@ class MyPageServiceTest {
             // given
             String expectedUrl = "newProfileImageUrl";
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse(expectedUrl));
 
             // when
@@ -224,7 +233,7 @@ class MyPageServiceTest {
         void 프로필을_처음_수정하는_것이면_이전_이미지를_삭제하지_않는다() {
             // given
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
@@ -239,7 +248,7 @@ class MyPageServiceTest {
             // given
             SiteUser 커스텀_프로필_사용자 = createSiteUserWithCustomProfile();
             MockMultipartFile imageFile = createValidImageFile();
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
 
             // when
@@ -255,7 +264,7 @@ class MyPageServiceTest {
 
         @BeforeEach
         void setUp() {
-            given(s3Service.uploadFile(any(), eq(ImgType.PROFILE)))
+            given(s3Service.uploadFile(any(), eq(UploadPath.PROFILE)))
                     .willReturn(new UploadedFileUrlResponse("newProfileImageUrl"));
         }
 

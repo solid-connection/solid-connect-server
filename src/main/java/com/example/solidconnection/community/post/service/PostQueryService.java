@@ -23,7 +23,6 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.PostFindSiteUserResponse;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.siteuser.repository.UserBlockRepository;
-import com.example.solidconnection.util.RedisUtils;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,8 +41,7 @@ public class PostQueryService {
     private final SiteUserRepository siteUserRepository;
     private final UserBlockRepository userBlockRepository;
     private final CommentService commentService;
-    private final RedisService redisService;
-    private final RedisUtils redisUtils;
+    private final PostRedisManager postRedisManager;
 
     @Transactional(readOnly = true)
     public List<PostListResponse> findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(String code, String category, Long siteUserId) {
@@ -81,10 +79,7 @@ public class PostQueryService {
         List<PostFindPostImageResponse> postImageFindResultDTOList = PostFindPostImageResponse.from(post.getPostImageList());
         List<PostFindCommentResponse> commentFindResultDTOList = commentService.findCommentsByPostId(siteUser.getId(), postId);
 
-        // caching && 어뷰징 방지
-        if (redisService.isPresent(redisUtils.getValidatePostViewCountRedisKey(siteUser.getId(), postId))) {
-            redisService.increaseViewCount(redisUtils.getPostViewCountRedisKey(postId));
-        }
+        postRedisManager.incrementViewCountIfFirstAccess(siteUser.getId(), postId);
 
         return PostFindResponse.from(
                 post, isOwner, isLiked, boardPostFindResultDTO, siteUserPostFindResultDTO, commentFindResultDTOList, postImageFindResultDTOList);
