@@ -13,7 +13,17 @@ if system == "Darwin":
     ])
 elif system == "Windows":
     ps1_path = os.path.join(script_dir, "notify.ps1")
-    subprocess.run([
-        "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
-        "-File", ps1_path
-    ])
+    # VS Code extension 환경에서는 PATH에 powershell이 없을 수 있으므로 절대 경로 사용
+    powershell_candidates = [
+        r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe",
+        "powershell",
+    ]
+    for ps in powershell_candidates:
+        try:
+            subprocess.run(
+                [ps, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1_path],
+                timeout=10,
+            )
+            break
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            continue
