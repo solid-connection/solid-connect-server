@@ -1,6 +1,6 @@
 package com.example.solidconnection.scheduler;
 
-import static com.example.solidconnection.community.post.service.RedisConstants.VIEW_COUNT_KEY_PATTERN;
+import static com.example.solidconnection.redis.RedisConstants.VIEW_COUNT_KEY_PATTERN;
 
 import com.example.solidconnection.community.post.service.UpdateViewCountService;
 import com.example.solidconnection.util.RedisUtils;

@@ -14,7 +14,7 @@ import com.example.solidconnection.location.region.service.InterestedRegionServi
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.repository.MentorRepository;
-import com.example.solidconnection.s3.domain.ImgType;
+import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.siteuser.domain.AuthType;
@@ -24,9 +24,9 @@ import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.University;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -48,7 +48,7 @@ public class MyPageService {
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
     private final CountryRepository countryRepository;
     private final MentorRepository mentorRepository;
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
     private final S3Service s3Service;
     private final InterestedCountryService interestedCountryService;
     private final InterestedRegionService interestedRegionService;
@@ -69,7 +69,7 @@ public class MyPageService {
         } else if (siteUser.getRole() == Role.MENTOR) {
             Mentor mentor = mentorRepository.findBySiteUserId(siteUser.getId())
                     .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
-            University university = universityRepository.findById(mentor.getUniversityId())
+            HostUniversity university = hostUniversityRepository.findById(mentor.getUniversityId())
                     .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
             universityKoreanName = university.getKoreanName();
         }
@@ -90,9 +90,8 @@ public class MyPageService {
             user.setNickname(nickname);
             user.setNicknameModifiedAt(LocalDateTime.now());
         }
-
         if (imageFile != null && !imageFile.isEmpty()) {
-            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, ImgType.PROFILE);
+            UploadedFileUrlResponse uploadedFile = s3Service.uploadFile(imageFile, UploadPath.PROFILE);
             if (!isDefaultProfileImage(user.getProfileImageUrl())) {
                 s3Service.deleteExProfile(user.getId());
             }

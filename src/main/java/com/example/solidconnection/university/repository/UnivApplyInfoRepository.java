@@ -19,6 +19,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                SELECT DISTINCT uai
                FROM UnivApplyInfo uai
                LEFT JOIN FETCH uai.languageRequirements lr
+               LEFT JOIN FETCH uai.homeUniversity hu
                JOIN FETCH uai.university u
                LEFT JOIN FETCH u.country c
                LEFT JOIN FETCH u.region r
@@ -40,6 +41,7 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
                SELECT uai
                FROM UnivApplyInfo uai
                LEFT JOIN FETCH uai.languageRequirements lr
+               LEFT JOIN FETCH uai.homeUniversity hu
                LEFT JOIN FETCH uai.university u
                LEFT JOIN FETCH u.country c
                LEFT JOIN FETCH u.region r
@@ -57,10 +59,13 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
            SELECT DISTINCT uai
            FROM UnivApplyInfo uai
            LEFT JOIN FETCH uai.languageRequirements lr
+           LEFT JOIN FETCH uai.homeUniversity hu
            LEFT JOIN FETCH uai.university u
            LEFT JOIN FETCH u.country c
            LEFT JOIN FETCH u.region r
            WHERE uai.id IN :ids
            """)
     List<UnivApplyInfo> findAllByIds(@Param("ids") List<Long> ids);
+
+    boolean existsByUniversityId(Long universityId);
 }

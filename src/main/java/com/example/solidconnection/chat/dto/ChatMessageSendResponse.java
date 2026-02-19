@@ -7,12 +7,12 @@ import java.util.List;
 public record ChatMessageSendResponse(
         long messageId,
         String content,
-        long senderId,
+        long siteUserId,
         MessageType messageType,
         List<ChatAttachmentResponse> attachments
 ) {
 
-    public static ChatMessageSendResponse from(ChatMessage chatMessage) {
+    public static ChatMessageSendResponse of(ChatMessage chatMessage, long siteUserId) {
         MessageType messageType = chatMessage.getChatAttachments().isEmpty()
                 ? MessageType.TEXT
                 : MessageType.IMAGE;
@@ -30,7 +30,7 @@ public record ChatMessageSendResponse(
         return new ChatMessageSendResponse(
                 chatMessage.getId(),
                 chatMessage.getContent(),
-                chatMessage.getSenderId(),
+                siteUserId,
                 messageType,
                 attachments
         );

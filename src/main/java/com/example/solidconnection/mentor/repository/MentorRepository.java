@@ -21,7 +21,7 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     @Query("""
            SELECT m FROM Mentor m
-           JOIN University u ON m.universityId = u.id
+           JOIN HostUniversity u ON m.universityId = u.id
            WHERE u.region = :region
            """)
     Slice<Mentor> findAllByRegion(@Param("region") Region region, Pageable pageable);

@@ -2,11 +2,14 @@ package com.example.solidconnection.location.country.repository;
 
 import com.example.solidconnection.location.country.domain.Country;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CountryRepository extends JpaRepository<Country, Long> {
+
+    Optional<Country> findByCode(String code);
 
     List<Country> findAllByKoreanNameIn(List<String> koreanNames);
 

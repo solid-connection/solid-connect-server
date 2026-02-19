@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -35,6 +36,10 @@ public class UnivApplyInfo extends BaseEntity {
 
     @Column(nullable = false, name = "term_id")
     private long termId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "home_university_id")
+    private HomeUniversity homeUniversity;
 
     @Column(nullable = false, length = 100)
     private String koreanName;
@@ -81,7 +86,7 @@ public class UnivApplyInfo extends BaseEntity {
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private University university;
+    private HostUniversity university;
 
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
         this.languageRequirements.add(languageRequirements);

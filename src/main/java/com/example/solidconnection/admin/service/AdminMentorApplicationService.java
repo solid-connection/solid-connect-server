@@ -1,5 +1,6 @@
 package com.example.solidconnection.admin.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -9,13 +10,15 @@ import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
+import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminMentorApplicationService {
 
     private final MentorApplicationRepository mentorApplicationRepository;
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
     private final SiteUserRepository siteUserRepository;
+    private final MentorRepository mentorRepository;
 
     @Transactional(readOnly = true)
     public Page<MentorApplicationSearchResponse> searchMentorApplications(
@@ -45,7 +49,26 @@ public class AdminMentorApplicationService {
         MentorApplication mentorApplication = mentorApplicationRepository.findById(mentorApplicationId)
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
+        SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        validateUserCanCreateMentor(siteUser.getId());
+
         mentorApplication.approve();
+        siteUser.becomeMentor();
+
+        Mentor mentor = new Mentor(
+                siteUser.getId(),
+                mentorApplication.getUniversityId(),
+                mentorApplication.getTermId()
+        );
+
+        mentorRepository.save(mentor);
+    }
+
+    private void validateUserCanCreateMentor(long siteUserId) {
+        if (mentorRepository.existsBySiteUserId(siteUserId)) {
+            throw new CustomException(MENTOR_ALREADY_EXISTS);
+        }
     }
 
     @Transactional
@@ -82,7 +105,7 @@ public class AdminMentorApplicationService {
 
         mentorApplication.validateCanAssignUniversity();
 
-        University university = universityRepository.getUniversityById(universityId);
+        HostUniversity university = hostUniversityRepository.getHostUniversityById(universityId);
 
         mentorApplication.assignUniversity(university.getId());
     }

@@ -18,13 +18,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class University extends BaseEntity {
+public class HostUniversity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String koreanName;
 
     @Column(nullable = false, length = 100)
@@ -56,4 +56,30 @@ public class University extends BaseEntity {
 
     @ManyToOne
     private Region region;
+
+    public void update(
+            String koreanName,
+            String englishName,
+            String formatName,
+            String homepageUrl,
+            String englishCourseUrl,
+            String accommodationUrl,
+            String logoImageUrl,
+            String backgroundImageUrl,
+            String detailsForLocal,
+            Country country,
+            Region region
+    ) {
+        this.koreanName = koreanName;
+        this.englishName = englishName;
+        this.formatName = formatName;
+        this.homepageUrl = homepageUrl;
+        this.englishCourseUrl = englishCourseUrl;
+        this.accommodationUrl = accommodationUrl;
+        this.logoImageUrl = logoImageUrl;
+        this.backgroundImageUrl = backgroundImageUrl;
+        this.detailsForLocal = detailsForLocal;
+        this.country = country;
+        this.region = region;
+    }
 }

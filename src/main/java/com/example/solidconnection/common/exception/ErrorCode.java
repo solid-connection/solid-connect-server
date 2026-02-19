@@ -41,6 +41,9 @@ public enum ErrorCode {
     REGION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "지역을 찾을 수 없습니다."),
     REGION_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 지역을 찾을 수 없습니다."),
     REGION_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 지역입니다."),
+    HOST_UNIVERSITY_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 파견 대학입니다."),
+    HOST_UNIVERSITY_HAS_REFERENCES(HttpStatus.CONFLICT.value(), "해당 파견 대학을 참조하는 대학 지원 정보가 존재합니다."),
+    COUNTRY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "국가를 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
     GPA_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학점입니다."),
     LANGUAGE_TEST_SCORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 어학성적입니다."),
@@ -96,6 +99,7 @@ public enum ErrorCode {
     INVALID_BOARD_CODE(HttpStatus.BAD_REQUEST.value(), "잘못된 게시판 코드입니다."),
     INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 게시글입니다."), // todo: NOT_FOUND로 통일 필요
     INVALID_POST_ACCESS(HttpStatus.BAD_REQUEST.value(), "자신의 게시글만 제어할 수 있습니다."),
+    DUPLICATE_POST_CREATE_REQUEST(HttpStatus.BAD_REQUEST.value(), "게시글이 이미 생성 중입니다."),
     CAN_NOT_DELETE_OR_UPDATE_QUESTION(HttpStatus.BAD_REQUEST.value(), "질문글은 수정이나 삭제할 수 없습니다."),
     CAN_NOT_UPLOAD_MORE_THAN_FIVE_IMAGES(HttpStatus.BAD_REQUEST.value(), "5개 이상의 파일을 업로드할 수 없습니다."),
     INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "존재하지 않는 댓글입니다."),

@@ -5,12 +5,17 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INP
 import static com.example.solidconnection.common.exception.ErrorCode.JSON_PARSING_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.JWT_EXCEPTION;
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_DEFINED_ERROR;
+import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
+import com.example.solidconnection.auth.controller.RefreshTokenCookieManager;
+import com.example.solidconnection.auth.exception.AuthException;
 import com.example.solidconnection.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,7 +26,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class CustomExceptionHandler {
+
+    private final RefreshTokenCookieManager refreshTokenCookieManager;
+
+    @ExceptionHandler(AuthException.class)
+    protected ResponseEntity<ErrorResponse> handleAuthException(
+            AuthException ex,
+            HttpServletResponse response
+    ) {
+        log.error("인증 예외 발생 : {}", ex.getMessage());
+        if (ex.getErrorCode().equals(REFRESH_TOKEN_EXPIRED)) {
+            refreshTokenCookieManager.deleteCookie(response);
+        }
+        ErrorResponse errorResponse = new ErrorResponse(ex);
+        return ResponseEntity
+                .status(ex.getCode())
+                .body(errorResponse);
+    }
 
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {

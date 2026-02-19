@@ -2,7 +2,6 @@ package com.example.solidconnection.community.post.service;
 
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
-import com.example.solidconnection.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -17,14 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateViewCountService {
 
     private final PostRepository postRepository;
-    private final RedisService redisService;
-    private final RedisUtils redisUtils;
+    private final PostRedisManager postRedisManager;
 
     @Transactional
     @Async
     public void updateViewCount(String key) {
-        Long postId = redisUtils.getPostIdFromPostViewCountRedisKey(key);
-        Post post = postRepository.getById(postId);
-        postRepository.increaseViewCount(postId, redisService.getAndDelete(key));
+        Long postId = postRedisManager.getPostIdFromPostViewCountRedisKey(key);
+        Long viewCount = postRedisManager.getAndDeleteViewCount(key);
+        postRepository.increaseViewCount(postId, viewCount);
     }
 }

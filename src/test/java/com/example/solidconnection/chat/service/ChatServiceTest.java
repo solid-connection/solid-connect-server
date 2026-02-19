@@ -117,9 +117,9 @@ class ChatServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.chatRooms()).hasSize(2),
-                    () -> assertThat(response.chatRooms().get(0).partner().partnerId()).isEqualTo(mentor2.getId()),
+                    () -> assertThat(response.chatRooms().get(0).partner().siteUserId()).isEqualTo(mentor2.getId()),
                     () -> assertThat(response.chatRooms().get(0).lastChatMessage()).isEqualTo(newMessage.getContent()),
-                    () -> assertThat(response.chatRooms().get(1).partner().partnerId()).isEqualTo(mentor1.getId()),
+                    () -> assertThat(response.chatRooms().get(1).partner().siteUserId()).isEqualTo(mentor1.getId()),
                     () -> assertThat(response.chatRooms().get(1).lastChatMessage()).isEqualTo(oldMessage.getContent())
             );
         }
@@ -244,9 +244,9 @@ class ChatServiceTest {
             assertAll(
                     () -> assertThat(response.content()).hasSize(2),
                     () -> assertThat(response.content().get(0).content()).isEqualTo(message2.getContent()),
-                    () -> assertThat(response.content().get(0).senderId()).isEqualTo(user.getId()),
+                    () -> assertThat(response.content().get(0).siteUserId()).isEqualTo(user.getId()),
                     () -> assertThat(response.content().get(1).content()).isEqualTo(message1.getContent()),
-                    () -> assertThat(response.content().get(1).senderId()).isEqualTo(mentor1.getId())
+                    () -> assertThat(response.content().get(1).siteUserId()).isEqualTo(mentor1.getId())
             );
         }
 
@@ -328,7 +328,7 @@ class ChatServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(response.partnerId()).isEqualTo(mentor1.getId()),
+                    () -> assertThat(response.siteUserId()).isEqualTo(mentor1.getId()),
                     () -> assertThat(response.nickname()).isEqualTo(mentor1.getNickname()),
                     () -> assertThat(response.profileUrl()).isEqualTo(mentor1.getProfileImageUrl())
             );
@@ -431,7 +431,7 @@ class ChatServiceTest {
             assertAll(
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
                     () -> assertThat(payloadCaptor.getValue().content()).isEqualTo(content),
-                    () -> assertThat(payloadCaptor.getValue().senderId()).isEqualTo(senderParticipant.getId())
+                    () -> assertThat(payloadCaptor.getValue().siteUserId()).isEqualTo(sender.getId())
             );
         }
 
@@ -454,8 +454,8 @@ class ChatServiceTest {
         private SiteUser sender;
         private ChatParticipant senderParticipant;
         private ChatRoom chatRoom;
-        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example.jpg";
-        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/images/example2.jpg";
+        private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example.jpg";
+        private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example2.jpg";
         private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
 
         @BeforeEach
@@ -491,7 +491,7 @@ class ChatServiceTest {
                     () -> assertThat(response.attachments().get(0).url()).isEqualTo(imageUrls.get(0)),
                     () -> assertThat(response.attachments().get(1).url()).isEqualTo(imageUrls.get(1)),
                     () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
-                    () -> assertThat(response.senderId()).isEqualTo(senderParticipant.getId()),
+                    () -> assertThat(response.siteUserId()).isEqualTo(sender.getId()),
                     () -> assertThat(response.content()).isEmpty()
             );
         }

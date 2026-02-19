@@ -1,0 +1,29 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/notify.py 2>/dev/null || python .claude/hooks/notify.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/post-edit-check.py 2>/dev/null || python .claude/hooks/post-edit-check.py"
+          }
+        ]
+      }
+    ]
+  }
+}

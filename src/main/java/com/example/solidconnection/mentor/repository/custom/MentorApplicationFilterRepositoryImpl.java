@@ -4,7 +4,7 @@ import static com.example.solidconnection.location.country.domain.QCountry.count
 import static com.example.solidconnection.location.region.domain.QRegion.region;
 import static com.example.solidconnection.mentor.domain.QMentorApplication.mentorApplication;
 import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
-import static com.example.solidconnection.university.domain.QUniversity.university;
+import static com.example.solidconnection.university.domain.QHostUniversity.hostUniversity;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.example.solidconnection.admin.dto.MentorApplicationResponse;
@@ -48,7 +48,7 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                     mentorApplication.id,
                     region.koreanName,
                     country.koreanName,
-                    university.koreanName,
+                    hostUniversity.koreanName,
                     mentorApplication.universitySelectType,
                     mentorApplication.mentorProofUrl,
                     mentorApplication.mentorApplicationStatus,
@@ -77,9 +77,9 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
                 .select(MENTOR_APPLICATION_SEARCH_RESPONSE_PROJECTION)
                 .from(mentorApplication)
                 .join(siteUser).on(mentorApplication.siteUserId.eq(siteUser.id))
-                .leftJoin(university).on(mentorApplication.universityId.eq(university.id))
-                .leftJoin(region).on(university.region.eq(region))
-                .leftJoin(country).on(university.country.eq(country))
+                .leftJoin(hostUniversity).on(mentorApplication.universityId.eq(hostUniversity.id))
+                .leftJoin(region).on(hostUniversity.region.eq(region))
+                .leftJoin(country).on(hostUniversity.country.eq(country))
                 .where(
                         verifyMentorStatusEq(condition.mentorApplicationStatus()),
                         keywordContains(condition.keyword()),
@@ -105,9 +105,9 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
 
         if (hasText(keyword)) {
             query.join(siteUser).on(mentorApplication.siteUserId.eq(siteUser.id))
-                    .leftJoin(university).on(mentorApplication.universityId.eq(university.id))
-                    .leftJoin(region).on(university.region.eq(region))
-                    .leftJoin(country).on(university.country.eq(country));
+                    .leftJoin(hostUniversity).on(mentorApplication.universityId.eq(hostUniversity.id))
+                    .leftJoin(region).on(hostUniversity.region.eq(region))
+                    .leftJoin(country).on(hostUniversity.country.eq(country));
         }
 
         return query.where(
@@ -128,7 +128,7 @@ public class MentorApplicationFilterRepositoryImpl implements MentorApplicationF
         }
 
         return siteUser.nickname.containsIgnoreCase(keyword)
-                .or(university.koreanName.containsIgnoreCase(keyword))
+                .or(hostUniversity.koreanName.containsIgnoreCase(keyword))
                 .or(region.koreanName.containsIgnoreCase(keyword))
                 .or(country.koreanName.containsIgnoreCase(keyword));
     }

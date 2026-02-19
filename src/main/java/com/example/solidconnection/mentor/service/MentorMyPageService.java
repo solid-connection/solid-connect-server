@@ -1,8 +1,6 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CHANNEL_REGISTRATION_LIMIT_EXCEEDED;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
@@ -11,10 +9,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Channel;
 import com.example.solidconnection.mentor.domain.Mentor;
-import com.example.solidconnection.mentor.domain.MentorApplication;
-import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.dto.ChannelRequest;
-import com.example.solidconnection.mentor.dto.MentorMyPageCreateRequest;
 import com.example.solidconnection.mentor.dto.MentorMyPageResponse;
 import com.example.solidconnection.mentor.dto.MentorMyPageUpdateRequest;
 import com.example.solidconnection.mentor.repository.MentorApplicationRepository;
@@ -23,8 +18,8 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
-import com.example.solidconnection.university.domain.University;
-import com.example.solidconnection.university.repository.UniversityRepository;
+import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.repository.HostUniversityRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +35,7 @@ public class MentorMyPageService {
 
     private final MentorRepository mentorRepository;
     private final SiteUserRepository siteUserRepository;
-    private final UniversityRepository universityRepository;
+    private final HostUniversityRepository hostUniversityRepository;
     private final TermRepository termRepository;
     private final MentorApplicationRepository mentorApplicationRepository;
 
@@ -52,7 +47,7 @@ public class MentorMyPageService {
                 .orElseThrow(() -> new CustomException(MENTOR_NOT_FOUND));
         Term term = termRepository.findById(mentor.getTermId())
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-        University university = universityRepository.findById(mentor.getUniversityId())
+        HostUniversity university = hostUniversityRepository.findById(mentor.getUniversityId())
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
         return MentorMyPageResponse.of(mentor, siteUser, university, term.getName());
     }
@@ -65,48 +60,15 @@ public class MentorMyPageService {
 
         mentor.updateIntroduction(request.introduction());
         mentor.updatePassTip(request.passTip());
-        updateChannel(request.channels(), mentor);
-    }
 
-    private void updateChannel(List<ChannelRequest> channelRequests, Mentor mentor) {
-        List<Channel> newChannels = buildChannels(channelRequests);
+        List<Channel> newChannels = buildChannels(request.channels());
         mentor.updateChannels(newChannels);
-    }
-
-    @Transactional
-    public void createMentorMyPage(long siteUserId, MentorMyPageCreateRequest request) {
-        validateUserCanCreateMentor(siteUserId);
-        validateChannelRegistrationLimit(request.channels());
-        MentorApplication mentorApplication = mentorApplicationRepository.findBySiteUserIdAndMentorApplicationStatus(siteUserId, MentorApplicationStatus.APPROVED)
-                .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
-
-        Mentor mentor = new Mentor(
-                request.introduction(),
-                request.passTip(),
-                siteUserId,
-                mentorApplication.getUniversityId(),
-                mentorApplication.getTermId()
-        );
-
-        createChannels(request.channels(), mentor);
-        mentorRepository.save(mentor);
-    }
-
-    private void validateUserCanCreateMentor(long siteUserId) {
-        if (mentorRepository.existsBySiteUserId(siteUserId)) {
-            throw new CustomException(MENTOR_ALREADY_EXISTS);
-        }
     }
 
     private void validateChannelRegistrationLimit(List<ChannelRequest> channelRequests) {
         if (channelRequests.size() > CHANNEL_REGISTRATION_LIMIT) {
             throw new CustomException(CHANNEL_REGISTRATION_LIMIT_EXCEEDED);
         }
-    }
-
-    private void createChannels(List<ChannelRequest> channelRequests, Mentor mentor) {
-        List<Channel> newChannels = buildChannels(channelRequests);
-        mentor.createChannels(newChannels);
     }
 
     private List<Channel> buildChannels(List<ChannelRequest> channelRequests) {
