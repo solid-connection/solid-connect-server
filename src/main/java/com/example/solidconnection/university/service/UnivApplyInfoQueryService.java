@@ -30,8 +30,7 @@ public class UnivApplyInfoQueryService {
      * - 대학교(University) 정보와 대학 지원 정보(UniversityInfoForApply) 정보를 조합하여 반환한다.
      * */
     @Transactional(readOnly = true)
-    // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
-    // @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    @ThunderingHerdCaching(key = "univApplyInfo:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoDetailResponse getUnivApplyInfoDetail(Long univApplyInfoId) {
         UnivApplyInfo univApplyInfo
                 = univApplyInfoRepository.getUnivApplyInfoById(univApplyInfoId);
@@ -43,7 +42,8 @@ public class UnivApplyInfoQueryService {
     }
 
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
+    // @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
