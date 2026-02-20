@@ -62,7 +62,8 @@ public class ApplicationSubmissionService {
         Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
         Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
 
-        Optional<Application> existingApplication = applicationRepository.findBySiteUserIdAndTermId(siteUser.getId(), term.getId());
+        Optional<Application> existingApplication =
+                applicationRepository.findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(siteUser.getId(), term.getId());
         int updateCount = existingApplication
                 .map(application -> {
                     validateUpdateLimitNotExceed(application);
