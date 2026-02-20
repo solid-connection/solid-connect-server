@@ -27,6 +27,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
            """)
     List<Application> findAllByUnivApplyInfoIds(@Param("univApplyInfoIds") List<Long> univApplyInfoIds, @Param("status") VerifyStatus status, @Param("termId") long termId);
 
+    // TODO: 근본 해결 필요
+    // 지원서 유일성은 DB 제약으로 강제하고
+    // 이 조회는 임시 회피 로직을 제거하는 방향으로 수정 필요.
     Optional<Application> findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(long siteUserId, long termId);
 
     default Application getApplicationBySiteUserIdAndTermId(long siteUserId, long termId) {
