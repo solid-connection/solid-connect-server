@@ -27,17 +27,10 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
            """)
     List<Application> findAllByUnivApplyInfoIds(@Param("univApplyInfoIds") List<Long> univApplyInfoIds, @Param("status") VerifyStatus status, @Param("termId") long termId);
 
-    @Query("""
-           SELECT a
-           FROM Application a
-           WHERE a.siteUserId = :siteUserId
-               AND a.termId = :termId
-               AND a.isDelete = false
-           """)
-    Optional<Application> findBySiteUserIdAndTermId(@Param("siteUserId") long siteUserId, @Param("termId") long termId);
+    Optional<Application> findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(long siteUserId, long termId);
 
     default Application getApplicationBySiteUserIdAndTermId(long siteUserId, long termId) {
-        return findBySiteUserIdAndTermId(siteUserId, termId)
+        return findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(siteUserId, termId)
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 
