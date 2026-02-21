@@ -11,6 +11,8 @@ import com.example.solidconnection.admin.university.dto.AdminHostUniversityDetai
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityResponse;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversitySearchCondition;
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityUpdateRequest;
+import com.example.solidconnection.cache.annotation.DefaultCacheOut;
+import com.example.solidconnection.cache.manager.CustomCacheManager;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.repository.CountryRepository;
@@ -19,6 +21,7 @@ import com.example.solidconnection.location.region.repository.RegionRepository;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,7 @@ public class AdminHostUniversityService {
     private final CountryRepository countryRepository;
     private final RegionRepository regionRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final CustomCacheManager cacheManager;
 
     @Transactional(readOnly = true)
     public Page<AdminHostUniversityResponse> getHostUniversities(
@@ -56,6 +60,11 @@ public class AdminHostUniversityService {
     }
 
     @Transactional
+    @DefaultCacheOut(
+            key = {"univApplyInfoTextSearch", "university:recommend:general"},
+            cacheManager = "customCacheManager",
+            prefix = true
+    )
     public AdminHostUniversityDetailResponse createHostUniversity(AdminHostUniversityCreateRequest request) {
         validateKoreanNameNotExists(request.koreanName());
 
@@ -89,6 +98,11 @@ public class AdminHostUniversityService {
     }
 
     @Transactional
+    @DefaultCacheOut(
+            key = {"univApplyInfoTextSearch", "university:recommend:general"},
+            cacheManager = "customCacheManager",
+            prefix = true
+    )
     public AdminHostUniversityDetailResponse updateHostUniversity(Long id, AdminHostUniversityUpdateRequest request) {
         HostUniversity hostUniversity = hostUniversityRepository.findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
@@ -111,6 +125,8 @@ public class AdminHostUniversityService {
                 country,
                 region
         );
+
+        evictUnivApplyInfoDetailCaches(id);
 
         return AdminHostUniversityDetailResponse.from(hostUniversity);
     }
@@ -135,6 +151,11 @@ public class AdminHostUniversityService {
     }
 
     @Transactional
+    @DefaultCacheOut(
+            key = {"univApplyInfoTextSearch", "university:recommend:general"},
+            cacheManager = "customCacheManager",
+            prefix = true
+    )
     public void deleteHostUniversity(Long id) {
         HostUniversity hostUniversity = hostUniversityRepository.findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
@@ -148,5 +169,15 @@ public class AdminHostUniversityService {
         if (univApplyInfoRepository.existsByUniversityId(hostUniversityId)) {
             throw new CustomException(HOST_UNIVERSITY_HAS_REFERENCES);
         }
+    }
+
+    private void evictUnivApplyInfoDetailCaches(Long hostUniversityId) {
+        List<Long> affectedUnivApplyInfoIds = univApplyInfoRepository.findIdsByUniversityId(hostUniversityId);
+
+        List<String> cacheKeys = affectedUnivApplyInfoIds.stream()
+                .map(univApplyInfoId -> "univApplyInfo:" + univApplyInfoId)
+                .toList();
+
+        cacheManager.evictMultiple(cacheKeys);
     }
 }
