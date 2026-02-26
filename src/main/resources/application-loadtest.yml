@@ -14,6 +14,9 @@ spring:
       maximum-pool-size: 50
       minimum-idle: 20
 
+  flyway:
+    enabled: false
+
 websocket:
   thread-pool:
     inbound:
