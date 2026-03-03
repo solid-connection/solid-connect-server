@@ -19,6 +19,7 @@ services:
     container_name: solid-connection-dev-mysql
     environment:
       MYSQL_DATABASE: solid_connection
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - "3306:3306"
     volumes:
