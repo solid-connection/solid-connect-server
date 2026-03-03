@@ -13,3 +13,14 @@ services:
     volumes:
       - ./logs:/var/log/spring
     restart: always
+
+  mysql:
+    image: mysql:8.0
+    container_name: solid-connection-dev-mysql
+    environment:
+      MYSQL_DATABASE: solid_connection
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data_dev:/var/lib/mysql
+    restart: always
