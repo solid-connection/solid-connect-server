@@ -23,29 +23,28 @@ import lombok.RequiredArgsConstructor;
 public class AdminUserService {
 
 	private final SiteUserRepository siteUserRepository;
-	private final SiteUserFilterRepository siteUserFilterRepository;
 
 	@Transactional(readOnly = true)
     public Page<UserSearchResponse> searchAllUsers(UserSearchCondition searchCondition, Pageable pageable) {
-        return siteUserFilterRepository.searchAllUsers(searchCondition, pageable);
+        return siteUserRepository.searchAllUsers(searchCondition, pageable);
     }
 
 	@Transactional(readOnly = true)
     public Page<RestrictedUserSearchResponse> searchRestrictedUsers(RestrictedUserSearchCondition searchCondition, Pageable pageable) {
-        return siteUserFilterRepository.searchRestrictedUsers(searchCondition, pageable);
+        return siteUserRepository.searchRestrictedUsers(searchCondition, pageable);
     }
 
 	@Transactional(readOnly = true)
     public UserInfoDetailResponse getUserInfoDetail(long userId) {
 		SiteUser siteUser = siteUserRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return siteUserFilterRepository.getUserInfoDetailByUserId(siteUser.getId());
+        return siteUserRepository.getUserInfoDetailByUserId(siteUser);
     }
 
 	@Transactional(readOnly = true)
     public RestrictedUserInfoDetailResponse getRestrictedUserInfoDetail(long userId) {
 		SiteUser siteUser = siteUserRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return siteUserFilterRepository.getRestrictedUserInfoDetail(siteUser.getId());
+        return siteUserRepository.getRestrictedUserInfoDetail(siteUser.getId());
     }
 }

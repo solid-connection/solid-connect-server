@@ -3,7 +3,7 @@ package com.example.solidconnection.admin.dto;
 import java.util.List;
 
 public record MenteeInfoResponse(
-	UnivApplyInfoResponse univApplyInfos,
+	UnivApplyInfoResponse univApplyInfo,
 	List<MatchedInfoResponse> mentorInfos
 ) {
 

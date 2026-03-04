@@ -51,6 +51,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
     private static final ConstructorExpression<UserSearchResponse> USER_SEARCH_RESPONSE_PROJECTION =
             Projections.constructor(
                     UserSearchResponse.class,
+                    siteUser.id,
                     siteUser.nickname,
                     siteUser.email,
                     siteUser.role,
@@ -75,6 +76,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
     private static final ConstructorExpression<RestrictedUserSearchResponse> RESTRICTED_USER_SEARCH_RESPONSE_PROJECTION =
             Projections.constructor(
                     RestrictedUserSearchResponse.class,
+                    siteUser.id,
                     siteUser.nickname,
                     siteUser.role,
                     siteUser.userStatus,
@@ -238,25 +240,20 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
     }
 
     @Override
-    public UserInfoDetailResponse getUserInfoDetailByUserId(long userId) {
-        SiteUser user = queryFactory
-                .selectFrom(siteUser)
-                .where(siteUser.id.eq(userId))
-                .fetchOne();
-
+    public UserInfoDetailResponse getUserInfoDetailByUserId(SiteUser user) {
         // 신고 내역
         List<ReportedHistoryResponse> reportedHistoryResponses = new ArrayList<>();
         if (user.getUserStatus() != UserStatus.ACTIVE) {
-            reportedHistoryResponses = fetchReportedHistories(userId);
+            reportedHistoryResponses = fetchReportedHistories(user.getId());
         }
 
         if (user.getRole() == Role.MENTOR) {
             // 멘토 상세 내역
-            MentorInfoResponse mentorInfoResponse = fetchMentorInfo(userId);
+            MentorInfoResponse mentorInfoResponse = fetchMentorInfo(user.getId());
             return new UserInfoDetailResponse(mentorInfoResponse, null, reportedHistoryResponses);
         } else {
             // 멘티 상세 내역
-            MenteeInfoResponse menteeInfoResponse = fetchMenteeInfo(userId);
+            MenteeInfoResponse menteeInfoResponse = fetchMenteeInfo(user.getId());
             return new UserInfoDetailResponse(null, menteeInfoResponse, reportedHistoryResponses);
         }
     }

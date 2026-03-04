@@ -1,10 +1,11 @@
 package com.example.solidconnection.admin.dto;
 
 import com.example.solidconnection.siteuser.domain.UserBanDuration;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record BannedInfoResponse(
-	boolean isBanned,
-	UserBanDuration duration
+		@JsonProperty("isBanned") boolean isBanned,
+		UserBanDuration duration
 ) {
 
 }

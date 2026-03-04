@@ -2,7 +2,7 @@ package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
@@ -90,7 +90,6 @@ public class AdminUserServiceTest {
     private TermFixture termFixture;
 
     @Nested
-    @DisplayName("전체 유저 검색")
     class 전체_유저_검색 {
 
         @Test
@@ -175,7 +174,6 @@ public class AdminUserServiceTest {
     }
 
     @Nested
-    @DisplayName("유저 상세 정보 조회")
     class 유저_상세_정보_조회 {
 
         @Test
@@ -205,7 +203,7 @@ public class AdminUserServiceTest {
             assertAll(
                     () -> assertThat(result.mentorInfoResponse()).isNull(),
                     () -> assertThat(result.menteeInfoResponse()).isNotNull(),
-                    () -> assertThat(result.menteeInfoResponse().univApplyInfos()).isNotNull()
+                    () -> assertThat(result.menteeInfoResponse().univApplyInfo()).isNotNull()
             );
         }
 

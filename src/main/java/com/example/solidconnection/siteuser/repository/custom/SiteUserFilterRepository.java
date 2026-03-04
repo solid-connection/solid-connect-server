@@ -1,5 +1,6 @@
 package com.example.solidconnection.siteuser.repository.custom;
 
+import com.example.solidconnection.siteuser.domain.SiteUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
@@ -15,7 +16,7 @@ public interface SiteUserFilterRepository {
 
 	Page<RestrictedUserSearchResponse> searchRestrictedUsers(RestrictedUserSearchCondition searchCondition, Pageable pageable);
 
-	UserInfoDetailResponse getUserInfoDetailByUserId(long userId);
+	UserInfoDetailResponse getUserInfoDetailByUserId(SiteUser user);
 
 	RestrictedUserInfoDetailResponse getRestrictedUserInfoDetail(long userId);
 }
