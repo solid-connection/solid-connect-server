@@ -68,7 +68,7 @@ kakao:
     redirect-url: "http://localhost:8080/auth/kakao"
     client-id: client-id
     token-url: "https://kauth.kakao.com/oauth/token"
-    user-info_url: "https://kapi.kakao.com/v2/user/me"
+    user-info-url: "https://kapi.kakao.com/v2/user/me"
 sentry:
   environment: test
   dsn: "https://test-public-key@sentry.test-domain.io/123456"
