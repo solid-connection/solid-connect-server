@@ -4,7 +4,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_AL
 import static com.example.solidconnection.common.exception.ErrorCode.SIGN_UP_TOKEN_INVALID;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_ALREADY_EXISTED;
 
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.service.signin.SignInService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -38,7 +38,7 @@ public class SignUpService {
     private final PasswordTemporaryStorage passwordTemporaryStorage;
 
     @Transactional
-    public SignInResponse signUp(SignUpRequest signUpRequest) {
+    public SignInResult signUp(SignUpRequest signUpRequest) {
         // 검증
         signUpTokenProvider.validateSignUpToken(signUpRequest.signUpToken());
         String email = signUpTokenProvider.parseEmail(signUpRequest.signUpToken());
@@ -66,7 +66,7 @@ public class SignUpService {
         interestedCountryService.saveInterestedCountry(siteUser, signUpRequest.interestedCountries());
 
         // 로그인
-        SignInResponse response = signInService.signIn(siteUser);
+        SignInResult response = signInService.signIn(siteUser);
 
         // 회원가입을 위해 저장한 데이터(SignUpToken, 비밀번호) 삭제
         clearSignUpData(email, authType);

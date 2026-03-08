@@ -114,7 +114,7 @@ class MyPageServiceTest {
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
-        term = termFixture.현재_학기("2025-2");
+        term = termFixture.현재_학기("2025-1");
         UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
         괌대학_A_지원_정보_ID = 괌대학_A_지원_정보.getId();
         괌대학 = 괌대학_A_지원_정보.getUniversity();

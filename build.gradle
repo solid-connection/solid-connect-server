@@ -67,6 +67,7 @@ dependencies {
     // Etc
     implementation platform('software.amazon.awssdk:bom:2.41.4')
     implementation 'software.amazon.awssdk:s3'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.0.4'
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 

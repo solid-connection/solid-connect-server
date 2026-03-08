@@ -7,8 +7,21 @@ services:
     network_mode: "host"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - AWS_REGION=ap-northeast-2
       - SPRING_DATA_REDIS_HOST=127.0.0.1
       - SPRING_DATA_REDIS_PORT=6379
     volumes:
       - ./logs:/var/log/spring
+    restart: always
+
+  mysql:
+    image: mysql:8.0
+    container_name: solid-connection-dev-mysql
+    environment:
+      MYSQL_DATABASE: solid_connection
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data_dev:/var/lib/mysql
     restart: always

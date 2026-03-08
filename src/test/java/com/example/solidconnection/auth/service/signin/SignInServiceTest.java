@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.Subject;
-import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.service.TokenStorage;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -46,16 +46,16 @@ class SignInServiceTest {
     @Test
     void 성공적으로_로그인한다() {
         // when
-        SignInResponse signInResponse = signInService.signIn(user);
+        SignInResult signInResult = signInService.signIn(user);
 
         // then
-        Subject accessTokenSubject = tokenProvider.parseSubject(signInResponse.accessToken());
-        Subject refreshTokenSubject = tokenProvider.parseSubject(signInResponse.refreshToken());
+        Subject accessTokenSubject = tokenProvider.parseSubject(signInResult.accessToken());
+        Subject refreshTokenSubject = tokenProvider.parseSubject(signInResult.refreshToken());
         Optional<String> savedRefreshToken = tokenStorage.findToken(subject, RefreshToken.class);
         assertAll(
                 () -> assertThat(accessTokenSubject).isEqualTo(subject),
                 () -> assertThat(refreshTokenSubject).isEqualTo(subject),
-                () -> assertThat(savedRefreshToken).hasValue(signInResponse.refreshToken()));
+                () -> assertThat(savedRefreshToken).hasValue(signInResult.refreshToken()));
     }
 
     @Test

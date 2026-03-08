@@ -19,9 +19,6 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.SUBMODULE_ACCESS_TOKEN }}
-          submodules: true
 
       # --- Java, Gradle 설정 ---
       - name: Set up JDK 17
