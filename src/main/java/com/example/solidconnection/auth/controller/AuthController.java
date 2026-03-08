@@ -5,10 +5,11 @@ import com.example.solidconnection.auth.dto.EmailSignUpTokenRequest;
 import com.example.solidconnection.auth.dto.EmailSignUpTokenResponse;
 import com.example.solidconnection.auth.dto.ReissueResponse;
 import com.example.solidconnection.auth.dto.SignInResponse;
+import com.example.solidconnection.auth.dto.SignInResult;
 import com.example.solidconnection.auth.dto.SignUpRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthCodeRequest;
 import com.example.solidconnection.auth.dto.oauth.OAuthResponse;
-import com.example.solidconnection.auth.dto.oauth.OAuthSignInResponse;
+import com.example.solidconnection.auth.dto.oauth.OAuthResult;
 import com.example.solidconnection.auth.service.AuthService;
 import com.example.solidconnection.auth.service.oauth.OAuthService;
 import com.example.solidconnection.auth.service.signin.EmailSignInService;
@@ -47,11 +48,9 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.APPLE, oAuthCodeRequest);
-        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
-            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
-        }
-        return ResponseEntity.ok(oAuthResponse);
+        OAuthResult oAuthResult = oAuthService.processOAuth(AuthType.APPLE, oAuthCodeRequest);
+        setRefreshTokenCookie(httpServletResponse, oAuthResult.refreshToken());
+        return ResponseEntity.ok(oAuthResult.response());
     }
 
     @PostMapping("/kakao")
@@ -59,11 +58,9 @@ public class AuthController {
             @Valid @RequestBody OAuthCodeRequest oAuthCodeRequest,
             HttpServletResponse httpServletResponse
     ) {
-        OAuthResponse oAuthResponse = oAuthService.processOAuth(AuthType.KAKAO, oAuthCodeRequest);
-        if (oAuthResponse instanceof OAuthSignInResponse signInResponse) {
-            refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
-        }
-        return ResponseEntity.ok(oAuthResponse);
+        OAuthResult oAuthResult = oAuthService.processOAuth(AuthType.KAKAO, oAuthCodeRequest);
+        setRefreshTokenCookie(httpServletResponse, oAuthResult.refreshToken());
+        return ResponseEntity.ok(oAuthResult.response());
     }
 
     @PostMapping("/email/sign-in")
@@ -71,9 +68,9 @@ public class AuthController {
             @Valid @RequestBody EmailSignInRequest signInRequest,
             HttpServletResponse httpServletResponse
     ) {
-        SignInResponse signInResponse = emailSignInService.signIn(signInRequest);
-        refreshTokenCookieManager.setCookie(httpServletResponse, signInResponse.refreshToken());
-        return ResponseEntity.ok(signInResponse);
+        SignInResult signInResult = emailSignInService.signIn(signInRequest);
+        refreshTokenCookieManager.setCookie(httpServletResponse, signInResult.refreshToken());
+        return ResponseEntity.ok(SignInResponse.from(signInResult));
     }
 
     /* 이메일 회원가입 시 signUpToken 을 발급받기 위한 api */
@@ -87,10 +84,12 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<SignInResponse> signUp(
-            @Valid @RequestBody SignUpRequest signUpRequest
+            @Valid @RequestBody SignUpRequest signUpRequest,
+            HttpServletResponse httpServletResponse
     ) {
-        SignInResponse signInResponse = signUpService.signUp(signUpRequest);
-        return ResponseEntity.ok(signInResponse);
+        SignInResult signInResult = signUpService.signUp(signUpRequest);
+        refreshTokenCookieManager.setCookie(httpServletResponse, signInResult.refreshToken());
+        return ResponseEntity.ok(SignInResponse.from(signInResult));
     }
 
     @PostMapping("/sign-out")
@@ -121,6 +120,12 @@ public class AuthController {
         String refreshToken = refreshTokenCookieManager.getRefreshToken(request);
         ReissueResponse reissueResponse = authService.reissue(refreshToken);
         return ResponseEntity.ok(reissueResponse);
+    }
+
+    private void setRefreshTokenCookie(HttpServletResponse httpServletResponse, String refreshToken) {
+        if (refreshToken != null) {
+            refreshTokenCookieManager.setCookie(httpServletResponse, refreshToken);
+        }
     }
 
     private String getAccessToken(Authentication authentication) {
