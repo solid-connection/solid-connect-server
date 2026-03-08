@@ -42,7 +42,8 @@ public class UnivApplyInfoQueryService {
     }
 
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
+    // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
+    // @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
