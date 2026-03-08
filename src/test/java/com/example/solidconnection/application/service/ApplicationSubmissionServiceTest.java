@@ -89,7 +89,9 @@ class ApplicationSubmissionServiceTest {
         ApplicationSubmissionResponse response = applicationSubmissionService.apply(user.getId(), request);
 
         // then
-        Application savedApplication = applicationRepository.findBySiteUserIdAndTermId(user.getId(), term.getId()).orElseThrow();
+        Application savedApplication = applicationRepository
+                .findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(user.getId(), term.getId())
+                .orElseThrow();
         assertAll(
                 () -> assertThat(response.totalApplyCount())
                         .isEqualTo(APPLICATION_UPDATE_COUNT_LIMIT),
