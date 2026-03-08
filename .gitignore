@@ -40,6 +40,9 @@ out/
 ### Claude Code ###
 .claude/settings.local.json
 
+### Serena ###
+.serena/
+
 ### YML ###
 application-secret.yml
 application-prod.yml
