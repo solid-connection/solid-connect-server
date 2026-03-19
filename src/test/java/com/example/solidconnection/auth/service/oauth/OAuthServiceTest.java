@@ -65,6 +65,7 @@ class OAuthServiceTest {
         assertThat(response).isInstanceOf(OAuthSignInResponse.class);
         OAuthSignInResponse signInResponse = (OAuthSignInResponse) response;
         assertAll(
+                () -> assertThat(signInResponse.isRegistered()).isTrue(),
                 () -> assertThat(signInResponse.accessToken()).isNotBlank(),
                 () -> assertThat(oAuthResult.refreshToken()).isNotBlank()
         );
@@ -80,6 +81,7 @@ class OAuthServiceTest {
         assertThat(response).isInstanceOf(SignUpPrepareResponse.class);
         SignUpPrepareResponse signUpPrepareResponse = (SignUpPrepareResponse) response;
         assertAll(
+                () -> assertThat(signUpPrepareResponse.isRegistered()).isFalse(),
                 () -> assertThat(signUpPrepareResponse.signUpToken()).isNotBlank(),
                 () -> assertThat(signUpPrepareResponse.email()).isEqualTo(email),
                 () -> assertThat(signUpPrepareResponse.profileImageUrl()).isEqualTo(profileImageUrl),
