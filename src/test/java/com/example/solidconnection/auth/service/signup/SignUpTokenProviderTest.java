@@ -17,9 +17,11 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestContainerSpringBootTest
 @DisplayName("회원가입 토큰 제공자 테스트")
@@ -39,7 +41,7 @@ class SignUpTokenProviderTest {
     @Autowired
     private TokenProvider tokenProvider;
 
-    @SpyBean
+    @MockitoSpyBean
     private TokenStorage tokenStorage;
 
     @Autowired
@@ -163,11 +165,12 @@ class SignUpTokenProviderTest {
     }
 
     private String createExpiredToken() {
+        SecretKey signingKey = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(signingKey)
                 .compact();
     }
 }

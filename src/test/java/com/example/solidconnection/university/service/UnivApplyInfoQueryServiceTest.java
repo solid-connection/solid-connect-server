@@ -23,7 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestContainerSpringBootTest
 @DisplayName("대학 지원 정보 조회 서비스 테스트")
@@ -32,7 +32,7 @@ class UnivApplyInfoQueryServiceTest {
     @Autowired
     private UnivApplyInfoQueryService univApplyInfoQueryService;
 
-    @SpyBean
+    @MockitoSpyBean
     private UnivApplyInfoRepository univApplyInfoRepository;
 
     @Autowired

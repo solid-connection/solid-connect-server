@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @DisplayName("OAuth 서비스 테스트")
 @TestContainerSpringBootTest
@@ -30,7 +30,7 @@ class OAuthServiceTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    @MockBean
+    @MockitoBean
     private OAuthClientMap oauthClientMap;
 
     private final AuthType authType = AuthType.KAKAO;

@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -35,7 +35,7 @@ class RefreshTokenCookieManagerTest {
     @Autowired
     private TokenProperties tokenProperties;
 
-    @MockBean
+    @MockitoBean
     private RefreshTokenCookieProperties refreshTokenCookieProperties;
 
     private final String domain = "example.com";
