@@ -7,11 +7,14 @@ import com.example.solidconnection.auth.service.TokenProvider;
 import com.example.solidconnection.auth.token.config.JwtProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -32,16 +35,18 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     private String generateJwtTokenValue(String subject, Map<String, String> claims, Duration expireTime) {
-        Claims jwtClaims = Jwts.claims().setSubject(subject);
-        jwtClaims.putAll(claims);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expireTime.toMillis());
-        return Jwts.builder()
-                .setClaims(jwtClaims)
-                .setIssuedAt(now)
-                .setExpiration(expiredDate)
-                .signWith(SignatureAlgorithm.HS512, jwtProperties.secret())
-                .compact();
+        JwtBuilder builder = Jwts.builder()
+                .subject(subject)
+                .issuedAt(now)
+                .expiration(expiredDate);
+        claims.forEach(builder::claim);
+        return builder.signWith(getSigningKey()).compact();
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
@@ -61,9 +66,10 @@ public class JwtTokenProvider implements TokenProvider {
     private Claims parseJwtClaims(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(jwtProperties.secret())
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (Exception e) {
             throw new CustomException(INVALID_TOKEN);
         }

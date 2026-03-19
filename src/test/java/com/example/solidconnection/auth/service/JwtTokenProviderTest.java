@@ -11,12 +11,15 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -77,9 +80,10 @@ class JwtTokenProviderTest {
 
         private Duration getActualExpireTime(String token) {
             Claims claims = Jwts.parser()
-                    .setSigningKey(jwtProperties.secret())
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
             return Duration.ofMillis(claims.getExpiration().getTime() - claims.getIssuedAt().getTime());
         }
     }
@@ -114,8 +118,7 @@ class JwtTokenProviderTest {
         @Test
         void subject_가_없는_토큰의_subject_를_추출하면_예외가_발생한다() {
             // given
-            Claims claims = Jwts.claims(new HashMap<>());
-            String subjectNotExistingToken = createExpiredToken(claims);
+            String subjectNotExistingToken = createExpiredToken(new HashMap<>());
             String subjectBlankToken = tokenProvider.generateToken(new Subject("   "), expectedExpireTime);
 
             // when, then
@@ -155,8 +158,9 @@ class JwtTokenProviderTest {
         @Test
         void 유효하지_않은_토큰의_claim_을_추출하면_예외가_발생한다() {
             // given
-            Claims expectedClaims = Jwts.claims(new HashMap<>(Map.of(claimKey, claimValue)));
-            String token = createExpiredToken(expectedClaims);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put(claimKey, claimValue);
+            String token = createExpiredToken(claims);
 
             // when
             assertThatCode(() -> tokenProvider.parseClaims(token, claimKey, String.class))
@@ -184,19 +188,22 @@ class JwtTokenProviderTest {
 
     private String createExpiredToken(String subject) {
         return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject(subject)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    private String createExpiredToken(Claims claims) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
-                .compact();
+    private String createExpiredToken(Map<String, Object> claims) {
+        JwtBuilder builder = Jwts.builder()
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000));
+        claims.forEach(builder::claim);
+        return builder.signWith(getSigningKey()).compact();
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
     }
 }

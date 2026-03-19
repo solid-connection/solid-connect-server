@@ -5,16 +5,15 @@ import static com.example.solidconnection.common.exception.ErrorCode.FAILED_TO_R
 import com.example.solidconnection.auth.client.config.AppleOAuthClientProperties;
 import com.example.solidconnection.common.exception.CustomException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Component;
 
 /*
@@ -42,20 +41,19 @@ public class AppleOAuthClientSecretProvider {
         Date expiration = new Date(now.getTime() + TOKEN_DURATION);
 
         return Jwts.builder()
-                .setHeaderParam("alg", "ES256")
-                .setHeaderParam(KEY_ID_HEADER, appleOAuthClientProperties.keyId())
-                .setSubject(appleOAuthClientProperties.clientId())
-                .setIssuer(appleOAuthClientProperties.teamId())
-                .setAudience(appleOAuthClientProperties.clientSecretAudienceUrl())
-                .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.ES256, privateKey)
+                .header().add(KEY_ID_HEADER, appleOAuthClientProperties.keyId()).and()
+                .subject(appleOAuthClientProperties.clientId())
+                .issuer(appleOAuthClientProperties.teamId())
+                .audience().add(appleOAuthClientProperties.clientSecretAudienceUrl()).and()
+                .expiration(expiration)
+                .signWith(privateKey, Jwts.SIG.ES256)
                 .compact();
     }
 
     private PrivateKey loadPrivateKey() {
         try {
             String secretKey = appleOAuthClientProperties.secretKey();
-            byte[] encoded = Base64.decodeBase64(secretKey);
+            byte[] encoded = Base64.getMimeDecoder().decode(secretKey);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             return keyFactory.generatePrivate(keySpec);
