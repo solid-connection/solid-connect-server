@@ -14,10 +14,11 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -93,10 +94,10 @@ class TokenAuthenticationFilterTest {
 
     private String createTokenWithExpiration(Date expiration) {
         return Jwts.builder()
-                .setSubject("1")
-                .setIssuedAt(new Date())
-                .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject("1")
+                .issuedAt(new Date())
+                .expiration(expiration)
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
 
