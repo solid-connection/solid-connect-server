@@ -14,16 +14,17 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +42,7 @@ class TokenAuthenticationFilterTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
-    @MockBean // 이 테스트코드에서 사용자를 조회할 필요는 없으므로 MockBean 으로 대체
+    @MockitoBean // 이 테스트코드에서 사용자를 조회할 필요는 없으므로 MockBean 으로 대체
     private SiteUserDetailsService siteUserDetailsService;
 
     private HttpServletRequest request;
@@ -93,10 +94,10 @@ class TokenAuthenticationFilterTest {
 
     private String createTokenWithExpiration(Date expiration) {
         return Jwts.builder()
-                .setSubject("1")
-                .setIssuedAt(new Date())
-                .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.secret())
+                .subject("1")
+                .issuedAt(new Date())
+                .expiration(expiration)
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
 
