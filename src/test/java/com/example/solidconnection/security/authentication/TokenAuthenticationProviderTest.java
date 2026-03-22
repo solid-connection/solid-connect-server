@@ -44,6 +44,8 @@ class TokenAuthenticationProviderTest {
         user = siteUserFixture.사용자();
     }
 
+    private static final long VALID_TOKEN_TTL_MS = 30 * 1000L;
+
     @Test
     void 처리할_수_있는_타입인지를_반환한다() {
         // given
@@ -118,7 +120,7 @@ class TokenAuthenticationProviderTest {
         return Jwts.builder()
                 .subject(String.valueOf(id))
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000))
+                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
                 .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
@@ -127,7 +129,7 @@ class TokenAuthenticationProviderTest {
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .expiration(new Date(System.currentTimeMillis() - VALID_TOKEN_TTL_MS))
                 .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
@@ -136,7 +138,7 @@ class TokenAuthenticationProviderTest {
         return Jwts.builder()
                 .subject("subject")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000))
+                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
                 .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
