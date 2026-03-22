@@ -29,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -55,7 +55,7 @@ class AdminHostUniversityServiceTest {
     @Autowired
     private UnivApplyInfoFixtureBuilder univApplyInfoFixtureBuilder;
 
-    @SpyBean
+    @MockitoSpyBean
     private CustomCacheManager cacheManager;
 
     @Nested

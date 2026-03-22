@@ -81,9 +81,10 @@ public class AppleOAuthClient implements OAuthClient {
     private String parseEmailFromToken(PublicKey applePublicKey, String idToken) {
         try {
             return Jwts.parser()
-                    .setSigningKey(applePublicKey)
-                    .parseClaimsJws(idToken)
-                    .getBody()
+                    .verifyWith(applePublicKey)
+                    .build()
+                    .parseSignedClaims(idToken)
+                    .getPayload()
                     .get("email", String.class);
         } catch (Exception e) {
             throw new CustomException(INVALID_APPLE_ID_TOKEN);

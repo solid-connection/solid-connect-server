@@ -1,15 +1,15 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.5'
-    id 'io.spring.dependency-management' version '1.1.4'
-    id 'org.flywaydb.flyway' version '9.16.3'
+    id 'org.springframework.boot' version '3.5.11'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.flywaydb.flyway' version '10.15.0'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 configurations {
@@ -43,8 +43,9 @@ dependencies {
     // Security
     implementation 'org.springframework.security:spring-security-config'
     implementation 'org.springframework.security:spring-security-web'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    runtimeOnly 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359' // for jjwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -70,6 +71,7 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.0.4'
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.apache.commons:commons-lang3'
 
     // Database Proxy
     implementation 'net.ttddyy.observation:datasource-micrometer:1.2.0'
