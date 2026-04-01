@@ -11,9 +11,6 @@ spring:
     show-sql: false
     defer-datasource-initialization: false
 
-  datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
-
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -31,9 +28,6 @@ spring:
     generate-ddl: false
     show-sql: false
     defer-datasource-initialization: false
-
-  datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
 
   flyway:
     enabled: true
@@ -59,9 +53,6 @@ spring:
   sql:
     init:
       mode: always
-
-  datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
 
   flyway:
     enabled: false
