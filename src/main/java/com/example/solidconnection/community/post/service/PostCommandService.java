@@ -27,7 +27,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,7 +136,7 @@ public class PostCommandService {
     }
 
     private void validatePostCategory(String category) {
-        if (!EnumUtils.isValidEnum(PostCategory.class, category) || category.equals(PostCategory.전체.toString())) {
+        if (!PostCategory.isValid(category) || category.equals(PostCategory.전체.toString())) {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
     }
