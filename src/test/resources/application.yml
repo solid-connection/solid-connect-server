@@ -24,8 +24,6 @@ cloud:
       secret-key: access-key
     region:
       static: ap-northeast-2
-    stack:
-      auto: false
     s3:
       bucket: solid-connection-uploaded
       url:
