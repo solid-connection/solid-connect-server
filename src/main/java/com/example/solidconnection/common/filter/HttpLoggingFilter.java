@@ -13,16 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
+import org.springframework.http.server.PathContainer;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class HttpLoggingFilter extends OncePerRequestFilter {
 
-    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
-    private static final List<String> EXCLUDE_PATTERNS = List.of("/actuator/**");
+    private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
+    private static final List<PathPattern> EXCLUDE_PATTERNS = List.of(
+            PATH_PATTERN_PARSER.parse("/actuator/**")
+    );
     private static final List<String> EXCLUDE_QUERIES = List.of("token");
     private static final String MASK_VALUE = "****";
 
@@ -60,9 +64,9 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcluded(HttpServletRequest req) {
-        String path = req.getRequestURI();
-        for (String p : EXCLUDE_PATTERNS) {
-            if (PATH_MATCHER.match(p, path)) {
+        PathContainer path = PathContainer.parsePath(req.getRequestURI());
+        for (PathPattern p : EXCLUDE_PATTERNS) {
+            if (p.matches(path)) {
                 return true;
             }
         }
