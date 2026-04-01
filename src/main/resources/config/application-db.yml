@@ -9,7 +9,6 @@ spring:
       ddl-auto: none
     generate-ddl: false
     show-sql: false
-    database: mysql
     defer-datasource-initialization: false
 
   datasource:
@@ -31,7 +30,6 @@ spring:
       ddl-auto: validate
     generate-ddl: false
     show-sql: false
-    database: mysql
     defer-datasource-initialization: false
 
   datasource:
@@ -53,7 +51,6 @@ spring:
       ddl-auto: create
     generate-ddl: true
     show-sql: true
-    database: mysql
     defer-datasource-initialization: true
     properties:
       hibernate:
