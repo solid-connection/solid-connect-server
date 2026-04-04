@@ -2,7 +2,7 @@ package com.example.solidconnection.score.repository.custom;
 
 import static com.example.solidconnection.score.domain.QLanguageTestScore.languageTestScore;
 import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
-import static io.jsonwebtoken.lang.Strings.hasText;
+import static org.springframework.util.StringUtils.hasText;
 
 import com.example.solidconnection.admin.dto.LanguageTestResponse;
 import com.example.solidconnection.admin.dto.LanguageTestScoreSearchResponse;

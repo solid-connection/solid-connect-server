@@ -167,7 +167,7 @@ public class UserCreateResponse { ... }
 
 ### Core Framework
 
-- **Spring Boot 3.1.5**: 스프링 부트
+- **Spring Boot 3.5.11**: 스프링 부트
 - **Spring Security**: JWT 기반 인증
 - **Spring Data JPA**: ORM
 - **QueryDSL**: 동적 쿼리 생성

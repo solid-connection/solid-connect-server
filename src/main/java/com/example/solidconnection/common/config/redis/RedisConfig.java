@@ -3,6 +3,7 @@ package com.example.solidconnection.common.config.redis;
 import static com.example.solidconnection.redis.RedisConstants.CREATE_CHANNEL;
 
 import com.example.solidconnection.cache.CacheUpdateListener;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +50,7 @@ public class RedisConfig {
     public RedisTemplate<String, Object> objectRedisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(new ObjectMapper(), Object.class));
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         return redisTemplate;
     }

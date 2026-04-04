@@ -1,4 +1,8 @@
 spring:
+  cloud:
+    aws:
+      parameterstore:
+        enabled: false
 
 # db
   data:
@@ -10,7 +14,6 @@ spring:
       ddl-auto: create
     generate-ddl: true
     show-sql: true
-    database: mysql
     properties:
       hibernate:
         format_sql: true
@@ -25,8 +28,6 @@ cloud:
       secret-key: access-key
     region:
       static: ap-northeast-2
-    stack:
-      auto: false
     s3:
       bucket: solid-connection-uploaded
       url:
