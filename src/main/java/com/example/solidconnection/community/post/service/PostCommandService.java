@@ -74,6 +74,7 @@ public class PostCommandService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         // 유효성 검증
         Post post = postRepository.getById(postId);
+        validatePostCategory(postUpdateRequest.postCategory());
         validateOwnership(post, siteUser);
         validateQuestion(post);
         validateFileSize(imageFile);
