@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,7 +102,7 @@ public class PostQueryService {
     }
 
     private PostCategory validatePostCategory(String category) {
-        if (!EnumUtils.isValidEnum(PostCategory.class, category)) {
+        if (!PostCategory.isValid(category)) {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
         return PostCategory.valueOf(category);
