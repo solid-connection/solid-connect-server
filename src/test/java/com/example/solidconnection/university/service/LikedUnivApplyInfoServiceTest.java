@@ -71,6 +71,57 @@ class LikedUnivApplyInfoServiceTest {
                 .containsExactlyInAnyOrder(메이지대학_지원_정보.getId(), 그라츠대학_지원_정보.getId());
     }
 
+    @Test
+    void 존재하지_않는_지원_정보에_좋아요_시도하면_예외가_발생한다() {
+        // given
+        Long invalidUnivApplyInfoId = 9999L;
+
+        // when & then
+        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user.getId(), invalidUnivApplyInfoId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 좋아요한_대학_지원_정보인지_확인한다() {
+        // given
+        saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
+
+        // when
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
+
+        // then
+        assertThat(response.isLike()).isTrue();
+    }
+
+    @Test
+    void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
+        // when
+        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
+
+        // then
+        assertThat(response.isLike()).isFalse();
+    }
+
+    @Test
+    void 존재하지_않는_대학_지원_정보의_좋아요_여부를_조회하면_예외가_발생한다() {
+        // given
+        Long invalidUnivApplyInfoId = 9999L;
+
+        // when & then
+        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), invalidUnivApplyInfoId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
+    }
+
+    private void saveLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+        LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
+                .siteUserId(siteUser.getId())
+                .univApplyInfoId(univApplyInfo.getId())
+                .build();
+        likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
+    }
+
     @Nested
     class 대학_지원_정보_좋아요를_등록한다 {
 
@@ -121,56 +172,5 @@ class LikedUnivApplyInfoServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(NOT_LIKED_UNIV_APPLY_INFO.getMessage());
         }
-    }
-
-    @Test
-    void 존재하지_않는_지원_정보에_좋아요_시도하면_예외가_발생한다() {
-        // given
-        Long invalidUnivApplyInfoId = 9999L;
-
-        // when & then
-        assertThatCode(() -> likedUnivApplyInfoService.addUnivApplyInfoLike(user.getId(), invalidUnivApplyInfoId))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    void 좋아요한_대학_지원_정보인지_확인한다() {
-        // given
-        saveLikedUnivApplyInfo(user, 괌대학_A_지원_정보);
-
-        // when
-        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.isLike()).isTrue();
-    }
-
-    @Test
-    void 좋아요하지_않은_대학_지원_정보인지_확인한다() {
-        // when
-        IsLikeResponse response = likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), 괌대학_A_지원_정보.getId());
-
-        // then
-        assertThat(response.isLike()).isFalse();
-    }
-
-    @Test
-    void 존재하지_않는_대학_지원_정보의_좋아요_여부를_조회하면_예외가_발생한다() {
-        // given
-        Long invalidUnivApplyInfoId = 9999L;
-
-        // when & then
-        assertThatCode(() -> likedUnivApplyInfoService.isUnivApplyInfoLiked(user.getId(), invalidUnivApplyInfoId))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
-    }
-
-    private void saveLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
-        LikedUnivApplyInfo likedUnivApplyInfo = LikedUnivApplyInfo.builder()
-                .siteUserId(siteUser.getId())
-                .univApplyInfoId(univApplyInfo.getId())
-                .build();
-        likedUnivApplyInfoRepository.save(likedUnivApplyInfo);
     }
 }

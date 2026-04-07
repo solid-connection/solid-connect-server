@@ -29,14 +29,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TestContainerSpringBootTest
 class JwtTokenProviderTest {
 
+    private final Subject expectedSubject = new Subject("subject123");
+    private final Duration expectedExpireTime = Duration.ofMinutes(10);
     @Autowired
     private JwtTokenProvider tokenProvider;
-
     @Autowired
     private JwtProperties jwtProperties;
 
-    private final Subject expectedSubject = new Subject("subject123");
-    private final Duration expectedExpireTime = Duration.ofMinutes(10);
+    private String createExpiredToken(String subject) {
+        return Jwts.builder()
+                .subject(subject)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    private String createExpiredToken(Map<String, Object> claims) {
+        JwtBuilder builder = Jwts.builder()
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000));
+        claims.forEach(builder::claim);
+        return builder.signWith(getSigningKey()).compact();
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
+    }
 
     @Nested
     class 토큰을_생성한다 {
@@ -184,26 +203,5 @@ class JwtTokenProviderTest {
             // then
             assertThat(actualClaimValue).isNull();
         }
-    }
-
-    private String createExpiredToken(String subject) {
-        return Jwts.builder()
-                .subject(subject)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    private String createExpiredToken(Map<String, Object> claims) {
-        JwtBuilder builder = Jwts.builder()
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() - 1000));
-        claims.forEach(builder::claim);
-        return builder.signWith(getSigningKey()).compact();
-    }
-
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
     }
 }

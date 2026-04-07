@@ -8,11 +8,10 @@ import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.region.repository.RegionRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -41,7 +41,7 @@ public class Mentoring extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="confirmed_at")
+    @Column(name = "confirmed_at")
     private ZonedDateTime confirmedAt;
 
     @Column(name = "checked_at_by_mentor")
@@ -50,7 +50,7 @@ public class Mentoring extends BaseEntity {
     @Column(name = "checked_at_by_mentee")
     private ZonedDateTime checkedAtByMentee;
 
-    @Column(nullable = false, name="verify_status")
+    @Column(nullable = false, name = "verify_status")
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 

@@ -38,11 +38,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @TestContainerSpringBootTest
 @DisplayName("채팅 서비스 테스트")
@@ -451,12 +451,12 @@ class ChatServiceTest {
     @Nested
     class 채팅_이미지를_전송한다 {
 
-        private SiteUser sender;
-        private ChatParticipant senderParticipant;
-        private ChatRoom chatRoom;
         private static final String TEST_IMAGE_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example.jpg";
         private static final String TEST_IMAGE_URL2 = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/files/example2.jpg";
         private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
+        private SiteUser sender;
+        private ChatParticipant senderParticipant;
+        private ChatRoom chatRoom;
 
         @BeforeEach
         void setUp() {

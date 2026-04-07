@@ -1,6 +1,6 @@
 package com.example.solidconnection.siteuser.dto;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.Role;

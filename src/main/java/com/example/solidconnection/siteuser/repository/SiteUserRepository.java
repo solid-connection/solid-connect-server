@@ -3,11 +3,10 @@ package com.example.solidconnection.siteuser.repository;
 import com.example.solidconnection.siteuser.domain.AuthType;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.domain.UserStatus;
+import com.example.solidconnection.siteuser.repository.custom.SiteUserFilterRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import com.example.solidconnection.siteuser.repository.custom.SiteUserFilterRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

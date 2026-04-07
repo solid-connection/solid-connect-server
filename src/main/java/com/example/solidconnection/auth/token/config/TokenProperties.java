@@ -19,6 +19,14 @@ public record TokenProperties(
 
     private static Map<Class<? extends Token>, TokenConfig> tokenConfigs;
 
+    public static Duration getExpireTime(Class<? extends Token> tokenClass) {
+        return tokenConfigs.get(tokenClass).expireTime();
+    }
+
+    public static String getStorageKeyPrefix(Class<? extends Token> tokenClass) {
+        return tokenConfigs.get(tokenClass).storageKeyPrefix();
+    }
+
     @PostConstruct
     public void init() {
         tokenConfigs = Map.of(
@@ -26,13 +34,5 @@ public record TokenProperties(
                 RefreshToken.class, refresh,
                 SignUpToken.class, signUp
         );
-    }
-
-    public static Duration getExpireTime(Class<? extends Token> tokenClass) {
-        return tokenConfigs.get(tokenClass).expireTime();
-    }
-
-    public static String getStorageKeyPrefix(Class<? extends Token> tokenClass) {
-        return tokenConfigs.get(tokenClass).storageKeyPrefix();
     }
 }

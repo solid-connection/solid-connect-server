@@ -9,9 +9,9 @@ import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.country.service.InterestedCountryService;
 import com.example.solidconnection.location.region.service.InterestedRegionService;
-import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.repository.MentorRepository;
 import com.example.solidconnection.s3.domain.UploadPath;
@@ -25,8 +25,8 @@ import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.HostUniversity;
-import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

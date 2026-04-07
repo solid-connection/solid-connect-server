@@ -15,6 +15,6 @@ CREATE TABLE mentor_application
     CONSTRAINT fk_mentor_application_site_user FOREIGN KEY (site_user_id) REFERENCES site_user (id),
     CONSTRAINT chk_ma_university_select_rule CHECK (
         (university_select_type = 'CATALOG' AND university_id IS NOT NULL) OR
-        (university_select_type = 'OTHER'   AND university_id IS NULL)
-    )
+        (university_select_type = 'OTHER' AND university_id IS NULL)
+        )
 ) ENGINE=InnoDB

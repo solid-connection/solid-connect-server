@@ -50,6 +50,19 @@ class RedisTokenStorageTest {
         );
     }
 
+    @Test
+    void 토큰을_삭제한다() {
+        // given
+        redisTokenStorage.saveToken(subject, expectedToken);
+
+        // when
+        redisTokenStorage.deleteToken(subject, tokenClass);
+
+        // then
+        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenClass);
+        assertThat(foundToken).isEmpty();
+    }
+
     @Nested
     class 토큰을_조회한다 {
 
@@ -73,18 +86,5 @@ class RedisTokenStorageTest {
             // then
             assertThat(foundToken).isEmpty();
         }
-    }
-
-    @Test
-    void 토큰을_삭제한다() {
-        // given
-        redisTokenStorage.saveToken(subject, expectedToken);
-
-        // when
-        redisTokenStorage.deleteToken(subject, tokenClass);
-
-        // then
-        Optional<String> foundToken = redisTokenStorage.findToken(subject, tokenClass);
-        assertThat(foundToken).isEmpty();
     }
 }

@@ -55,6 +55,36 @@ class AuthorizedUserResolverTest {
         );
     }
 
+    private TokenAuthentication createAuthenticationWithUser(SiteUser siteUser) {
+        SiteUserDetails userDetails = new SiteUserDetails(siteUser);
+        return new TokenAuthentication("token", userDetails);
+    }
+
+    private MethodParameter getTestMethodParameter(String methodName, Class<?> parameterType) {
+        // 테스트의 목적을 불분명히 만들 수 있는 throws 절을 제거하기 위해 uncheckedException 로 변환한다.
+        try {
+            Method method = TestController.class.getMethod(methodName, parameterType);
+            return new MethodParameter(method, 0);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Method not found: " + methodName, e);
+        }
+    }
+
+    static class TestController {
+
+        public void method(@AuthorizedUser Long userId) {
+        }
+
+        public void primitiveType(@AuthorizedUser long userId) {
+        }
+
+        public void required(@AuthorizedUser(required = true) Long userId) {
+        }
+
+        public void notRequired(@AuthorizedUser(required = false) Long userId) {
+        }
+    }
+
     @Nested
     class security_context_에_저장된_사용자가_없는_경우 {
 
@@ -89,36 +119,6 @@ class AuthorizedUserResolverTest {
             assertThat(
                     authorizedUserResolver.resolveArgument(parameter, null, null, null)
             ).isNull();
-        }
-    }
-
-    private TokenAuthentication createAuthenticationWithUser(SiteUser siteUser) {
-        SiteUserDetails userDetails = new SiteUserDetails(siteUser);
-        return new TokenAuthentication("token", userDetails);
-    }
-
-    private MethodParameter getTestMethodParameter(String methodName, Class<?> parameterType) {
-        // 테스트의 목적을 불분명히 만들 수 있는 throws 절을 제거하기 위해 uncheckedException 로 변환한다.
-        try {
-            Method method = TestController.class.getMethod(methodName, parameterType);
-            return new MethodParameter(method, 0);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Method not found: " + methodName, e);
-        }
-    }
-
-    static class TestController {
-
-        public void method(@AuthorizedUser Long userId) {
-        }
-
-        public void primitiveType(@AuthorizedUser long userId) {
-        }
-
-        public void required(@AuthorizedUser(required = true) Long userId) {
-        }
-
-        public void notRequired(@AuthorizedUser(required = false) Long userId) {
         }
     }
 }

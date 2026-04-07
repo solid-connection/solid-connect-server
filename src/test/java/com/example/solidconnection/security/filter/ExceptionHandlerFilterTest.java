@@ -37,6 +37,13 @@ class ExceptionHandlerFilterTest {
     private HttpServletResponse response;
     private FilterChain filterChain;
 
+    private static Stream<Throwable> provideException() {
+        return Stream.of(
+                new RuntimeException(),
+                new CustomException(ErrorCode.INVALID_TOKEN)
+        );
+    }
+
     @BeforeEach()
     void setUp() {
         request = new MockHttpServletRequest();
@@ -81,13 +88,6 @@ class ExceptionHandlerFilterTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
-    }
-
-    private static Stream<Throwable> provideException() {
-        return Stream.of(
-                new RuntimeException(),
-                new CustomException(ErrorCode.INVALID_TOKEN)
-        );
     }
 
     private Authentication getAnonymousAuth() {

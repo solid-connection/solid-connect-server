@@ -1,7 +1,7 @@
 package com.example.solidconnection.university.dto;
 
-import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import java.util.List;
 
 public record UnivApplyInfoDetailResponse(

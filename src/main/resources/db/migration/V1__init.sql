@@ -1,174 +1,511 @@
 CREATE TABLE IF NOT EXISTS application
 (
-    id                          BIGINT AUTO_INCREMENT         NOT NULL,
-    term                        VARCHAR(50)                   NOT NULL,
-    site_user_id                BIGINT NULL,
-    nickname_for_apply          VARCHAR(100) NULL,
-    update_count                INT         DEFAULT 0         NOT NULL,
-    verify_status               VARCHAR(50) DEFAULT 'PENDING' NOT NULL,
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    term
+    VARCHAR
+(
+    50
+) NOT NULL,
+    site_user_id BIGINT NULL,
+    nickname_for_apply VARCHAR
+(
+    100
+) NULL,
+    update_count INT DEFAULT 0 NOT NULL,
+    verify_status VARCHAR
+(
+    50
+) DEFAULT 'PENDING' NOT NULL,
     gpa DOUBLE NOT NULL,
     gpa_criteria DOUBLE NOT NULL,
-    language_test_type          ENUM ('CEFR','DALF','DELF','DUOLINGO','IELTS','JLPT','NEW_HSK','TCF','TEF','TOEFL_IBT','TOEFL_ITP','TOEIC') NOT NULL,
-    language_test_score         VARCHAR(255)                  NOT NULL,
-    gpa_report_url              VARCHAR(500)                  NOT NULL,
-    language_test_report_url    VARCHAR(500)                  NOT NULL,
-    first_choice_university_id  BIGINT NULL,
+    language_test_type ENUM
+(
+    'CEFR',
+    'DALF',
+    'DELF',
+    'DUOLINGO',
+    'IELTS',
+    'JLPT',
+    'NEW_HSK',
+    'TCF',
+    'TEF',
+    'TOEFL_IBT',
+    'TOEFL_ITP',
+    'TOEIC'
+) NOT NULL,
+    language_test_score VARCHAR
+(
+    255
+) NOT NULL,
+    gpa_report_url VARCHAR
+(
+    500
+) NOT NULL,
+    language_test_report_url VARCHAR
+(
+    500
+) NOT NULL,
+    first_choice_university_id BIGINT NULL,
     second_choice_university_id BIGINT NULL,
-    third_choice_university_id  BIGINT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    third_choice_university_id BIGINT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS board
 (
-    code        VARCHAR(20) NOT NULL,
-    korean_name VARCHAR(20) NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (code)
-);
+    code
+    VARCHAR
+(
+    20
+) NOT NULL,
+    korean_name VARCHAR
+(
+    20
+) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    code
+)
+    );
 
 CREATE TABLE IF NOT EXISTS comment
 (
-    created_at   datetime NULL,
-    id           BIGINT AUTO_INCREMENT NOT NULL,
-    parent_id    BIGINT NULL,
-    post_id      BIGINT NULL,
-    site_user_id BIGINT NULL,
-    updated_at   datetime NULL,
-    content      VARCHAR(255) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    created_at
+    datetime
+    NULL,
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    parent_id
+    BIGINT
+    NULL,
+    post_id
+    BIGINT
+    NULL,
+    site_user_id
+    BIGINT
+    NULL,
+    updated_at
+    datetime
+    NULL,
+    content
+    VARCHAR
+(
+    255
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS country
 (
-    code        VARCHAR(2)   NOT NULL,
-    region_code VARCHAR(10) NULL,
-    korean_name VARCHAR(100) NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (code)
-);
+    code
+    VARCHAR
+(
+    2
+) NOT NULL,
+    region_code VARCHAR
+(
+    10
+) NULL,
+    korean_name VARCHAR
+(
+    100
+) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    code
+)
+    );
 
 CREATE TABLE IF NOT EXISTS interested_country
 (
-    country_code VARCHAR(2) NULL,
-    id           BIGINT AUTO_INCREMENT NOT NULL,
+    country_code
+    VARCHAR
+(
+    2
+) NULL,
+    id BIGINT AUTO_INCREMENT NOT NULL,
     site_user_id BIGINT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS interested_region
 (
-    id           BIGINT AUTO_INCREMENT NOT NULL,
-    site_user_id BIGINT NULL,
-    region_code  VARCHAR(10) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    site_user_id
+    BIGINT
+    NULL,
+    region_code
+    VARCHAR
+(
+    10
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS language_requirement
 (
-    id                           BIGINT AUTO_INCREMENT NOT NULL,
-    university_info_for_apply_id BIGINT NULL,
-    language_test_type           ENUM ('CEFR','DALF','DELF','DUOLINGO','IELTS','JLPT','NEW_HSK','TCF','TEF','TOEFL_IBT','TOEFL_ITP','TOEIC') NOT NULL,
-    min_score                    VARCHAR(255) NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    university_info_for_apply_id
+    BIGINT
+    NULL,
+    language_test_type
+    ENUM
+(
+    'CEFR',
+    'DALF',
+    'DELF',
+    'DUOLINGO',
+    'IELTS',
+    'JLPT',
+    'NEW_HSK',
+    'TCF',
+    'TEF',
+    'TOEFL_IBT',
+    'TOEFL_ITP',
+    'TOEIC'
+) NOT NULL,
+    min_score VARCHAR
+(
+    255
+) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS liked_university
 (
-    id                           BIGINT AUTO_INCREMENT NOT NULL,
-    site_user_id                 BIGINT NULL,
-    university_info_for_apply_id BIGINT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    site_user_id
+    BIGINT
+    NULL,
+    university_info_for_apply_id
+    BIGINT
+    NULL,
+    CONSTRAINT
+    `PRIMARY`
+    PRIMARY
+    KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS post
 (
-    is_question  BIT(1) NULL,
-    created_at   datetime NULL,
-    id           BIGINT AUTO_INCREMENT NOT NULL,
-    like_count   BIGINT NULL,
+    is_question
+    BIT
+(
+    1
+) NULL,
+    created_at datetime NULL,
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    like_count BIGINT NULL,
     site_user_id BIGINT NULL,
-    updated_at   datetime NULL,
-    view_count   BIGINT NULL,
-    board_code   VARCHAR(20) NULL,
-    content      VARCHAR(1000) NULL,
-    category     ENUM ('자유','전체','질문') NULL,
-    title        VARCHAR(255) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    updated_at datetime NULL,
+    view_count BIGINT NULL,
+    board_code VARCHAR
+(
+    20
+) NULL,
+    content VARCHAR
+(
+    1000
+) NULL,
+    category ENUM
+(
+    '자유',
+    '전체',
+    '질문'
+) NULL,
+    title VARCHAR
+(
+    255
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS post_image
 (
-    id      BIGINT AUTO_INCREMENT NOT NULL,
-    post_id BIGINT NULL,
-    url     VARCHAR(500) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    post_id
+    BIGINT
+    NULL,
+    url
+    VARCHAR
+(
+    500
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS post_like
 (
-    id           BIGINT AUTO_INCREMENT NOT NULL,
-    post_id      BIGINT NULL,
-    site_user_id BIGINT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    post_id
+    BIGINT
+    NULL,
+    site_user_id
+    BIGINT
+    NULL,
+    CONSTRAINT
+    `PRIMARY`
+    PRIMARY
+    KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS region
 (
-    code        VARCHAR(10)  NOT NULL,
-    korean_name VARCHAR(100) NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (code)
-);
+    code
+    VARCHAR
+(
+    10
+) NOT NULL,
+    korean_name VARCHAR
+(
+    100
+) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    code
+)
+    );
 
 CREATE TABLE IF NOT EXISTS site_user
 (
-    quited_at            date NULL,
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    nickname_modified_at datetime NULL,
-    birth                VARCHAR(20)  NOT NULL,
-    email                VARCHAR(100) NOT NULL,
-    nickname             VARCHAR(100) NOT NULL,
-    profile_image_url    VARCHAR(500) NULL,
-    gender               ENUM ('FEMALE','MALE','PREFER_NOT_TO_SAY') NOT NULL,
-    preparation_stage    ENUM ('AFTER_EXCHANGE','CONSIDERING','PREPARING_FOR_DEPARTURE','STUDYING_ABROAD') NOT NULL,
-    `role`               ENUM ('MENTEE','MENTOR') NOT NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    quited_at
+    date
+    NULL,
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    nickname_modified_at
+    datetime
+    NULL,
+    birth
+    VARCHAR
+(
+    20
+) NOT NULL,
+    email VARCHAR
+(
+    100
+) NOT NULL,
+    nickname VARCHAR
+(
+    100
+) NOT NULL,
+    profile_image_url VARCHAR
+(
+    500
+) NULL,
+    gender ENUM
+(
+    'FEMALE',
+    'MALE',
+    'PREFER_NOT_TO_SAY'
+) NOT NULL,
+    preparation_stage ENUM
+(
+    'AFTER_EXCHANGE',
+    'CONSIDERING',
+    'PREPARING_FOR_DEPARTURE',
+    'STUDYING_ABROAD'
+) NOT NULL,
+    `role` ENUM
+(
+    'MENTEE',
+    'MENTOR'
+) NOT NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS university
 (
-    id                   BIGINT AUTO_INCREMENT NOT NULL,
-    region_code          VARCHAR(10) NULL,
-    country_code         VARCHAR(2) NULL,
-    format_name          VARCHAR(100) NOT NULL,
-    english_name         VARCHAR(100) NOT NULL,
-    korean_name          VARCHAR(100) NOT NULL,
-    background_image_url VARCHAR(500) NOT NULL,
-    logo_image_url       VARCHAR(500) NOT NULL,
-    details_for_local    VARCHAR(1000) NULL,
-    homepage_url         VARCHAR(500) NULL,
-    english_course_url   VARCHAR(500) NULL,
-    accommodation_url    VARCHAR(500) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    region_code
+    VARCHAR
+(
+    10
+) NULL,
+    country_code VARCHAR
+(
+    2
+) NULL,
+    format_name VARCHAR
+(
+    100
+) NOT NULL,
+    english_name VARCHAR
+(
+    100
+) NOT NULL,
+    korean_name VARCHAR
+(
+    100
+) NOT NULL,
+    background_image_url VARCHAR
+(
+    500
+) NOT NULL,
+    logo_image_url VARCHAR
+(
+    500
+) NOT NULL,
+    details_for_local VARCHAR
+(
+    1000
+) NULL,
+    homepage_url VARCHAR
+(
+    500
+) NULL,
+    english_course_url VARCHAR
+(
+    500
+) NULL,
+    accommodation_url VARCHAR
+(
+    500
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS university_info_for_apply
 (
-    id                              BIGINT AUTO_INCREMENT NOT NULL,
-    term                            VARCHAR(50)  NOT NULL,
-    university_id                   BIGINT NULL,
-    korean_name                     VARCHAR(100) NOT NULL,
-    student_capacity                INT NULL,
-    tuition_fee_type                ENUM ('HOME_UNIVERSITY_PAYMENT','MIXED_PAYMENT','OVERSEAS_UNIVERSITY_PAYMENT') NULL,
-    semester_available_for_dispatch ENUM ('FOUR_SEMESTER','IRRELEVANT','NO_DATA','ONE_OR_TWO_SEMESTER','ONE_SEMESTER','ONE_YEAR') NULL,
-    details_for_language            VARCHAR(1000) NULL,
-    gpa_requirement                 VARCHAR(100) NULL,
-    gpa_requirement_criteria        VARCHAR(100) NULL,
-    semester_requirement            VARCHAR(100) NULL,
-    details_for_apply               VARCHAR(1000) NULL,
-    details_for_major               VARCHAR(1000) NULL,
-    details_for_english_course      VARCHAR(1000) NULL,
-    details_for_accommodation       VARCHAR(1000) NULL,
-    details                         VARCHAR(500) NULL,
-    CONSTRAINT `PRIMARY` PRIMARY KEY (id)
-);
+    id
+    BIGINT
+    AUTO_INCREMENT
+    NOT
+    NULL,
+    term
+    VARCHAR
+(
+    50
+) NOT NULL,
+    university_id BIGINT NULL,
+    korean_name VARCHAR
+(
+    100
+) NOT NULL,
+    student_capacity INT NULL,
+    tuition_fee_type ENUM
+(
+    'HOME_UNIVERSITY_PAYMENT',
+    'MIXED_PAYMENT',
+    'OVERSEAS_UNIVERSITY_PAYMENT'
+) NULL,
+    semester_available_for_dispatch ENUM
+(
+    'FOUR_SEMESTER',
+    'IRRELEVANT',
+    'NO_DATA',
+    'ONE_OR_TWO_SEMESTER',
+    'ONE_SEMESTER',
+    'ONE_YEAR'
+) NULL,
+    details_for_language VARCHAR
+(
+    1000
+) NULL,
+    gpa_requirement VARCHAR
+(
+    100
+) NULL,
+    gpa_requirement_criteria VARCHAR
+(
+    100
+) NULL,
+    semester_requirement VARCHAR
+(
+    100
+) NULL,
+    details_for_apply VARCHAR
+(
+    1000
+) NULL,
+    details_for_major VARCHAR
+(
+    1000
+) NULL,
+    details_for_english_course VARCHAR
+(
+    1000
+) NULL,
+    details_for_accommodation VARCHAR
+(
+    1000
+) NULL,
+    details VARCHAR
+(
+    500
+) NULL,
+    CONSTRAINT `PRIMARY` PRIMARY KEY
+(
+    id
+)
+    );
 
 ALTER TABLE site_user
     ADD CONSTRAINT site_user_email_unique UNIQUE (email);

@@ -35,6 +35,16 @@ class CustomPageableHandlerMethodArgumentResolverTest {
     private NativeWebRequest webRequest;
     private MethodParameter parameter;
 
+    static Stream<Arguments> provideInvalidParameters() {
+        return Stream.of(
+                Arguments.of("null", null),
+                Arguments.of("빈 문자열", ""),
+                Arguments.of("0", "0"),
+                Arguments.of("음수", "-1"),
+                Arguments.of("문자열", "invalid")
+        );
+    }
+
     @BeforeEach
     void setUp() throws NoSuchMethodException {
         request = new MockHttpServletRequest();
@@ -112,16 +122,6 @@ class CustomPageableHandlerMethodArgumentResolverTest {
 
         // then
         assertThat(pageable.getPageSize()).isEqualTo(DEFAULT_SIZE);
-    }
-
-    static Stream<Arguments> provideInvalidParameters() {
-        return Stream.of(
-                Arguments.of("null", null),
-                Arguments.of("빈 문자열", ""),
-                Arguments.of("0", "0"),
-                Arguments.of("음수", "-1"),
-                Arguments.of("문자열", "invalid")
-        );
     }
 
     private static class TestController {

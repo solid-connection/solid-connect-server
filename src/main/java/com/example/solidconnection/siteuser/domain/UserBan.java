@@ -2,7 +2,6 @@ package com.example.solidconnection.siteuser.domain;
 
 import static java.time.ZoneOffset.UTC;
 
-import java.time.ZonedDateTime;
 import com.example.solidconnection.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

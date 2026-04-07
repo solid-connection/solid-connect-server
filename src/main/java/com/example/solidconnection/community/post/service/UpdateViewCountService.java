@@ -1,6 +1,5 @@
 package com.example.solidconnection.community.post.service;
 
-import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

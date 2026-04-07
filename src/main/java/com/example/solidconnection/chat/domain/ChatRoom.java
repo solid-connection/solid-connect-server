@@ -20,21 +20,17 @@ import org.hibernate.annotations.BatchSize;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private boolean isGroup = false;
-
-    @Column(name = "mentoring_id", unique = true)
-    private Long mentoringId;
-
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @BatchSize(size = 10)
     private final List<ChatParticipant> chatParticipants = new ArrayList<>();
-
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private final List<ChatMessage> chatMessages = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private boolean isGroup = false;
+    @Column(name = "mentoring_id", unique = true)
+    private Long mentoringId;
 
     public ChatRoom(boolean isGroup) {
         this.isGroup = isGroup;

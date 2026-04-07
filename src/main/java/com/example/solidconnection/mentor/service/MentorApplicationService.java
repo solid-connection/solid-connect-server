@@ -1,5 +1,9 @@
 package com.example.solidconnection.mentor.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
@@ -18,10 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
-import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

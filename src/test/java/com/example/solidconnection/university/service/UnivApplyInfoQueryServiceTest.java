@@ -111,6 +111,53 @@ class UnivApplyInfoQueryServiceTest {
                     );
         }
 
+        @Test
+        void 대학_국가_권역_일치_순서로_정렬하여_응답한다() {
+            // given
+            String text = "아";
+            UnivApplyInfo 권역_아 = univApplyInfoFixture.메이지대학_지원_정보(term.getId());
+            UnivApplyInfo 국가_아 = univApplyInfoFixture.그라츠대학_지원_정보(term.getId());
+            UnivApplyInfo 대학지원정보_아 = univApplyInfoFixture.아칸소주립대학_지원_정보(term.getId());
+
+            // when
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+
+            // then
+            assertThat(response.univApplyInfoPreviews())
+                    .containsExactly(
+                            UnivApplyInfoPreviewResponse.of(대학지원정보_아, term.getName()),
+                            UnivApplyInfoPreviewResponse.of(국가_아, term.getName()),
+                            UnivApplyInfoPreviewResponse.of(권역_아, term.getName())
+                    );
+        }
+
+        // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
+        //  @Test
+        void 캐시가_적용된다() {
+            // given
+            String text = "Guam";
+            UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+
+            // when
+            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+
+            // then
+            assertThatCode(() -> {
+                List<Long> firstResponseIds = extractIds(firstResponse);
+                List<Long> secondResponseIds = extractIds(secondResponse);
+                assertThat(firstResponseIds).isEqualTo(secondResponseIds);
+            }).doesNotThrowAnyException();
+            then(univApplyInfoRepository).should(times(1)).findAllByText(text, term.getId());
+        }
+
+        private List<Long> extractIds(UnivApplyInfoPreviewResponses responses) {
+            return responses.univApplyInfoPreviews()
+                    .stream()
+                    .map(UnivApplyInfoPreviewResponse::id)
+                    .toList();
+        }
+
         @Nested
         class 각각의_검색_대상에_대해_검색한다 {
 
@@ -170,53 +217,6 @@ class UnivApplyInfoQueryServiceTest {
                                 UnivApplyInfoPreviewResponse.of(서던덴마크대학교_지원_정보, term.getName())
                         );
             }
-        }
-
-        @Test
-        void 대학_국가_권역_일치_순서로_정렬하여_응답한다() {
-            // given
-            String text = "아";
-            UnivApplyInfo 권역_아 = univApplyInfoFixture.메이지대학_지원_정보(term.getId());
-            UnivApplyInfo 국가_아 = univApplyInfoFixture.그라츠대학_지원_정보(term.getId());
-            UnivApplyInfo 대학지원정보_아 = univApplyInfoFixture.아칸소주립대학_지원_정보(term.getId());
-
-            // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
-
-            // then
-            assertThat(response.univApplyInfoPreviews())
-                    .containsExactly(
-                            UnivApplyInfoPreviewResponse.of(대학지원정보_아, term.getName()),
-                            UnivApplyInfoPreviewResponse.of(국가_아, term.getName()),
-                            UnivApplyInfoPreviewResponse.of(권역_아, term.getName())
-                    );
-        }
-
-        // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
-        //  @Test
-        void 캐시가_적용된다() {
-            // given
-            String text = "Guam";
-            UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
-
-            // when
-            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
-            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
-
-            // then
-            assertThatCode(() -> {
-                List<Long> firstResponseIds = extractIds(firstResponse);
-                List<Long> secondResponseIds = extractIds(secondResponse);
-                assertThat(firstResponseIds).isEqualTo(secondResponseIds);
-            }).doesNotThrowAnyException();
-            then(univApplyInfoRepository).should(times(1)).findAllByText(text, term.getId());
-        }
-
-        private List<Long> extractIds(UnivApplyInfoPreviewResponses responses) {
-            return responses.univApplyInfoPreviews()
-                    .stream()
-                    .map(UnivApplyInfoPreviewResponse::id)
-                    .toList();
         }
     }
 }

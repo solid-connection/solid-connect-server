@@ -11,7 +11,7 @@ public enum PostCategory {
             .map(Enum::name)
             .collect(Collectors.toSet());
 
-    public static boolean isValid(String name){
+    public static boolean isValid(String name) {
         return name != null && NAMES.contains(name);
     }
 }

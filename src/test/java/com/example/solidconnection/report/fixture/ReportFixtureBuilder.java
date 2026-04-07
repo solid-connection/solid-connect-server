@@ -28,7 +28,7 @@ public class ReportFixtureBuilder {
         return this;
     }
 
-     public ReportFixtureBuilder reportedId(long reportedId) {
+    public ReportFixtureBuilder reportedId(long reportedId) {
         this.reportedId = reportedId;
         return this;
     }

@@ -78,14 +78,14 @@ class BannedUserInterceptorTest {
 
         // when & then
         mockMvc.perform(post("/comments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                                        {
-                                            "postId": 1,
-                                            "content": "테스트 댓글 내용",
-                                            "parentId": null
-                                        }
-                                        """))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                         {
+                                             "postId": 1,
+                                             "content": "테스트 댓글 내용",
+                                             "parentId": null
+                                         }
+                                         """))
                 .andExpect(status().isForbidden());
     }
 
@@ -124,12 +124,12 @@ class BannedUserInterceptorTest {
         mockMvc.perform(post("/comments")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
-                                        {
-                                            "postId": 1,
-                                            "content": "테스트 댓글 내용",
-                                            "parentId": null
-                                        }
-                                        """))
+                                         {
+                                             "postId": 1,
+                                             "content": "테스트 댓글 내용",
+                                             "parentId": null
+                                         }
+                                         """))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/chats/rooms"))

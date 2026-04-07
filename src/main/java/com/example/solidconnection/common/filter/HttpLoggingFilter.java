@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.http.server.PathContainer;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
@@ -98,7 +98,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String query = request.getQueryString();
 
-        if(query == null || query.isBlank()){
+        if (query == null || query.isBlank()) {
             return path;
         }
 
@@ -109,7 +109,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     }
 
     private String decodeQuery(String rawQuery) {
-        if(rawQuery == null || rawQuery.isBlank()){
+        if (rawQuery == null || rawQuery.isBlank()) {
             return rawQuery;
         }
 
@@ -125,23 +125,23 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         String[] params = decodedQuery.split("&");
         StringBuilder maskedQuery = new StringBuilder();
 
-        for(int i = 0; i < params.length; i++){
+        for (int i = 0; i < params.length; i++) {
             String param = params[i];
 
-            if(!param.contains("=")){
+            if (!param.contains("=")) {
                 maskedQuery.append(param);
-            }else{
+            } else {
                 int equalIndex = param.indexOf("=");
                 String key = param.substring(0, equalIndex);
 
-                if(isSensitiveParam(key)){
+                if (isSensitiveParam(key)) {
                     maskedQuery.append(key).append("=").append(MASK_VALUE);
-                }else{
+                } else {
                     maskedQuery.append(param);
                 }
             }
 
-            if(i < params.length - 1){
+            if (i < params.length - 1) {
                 maskedQuery.append("&");
             }
         }
@@ -150,8 +150,8 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     }
 
     private boolean isSensitiveParam(String paramKey) {
-        for (String sensitiveParam : EXCLUDE_QUERIES){
-            if(sensitiveParam.equalsIgnoreCase(paramKey)){
+        for (String sensitiveParam : EXCLUDE_QUERIES) {
+            if (sensitiveParam.equalsIgnoreCase(paramKey)) {
                 return true;
             }
         }

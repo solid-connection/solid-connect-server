@@ -18,27 +18,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @DisplayName("리프레시 토큰 쿠키 매니저 테스트")
 @TestContainerSpringBootTest
 class RefreshTokenCookieManagerTest {
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-
+    private final String domain = "example.com";
     @Autowired
     private RefreshTokenCookieManager cookieManager;
-
     @Autowired
     private TokenProperties tokenProperties;
-
     @MockitoBean
     private RefreshTokenCookieProperties refreshTokenCookieProperties;
-
-    private final String domain = "example.com";
 
     @BeforeEach
     void setUp() {

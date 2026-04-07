@@ -24,20 +24,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @TestContainerSpringBootTest
 class OAuthServiceTest {
 
-    @Autowired
-    private OAuthService oAuthService;
-
-    @Autowired
-    private SiteUserFixture siteUserFixture;
-
-    @MockitoBean
-    private OAuthClientMap oauthClientMap;
-
     private final AuthType authType = AuthType.KAKAO;
     private final String oauthCode = "code";
     private final String email = "test@test.com";
     private final String profileImageUrl = "profile.jpg";
     private final String nickname = "testUser";
+    @Autowired
+    private OAuthService oAuthService;
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+    @MockitoBean
+    private OAuthClientMap oauthClientMap;
 
     @BeforeEach
     void setUp() { // 실제 client 호출하지 않도록 mocking

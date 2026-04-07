@@ -22,4 +22,5 @@ public record MentorApplicationRequest(
         @NotBlank(message = "학기를 입력해주세요.")
         String term
 ) {
+
 }

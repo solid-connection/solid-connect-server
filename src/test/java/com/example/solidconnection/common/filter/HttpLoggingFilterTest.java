@@ -67,7 +67,7 @@ class HttpLoggingFilterTest {
 
             AtomicReference<String> capturedTraceId = new AtomicReference<>();
 
-            doAnswer(invocation ->{
+            doAnswer(invocation -> {
                 capturedTraceId.set(MDC.get("traceId"));
                 return null;
             }).when(filterChain).doFilter(request, response);
@@ -114,7 +114,6 @@ class HttpLoggingFilterTest {
             when(response.getStatus()).thenReturn(200);
             String expectedRequestLog = "[REQUEST] GET /api/users";
             String expectedResponseLog = "[RESPONSE] /api/users userId = null, (200 OK)";
-
 
             // when
             filter.doFilterInternal(request, response, filterChain);

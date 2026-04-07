@@ -1,5 +1,5 @@
 ALTER TABLE mentor
-    MODIFY introduction VARCHAR(1000) NULL;
+    MODIFY introduction VARCHAR (1000) NULL;
 
 ALTER TABLE mentor
-    MODIFY pass_tip VARCHAR(1000) NULL;
+    MODIFY pass_tip VARCHAR (1000) NULL;

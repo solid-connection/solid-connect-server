@@ -2,7 +2,7 @@ name: "[PROD] Build Gradle and Deploy"
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
   workflow_dispatch:
     inputs:

@@ -4,12 +4,12 @@ import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 
 public record RestrictedUserSearchResponse(
-	Long id,
-	String nickname,
-	Role role,
-	UserStatus userStatus,
-	ReportedInfoResponse reportedInfoResponse,
-	BannedInfoResponse bannedInfoResponse
+        Long id,
+        String nickname,
+        Role role,
+        UserStatus userStatus,
+        ReportedInfoResponse reportedInfoResponse,
+        BannedInfoResponse bannedInfoResponse
 ) {
 
 }

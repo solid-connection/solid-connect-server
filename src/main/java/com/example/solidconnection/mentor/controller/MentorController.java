@@ -38,7 +38,7 @@ public class MentorController {
     public ResponseEntity<SliceResponse<MentorPreviewResponse>> getMentorPreviews(
             @AuthorizedUser long siteUserId,
             @RequestParam("region") String region,
-            
+
             @PageableDefault(size = 3)
             @SortDefaults({
                     @SortDefault(sort = "menteeCount", direction = Sort.Direction.DESC),

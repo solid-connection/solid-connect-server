@@ -10,24 +10,15 @@ import static com.example.solidconnection.siteuser.domain.QUserBan.userBan;
 import static java.time.ZoneOffset.UTC;
 import static org.springframework.util.StringUtils.hasText;
 
-import com.example.solidconnection.admin.dto.MentorApplicationHistoryInfoResponse;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
-import com.example.solidconnection.university.domain.QUnivApplyInfo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 import com.example.solidconnection.admin.dto.BannedHistoryResponse;
 import com.example.solidconnection.admin.dto.BannedInfoResponse;
 import com.example.solidconnection.admin.dto.MatchedInfoResponse;
 import com.example.solidconnection.admin.dto.MenteeInfoResponse;
+import com.example.solidconnection.admin.dto.MentorApplicationHistoryInfoResponse;
 import com.example.solidconnection.admin.dto.MentorInfoResponse;
 import com.example.solidconnection.admin.dto.ReportedHistoryResponse;
 import com.example.solidconnection.admin.dto.ReportedInfoResponse;
+import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchCondition;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchResponse;
 import com.example.solidconnection.admin.dto.UnivApplyInfoResponse;
@@ -37,6 +28,7 @@ import com.example.solidconnection.admin.dto.UserSearchResponse;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.domain.UserStatus;
+import com.example.solidconnection.university.domain.QUnivApplyInfo;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -44,6 +36,14 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
@@ -219,8 +219,8 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
 
     private BooleanExpression isRestrictedUser() {
         return siteUser.userStatus.in(
-            UserStatus.REPORTED,
-            UserStatus.BANNED
+                UserStatus.REPORTED,
+                UserStatus.BANNED
         );
     }
 

@@ -23,12 +23,17 @@ public enum UploadPath {
     }
 
     public boolean isResizable(long fileSize, String extension, long maxSizeBytes) {
-        if (!isImage(extension)) return false;
+        if (!isImage(extension)) {
+            return false;
+        }
 
-        if (this == CHAT) return false;
+        if (this == CHAT) {
+            return false;
+        }
 
         return fileSize >= maxSizeBytes;
     }
+
     public void validateExtension(String extension) {
         if (extension == null || !FileConstants.ALL_ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
             throw new CustomException(ErrorCode.NOT_ALLOWED_FILE_EXTENSIONS,

@@ -13,6 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 @Component
 public class ApiPerformanceInterceptor implements HandlerInterceptor {
+
     private static final String START_TIME_ATTRIBUTE = "startTime";
     private static final String REQUEST_URI_ATTRIBUTE = "requestUri";
     private static final int RESPONSE_TIME_THRESHOLD = 3_000;
@@ -41,7 +42,7 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
             Exception ex
     ) throws Exception {
         Long startTime = (Long) request.getAttribute(START_TIME_ATTRIBUTE);
-        if(startTime == null) {
+        if (startTime == null) {
             return;
         }
 
@@ -56,8 +57,7 @@ public class ApiPerformanceInterceptor implements HandlerInterceptor {
                     "type=API_Performance method_type={} uri={} response_time={} status={}",
                     method, uri, responseTime, status
             );
-        }
-        else {
+        } else {
             API_PERF.info(
                     "type=API_Performance method_type={} uri={} response_time={} status={}",
                     method, uri, responseTime, status

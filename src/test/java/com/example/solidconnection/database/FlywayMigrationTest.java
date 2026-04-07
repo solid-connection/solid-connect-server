@@ -28,7 +28,14 @@ class FlywayMigrationTest {
         CONTAINER.start();
     }
 
+    @Test
+    void flyway_스크립트가_정상적으로_수행되는지_확인한다() {
+        // Spring Boot 컨텍스트가 정상적으로 시작되면
+        // Flyway 마이그레이션과 ddl-auto=validate 검증이 성공한 것
+    }
+
     static class FlywayMySQLInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertyValues.of(
@@ -37,11 +44,5 @@ class FlywayMigrationTest {
                     "spring.datasource.password=" + CONTAINER.getPassword()
             ).applyTo(applicationContext.getEnvironment());
         }
-    }
-
-    @Test
-    void flyway_스크립트가_정상적으로_수행되는지_확인한다() {
-        // Spring Boot 컨텍스트가 정상적으로 시작되면
-        // Flyway 마이그레이션과 ddl-auto=validate 검증이 성공한 것
     }
 }

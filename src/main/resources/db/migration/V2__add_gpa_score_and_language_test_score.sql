@@ -1,15 +1,16 @@
-create table gpa_score (
-                           gpa float(53) not null,
-                           gpa_criteria float(53) not null,
-                           issue_date date,
-                           created_at datetime(6),
-                           id bigint not null auto_increment,
-                           site_user_id bigint,
-                           updated_at datetime(6),
-                           gpa_report_url varchar(500) not null,
-                           rejected_reason varchar(255),
-                           verify_status varchar(50) not null default 'PENDING',
-                           primary key (id)
+create table gpa_score
+(
+    gpa             float(53)    not null,
+    gpa_criteria    float(53)    not null,
+    issue_date      date,
+    created_at      datetime(6),
+    id              bigint       not null auto_increment,
+    site_user_id    bigint,
+    updated_at      datetime(6),
+    gpa_report_url  varchar(500) not null,
+    rejected_reason varchar(255),
+    verify_status   varchar(50)  not null default 'PENDING',
+    primary key (id)
 ) engine=InnoDB;
 
 alter table gpa_score
@@ -17,18 +18,19 @@ alter table gpa_score
         foreign key (site_user_id)
             references site_user (id);
 
-create table language_test_score (
-                                     issue_date date,
-                                     created_at datetime(6),
-                                     id bigint not null auto_increment,
-                                     site_user_id bigint,
-                                     updated_at datetime(6),
-                                     language_test_type enum ('CEFR', 'DALF', 'DELF', 'DUOLINGO', 'IELTS', 'JLPT', 'NEW_HSK', 'TCF', 'TEF', 'TOEFL_IBT', 'TOEFL_ITP', 'TOEIC') not null,
-                                     language_test_report_url varchar(500) not null,
-                                     language_test_score varchar(255) not null,
-                                     rejected_reason varchar(255),
-                                     verify_status varchar(50) not null default 'PENDING',
-                                     primary key (id)
+create table language_test_score
+(
+    issue_date               date,
+    created_at               datetime(6),
+    id                       bigint       not null auto_increment,
+    site_user_id             bigint,
+    updated_at               datetime(6),
+    language_test_type       enum ('CEFR', 'DALF', 'DELF', 'DUOLINGO', 'IELTS', 'JLPT', 'NEW_HSK', 'TCF', 'TEF', 'TOEFL_IBT', 'TOEFL_ITP', 'TOEIC') not null,
+    language_test_report_url varchar(500) not null,
+    language_test_score      varchar(255) not null,
+    rejected_reason          varchar(255),
+    verify_status            varchar(50)  not null default 'PENDING',
+    primary key (id)
 ) engine=InnoDB;
 
 alter table language_test_score
@@ -36,7 +38,8 @@ alter table language_test_score
         foreign key (site_user_id)
             references site_user (id);
 
-alter table application add column is_delete bit;
+alter table application
+    add column is_delete bit;
 
 alter table application drop foreign key fk_university_info_for_apply_id_1;
 alter table application drop foreign key fk_university_info_for_apply_id_2;
