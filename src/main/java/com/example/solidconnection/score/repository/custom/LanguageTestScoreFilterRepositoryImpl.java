@@ -45,16 +45,16 @@ public class LanguageTestScoreFilterRepositoryImpl implements LanguageTestScoreF
             languageTestScore.createdAt,
             languageTestScore.updatedAt
     );
-    private static final ConstructorExpression<LanguageTestScoreSearchResponse> LANGUAGE_TEST_SCORE_SEARCH_RESPONSE_PROJECTION = Projections.constructor(
-            LanguageTestScoreSearchResponse.class,
-            LANGUAGE_TEST_SCORE_STATUS_RESPONSE_PROJECTION,
-            SITE_USER_RESPONSE_PROJECTION
-    );
     private static final ConstructorExpression<SiteUserResponse> SITE_USER_RESPONSE_PROJECTION = Projections.constructor(
             SiteUserResponse.class,
             siteUser.id,
             siteUser.nickname,
             siteUser.profileImageUrl
+    );
+    private static final ConstructorExpression<LanguageTestScoreSearchResponse> LANGUAGE_TEST_SCORE_SEARCH_RESPONSE_PROJECTION = Projections.constructor(
+            LanguageTestScoreSearchResponse.class,
+            LANGUAGE_TEST_SCORE_STATUS_RESPONSE_PROJECTION,
+            SITE_USER_RESPONSE_PROJECTION
     );
     private final JPAQueryFactory queryFactory;
 

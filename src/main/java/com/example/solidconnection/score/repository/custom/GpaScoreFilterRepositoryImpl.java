@@ -45,16 +45,16 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
             gpaScore.createdAt,
             gpaScore.updatedAt
     );
-    private static final ConstructorExpression<GpaScoreSearchResponse> GPA_SCORE_SEARCH_RESPONSE_PROJECTION = Projections.constructor(
-            GpaScoreSearchResponse.class,
-            GPA_SCORE_STATUS_RESPONSE_PROJECTION,
-            SITE_USER_RESPONSE_PROJECTION
-    );
     private static final ConstructorExpression<SiteUserResponse> SITE_USER_RESPONSE_PROJECTION = Projections.constructor(
             SiteUserResponse.class,
             siteUser.id,
             siteUser.nickname,
             siteUser.profileImageUrl
+    );
+    private static final ConstructorExpression<GpaScoreSearchResponse> GPA_SCORE_SEARCH_RESPONSE_PROJECTION = Projections.constructor(
+            GpaScoreSearchResponse.class,
+            GPA_SCORE_STATUS_RESPONSE_PROJECTION,
+            SITE_USER_RESPONSE_PROJECTION
     );
     private final JPAQueryFactory queryFactory;
 
