@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Entity
@@ -32,6 +33,7 @@ public class LanguageTestScore extends BaseEntity {
     private LanguageTest languageTest;
 
     @Setter
+    @ColumnDefault("'PENDING'")
     @Column(name = "verify_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
@@ -39,7 +41,7 @@ public class LanguageTestScore extends BaseEntity {
     @Column(name = "rejected_reason")
     private String rejectedReason;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public LanguageTestScore(LanguageTest languageTest, SiteUser siteUser) {

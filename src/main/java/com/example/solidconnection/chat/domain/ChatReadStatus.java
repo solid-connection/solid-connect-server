@@ -28,10 +28,10 @@ public class ChatReadStatus extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "chat_room_id")
+    @Column(name = "chat_room_id", nullable = false)
     private long chatRoomId;
 
-    @Column(name = "chat_participant_id")
+    @Column(name = "chat_participant_id", nullable = false)
     private long chatParticipantId;
 
     public ChatReadStatus(long chatRoomId, long chatParticipantId) {

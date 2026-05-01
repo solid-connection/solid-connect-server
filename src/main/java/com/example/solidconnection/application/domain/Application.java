@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -50,6 +51,7 @@ public class Application extends BaseEntity {
     private LanguageTest languageTest;
 
     @Setter
+    @ColumnDefault("'PENDING'")
     @Column(name = "verify_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
@@ -57,13 +59,15 @@ public class Application extends BaseEntity {
     @Column(length = 100, name = "nickname_for_apply")
     private String nicknameForApply;
 
-    @Column(columnDefinition = "int not null default 1", name = "update_count")
-    private Integer updateCount;
+    @ColumnDefault("1")
+    @Column(name = "update_count", nullable = false)
+    private Integer updateCount = 1;
 
     @Column(nullable = false, name = "term_id")
     private long termId;
 
-    @Column(name = "is_delete")
+    @ColumnDefault("false")
+    @Column(name = "is_delete", nullable = false)
     private boolean isDelete = false;
 
     @Column(nullable = false, name = "first_choice_university_info_for_apply_id")
@@ -75,7 +79,7 @@ public class Application extends BaseEntity {
     @Column(name = "third_choice_university_info_for_apply_id")
     private Long thirdChoiceUnivApplyInfoId;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public Application(

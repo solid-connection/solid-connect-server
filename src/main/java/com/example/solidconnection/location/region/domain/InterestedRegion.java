@@ -29,7 +29,7 @@ public class InterestedRegion extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     @Column(name = "region_code")

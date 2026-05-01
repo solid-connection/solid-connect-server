@@ -28,7 +28,7 @@ public class PostLike extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public void setPostAndSiteUserId(Post post, long siteUserId) {

@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -28,10 +29,12 @@ public class Mentor extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "mentee_count")
+    @ColumnDefault("0")
+    @Column(name = "mentee_count", nullable = false)
     private int menteeCount = 0;
 
-    @Column(name = "has_badge")
+    @ColumnDefault("false")
+    @Column(name = "has_badge", nullable = false)
     private boolean hasBadge = false;
 
     @Column(name = "introduction", length = 1000)
@@ -40,10 +43,10 @@ public class Mentor extends BaseEntity {
     @Column(name = "pass_tip", length = 1000)
     private String passTip;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
-    @Column(name = "university_id")
+    @Column(name = "university_id", nullable = false)
     private long universityId;
 
     @Column(nullable = false, name = "term_id")

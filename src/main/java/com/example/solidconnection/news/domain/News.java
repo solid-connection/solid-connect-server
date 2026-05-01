@@ -36,7 +36,7 @@ public class News extends BaseEntity {
     @Column(name = "url", length = 500)
     private String url;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public News(

@@ -34,7 +34,7 @@ public class Channel extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "sequence")
+    @Column(name = "sequence", nullable = false)
     private int sequence;
 
     @Enumerated(EnumType.STRING)

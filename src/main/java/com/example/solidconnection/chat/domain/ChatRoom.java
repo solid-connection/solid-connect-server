@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -29,7 +30,8 @@ public class ChatRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "is_group")
+    @ColumnDefault("false")
+    @Column(name = "is_group", nullable = false)
     private boolean isGroup = false;
     @Column(name = "mentoring_id", unique = true)
     private Long mentoringId;

@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -54,10 +55,11 @@ public class Post extends BaseEntity {
     @Column(name = "board_code")
     private String boardCode;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
-    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    @ColumnDefault("false")
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
     @BatchSize(size = 20)
