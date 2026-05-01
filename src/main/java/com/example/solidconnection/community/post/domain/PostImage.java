@@ -19,9 +19,10 @@ public class PostImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(length = 500)
+    @Column(name = "url", length = 500)
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class Board {
 
     @Id
-    @Column(length = 20)
+    @Column(name = "code", length = 20)
     private String code;
 
-    @Column(nullable = false, length = 20)
+    @Column(name = "korean_name", nullable = false, length = 20)
     private String koreanName;
 
     public Board(String code, String koreanName) {

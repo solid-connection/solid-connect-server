@@ -27,7 +27,9 @@ public class ChatRoom extends BaseEntity {
     private final List<ChatMessage> chatMessages = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+    @Column(name = "is_group")
     private boolean isGroup = false;
     @Column(name = "mentoring_id", unique = true)
     private Long mentoringId;

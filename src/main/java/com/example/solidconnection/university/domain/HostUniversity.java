@@ -22,33 +22,34 @@ public class HostUniversity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "korean_name", nullable = false, unique = true, length = 100)
     private String koreanName;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "english_name", nullable = false, length = 100)
     private String englishName;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "format_name", nullable = false, length = 100)
     private String formatName;
 
-    @Column(length = 500)
+    @Column(name = "homepage_url", length = 500)
     private String homepageUrl;
 
-    @Column(length = 500)
+    @Column(name = "english_course_url", length = 500)
     private String englishCourseUrl;
 
-    @Column(length = 500)
+    @Column(name = "accommodation_url", length = 500)
     private String accommodationUrl;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "logo_image_url", nullable = false, length = 500)
     private String logoImageUrl;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "background_image_url", nullable = false, length = 500)
     private String backgroundImageUrl;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_local", length = 1000)
     private String detailsForLocal;
 
     @ManyToOne

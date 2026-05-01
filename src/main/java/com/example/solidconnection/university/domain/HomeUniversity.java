@@ -19,8 +19,9 @@ public class HomeUniversity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 }

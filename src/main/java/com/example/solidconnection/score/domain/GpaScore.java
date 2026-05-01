@@ -25,18 +25,21 @@ public class GpaScore extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Embedded
     private Gpa gpa;
 
     @Setter
-    @Column(nullable = false)
+    @Column(name = "verify_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
+    @Column(name = "rejected_reason")
     private String rejectedReason;
 
+    @Column(name = "site_user_id")
     private long siteUserId;
 
     public GpaScore(Gpa gpa, SiteUser siteUser) {

@@ -30,6 +30,7 @@ public class LikedUnivApplyInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "university_info_for_apply_id")

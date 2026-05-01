@@ -34,9 +34,10 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(length = 255)
+    @Column(name = "content", length = 255)
     private String content;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
@@ -46,7 +47,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column
+    @Column(name = "site_user_id")
     private long siteUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)

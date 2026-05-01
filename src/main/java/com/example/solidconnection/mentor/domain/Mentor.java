@@ -25,24 +25,25 @@ public class Mentor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column
+    @Column(name = "mentee_count")
     private int menteeCount = 0;
 
-    @Column
+    @Column(name = "has_badge")
     private boolean hasBadge = false;
 
-    @Column(length = 1000)
+    @Column(name = "introduction", length = 1000)
     private String introduction;
 
-    @Column(length = 1000)
+    @Column(name = "pass_tip", length = 1000)
     private String passTip;
 
-    @Column
+    @Column(name = "site_user_id")
     private long siteUserId;
 
-    @Column
+    @Column(name = "university_id")
     private long universityId;
 
     @Column(nullable = false, name = "term_id")

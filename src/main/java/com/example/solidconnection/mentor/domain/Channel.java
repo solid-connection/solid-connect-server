@@ -31,16 +31,17 @@ public class Channel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column
+    @Column(name = "sequence")
     private int sequence;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private ChannelType type;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "url", nullable = false, length = 500)
     private String url;
 
     @ManyToOne(fetch = FetchType.LAZY)

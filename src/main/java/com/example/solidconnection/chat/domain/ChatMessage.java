@@ -27,9 +27,11 @@ public class ChatMessage extends BaseEntity {
     private final List<ChatAttachment> chatAttachments = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Column(nullable = false, length = 500)
+    @Column(name = "content", nullable = false, length = 500)
     private String content;
+    @Column(name = "sender_id")
     private long senderId; // chat_participant의 id
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;

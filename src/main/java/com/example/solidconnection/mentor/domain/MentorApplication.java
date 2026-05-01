@@ -44,28 +44,30 @@ public class MentorApplication extends BaseEntity {
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Column(nullable = false)
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
-    @Column(nullable = false, name = "country_code")
+    @Column(name = "country_code", nullable = false)
     private String countryCode;
-    @Column
+    @Column(name = "university_id")
     private Long universityId;
-    @Column(nullable = false)
+    @Column(name = "university_select_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private UniversitySelectType universitySelectType;
-    @Column(nullable = false, name = "mentor_proof_url", length = 500)
+    @Column(name = "mentor_proof_url", nullable = false, length = 500)
     private String mentorProofUrl;
-    @Column(nullable = false, name = "term_id")
+    @Column(name = "term_id", nullable = false)
     private long termId;
+    @Column(name = "rejected_reason")
     private String rejectedReason;
-    @Column(nullable = false)
+    @Column(name = "exchange_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ExchangeStatus exchangeStatus;
-    @Column(nullable = false)
+    @Column(name = "mentor_application_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private MentorApplicationStatus mentorApplicationStatus;
-    @Column
+    @Column(name = "approved_at")
     private ZonedDateTime approvedAt;
 
     public MentorApplication(

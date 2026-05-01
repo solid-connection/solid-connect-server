@@ -1,6 +1,7 @@
 package com.example.solidconnection.community.post.domain;
 
 import com.example.solidconnection.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,12 +21,14 @@ public class PostLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column(name = "site_user_id")
     private long siteUserId;
 
     public void setPostAndSiteUserId(Post post, long siteUserId) {

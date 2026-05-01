@@ -29,27 +29,32 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(length = 255)
+    @Column(name = "title", length = 255)
     private String title;
 
-    @Column(length = 1000)
+    @Column(name = "content", length = 1000)
     private String content;
 
+    @Column(name = "is_question")
     private Boolean isQuestion;
 
+    @Column(name = "like_count")
     private Long likeCount;
 
+    @Column(name = "view_count")
     private Long viewCount;
 
+    @Column(name = "category")
     @Enumerated(EnumType.STRING)
     private PostCategory category;
 
-    @Column
+    @Column(name = "board_code")
     private String boardCode;
 
-    @Column
+    @Column(name = "site_user_id")
     private long siteUserId;
 
     @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)

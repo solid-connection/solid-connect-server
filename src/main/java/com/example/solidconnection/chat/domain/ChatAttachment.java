@@ -19,15 +19,16 @@ public class ChatAttachment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "is_image", nullable = false)
     private Boolean isImage;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "url", nullable = false, length = 500)
     private String url;
 
-    @Column(length = 500)
+    @Column(name = "thumbnail_url", length = 500)
     private String thumbnailUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
