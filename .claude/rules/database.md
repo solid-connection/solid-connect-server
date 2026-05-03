@@ -1,3 +1,9 @@
+---
+paths:
+  - "src/main/java/**/domain/*.java"
+  - "src/main/resources/db/migration/*.sql"
+---
+
 # Database
 
 ## JPA Entity

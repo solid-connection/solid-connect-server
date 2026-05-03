@@ -1,3 +1,8 @@
+---
+paths:
+  - "src/**/*.java"
+---
+
 # Code Style
 
 ## Naming

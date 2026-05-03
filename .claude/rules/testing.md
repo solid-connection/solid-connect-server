@@ -1,3 +1,8 @@
+---
+paths:
+  - "src/test/**/*.java"
+---
+
 # Testing
 
 Base annotation: `@TestContainerSpringBootTest` for all integration tests.
