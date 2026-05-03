@@ -50,3 +50,6 @@ application-prod.yml
 ### docker volumes ###
 mysql_data_local
 redis_data_local
+
+### macOS ###
+.DS_Store
