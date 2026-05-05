@@ -38,6 +38,7 @@ class RefreshTokenCookieManagerTest {
 
     @BeforeEach
     void setUp() {
+        given(refreshTokenCookieProperties.cookieName()).willReturn(REFRESH_TOKEN_COOKIE_NAME);
         given(refreshTokenCookieProperties.cookieDomain()).willReturn(domain);
     }
 

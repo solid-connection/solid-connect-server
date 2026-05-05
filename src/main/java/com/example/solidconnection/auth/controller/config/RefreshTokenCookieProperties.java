@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "token.refresh")
 public record RefreshTokenCookieProperties(
+        String cookieName,
         String cookieDomain
 ) {
 

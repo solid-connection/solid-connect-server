@@ -81,6 +81,7 @@ sentry:
 
 token:
   refresh:
+    cookie-name: "refreshToken"
     cookie-domain: ".solid-connection.com"
 
 ---
@@ -118,6 +119,7 @@ sentry:
 
 token:
   refresh:
+    cookie-name: "stageRefreshToken"
     cookie-domain: ".stage.solid-connection.com"
 
 ---
@@ -152,4 +154,5 @@ sentry:
 
 token:
   refresh:
+    cookie-name: "refreshToken"
     cookie-domain: "localhost"
