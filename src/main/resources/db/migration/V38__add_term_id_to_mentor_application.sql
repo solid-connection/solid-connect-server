@@ -3,4 +3,4 @@ ALTER TABLE mentor_application
 
 ALTER TABLE mentor_application
     ADD CONSTRAINT fk_mentor_application_term_id
-        FOREIGN KEY (term_id) REFERENCES term (id);
+        FOREIGN KEY (term_id) REFERENCES term(id);

@@ -1,3 +1,2 @@
 ALTER TABLE mentoring
-DROP
-COLUMN rejected_reason;
+    DROP COLUMN rejected_reason;
