@@ -1,12 +1,11 @@
 package com.example.solidconnection.admin.dto;
 
+import com.example.solidconnection.report.domain.ReportType;
 import java.time.ZonedDateTime;
 
-import com.example.solidconnection.report.domain.ReportType;
-
 public record ReportedHistoryResponse(
-	ZonedDateTime reportedDate,
-	ReportType reportType
+        ZonedDateTime reportedDate,
+        ReportType reportType
 ) {
 
 }

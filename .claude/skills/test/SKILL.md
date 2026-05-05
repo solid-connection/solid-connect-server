@@ -18,6 +18,7 @@ class ChatServiceTest {
 ```
 
 **제공 기능:**
+
 - MySQL, Redis 자동 실행
 - Spring Boot 컨텍스트 로드
 - 테스트 후 자동 DB 초기화

@@ -12,10 +12,12 @@ assignees: ''
 > 리팩터링하려는 부분에 대해 간결하게 설명해주세요
 
 ### AS-IS
+
 - as-is
 - as-is
 
 ### TO-BE
+
 - to-be
 - to-be
 

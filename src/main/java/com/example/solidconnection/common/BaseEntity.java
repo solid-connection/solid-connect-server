@@ -3,6 +3,7 @@ package com.example.solidconnection.common;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.ChronoUnit.MICROS;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -20,7 +21,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicInsert
 public abstract class BaseEntity {
 
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
+
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @PrePersist

@@ -24,13 +24,14 @@ public class LanguageRequirement extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "language_test_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private LanguageTestType languageTestType;
 
-    @Column(nullable = false)
+    @Column(name = "min_score", nullable = false)
     private String minScore;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MentorApplicationRepository extends JpaRepository<MentorApplication, Long> , MentorApplicationFilterRepository {
+public interface MentorApplicationRepository extends JpaRepository<MentorApplication, Long>, MentorApplicationFilterRepository {
 
     boolean existsBySiteUserIdAndMentorApplicationStatusIn(long siteUserId, List<MentorApplicationStatus> mentorApplicationStatuses);
 
     void deleteAllBySiteUserId(long siteUserId);
-  
+
     Optional<MentorApplication> findBySiteUserIdAndMentorApplicationStatus(long siteUserId, MentorApplicationStatus mentorApplicationStatus);
 
     long countByMentorApplicationStatus(MentorApplicationStatus mentorApplicationStatus);

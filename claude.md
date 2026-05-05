@@ -1,4 +1,3 @@
-
 # CLAUDE.md
 
 이 파일은 Claude Code가 solid-connect-server 저장소에서 작업할 때 참고하는 가이드입니다.
@@ -145,15 +144,18 @@ Controller → Service → Repository/Domain
 ```java
 // DTO 변환
 // 다중 파라미터: of() 메서드
-public static UserDto of(User user, Profile profile) { ... }
+public static UserDto of(User user, Profile profile) { ...}
 
 // 단일 파라미터: from() 메서드
-public static UserDto from(User user) { ... }
+public static UserDto from(User user) { ...}
 
 // API 요청/응답
 // XXXRequest, XXXResponse 형식
-public class UserCreateRequest { ... }
-public class UserCreateResponse { ... }
+public class UserCreateRequest { ...
+}
+
+public class UserCreateResponse { ...
+}
 
 // REST API 엔드포인트
 // kebab-case 사용
@@ -278,6 +280,7 @@ V3__add_user_role_column.sql
 ### JPA Entity
 
 ```java
+
 @Entity
 @Table(name = "chat_room")
 public class ChatRoom {
@@ -296,6 +299,7 @@ public class ChatRoom {
 ```
 
 **규칙:**
+
 - `@Column` 필수 (모든 필드)
 - 필드명과 DB 컬럼명 일치
 - nullable 명시
@@ -304,7 +308,9 @@ public class ChatRoom {
 
 ```java
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+
     Optional<ChatRoom> findByMentoringId(Long mentoringId);
+
     List<ChatRoom> findByIsGroup(boolean isGroup);
 }
 ```
@@ -313,18 +319,19 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
 ## 주요 파일 위치
 
-| 파일/폴더 | 설명 |
-|----------|------|
-| `src/main/java/com/example/solidconnection/` | 메인 소스 코드 |
-| `src/test/java/com/example/solidconnection/` | 테스트 코드 |
-| `src/main/resources/db/migration/` | Flyway 마이그레이션 |
-| `src/main/resources/application.yml` | 공통 설정 |
-| `docker-compose.*.yml` | 환경별 도커 설정 |
-| `build.gradle` | Gradle 빌드 설정 |
+| 파일/폴더                                        | 설명            |
+|----------------------------------------------|---------------|
+| `src/main/java/com/example/solidconnection/` | 메인 소스 코드      |
+| `src/test/java/com/example/solidconnection/` | 테스트 코드        |
+| `src/main/resources/db/migration/`           | Flyway 마이그레이션 |
+| `src/main/resources/application.yml`         | 공통 설정         |
+| `docker-compose.*.yml`                       | 환경별 도커 설정     |
+| `build.gradle`                               | Gradle 빌드 설정  |
 
 ---
 
 ### 프로필
+
 - **local**: Development with embedded Tomcat
 - **dev**: Development server (stage.solid-connection.com)
 - **prod**: Production server (solid-connection.com)
@@ -371,7 +378,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 - **Flyway**: https://flywaydb.org/
 
 ---
-
 
 ## 주의사항
 

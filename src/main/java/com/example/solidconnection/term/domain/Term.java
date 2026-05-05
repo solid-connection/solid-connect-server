@@ -26,9 +26,10 @@ public class Term {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(length = 20)
+    @Column(name = "name", length = 20)
     private String name;
 
     @Column(name = "is_current", unique = true)

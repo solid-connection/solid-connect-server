@@ -39,8 +39,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 @TestContainerSpringBootTest
@@ -96,6 +96,44 @@ class PostCommandServiceTest {
                 PostCategory.질문,
                 boardFixture.자유게시판(),
                 user1
+        );
+    }
+
+    private PostCreateRequest createPostCreateRequest(String category) {
+        return new PostCreateRequest(
+                boardFixture.자유게시판().getCode(),
+                category,
+                "테스트 제목",
+                "테스트 내용",
+                false
+        );
+    }
+
+    private MockMultipartFile createImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
+    private List<MultipartFile> createSixImageFiles() {
+        return List.of(
+                createImageFile(),
+                createImageFile(),
+                createImageFile(),
+                createImageFile(),
+                createImageFile(),
+                createImageFile()
+        );
+    }
+
+    private PostUpdateRequest createPostUpdateRequest() {
+        return new PostUpdateRequest(
+                PostCategory.자유.name(),
+                "수정된 제목",
+                "수정된 내용"
         );
     }
 
@@ -307,43 +345,5 @@ class PostCommandServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CAN_NOT_DELETE_OR_UPDATE_QUESTION.getMessage());
         }
-    }
-
-    private PostCreateRequest createPostCreateRequest(String category) {
-        return new PostCreateRequest(
-                boardFixture.자유게시판().getCode(),
-                category,
-                "테스트 제목",
-                "테스트 내용",
-                false
-        );
-    }
-
-    private MockMultipartFile createImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
-    }
-
-    private List<MultipartFile> createSixImageFiles() {
-        return List.of(
-                createImageFile(),
-                createImageFile(),
-                createImageFile(),
-                createImageFile(),
-                createImageFile(),
-                createImageFile()
-        );
-    }
-
-    private PostUpdateRequest createPostUpdateRequest() {
-        return new PostUpdateRequest(
-                PostCategory.자유.name(),
-                "수정된 제목",
-                "수정된 내용"
-        );
     }
 }

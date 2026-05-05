@@ -27,8 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @TestContainerSpringBootTest
 @DisplayName("멘토 승격 신청 서비스 테스트")
@@ -94,11 +94,11 @@ public class MentorApplicationServiceTest {
         mentorApplicationService.submitMentorApplication(user.getId(), request, file);
 
         // then
-        assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(),List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
+        assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(), List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
     }
 
     @Test
-    void 대학_선택_타입이_CATALOG_인데_universityId가_null_이면_예외가_발생한다(){
+    void 대학_선택_타입이_CATALOG_인데_universityId가_null_이면_예외가_발생한다() {
         // given
         UniversitySelectType universitySelectType = UniversitySelectType.CATALOG;
         Long universityId = null;
@@ -115,7 +115,7 @@ public class MentorApplicationServiceTest {
     }
 
     @Test
-    void 대학_선택_타입이_OTHER_인데_universityId가_존재하면_예외가_발생한다(){
+    void 대학_선택_타입이_OTHER_인데_universityId가_존재하면_예외가_발생한다() {
         // given
         UniversitySelectType universitySelectType = UniversitySelectType.OTHER;
         Long universityId = 1L;
@@ -180,7 +180,7 @@ public class MentorApplicationServiceTest {
         mentorApplicationService.submitMentorApplication(user.getId(), request, file);
 
         // then
-        assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(),List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
+        assertThat(mentorApplicationRepository.existsBySiteUserIdAndMentorApplicationStatusIn(user.getId(), List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))).isEqualTo(true);
     }
 
     private MockMultipartFile createMentorProofFile() {

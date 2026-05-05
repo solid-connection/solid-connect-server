@@ -29,23 +29,18 @@ import org.springframework.mock.web.MockHttpServletResponse;
 @DisplayName("로그아웃 체크 필터 테스트")
 class SignOutCheckFilterTest {
 
+    private final String subject = "subject";
     @Autowired
     private SignOutCheckFilter signOutCheckFilter;
-
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
-
     @Autowired
     private JwtProperties jwtProperties;
-
     @Autowired
     private TokenProperties tokenProperties;
-
     private HttpServletRequest request;
     private HttpServletResponse response;
     private FilterChain filterChain;
-
-    private final String subject = "subject";
 
     @BeforeEach
     void setUp() {

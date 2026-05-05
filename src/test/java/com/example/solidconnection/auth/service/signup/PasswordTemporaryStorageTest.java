@@ -13,14 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @TestContainerSpringBootTest
 class PasswordTemporaryStorageTest {
 
-    @Autowired
-    private PasswordTemporaryStorage passwordTemporaryStorage;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private final String email = "test@email.com";
     private final String rawPassword = "password123";
+    @Autowired
+    private PasswordTemporaryStorage passwordTemporaryStorage;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void 인코딩된_비밀번호를_임시_저장소에_저장하고_조회한다() {

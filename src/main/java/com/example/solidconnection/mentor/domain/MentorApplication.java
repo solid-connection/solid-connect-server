@@ -40,44 +40,35 @@ import org.hibernate.annotations.Check;
 )
 public class MentorApplication extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private long siteUserId;
-
-    @Column(nullable = false, name = "country_code")
-    private String countryCode;
-
-    @Column
-    private Long universityId;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UniversitySelectType universitySelectType;
-
-    @Column(nullable = false, name = "mentor_proof_url", length = 500)
-    private String mentorProofUrl;
-
-    @Column(nullable = false, name = "term_id")
-    private long termId;
-
-    private String rejectedReason;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ExchangeStatus exchangeStatus;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MentorApplicationStatus mentorApplicationStatus;
-
-    @Column
-    private ZonedDateTime approvedAt;
-
     private static final Set<ExchangeStatus> ALLOWED =
             Collections.unmodifiableSet(EnumSet.of(ExchangeStatus.STUDYING_ABROAD, ExchangeStatus.AFTER_EXCHANGE));
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "site_user_id", nullable = false)
+    private long siteUserId;
+    @Column(name = "country_code", nullable = false)
+    private String countryCode;
+    @Column(name = "university_id")
+    private Long universityId;
+    @Column(name = "university_select_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UniversitySelectType universitySelectType;
+    @Column(name = "mentor_proof_url", nullable = false, length = 500)
+    private String mentorProofUrl;
+    @Column(name = "term_id", nullable = false)
+    private long termId;
+    @Column(name = "rejected_reason")
+    private String rejectedReason;
+    @Column(name = "exchange_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ExchangeStatus exchangeStatus;
+    @Column(name = "mentor_application_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MentorApplicationStatus mentorApplicationStatus;
+    @Column(name = "approved_at")
+    private ZonedDateTime approvedAt;
 
     public MentorApplication(
             long siteUserId,
@@ -104,39 +95,39 @@ public class MentorApplication extends BaseEntity {
     private void validateUniversitySelection(UniversitySelectType universitySelectType, Long universityId) {
         switch (universitySelectType) {
             case CATALOG -> {
-                if(universityId == null) {
+                if (universityId == null) {
                     throw new CustomException(ErrorCode.UNIVERSITY_ID_REQUIRED_FOR_CATALOG);
                 }
             }
             case OTHER -> {
-                if(universityId != null) {
+                if (universityId != null) {
                     throw new CustomException(ErrorCode.UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER);
                 }
             }
-            default ->  throw new CustomException(ErrorCode.INVALID_UNIVERSITY_SELECT_TYPE);
+            default -> throw new CustomException(ErrorCode.INVALID_UNIVERSITY_SELECT_TYPE);
         }
     }
 
     private void validateExchangeStatus(ExchangeStatus exchangeStatus) {
-        if(!ALLOWED.contains(exchangeStatus)) {
+        if (!ALLOWED.contains(exchangeStatus)) {
             throw new CustomException(ErrorCode.INVALID_EXCHANGE_STATUS_FOR_MENTOR);
         }
     }
 
-    public void approve(){
+    public void approve() {
         validatePending();
         validateCanApprove();
         this.mentorApplicationStatus = MentorApplicationStatus.APPROVED;
         this.approvedAt = ZonedDateTime.now(UTC).truncatedTo(MICROS);
     }
 
-    private void validateCanApprove(){
-        if(this.universitySelectType != UniversitySelectType.CATALOG){
+    private void validateCanApprove() {
+        if (this.universitySelectType != UniversitySelectType.CATALOG) {
             throw new CustomException(MENTOR_APPLICATION_UNIVERSITY_NOT_SELECTED);
         }
     }
 
-    public void reject(String rejectedReason){
+    public void reject(String rejectedReason) {
         validatePending();
         this.mentorApplicationStatus = MentorApplicationStatus.REJECTED;
         this.rejectedReason = rejectedReason;
@@ -146,16 +137,16 @@ public class MentorApplication extends BaseEntity {
         this.universityId = universityId;
         this.universitySelectType = UniversitySelectType.CATALOG;
     }
-    
-    public void validateCanAssignUniversity(){
+
+    public void validateCanAssignUniversity() {
         validatePending();
-        if(this.universitySelectType != UniversitySelectType.OTHER){
+        if (this.universitySelectType != UniversitySelectType.OTHER) {
             throw new CustomException(MENTOR_APPLICATION_NOT_OTHER_STATUS);
         }
     }
 
-    private void validatePending(){
-        if(this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
+    private void validatePending() {
+        if (this.mentorApplicationStatus != MentorApplicationStatus.PENDING) {
             throw new CustomException(MENTOR_APPLICATION_ALREADY_CONFIRMED);
         }
     }

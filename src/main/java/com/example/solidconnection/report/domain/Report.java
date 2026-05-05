@@ -30,10 +30,10 @@ public class Report extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "reporter_id")
+    @Column(name = "reporter_id", nullable = false)
     private long reporterId;
 
-    @Column(name = "reported_id")
+    @Column(name = "reported_id", nullable = false)
     private long reportedId;
 
     @Column(name = "report_type")
@@ -44,7 +44,7 @@ public class Report extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private TargetType targetType;
 
-    @Column(name = "target_id")
+    @Column(name = "target_id", nullable = false)
     private long targetId;
 
     public Report(long reporterId, long reportedId, ReportType reportType, TargetType targetType, long targetId) {

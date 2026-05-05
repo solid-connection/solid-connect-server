@@ -21,11 +21,11 @@ import org.springframework.mock.web.MockMultipartFile;
 @ExtendWith(MockitoExtension.class)
 public class S3ServiceTest {
 
+    private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
     @InjectMocks
     private S3Service s3Service;
-
-    @Mock private FileUploadService fileUploadService;
-    private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
+    @Mock
+    private FileUploadService fileUploadService;
 
     private MockMultipartFile createMockFile(String originalName, long size) {
         return new MockMultipartFile("file", originalName, "image/jpeg", new byte[(int) size]);

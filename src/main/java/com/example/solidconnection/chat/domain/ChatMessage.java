@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -23,23 +24,21 @@ import org.hibernate.annotations.Where;
 @Where(clause = "is_deleted = false")
 public class ChatMessage extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 500)
-    private String content;
-
-    private long senderId; // chat_participant의 id
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private ChatRoom chatRoom;
-
-    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
-    private boolean isDeleted = false;
-
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ChatAttachment> chatAttachments = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "content", nullable = false, length = 500)
+    private String content;
+    @Column(name = "sender_id", nullable = false)
+    private long senderId; // chat_participant의 id
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
+    @ColumnDefault("false")
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     public ChatMessage(String content, long senderId, ChatRoom chatRoom) {
         this.content = content;

@@ -46,6 +46,10 @@ class SiteUserDetailsServiceTest {
         );
     }
 
+    private String getUserName(SiteUser siteUser) {
+        return siteUser.getId().toString();
+    }
+
     @Nested
     class 예외가_발생한다 {
 
@@ -84,9 +88,5 @@ class SiteUserDetailsServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(AUTHENTICATION_FAILED.getMessage());
         }
-    }
-
-    private String getUserName(SiteUser siteUser) {
-        return siteUser.getId().toString();
     }
 }

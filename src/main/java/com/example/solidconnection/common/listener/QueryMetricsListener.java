@@ -38,16 +38,26 @@ public class QueryMetricsListener implements QueryExecutionListener {
                 "sql_type", type,
                 "http_method", httpMethod,
                 "http_path", httpPath
-                ).record(elapsedMs, TimeUnit.MILLISECONDS);
+        ).record(elapsedMs, TimeUnit.MILLISECONDS);
     }
 
     private String guessType(String sql) {
-        if (sql == null) return "OTHER";
+        if (sql == null) {
+            return "OTHER";
+        }
         String s = sql.trim().toUpperCase();
-        if (s.startsWith("SELECT")) return "SELECT";
-        if (s.startsWith("INSERT")) return "INSERT";
-        if (s.startsWith("UPDATE")) return "UPDATE";
-        if (s.startsWith("DELETE")) return "DELETE";
+        if (s.startsWith("SELECT")) {
+            return "SELECT";
+        }
+        if (s.startsWith("INSERT")) {
+            return "INSERT";
+        }
+        if (s.startsWith("UPDATE")) {
+            return "UPDATE";
+        }
+        if (s.startsWith("DELETE")) {
+            return "DELETE";
+        }
         return "UNKNOWN";
     }
 }

@@ -4,11 +4,11 @@ import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 
 public record UserSearchResponse(
-	Long id,
-	String nickname,
-	String email,
-	Role role,
-	UserStatus userStatus
+        Long id,
+        String nickname,
+        String email,
+        Role role,
+        UserStatus userStatus
 ) {
 
 }

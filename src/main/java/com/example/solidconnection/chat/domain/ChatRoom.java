@@ -14,27 +14,27 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private boolean isGroup = false;
-
-    @Column(name = "mentoring_id", unique = true)
-    private Long mentoringId;
-
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @BatchSize(size = 10)
     private final List<ChatParticipant> chatParticipants = new ArrayList<>();
-
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private final List<ChatMessage> chatMessages = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @ColumnDefault("false")
+    @Column(name = "is_group", nullable = false)
+    private boolean isGroup = false;
+    @Column(name = "mentoring_id", unique = true)
+    private Long mentoringId;
 
     public ChatRoom(boolean isGroup) {
         this.isGroup = isGroup;

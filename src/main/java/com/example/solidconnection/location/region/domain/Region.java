@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 public class Region {
 
     @Id
-    @Column(length = 10)
+    @Column(name = "code", length = 10)
     private String code;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "korean_name", nullable = false, length = 100)
     private String koreanName;
 
     public Region(String code, String koreanName) {

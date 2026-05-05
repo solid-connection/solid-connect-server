@@ -58,6 +58,18 @@ class AuthTokenProviderTest {
         );
     }
 
+    @Test
+    void 토큰으로부터_SiteUser_를_추출한다() {
+        // given
+        String accessToken = authTokenProvider.generateAccessToken(siteUser).token();
+
+        // when
+        SiteUser actualSitUser = authTokenProvider.parseSiteUser(accessToken);
+
+        // then
+        assertThat(actualSitUser.getId()).isEqualTo(siteUser.getId());
+    }
+
     @Nested
     class 리프레시_토큰을_제공한다 {
 
@@ -100,17 +112,5 @@ class AuthTokenProviderTest {
             // then
             assertThat(tokenStorage.findToken(expectedSubject, RefreshToken.class)).isEmpty();
         }
-    }
-
-    @Test
-    void 토큰으로부터_SiteUser_를_추출한다() {
-        // given
-        String accessToken = authTokenProvider.generateAccessToken(siteUser).token();
-
-        // when
-        SiteUser actualSitUser = authTokenProvider.parseSiteUser(accessToken);
-
-        // then
-        assertThat(actualSitUser.getId()).isEqualTo(siteUser.getId());
     }
 }

@@ -13,6 +13,16 @@ import org.junit.jupiter.api.Test;
 @DisplayName("토큰 인증 정보 테스트")
 class TokenAuthenticationTest {
 
+    private SiteUser createSiteUser() {
+        return new SiteUser(
+                "test@example.com",
+                "nickname",
+                "profileImageUrl",
+                ExchangeStatus.CONSIDERING,
+                Role.MENTEE
+        );
+    }
+
     @Nested
     class Authentication의_인증_정보를_반환한다 {
 
@@ -67,15 +77,5 @@ class TokenAuthenticationTest {
             // when & then
             assertThat(authentication.isAuthenticated()).isTrue();
         }
-    }
-
-    private SiteUser createSiteUser() {
-        return new SiteUser(
-                "test@example.com",
-                "nickname",
-                "profileImageUrl",
-                ExchangeStatus.CONSIDERING,
-                Role.MENTEE
-        );
     }
 }

@@ -32,54 +32,55 @@ public class UnivApplyInfo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, name = "term_id")
+    @Column(name = "term_id", nullable = false)
     private long termId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_university_id")
     private HomeUniversity homeUniversity;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "korean_name", nullable = false, length = 100)
     private String koreanName;
 
-    @Column
+    @Column(name = "student_capacity")
     private Integer studentCapacity;
 
-    @Column
+    @Column(name = "tuition_fee_type")
     @Enumerated(EnumType.STRING)
     private TuitionFeeType tuitionFeeType;
 
-    @Column
+    @Column(name = "semester_available_for_dispatch")
     @Enumerated(EnumType.STRING)
     private SemesterAvailableForDispatch semesterAvailableForDispatch;
 
-    @Column(length = 100)
+    @Column(name = "semester_requirement", length = 100)
     private String semesterRequirement;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_language", length = 1000)
     private String detailsForLanguage;
 
-    @Column(length = 100)
+    @Column(name = "gpa_requirement", length = 100)
     private String gpaRequirement;
 
-    @Column(length = 100)
+    @Column(name = "gpa_requirement_criteria", length = 100)
     private String gpaRequirementCriteria;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_apply", length = 1000)
     private String detailsForApply;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_major", length = 1000)
     private String detailsForMajor;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_accommodation", length = 1000)
     private String detailsForAccommodation;
 
-    @Column(length = 1000)
+    @Column(name = "details_for_english_course", length = 1000)
     private String detailsForEnglishCourse;
 
-    @Column(length = 1000)
+    @Column(name = "details", length = 1000)
     private String details;
 
     @OneToMany(mappedBy = "univApplyInfo", cascade = CascadeType.ALL, orphanRemoval = true)

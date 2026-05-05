@@ -4,7 +4,7 @@ spring:
       parameterstore:
         enabled: false
 
-# db
+  # db
   data:
     redis:
       host: localhost
@@ -66,10 +66,10 @@ oauth:
     redirect-url: "https://localhost:8080/auth/apple"
     secret-key: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAfGIQ3TtNYAZG7i3m72odmdhfymkM9wAFg2rEL2RKUEA== # base64 encoded 된 임의의 값
 kakao:
-    redirect-url: "http://localhost:8080/auth/kakao"
-    client-id: client-id
-    token-url: "https://kauth.kakao.com/oauth/token"
-    user-info-url: "https://kapi.kakao.com/v2/user/me"
+  redirect-url: "http://localhost:8080/auth/kakao"
+  client-id: client-id
+  token-url: "https://kauth.kakao.com/oauth/token"
+  user-info-url: "https://kapi.kakao.com/v2/user/me"
 sentry:
   environment: test
   dsn: "https://test-public-key@sentry.test-domain.io/123456"

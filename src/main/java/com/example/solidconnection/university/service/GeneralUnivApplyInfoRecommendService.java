@@ -1,10 +1,7 @@
 package com.example.solidconnection.university.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
 import static com.example.solidconnection.university.service.UnivApplyInfoRecommendService.RECOMMEND_UNIV_APPLY_INFO_NUM;
 
-import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;

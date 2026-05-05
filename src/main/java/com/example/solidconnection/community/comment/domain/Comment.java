@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -34,19 +35,21 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(length = 255)
+    @Column(name = "content", length = 255)
     private String content;
 
-    @Column(name = "is_deleted", columnDefinition = "boolean default false", nullable = false)
+    @ColumnDefault("false")
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Column
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)

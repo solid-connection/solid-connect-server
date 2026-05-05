@@ -15,6 +15,7 @@ args: <PR 번호> (예: /review-pr 666)
 ```
 
 **예제:**
+
 ```bash
 /review-pr 666
 ```
@@ -34,6 +35,7 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 ```
 
 **수집할 정보:**
+
 - PR 제목 및 설명
 - 관련 이슈 번호
 - 변경된 파일 목록
@@ -44,13 +46,13 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 **도구 우선순위:**
 
 1. **Serena MCP** (Java 코드 분석에 최적화)
-   - `mcp__serena__get_symbols_overview <파일경로>` - 파일의 클래스/메서드 구조 파악
-   - `mcp__serena__find_symbol <심볼명>` - 특정 심볼 검색
-   - `mcp__serena__search_for_pattern <패턴>` - 컨벤션 위반 패턴 검색
+    - `mcp__serena__get_symbols_overview <파일경로>` - 파일의 클래스/메서드 구조 파악
+    - `mcp__serena__find_symbol <심볼명>` - 특정 심볼 검색
+    - `mcp__serena__search_for_pattern <패턴>` - 컨벤션 위반 패턴 검색
 
 2. **Read/Grep** (보조 분석)
-   - `Read <파일경로>` - 파일 전체 읽기
-   - `Grep --pattern <패턴>` - 패턴 검색
+    - `Read <파일경로>` - 파일 전체 읽기
+    - `Grep --pattern <패턴>` - 패턴 검색
 
 ### 3단계: 체크리스트 검증
 
@@ -65,6 +67,7 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 ### 1. 아키텍처 및 계층 구조
 
 **검증 항목:**
+
 - 계층형 아키텍처 준수 (Controller → Service → Repository)
 - 역계층 참조 금지
 - 순환 의존성 없음
@@ -76,6 +79,7 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 ### 2. 네이밍 컨벤션
 
 **검증 항목:**
+
 - API 엔드포인트: kebab-case 사용 (예: `/user-profile`)
 - DTO 변환 메서드: 단일 파라미터 `from()`, 다중 파라미터 `of()`
 - Request/Response: `XXXRequest`, `XXXResponse` 형식
@@ -88,6 +92,7 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 ### 3. 코드 스타일
 
 **검증 항목:**
+
 - 와일드카드(`*`) import 금지
 - 클래스 선언 전 빈 줄 존재
 - private 메서드는 호출하는 public 메서드 바로 아래 위치
@@ -96,6 +101,7 @@ gh pr checks <번호> -R solid-connection/solid-connect-server    # CI/CD 상태
 - 파일 끝 개행 문자
 
 **패턴 검색 예제:**
+
 ```bash
 mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ```
@@ -107,6 +113,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ### 4. Entity 및 JPA
 
 **검증 항목:**
+
 - 모든 필드에 `@Column` 어노테이션 존재
 - `name` 속성으로 컬럼명 명시
 - `nullable` 속성 명시
@@ -121,6 +128,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ### 5. 데이터베이스 마이그레이션
 
 **검증 항목:**
+
 - 스키마 변경 시 Flyway 마이그레이션 파일 추가
 - 파일명 형식: `V{VERSION}__{DESCRIPTION}.sql`
 - 위치: `src/main/resources/db/migration/`
@@ -134,6 +142,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ### 6. 테스트 코드
 
 **검증 항목:**
+
 - 새로운 Service/Repository 메서드에 대한 테스트 존재
 - 예외 케이스 테스트 포함
 - `@TestContainerSpringBootTest` 어노테이션 사용
@@ -149,6 +158,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ### 7. 커밋 메시지
 
 **검증 항목:**
+
 - `<type>: <description>` 형식
 - Type: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`, `perf`
 - 간결하고 명확한 설명
@@ -160,6 +170,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 ### 8. 코드 품질 및 잠재적 이슈
 
 **검증 항목:**
+
 - 비즈니스 로직은 Service 계층에만
 - Controller는 요청/응답 처리만
 - `@Transactional` 적절하게 사용 (읽기 전용: `readOnly = true`)

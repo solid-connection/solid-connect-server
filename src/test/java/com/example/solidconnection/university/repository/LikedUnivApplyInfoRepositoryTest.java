@@ -40,6 +40,13 @@ public class LikedUnivApplyInfoRepositoryTest {
         term = termFixture.현재_학기("2025-2");
     }
 
+    private LikedUnivApplyInfo createLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
+        return LikedUnivApplyInfo.builder()
+                .siteUserId(siteUser.getId())
+                .univApplyInfoId(univApplyInfo.getId())
+                .build();
+    }
+
     @Nested
     class 사용자와_좋아요한_대학은_복합_유니크_제약조건을_갖는다 {
 
@@ -90,12 +97,5 @@ public class LikedUnivApplyInfoRepositoryTest {
             // when & then
             assertThatCode(() -> likedUnivApplyInfoRepository.save(secondLike)).doesNotThrowAnyException();
         }
-    }
-
-    private LikedUnivApplyInfo createLikedUnivApplyInfo(SiteUser siteUser, UnivApplyInfo univApplyInfo) {
-        return LikedUnivApplyInfo.builder()
-                .siteUserId(siteUser.getId())
-                .univApplyInfoId(univApplyInfo.getId())
-                .build();
     }
 }

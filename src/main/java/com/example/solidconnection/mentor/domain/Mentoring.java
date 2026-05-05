@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -39,9 +40,10 @@ public class Mentoring extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="confirmed_at")
+    @Column(name = "confirmed_at")
     private ZonedDateTime confirmedAt;
 
     @Column(name = "checked_at_by_mentor")
@@ -50,14 +52,15 @@ public class Mentoring extends BaseEntity {
     @Column(name = "checked_at_by_mentee")
     private ZonedDateTime checkedAtByMentee;
 
-    @Column(nullable = false, name="verify_status")
+    @ColumnDefault("'PENDING'")
+    @Column(name = "verify_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private VerifyStatus verifyStatus = VerifyStatus.PENDING;
 
-    @Column(name = "mentor_id")
+    @Column(name = "mentor_id", nullable = false)
     private long mentorId;
 
-    @Column(name = "mentee_id")
+    @Column(name = "mentee_id", nullable = false)
     private long menteeId;
 
     public Mentoring(long mentorId, long menteeId, VerifyStatus verifyStatus) {

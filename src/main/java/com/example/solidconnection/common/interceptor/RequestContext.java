@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class RequestContext {
+
     private final String httpMethod;
     private final String bestMatchPath;
 

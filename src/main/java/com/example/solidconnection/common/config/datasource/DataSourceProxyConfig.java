@@ -16,20 +16,17 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class DataSourceProxyConfig {
 
-    private final QueryMetricsListener queryMetricsListener;
-
     // Driver
     public static final String FLYWAY_MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
-
     // Pool Name
     public static final String FLYWAY_POOL_NAME = "FlywayPool";
-
     // Connection Pool Settings
     public static final int FLYWAY_MINIMUM_IDLE = 0;            // 유휴 커넥션을 0으로 설정하면 사용하지 않을 때 커넥션을 즉시 반납
     public static final int FLYWAY_MAXIMUM_POOL_SIZE = 2;
     public static final long FLYWAY_CONNECTION_TIMEOUT = 10000L;
     public static final long FLYWAY_IDLE_TIMEOUT = 60000L;      // 1분
     public static final long FLYWAY_MAX_LIFETIME = 300000L;     // 5분
+    private final QueryMetricsListener queryMetricsListener;
 
     @Bean
     @Primary

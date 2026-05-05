@@ -18,6 +18,17 @@ class SiteUserRepositoryTest {
     @Autowired
     private SiteUserRepository siteUserRepository;
 
+    private SiteUser createSiteUser(String email, String nickname, AuthType authType) {
+        return new SiteUser(
+                email,
+                nickname,
+                "profileImageUrl",
+                ExchangeStatus.CONSIDERING,
+                Role.MENTEE,
+                authType
+        );
+    }
+
     @Nested
     class 이메일과_인증_유형이_동일한_사용자는_저장할_수_없다 {
 
@@ -76,16 +87,5 @@ class SiteUserRepositoryTest {
             assertThatCode(() -> siteUserRepository.saveAndFlush(user2))
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
-    }
-
-    private SiteUser createSiteUser(String email, String nickname, AuthType authType) {
-        return new SiteUser(
-                email,
-                nickname,
-                "profileImageUrl",
-                ExchangeStatus.CONSIDERING,
-                Role.MENTEE,
-                authType
-        );
     }
 }

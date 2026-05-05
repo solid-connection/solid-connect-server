@@ -17,4 +17,5 @@ public record SignUpRequest(
 
         @NotBlank(message = "닉네임을 입력해주세요.")
         String nickname) {
+
 }

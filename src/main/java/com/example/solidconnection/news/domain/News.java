@@ -21,18 +21,22 @@ public class News extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "title")
     private String title;
 
+    @Column(name = "description")
     private String description;
 
-    @Column(length = 500)
+    @Column(name = "thumbnail_url", length = 500)
     private String thumbnailUrl;
 
-    @Column(length = 500)
+    @Column(name = "url", length = 500)
     private String url;
 
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public News(

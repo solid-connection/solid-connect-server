@@ -56,7 +56,6 @@ public class GpaScoreFilterRepositoryImpl implements GpaScoreFilterRepository {
             GPA_SCORE_STATUS_RESPONSE_PROJECTION,
             SITE_USER_RESPONSE_PROJECTION
     );
-
     private final JPAQueryFactory queryFactory;
 
     @Autowired

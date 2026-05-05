@@ -1,13 +1,5 @@
 package com.example.solidconnection.admin.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.example.solidconnection.admin.dto.RestrictedUserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchCondition;
 import com.example.solidconnection.admin.dto.RestrictedUserSearchResponse;
@@ -18,6 +10,14 @@ import com.example.solidconnection.admin.service.AdminUserService;
 import com.example.solidconnection.common.response.PageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin/users")
@@ -37,7 +37,7 @@ public class AdminUserController {
 
     @GetMapping("/{user-id}")
     public ResponseEntity<UserInfoDetailResponse> getUserInfoDetail(
-		    @PathVariable(name = "user-id") long userId
+            @PathVariable(name = "user-id") long userId
     ) {
         UserInfoDetailResponse response = adminUserService.getUserInfoDetail(userId);
         return ResponseEntity.ok(response);
@@ -54,7 +54,7 @@ public class AdminUserController {
 
     @GetMapping("/restricted/{user-id}")
     public ResponseEntity<RestrictedUserInfoDetailResponse> getRestrictedUserInfoDetail(
-		    @PathVariable(name = "user-id") long userId
+            @PathVariable(name = "user-id") long userId
     ) {
         RestrictedUserInfoDetailResponse response = adminUserService.getRestrictedUserInfoDetail(userId);
         return ResponseEntity.ok(response);

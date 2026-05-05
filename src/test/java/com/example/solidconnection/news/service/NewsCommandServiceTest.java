@@ -29,8 +29,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 @TestContainerSpringBootTest
@@ -62,6 +62,23 @@ class NewsCommandServiceTest {
         user = siteUserFixture.멘토(1, "mentor");
     }
 
+    private NewsCreateRequest createNewsCreateRequest() {
+        return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
+    }
+
+    private NewsUpdateRequest createNewsUpdateRequest(String title, String description, String url, Boolean resetToDefaultImage) {
+        return new NewsUpdateRequest(title, description, url, resetToDefaultImage);
+    }
+
+    private MockMultipartFile createImageFile() {
+        return new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".getBytes()
+        );
+    }
+
     @Nested
     class 소식지_생성_테스트 {
 
@@ -81,10 +98,6 @@ class NewsCommandServiceTest {
             News savedNews = newsRepository.findById(response.id()).orElseThrow();
             assertThat(response.id()).isEqualTo(savedNews.getId());
         }
-    }
-
-    private NewsCreateRequest createNewsCreateRequest() {
-        return new NewsCreateRequest("제목", "설명", "https://youtu.be/test");
     }
 
     @Nested
@@ -277,19 +290,6 @@ class NewsCommandServiceTest {
                 );
             }
         }
-    }
-
-    private NewsUpdateRequest createNewsUpdateRequest(String title, String description, String url, Boolean resetToDefaultImage) {
-        return new NewsUpdateRequest(title, description, url, resetToDefaultImage);
-    }
-
-    private MockMultipartFile createImageFile() {
-        return new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
     }
 
     @Nested

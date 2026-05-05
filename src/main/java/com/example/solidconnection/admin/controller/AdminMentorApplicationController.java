@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 public class AdminMentorApplicationController {
+
     private final AdminMentorApplicationService adminMentorApplicationService;
 
     @GetMapping
@@ -79,7 +80,7 @@ public class AdminMentorApplicationController {
     @GetMapping("/{site-user-id}/history")
     public ResponseEntity<List<MentorApplicationHistoryResponse>> getMentorApplicationHistory(
             @PathVariable("site-user-id") Long siteUserId
-    ){
+    ) {
         List<MentorApplicationHistoryResponse> response = adminMentorApplicationService.findMentorApplicationHistory(siteUserId);
         return ResponseEntity.ok(response);
     }

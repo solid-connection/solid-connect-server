@@ -14,7 +14,6 @@ import com.example.solidconnection.admin.dto.UserSearchResponse;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.fixture.ApplicationFixture;
-import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.board.fixture.BoardFixture;
 import com.example.solidconnection.community.post.domain.Post;
@@ -34,8 +33,9 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.fixture.UserBanFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.fixture.TermFixture;
-import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -292,8 +292,8 @@ public class AdminUserServiceTest {
                     () -> assertThat(result.getContent()).hasSize(2),
                     () -> assertThat(result.getContent())
                             .allMatch(user ->
-                                    user.userStatus() == UserStatus.REPORTED ||
-                                    user.userStatus() == UserStatus.BANNED
+                                              user.userStatus() == UserStatus.REPORTED ||
+                                                      user.userStatus() == UserStatus.BANNED
                             )
             );
         }

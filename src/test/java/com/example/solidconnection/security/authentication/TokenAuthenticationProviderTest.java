@@ -28,23 +28,19 @@ import org.springframework.security.core.Authentication;
 @DisplayName("사용자 인증정보 provider 테스트")
 class TokenAuthenticationProviderTest {
 
+    private static final long VALID_TOKEN_TTL_MS = 30 * 1000L;
     @Autowired
     private TokenAuthenticationProvider tokenAuthenticationProvider;
-
     @Autowired
     private JwtProperties jwtProperties;
-
     @Autowired
     private SiteUserFixture siteUserFixture;
-
     private SiteUser user;
 
     @BeforeEach
     void setUp() {
         user = siteUserFixture.사용자();
     }
-
-    private static final long VALID_TOKEN_TTL_MS = 30 * 1000L;
 
     @Test
     void 처리할_수_있는_타입인지를_반환한다() {
@@ -74,6 +70,33 @@ class TokenAuthenticationProviderTest {
                 () -> assertThat(result.getCredentials()).isEqualTo(token),
                 () -> assertThat(result.getPrincipal().getClass()).isEqualTo(SiteUserDetails.class)
         );
+    }
+
+    private String createValidToken(long id) {
+        return Jwts.builder()
+                .subject(String.valueOf(id))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
+                .compact();
+    }
+
+    private String createExpiredToken() {
+        return Jwts.builder()
+                .subject(String.valueOf(user.getId()))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - VALID_TOKEN_TTL_MS))
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
+                .compact();
+    }
+
+    private String createWrongSubjectTypeToken() {
+        return Jwts.builder()
+                .subject("subject")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
+                .compact();
     }
 
     @Nested
@@ -114,32 +137,5 @@ class TokenAuthenticationProviderTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(AUTHENTICATION_FAILED.getMessage());
         }
-    }
-
-    private String createValidToken(long id) {
-        return Jwts.builder()
-                .subject(String.valueOf(id))
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
-                .compact();
-    }
-
-    private String createExpiredToken() {
-        return Jwts.builder()
-                .subject(String.valueOf(user.getId()))
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() - VALID_TOKEN_TTL_MS))
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
-                .compact();
-    }
-
-    private String createWrongSubjectTypeToken() {
-        return Jwts.builder()
-                .subject("subject")
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + VALID_TOKEN_TTL_MS))
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8)))
-                .compact();
     }
 }

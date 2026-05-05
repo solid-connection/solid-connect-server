@@ -21,10 +21,10 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
-import javax.crypto.SecretKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,22 +35,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @DisplayName("회원가입 토큰 제공자 테스트")
 class SignUpTokenProviderTest {
 
-    @Autowired
-    private SignUpTokenProvider signUpTokenProvider;
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @MockitoSpyBean
-    private TokenStorage tokenStorage;
-
-    @Autowired
-    private JwtProperties jwtProperties;
-
     private final String authTypeClaimKey = "authType";
     private final String email = "test@email.com";
     private final Subject subject = new Subject(email);
     private final AuthType authType = AuthType.KAKAO;
+    @Autowired
+    private SignUpTokenProvider signUpTokenProvider;
+    @Autowired
+    private TokenProvider tokenProvider;
+    @MockitoSpyBean
+    private TokenStorage tokenStorage;
+    @Autowired
+    private JwtProperties jwtProperties;
 
     @Test
     void 회원가입_토큰을_생성하고_저장한다() {
@@ -78,6 +74,40 @@ class SignUpTokenProviderTest {
 
         // then
         assertThat(tokenStorage.findToken(subject, SignUpToken.class)).isEmpty();
+    }
+
+    @Test
+    void 회원가입_토큰에서_이메일을_추출한다() {
+        // given
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
+
+        // when
+        String extractedEmail = signUpTokenProvider.parseEmail(signUpToken);
+
+        // then
+        assertThat(extractedEmail).isEqualTo(email);
+    }
+
+    @Test
+    void 회원가입_토큰에서_인증_타입을_추출한다() {
+        // given
+        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
+
+        // when
+        AuthType extractedAuthType = signUpTokenProvider.parseAuthType(signUpToken);
+
+        // then
+        assertThat(extractedAuthType).isEqualTo(authType);
+    }
+
+    private String createExpiredToken() {
+        SecretKey signingKey = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() - 1000))
+                .signWith(signingKey)
+                .compact();
     }
 
     @Nested
@@ -138,39 +168,5 @@ class SignUpTokenProviderTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(SIGN_UP_TOKEN_NOT_ISSUED_BY_SERVER.getMessage());
         }
-    }
-
-    @Test
-    void 회원가입_토큰에서_이메일을_추출한다() {
-        // given
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
-
-        // when
-        String extractedEmail = signUpTokenProvider.parseEmail(signUpToken);
-
-        // then
-        assertThat(extractedEmail).isEqualTo(email);
-    }
-
-    @Test
-    void 회원가입_토큰에서_인증_타입을_추출한다() {
-        // given
-        String signUpToken = signUpTokenProvider.generateAndSaveSignUpToken(email, authType).token();
-
-        // when
-        AuthType extractedAuthType = signUpTokenProvider.parseAuthType(signUpToken);
-
-        // then
-        assertThat(extractedAuthType).isEqualTo(authType);
-    }
-
-    private String createExpiredToken() {
-        SecretKey signingKey = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
-        return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() - 1000))
-                .signWith(signingKey)
-                .compact();
     }
 }

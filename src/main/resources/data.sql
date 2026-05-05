@@ -41,18 +41,20 @@ VALUES ('BN', '브루나이', 'ASIA'),
        ('MY', '말레이시아', 'ASIA'),
        ('RU', '러시아', 'EUROPE');
 
-INSERT INTO term (name, is_current) VALUES ('2024-1', true);
+INSERT INTO term (name, is_current)
+VALUES ('2024-1', true);
 
 INSERT INTO site_user (email, nickname, profile_image_url, exchange_status, role, password, auth_type)
 VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',
         'CONSIDERING', 'MENTEE',
         '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'); -- 12341234
 
-INSERT INTO home_university (id, name) VALUES (1, '인하대학교');
+INSERT INTO home_university (id, name)
+VALUES (1, '인하대학교');
 
 INSERT INTO host_university(id, country_code, region_code, english_name, format_name, korean_name,
-                       accommodation_url, english_course_url, homepage_url,
-                       details_for_local, logo_image_url, background_image_url)
+                            accommodation_url, english_course_url, homepage_url,
+                            details_for_local, logo_image_url, background_image_url)
 VALUES (1, 'US', 'AMERICAS', 'University of Guam', 'university_of_guam', '괌대학',
         'https://www.uog.edu/life-at-uog/residence-halls/', 'https://www.uog.edu/admissions/course-schedule',
         'https://www.uog.edu/admissions/international-students', NULL,

@@ -85,7 +85,7 @@ public class MentorApplicationFixtureBuilder {
                 exchangeStatus
         );
         ReflectionTestUtils.setField(mentorApplication, "mentorApplicationStatus", mentorApplicationStatus);
-        if(rejectedReason != null) {
+        if (rejectedReason != null) {
             ReflectionTestUtils.setField(mentorApplication, "rejectedReason", rejectedReason);
         }
         return mentorApplicationRepository.save(mentorApplication);

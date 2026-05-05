@@ -27,12 +27,13 @@ public class LikedNews extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "news_id")
+    @Column(name = "news_id", nullable = false)
     private long newsId;
 
-    @Column(name = "site_user_id")
+    @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
 
     public LikedNews(long newsId, long siteUserId) {

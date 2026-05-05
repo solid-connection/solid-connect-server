@@ -36,6 +36,7 @@ public class SiteUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "email", nullable = false, length = 100)
@@ -46,31 +47,33 @@ public class SiteUser extends BaseEntity {
     private AuthType authType;
 
     @Setter
-    @Column(nullable = false, length = 100)
+    @Column(name = "nickname", nullable = false, length = 100)
     private String nickname;
 
     @Setter
-    @Column(length = 500)
+    @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
-    @Column(nullable = false)
+    @Column(name = "exchange_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ExchangeStatus exchangeStatus;
 
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Setter
+    @Column(name = "nickname_modified_at")
     private LocalDateTime nicknameModifiedAt;
 
     @Setter
+    @Column(name = "quited_at")
     private LocalDate quitedAt;
 
-    @Column(nullable = true)
+    @Column(name = "password", nullable = true)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "user_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus = UserStatus.ACTIVE;
 

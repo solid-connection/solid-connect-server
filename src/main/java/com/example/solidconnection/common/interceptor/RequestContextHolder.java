@@ -1,6 +1,7 @@
 package com.example.solidconnection.common.interceptor;
 
 public class RequestContextHolder {
+
     private static final ThreadLocal<RequestContext> CONTEXT = new ThreadLocal<>();
 
     public static void initContext(RequestContext requestContext) {
@@ -12,7 +13,7 @@ public class RequestContextHolder {
         return CONTEXT.get();
     }
 
-    public static void clear(){
+    public static void clear() {
         CONTEXT.remove();
     }
 }

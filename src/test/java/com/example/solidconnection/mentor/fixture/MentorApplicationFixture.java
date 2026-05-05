@@ -12,13 +12,12 @@ import org.springframework.boot.test.context.TestComponent;
 @RequiredArgsConstructor
 public class MentorApplicationFixture {
 
-    private final MentorApplicationFixtureBuilder mentorApplicationFixtureBuilder;
-    private final TermFixture termFixture;
-
     private static final String DEFAULT_COUNTRY_CODE = "US";
-    private static final String DEFAULT_PROOF_URL   = "/mentor-proof.pdf";
+    private static final String DEFAULT_PROOF_URL = "/mentor-proof.pdf";
     private static final ExchangeStatus DEFAULT_EXCHANGE_STATUS = ExchangeStatus.AFTER_EXCHANGE;
     private static final String REJECTED_REASON = "pdf 파일 안열림";
+    private final MentorApplicationFixtureBuilder mentorApplicationFixtureBuilder;
+    private final TermFixture termFixture;
 
     public MentorApplication 대기중_멘토신청(
             long siteUserId,
@@ -40,7 +39,7 @@ public class MentorApplicationFixture {
             long siteUserId,
             UniversitySelectType selectType,
             Long universityId
-    ){
+    ) {
         return mentorApplicationFixtureBuilder.mentorApplication()
                 .siteUserId(siteUserId)
                 .countryCode(DEFAULT_COUNTRY_CODE)
@@ -57,7 +56,7 @@ public class MentorApplicationFixture {
             long siteUserId,
             UniversitySelectType selectType,
             Long universityId
-    ){
+    ) {
         return mentorApplicationFixtureBuilder.mentorApplication()
                 .siteUserId(siteUserId)
                 .countryCode(DEFAULT_COUNTRY_CODE)
