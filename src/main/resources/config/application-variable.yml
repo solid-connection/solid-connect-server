@@ -81,7 +81,7 @@ sentry:
 
 token:
   refresh:
-    cookie-name: "refreshToken"
+    cookie-name: "prodRefreshToken"
     cookie-domain: ".solid-connection.com"
 
 ---
