@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RefreshTokenCookieManager {
 
-    private static final String COOKIE_NAME = "refreshToken";
     private static final String PATH = "/";
 
     private final RefreshTokenCookieProperties properties;
@@ -44,7 +43,7 @@ public class RefreshTokenCookieManager {
     private void setRefreshTokenCookie(
             HttpServletResponse response, String refreshToken, long maxAge
     ) {
-        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, refreshToken)
+        ResponseCookie cookie = ResponseCookie.from(properties.cookieName(), refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path(PATH)
@@ -64,7 +63,7 @@ public class RefreshTokenCookieManager {
 
         // refreshToken 쿠키가 없는 경우 예외 발생
         Cookie refreshTokenCookie = Arrays.stream(cookies)
-                .filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
+                .filter(cookie -> properties.cookieName().equals(cookie.getName()))
                 .findFirst()
                 .orElseThrow(() -> new CustomException(REFRESH_TOKEN_NOT_EXISTS));
 
