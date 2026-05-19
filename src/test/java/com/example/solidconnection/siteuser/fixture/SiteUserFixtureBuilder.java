@@ -20,6 +20,7 @@ public class SiteUserFixtureBuilder {
     private String email;
     private AuthType authType;
     private String nickname;
+    private Long homeUniversityId;
     private String profileImageUrl;
     private Role role;
     private String password;
@@ -41,6 +42,11 @@ public class SiteUserFixtureBuilder {
 
     public SiteUserFixtureBuilder nickname(String nickname) {
         this.nickname = nickname;
+        return this;
+    }
+
+    public SiteUserFixtureBuilder homeUniversityId(Long homeUniversityId) {
+        this.homeUniversityId = homeUniversityId;
         return this;
     }
 
@@ -68,6 +74,7 @@ public class SiteUserFixtureBuilder {
         SiteUser siteUser = new SiteUser(
                 email,
                 nickname,
+                homeUniversityId,
                 profileImageUrl,
                 ExchangeStatus.CONSIDERING,
                 role,
