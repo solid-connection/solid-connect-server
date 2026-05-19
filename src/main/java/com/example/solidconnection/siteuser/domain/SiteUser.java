@@ -51,6 +51,10 @@ public class SiteUser extends BaseEntity {
     private String nickname;
 
     @Setter
+    @Column(name = "home_university_id", nullable = true)
+    private Long homeUniversityId;
+
+    @Setter
     @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
@@ -118,6 +122,27 @@ public class SiteUser extends BaseEntity {
             UserStatus userStatus) {
         this.email = email;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.exchangeStatus = exchangeStatus;
+        this.role = role;
+        this.authType = authType;
+        this.password = password;
+        this.userStatus = userStatus;
+    }
+
+    public SiteUser(
+            String email,
+            String nickname,
+            Long homeUniversityId,
+            String profileImageUrl,
+            ExchangeStatus exchangeStatus,
+            Role role,
+            AuthType authType,
+            String password,
+            UserStatus userStatus) {
+        this.email = email;
+        this.nickname = nickname;
+        this.homeUniversityId = homeUniversityId;
         this.profileImageUrl = profileImageUrl;
         this.exchangeStatus = exchangeStatus;
         this.role = role;
