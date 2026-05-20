@@ -1,6 +1,7 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -28,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class MentorApplicationService {
 
+    public static final int MENTOR_APPLICATION_COUNT_LIMIT = 5;
+
     private final MentorApplicationRepository mentorApplicationRepository;
     private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
@@ -40,6 +43,7 @@ public class MentorApplicationService {
             MultipartFile file
     ) {
         ensureNoPendingOrApprovedMentorApplication(siteUserId);
+        ensureApplicationCountNotExceeded(siteUserId);
 
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -64,6 +68,12 @@ public class MentorApplicationService {
                 List.of(MentorApplicationStatus.PENDING, MentorApplicationStatus.APPROVED))
         ) {
             throw new CustomException(MENTOR_APPLICATION_ALREADY_EXISTED);
+        }
+    }
+
+    private void ensureApplicationCountNotExceeded(long siteUserId) {
+        if (mentorApplicationRepository.countBySiteUserId(siteUserId) >= MENTOR_APPLICATION_COUNT_LIMIT) {
+            throw new CustomException(MENTOR_APPLICATION_LIMIT_EXCEEDED);
         }
     }
 }
