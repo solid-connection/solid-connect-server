@@ -10,7 +10,6 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
