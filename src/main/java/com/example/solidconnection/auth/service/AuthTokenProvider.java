@@ -10,6 +10,7 @@ import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class AuthTokenProvider {
 
     private static final String ROLE_CLAIM_KEY = "role";
+    private static final String HOME_UNIVERSITY_CLAIM_KEY = "home_university";
 
     private final TokenProvider tokenProvider;
     private final TokenStorage tokenStorage;
@@ -29,9 +31,14 @@ public class AuthTokenProvider {
     public AccessToken generateAccessToken(SiteUser siteUser) {
         Subject subject = toSubject(siteUser);
         Role role = siteUser.getRole();
+        Map<String, String> claims = new HashMap<>(Map.of(ROLE_CLAIM_KEY, role.name()));
+        if (siteUser.getHomeUniversityId() != null) {
+            claims.put(HOME_UNIVERSITY_CLAIM_KEY, String.valueOf(siteUser.getHomeUniversityId()));
+        }
+
         String token = tokenProvider.generateToken(
                 subject,
-                Map.of(ROLE_CLAIM_KEY, role.name()),
+                claims,
                 tokenProperties.access().expireTime()
         );
         return new AccessToken(token);
@@ -69,6 +76,11 @@ public class AuthTokenProvider {
         long siteUserId = Long.parseLong(subject.value());
         return siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
+
+    public Long parseHomeUniversityId(String token) {
+        String value = tokenProvider.parseClaims(token, HOME_UNIVERSITY_CLAIM_KEY, String.class);
+        return value != null ? Long.parseLong(value) : null;
     }
 
     public Subject toSubject(SiteUser siteUser) {

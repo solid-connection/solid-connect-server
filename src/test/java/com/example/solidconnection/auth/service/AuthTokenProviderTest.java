@@ -10,6 +10,7 @@ import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +34,19 @@ class AuthTokenProviderTest {
     @Autowired
     private SiteUserFixture siteUserFixture;
 
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
+
     private SiteUser siteUser;
+    private SiteUser siteUserWithHomeUniversity;
+    private Long homeUniversityId;
     private Subject expectedSubject;
 
     @BeforeEach
     void setUp() {
+        homeUniversityId = homeUniversityFixture.인하대학교().getId();
         siteUser = siteUserFixture.사용자();
+        siteUserWithHomeUniversity = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversityId);
         expectedSubject = new Subject(siteUser.getId().toString());
     }
 
@@ -68,6 +76,30 @@ class AuthTokenProviderTest {
 
         // then
         assertThat(actualSitUser.getId()).isEqualTo(siteUser.getId());
+    }
+
+    @Nested
+    class 액세스_토큰_homeUniversityId_클레임 {
+
+        @Test
+        void homeUniversityId가_있는_사용자는_액세스_토큰_클레임에_포함된다() {
+            // when
+            String token = authTokenProvider.generateAccessToken(siteUserWithHomeUniversity).token();
+
+            // then
+            Long actual = authTokenProvider.parseHomeUniversityId(token);
+            assertThat(actual).isEqualTo(homeUniversityId);
+        }
+
+        @Test
+        void homeUniversityId가_없는_사용자는_액세스_토큰_클레임에서_생략된다() {
+            // when
+            String token = authTokenProvider.generateAccessToken(siteUser).token();
+
+            // then
+            Long actual = authTokenProvider.parseHomeUniversityId(token);
+            assertThat(actual).isNull();
+        }
     }
 
     @Nested
