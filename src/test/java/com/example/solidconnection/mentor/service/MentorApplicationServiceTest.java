@@ -1,8 +1,10 @@
 package com.example.solidconnection.mentor.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_EXISTED;
+import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_LIMIT_EXCEEDED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_ID_REQUIRED_FOR_CATALOG;
+import static com.example.solidconnection.mentor.service.MentorApplicationService.MENTOR_APPLICATION_COUNT_LIMIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.BDDMockito.given;
@@ -161,6 +163,24 @@ public class MentorApplicationServiceTest {
         assertThatCode(() -> mentorApplicationService.submitMentorApplication(user.getId(), request, file))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(MENTOR_APPLICATION_ALREADY_EXISTED.getMessage());
+    }
+
+    @Test
+    void 멘토_승격_신청_횟수가_최대_횟수에_도달하면_예외가_발생한다() {
+        // given
+        for (int i = 0; i < MENTOR_APPLICATION_COUNT_LIMIT; i++) {
+            mentorApplicationFixture.거절된_멘토신청(user.getId(), UniversitySelectType.CATALOG, 1L);
+        }
+
+        UniversitySelectType universitySelectType = UniversitySelectType.CATALOG;
+        Long universityId = 1L;
+        MentorApplicationRequest request = createMentorApplicationRequest(universitySelectType, universityId);
+        MockMultipartFile file = createMentorProofFile();
+
+        // when & then
+        assertThatCode(() -> mentorApplicationService.submitMentorApplication(user.getId(), request, file))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(MENTOR_APPLICATION_LIMIT_EXCEEDED.getMessage());
     }
 
     @Test

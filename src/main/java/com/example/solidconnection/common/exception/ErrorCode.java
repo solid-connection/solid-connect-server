@@ -1,6 +1,7 @@
 package com.example.solidconnection.common.exception;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
+import static com.example.solidconnection.mentor.service.MentorApplicationService.MENTOR_APPLICATION_COUNT_LIMIT;
 import static com.example.solidconnection.siteuser.service.MyPageService.MIN_DAYS_BETWEEN_NICKNAME_CHANGES;
 
 import lombok.AllArgsConstructor;
@@ -133,6 +134,7 @@ public enum ErrorCode {
     UNAUTHORIZED_MENTORING(HttpStatus.FORBIDDEN.value(), "멘토링 권한이 없습니다."),
     MENTORING_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST.value(), "이미 승인 또는 거절된 멘토링입니다."),
     MENTOR_APPLICATION_ALREADY_EXISTED(HttpStatus.CONFLICT.value(), "멘토 승격 요청이 이미 존재합니다."),
+    MENTOR_APPLICATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "멘토 승격 요청은 " + MENTOR_APPLICATION_COUNT_LIMIT + "회까지만 가능합니다."),
     INVALID_EXCHANGE_STATUS_FOR_MENTOR(HttpStatus.BAD_REQUEST.value(), "멘토 승격 지원 가능한 교환학생 상태가 아닙니다."),
     UNIVERSITY_ID_REQUIRED_FOR_CATALOG(HttpStatus.BAD_REQUEST.value(), "목록에서 학교를 선택한 경우 학교 정보가 필요합니다."),
     UNIVERSITY_ID_MUST_BE_NULL_FOR_OTHER(HttpStatus.BAD_REQUEST.value(), "기타 학교를 선택한 경우 학교 정보를 입력할 수 없습니다."),
