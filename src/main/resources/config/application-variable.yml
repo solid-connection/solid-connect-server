@@ -73,7 +73,7 @@ cors:
   allowed-origins:
     - "https://www.solid-connection.com"
     - "https://api.solid-connection.com"
-    - "https://admin.solid-connection.com"
+    - "https://admins.solid-connection.com"
 
 sentry:
   environment: "production"
