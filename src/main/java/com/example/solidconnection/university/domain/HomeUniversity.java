@@ -24,4 +24,8 @@ public class HomeUniversity extends BaseEntity {
 
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
+
+    public void update(String name) {
+        this.name = name;
+    }
 }
