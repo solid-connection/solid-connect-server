@@ -74,6 +74,7 @@ cors:
     - "https://www.solid-connection.com"
     - "https://api.solid-connection.com"
     - "https://admins.solid-connection.com"
+    - "https://www.admins.solid-connection.com"
 
 sentry:
   environment: "production"
