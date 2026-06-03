@@ -52,6 +52,13 @@ public class AdminHomeUniversityService {
         return AdminHomeUniversityResponse.from(homeUniversityRepository.save(homeUniversity));
     }
 
+    private void validateNameNotExists(String name) {
+        homeUniversityRepository.findByName(name)
+                .ifPresent(existing -> {
+                    throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
+                });
+    }
+
     @Transactional
     @DefaultCacheOut(
             key = {"univApplyInfoTextSearch", "university:recommend:general"},
@@ -66,6 +73,15 @@ public class AdminHomeUniversityService {
         return AdminHomeUniversityResponse.from(homeUniversity);
     }
 
+    private void validateNameNotDuplicated(String name, Long excludeId) {
+        homeUniversityRepository.findByName(name)
+                .ifPresent(existing -> {
+                    if (!existing.getId().equals(excludeId)) {
+                        throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
+                    }
+                });
+    }
+
     @Transactional
     @DefaultCacheOut(
             key = {"univApplyInfoTextSearch", "university:recommend:general"},
@@ -77,22 +93,6 @@ public class AdminHomeUniversityService {
                 .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
         validateNoReferences(id);
         homeUniversityRepository.delete(homeUniversity);
-    }
-
-    private void validateNameNotExists(String name) {
-        homeUniversityRepository.findByName(name)
-                .ifPresent(existing -> {
-                    throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
-                });
-    }
-
-    private void validateNameNotDuplicated(String name, Long excludeId) {
-        homeUniversityRepository.findByName(name)
-                .ifPresent(existing -> {
-                    if (!existing.getId().equals(excludeId)) {
-                        throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
-                    }
-                });
     }
 
     private void validateNoReferences(Long id) {
