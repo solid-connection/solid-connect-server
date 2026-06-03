@@ -25,6 +25,8 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long>, SiteU
 
     List<SiteUser> findAllByIdIn(List<Long> ids);
 
+    boolean existsByHomeUniversityId(Long homeUniversityId);
+
     @Modifying
     @Query("UPDATE SiteUser u SET u.userStatus = :status WHERE u.id IN :userIds")
     void bulkUpdateUserStatus(@Param("userIds") List<Long> userIds, @Param("status") UserStatus status);
