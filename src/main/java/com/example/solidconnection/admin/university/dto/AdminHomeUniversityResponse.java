@@ -3,7 +3,7 @@ package com.example.solidconnection.admin.university.dto;
 import com.example.solidconnection.university.domain.HomeUniversity;
 
 public record AdminHomeUniversityResponse(
-        Long id,
+        long id,
         String name
 ) {
 
