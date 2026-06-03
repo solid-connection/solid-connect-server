@@ -15,4 +15,10 @@ public class HomeUniversityFixture {
                 .name("인하대학교")
                 .create();
     }
+
+    public HomeUniversity 인천대학교() {
+        return homeUniversityFixtureBuilder.homeUniversity()
+                .name("인천대학교")
+                .create();
+    }
 }

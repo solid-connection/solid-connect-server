@@ -57,7 +57,7 @@ class AdminHomeUniversityServiceTest {
         void 저장된_모든_협정대학을_반환한다() {
             // given
             HomeUniversity homeUniversity1 = homeUniversityFixture.인하대학교();
-            HomeUniversity homeUniversity2 = homeUniversityRepository.save(new HomeUniversity(null, "연세대학교"));
+            HomeUniversity homeUniversity2 = homeUniversityFixture.인천대학교();
 
             // when
             List<AdminHomeUniversityResponse> responses = adminHomeUniversityService.getAllHomeUniversities();
