@@ -42,6 +42,9 @@ token:
   refresh:
     storage-key-prefix: "REFRESH"
     expire-time: 90d
+  admin-refresh:
+    storage-key-prefix: "ADMIN_REFRESH"
+    expire-time: 90d
   sign-up:
     storage-key-prefix: "SIGN_UP"
     expire-time: 10m
@@ -84,6 +87,9 @@ token:
   refresh:
     cookie-name: "prodRefreshToken"
     cookie-domain: ".solid-connection.com"
+  admin-refresh:
+    cookie-name: "adminProdRefreshToken"
+    cookie-domain: ".solid-connection.com"
 
 ---
 spring:
@@ -122,6 +128,9 @@ token:
   refresh:
     cookie-name: "stageRefreshToken"
     cookie-domain: ".stage.solid-connection.com"
+  admin-refresh:
+    cookie-name: "adminStageRefreshToken"
+    cookie-domain: ".stage.solid-connection.com"
 
 ---
 spring:
@@ -156,4 +165,7 @@ sentry:
 token:
   refresh:
     cookie-name: "refreshToken"
+    cookie-domain: "localhost"
+  admin-refresh:
+    cookie-name: "adminRefreshToken"
     cookie-domain: "localhost"
