@@ -15,12 +15,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @EqualsAndHashCode(of = "id")
@@ -83,6 +86,10 @@ public class UnivApplyInfo extends BaseEntity {
     @Column(name = "details", length = 1000)
     private String details;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "extra_info", columnDefinition = "JSON")
+    private Map<String, String> extraInfo;
+
     @OneToMany(mappedBy = "univApplyInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
@@ -91,5 +98,9 @@ public class UnivApplyInfo extends BaseEntity {
 
     public void addLanguageRequirements(LanguageRequirement languageRequirements) {
         this.languageRequirements.add(languageRequirements);
+    }
+
+    public void updateExtraInfo(Map<String, String> extraInfo) {
+        this.extraInfo = extraInfo;
     }
 }

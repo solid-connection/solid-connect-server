@@ -52,7 +52,7 @@ public class UnivApplyInfoFixtureBuilder {
                 "1", "detailsForLanguage", "gpaRequirement",
                 "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
                 "detailsForAccommodation", "detailsForEnglishCourse", "details",
-                new HashSet<>(), university
+                null, new HashSet<>(), university
         );
         return univApplyInfoRepository.save(univApplyInfo);
     }
