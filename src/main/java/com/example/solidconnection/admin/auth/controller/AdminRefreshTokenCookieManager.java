@@ -1,6 +1,6 @@
 package com.example.solidconnection.admin.auth.controller;
 
-import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_NOT_EXISTS;
+import static com.example.solidconnection.common.exception.ErrorCode.ADMIN_REFRESH_TOKEN_NOT_EXISTS;
 
 import com.example.solidconnection.admin.auth.controller.config.AdminRefreshTokenCookieProperties;
 import com.example.solidconnection.auth.token.config.TokenProperties;
@@ -52,17 +52,17 @@ public class AdminRefreshTokenCookieManager {
     public String getAdminRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null || cookies.length == 0) {
-            throw new CustomException(REFRESH_TOKEN_NOT_EXISTS);
+            throw new CustomException(ADMIN_REFRESH_TOKEN_NOT_EXISTS);
         }
 
         Cookie adminRefreshTokenCookie = Arrays.stream(cookies)
                 .filter(cookie -> properties.cookieName().equals(cookie.getName()))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(REFRESH_TOKEN_NOT_EXISTS));
+                .orElseThrow(() -> new CustomException(ADMIN_REFRESH_TOKEN_NOT_EXISTS));
 
         String adminRefreshToken = adminRefreshTokenCookie.getValue();
         if (adminRefreshToken == null || adminRefreshToken.isBlank()) {
-            throw new CustomException(REFRESH_TOKEN_NOT_EXISTS);
+            throw new CustomException(ADMIN_REFRESH_TOKEN_NOT_EXISTS);
         }
         return adminRefreshToken;
     }
