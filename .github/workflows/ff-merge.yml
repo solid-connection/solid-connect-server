@@ -1,15 +1,15 @@
 name: FF-Only Merge to Master
 
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: [labeled]
   check_suite:
     types: [completed]
 
 jobs:
   ff-merge:
     if: |
-      github.event_name == 'pull_request_review' ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'ready-to-merge') ||
       (github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success')
     runs-on: ubuntu-latest
 
@@ -21,13 +21,9 @@ jobs:
           script: |
             let prNumber, headSha;
 
-            if (context.eventName === 'pull_request_review') {
+            if (context.eventName === 'pull_request') {
               const pr = context.payload.pull_request;
               if (pr.base.ref !== 'master' || pr.head.ref !== 'develop' || pr.state !== 'open') {
-                core.setOutput('ready', 'false');
-                return;
-              }
-              if (context.payload.review.state !== 'approved') {
                 core.setOutput('ready', 'false');
                 return;
               }
@@ -56,25 +52,15 @@ jobs:
               }
             }
 
-            // 승인 상태 확인
-            const { data: reviews } = await github.rest.pulls.listReviews({
+            // ready-to-merge 레이블 확인
+            const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
             });
 
-            const latest = {};
-            for (const r of reviews) {
-              if (r.state !== 'COMMENTED') {
-                latest[r.user.login] = r.state;
-              }
-            }
-
-            const values = Object.values(latest);
-            const approved = values.filter(s => s === 'APPROVED').length >= 1;
-            const blocked = values.some(s => s === 'CHANGES_REQUESTED');
-
-            if (!approved || blocked) {
+            const hasLabel = pr.labels.some(l => l.name === 'ready-to-merge');
+            if (!hasLabel) {
               core.setOutput('ready', 'false');
               return;
             }
@@ -120,9 +106,9 @@ jobs:
           APPROVED_SHA="${{ steps.validate.outputs.head_sha }}"
           CURRENT_SHA=$(git rev-parse origin/develop)
           if [ "$APPROVED_SHA" != "$CURRENT_SHA" ]; then
-            echo "develop이 승인 이후 변경되었습니다."
-            echo "  승인된 SHA: $APPROVED_SHA"
-            echo "  현재 SHA:   $CURRENT_SHA"
+            echo "레이블 부착 이후 develop이 변경되었습니다."
+            echo "  레이블 시점 SHA: $APPROVED_SHA"
+            echo "  현재 SHA:        $CURRENT_SHA"
             exit 1
           fi
 
