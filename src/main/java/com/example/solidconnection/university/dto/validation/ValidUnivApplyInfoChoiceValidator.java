@@ -2,12 +2,14 @@ package com.example.solidconnection.university.dto.validation;
 
 import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
 import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_UNIV_APPLY_INFO_CHOICE;
 
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class ValidUnivApplyInfoChoiceValidator
@@ -21,6 +23,12 @@ public class ValidUnivApplyInfoChoiceValidator
 
         if (ids == null || ids.isEmpty()) {
             context.buildConstraintViolationWithTemplate(FIRST_CHOICE_REQUIRED.getMessage())
+                    .addConstraintViolation();
+            return false;
+        }
+
+        if (ids.stream().anyMatch(Objects::isNull)) {
+            context.buildConstraintViolationWithTemplate(INVALID_UNIV_APPLY_INFO_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
         }

@@ -98,6 +98,7 @@ public enum ErrorCode {
     FIRST_CHOICE_REQUIRED(HttpStatus.BAD_REQUEST.value(), "1지망 대학교를 입력해주세요."),
     THIRD_CHOICE_REQUIRES_SECOND(HttpStatus.BAD_REQUEST.value(), "2지망 없이 3지망을 선택할 수 없습니다."),
     DUPLICATE_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
+    INVALID_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 지망 대학교가 포함되어 있습니다."),
     CHOICE_COUNT_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST.value(), "지망 수가 최대 지망 수를 초과했습니다."),
 
     // community
