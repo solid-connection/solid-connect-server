@@ -51,23 +51,23 @@ class SchoolEmailServiceTest {
         @Test
         void 인증_코드가_발급되고_이메일이_발송된다() {
             // Given
-            homeUniversityFixture.인천대학교();
+            homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
 
             // When & Then
-            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
-            then(mailService).should().sendVerificationEmail(eq("test@inu.ac.kr"), any());
+            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
+            then(mailService).should().sendVerificationEmail(eq("test@inha.edu"), any());
         }
 
         @Test
         void 이미_학교_인증된_사용자는_예외가_발생한다() {
             // Given
-            HomeUniversity homeUniversity = homeUniversityFixture.인천대학교();
+            HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
 
             // When & Then
             assertThatThrownBy(() ->
-                    schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr"))
+                    schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu"))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(SCHOOL_EMAIL_ALREADY_VERIFIED.getMessage());
         }
@@ -92,9 +92,9 @@ class SchoolEmailServiceTest {
         @Test
         void 인증_코드가_일치하면_homeUniversityId가_설정되고_인증이_완료된다() {
             // Given
-            HomeUniversity homeUniversity = homeUniversityFixture.인천대학교();
+            HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
-            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
+            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
 
             ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
             then(mailService).should().sendVerificationEmail(any(), codeCaptor.capture());
@@ -109,7 +109,7 @@ class SchoolEmailServiceTest {
         }
 
         @Test
-        void 인증_요청이_없으면_예외가_발생한다() {
+        void 인증_정보가_없으면_예외가_발생한다() {
             // Given
             SiteUser siteUser = siteUserFixture.사용자();
 
@@ -123,9 +123,9 @@ class SchoolEmailServiceTest {
         @Test
         void 인증_코드가_다르면_예외가_발생한다() {
             // Given
-            homeUniversityFixture.인천대학교();
+            homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
-            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
+            schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
 
             // When & Then
             assertThatThrownBy(() ->

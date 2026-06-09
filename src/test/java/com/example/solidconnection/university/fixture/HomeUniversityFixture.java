@@ -22,6 +22,7 @@ public class HomeUniversityFixture {
                 .name("테스트협정대학교_최대2지망")
                 .maxChoiceCount(2)
                 .emailDomain("inha.ac.kr")
+                .emailDomain("inha.edu")
                 .create();
     }
 
