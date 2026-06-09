@@ -48,6 +48,7 @@ public class AdminHomeUniversityService {
     )
     public AdminHomeUniversityResponse createHomeUniversity(AdminHomeUniversityCreateRequest request) {
         validateNameNotExists(request.name());
+        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.emailDomain());
         HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.maxChoiceCount());
         return AdminHomeUniversityResponse.from(homeUniversityRepository.save(homeUniversity));
     }
@@ -69,6 +70,7 @@ public class AdminHomeUniversityService {
         HomeUniversity homeUniversity = homeUniversityRepository.findById(id)
                 .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
         validateNameNotDuplicated(request.name(), id);
+        homeUniversity.update(request.name(), request.emailDomain());
         homeUniversity.update(request.name(), request.maxChoiceCount());
         return AdminHomeUniversityResponse.from(homeUniversity);
     }

@@ -104,6 +104,7 @@ class AdminHomeUniversityServiceTest {
         @Test
         void 유효한_요청으로_협정대학을_생성하면_성공한다() {
             // given
+            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", null);
             AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", 3);
 
             // when
@@ -124,6 +125,7 @@ class AdminHomeUniversityServiceTest {
             // given
             homeUniversityFixture.인하대학교();
             AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", 3);
+            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", null);
 
             // when & then
             assertThatCode(() -> adminHomeUniversityService.createHomeUniversity(request))
@@ -139,7 +141,7 @@ class AdminHomeUniversityServiceTest {
         void 유효한_요청으로_협정대학을_수정하면_성공한다() {
             // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
-            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교", 5);
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교");
 
             // when
             AdminHomeUniversityResponse response = adminHomeUniversityService.updateHomeUniversity(homeUniversity.getId(), request);
@@ -158,6 +160,7 @@ class AdminHomeUniversityServiceTest {
         void 존재하지_않는_협정대학을_수정하면_예외가_발생한다() {
             // given
             AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교", 3);
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교", null);
 
             // when & then
             assertThatCode(() -> adminHomeUniversityService.updateHomeUniversity(999L, request))
@@ -169,6 +172,8 @@ class AdminHomeUniversityServiceTest {
         void 다른_협정대학의_이름으로_수정하면_예외가_발생한다() {
             // given
             homeUniversityFixture.인하대학교();
+            HomeUniversity other = homeUniversityRepository.save(new HomeUniversity(null, "연세대학교", null));
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", null);
             HomeUniversity other = homeUniversityRepository.save(new HomeUniversity(null, "연세대학교", 3));
             AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", 3);
 
@@ -183,6 +188,7 @@ class AdminHomeUniversityServiceTest {
             // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
             AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", 3);
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", null);
 
             // when
             AdminHomeUniversityResponse response = adminHomeUniversityService.updateHomeUniversity(homeUniversity.getId(), request);

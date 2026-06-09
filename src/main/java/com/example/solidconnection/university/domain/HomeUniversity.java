@@ -27,11 +27,16 @@ public class HomeUniversity extends BaseEntity {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(name = "email_domain", unique = true, length = 100)
+    private String emailDomain;
+
+    public void update(String name, String emailDomain) {
     @Column(name = "max_choice_count", nullable = false)
     private int maxChoiceCount;
 
     public void update(String name, int maxChoiceCount) {
         this.name = name;
+        this.emailDomain = emailDomain;
         this.maxChoiceCount = maxChoiceCount;
     }
 }

@@ -78,6 +78,12 @@ public enum ErrorCode {
     SIGN_IN_FAILED(HttpStatus.UNAUTHORIZED.value(), "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."),
     OAUTH_USER_CANNOT_CHANGE_PASSWORD(HttpStatus.BAD_REQUEST.value(), "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
 
+    // school email verification
+    SCHOOL_EMAIL_ALREADY_VERIFIED(HttpStatus.BAD_REQUEST.value(), "이미 학교 이메일 인증이 완료되었습니다."),
+    SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 이메일 도메인입니다."),
+    SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "학교 이메일 인증 요청을 찾을 수 없습니다. 인증 코드 발송을 다시 요청해주세요."),
+    SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT(HttpStatus.BAD_REQUEST.value(), "인증 코드가 일치하지 않습니다."),
+
     // s3
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),
     S3_CLIENT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 클라이언트 에러 발생"),

@@ -10,4 +10,6 @@ public interface HomeUniversityRepository extends JpaRepository<HomeUniversity, 
     List<HomeUniversity> findAllByIdIn(List<Long> ids);
 
     Optional<HomeUniversity> findByName(String name);
+
+    Optional<HomeUniversity> findByEmailDomain(String emailDomain);
 }

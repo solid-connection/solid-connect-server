@@ -13,6 +13,7 @@ public class HomeUniversityFixtureBuilder {
 
     private String name;
     private int maxChoiceCount = 3;
+    private String emailDomain;
 
     public HomeUniversityFixtureBuilder homeUniversity() {
         return new HomeUniversityFixtureBuilder(homeUniversityRepository);
@@ -23,9 +24,19 @@ public class HomeUniversityFixtureBuilder {
         return this;
     }
 
+    public HomeUniversityFixtureBuilder emailDomain(String emailDomain) {
+        this.emailDomain = emailDomain;
+        return this;
+    }
+
     public HomeUniversityFixtureBuilder maxChoiceCount(int maxChoiceCount) {
         this.maxChoiceCount = maxChoiceCount;
         return this;
+    }
+
+    public HomeUniversity create() {
+        return homeUniversityRepository.findByName(name)
+                .orElseGet(() -> homeUniversityRepository.save(new HomeUniversity(null, name, emailDomain)));
     }
 
     public HomeUniversity create() {
