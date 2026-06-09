@@ -25,6 +25,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -80,6 +81,7 @@ public class Application extends BaseEntity {
             joinColumns = @JoinColumn(name = "application_id")
     )
     @OrderBy("choiceOrder ASC")
+    @BatchSize(size = 100)
     private List<ApplicationChoice> choices = new ArrayList<>();
 
     public Application(
