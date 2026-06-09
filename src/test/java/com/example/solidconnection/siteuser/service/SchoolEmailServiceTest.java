@@ -54,10 +54,8 @@ class SchoolEmailServiceTest {
             homeUniversityFixture.인천대학교();
             SiteUser siteUser = siteUserFixture.사용자();
 
-            // When
+            // When & Then
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
-
-            // Then
             then(mailService).should().sendVerificationEmail(eq("test@inu.ac.kr"), any());
         }
 

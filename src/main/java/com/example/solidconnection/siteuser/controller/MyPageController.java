@@ -7,12 +7,10 @@ import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.dto.SchoolEmailConfirmRequest;
 import com.example.solidconnection.siteuser.dto.SchoolEmailRequest;
-import com.example.solidconnection.siteuser.dto.SchoolEmailResponse;
 import com.example.solidconnection.siteuser.service.MyPageService;
 import com.example.solidconnection.siteuser.service.SchoolEmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -68,20 +66,20 @@ class MyPageController {
     }
 
     @PostMapping("/school-email")
-    public ResponseEntity<SchoolEmailResponse> requestSchoolEmailVerification(
+    public ResponseEntity<Void> requestSchoolEmailVerification(
             @AuthorizedUser long siteUserId,
             @RequestBody @Valid SchoolEmailRequest request
     ) {
-        String schoolEmail = schoolEmailService.requestSchoolEmailVerification(siteUserId, request.schoolEmail());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new SchoolEmailResponse(schoolEmail));
+        schoolEmailService.requestSchoolEmailVerification(siteUserId, request.schoolEmail());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/school-email/confirm")
-    public ResponseEntity<SchoolEmailResponse> confirmSchoolEmail(
+    public ResponseEntity<Void> confirmSchoolEmail(
             @AuthorizedUser long siteUserId,
             @RequestBody @Valid SchoolEmailConfirmRequest request
     ) {
-        String schoolEmail = schoolEmailService.confirmSchoolEmail(siteUserId, request.code());
-        return ResponseEntity.ok(new SchoolEmailResponse(schoolEmail));
+        schoolEmailService.confirmSchoolEmail(siteUserId, request.code());
+        return ResponseEntity.ok().build();
     }
 }

@@ -38,7 +38,7 @@ public class SchoolEmailService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public String requestSchoolEmailVerification(long siteUserId, String schoolEmail) {
+    public void requestSchoolEmailVerification(long siteUserId, String schoolEmail) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -54,11 +54,10 @@ public class SchoolEmailService {
         saveVerificationInfo(siteUserId, new SchoolVerificationInfo(schoolEmail, homeUniversity.getId(), code));
 
         mailService.sendVerificationEmail(schoolEmail, code);
-        return schoolEmail;
     }
 
     @Transactional
-    public String confirmSchoolEmail(long siteUserId, String code) {
+    public void confirmSchoolEmail(long siteUserId, String code) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -70,7 +69,6 @@ public class SchoolEmailService {
 
         siteUser.verifySchool(info.getHomeUniversityId());
         redisTemplate.delete(KEY_PREFIX + siteUserId);
-        return info.getSchoolEmail();
     }
 
     private void saveVerificationInfo(long siteUserId, SchoolVerificationInfo info) {
