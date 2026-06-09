@@ -27,6 +27,19 @@ jobs:
                 core.setOutput('ready', 'false');
                 return;
               }
+
+              // 레이블을 부착한 주체의 저장소 권한 확인
+              const { data: perm } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: context.payload.sender.login,
+              });
+
+              if (!['admin', 'write'].includes(perm.permission)) {
+                core.setOutput('ready', 'false');
+                return;
+              }
+
               prNumber = pr.number;
               headSha = pr.head.sha;
             } else {
