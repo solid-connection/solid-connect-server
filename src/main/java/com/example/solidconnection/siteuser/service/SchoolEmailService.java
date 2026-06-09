@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_ALREADY_VERIFIED;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND;
@@ -85,15 +86,15 @@ public class SchoolEmailService {
     }
 
     private SchoolVerificationInfo getVerificationInfo(long siteUserId) {
-        String json = redisTemplate.opsForValue().get(KEY_PREFIX + siteUserId);
-        if (json == null) {
+        String jsonInfo = redisTemplate.opsForValue().get(KEY_PREFIX + siteUserId);
+        if (jsonInfo == null) {
             throw new CustomException(SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND);
         }
         try {
-            return objectMapper.readValue(json, SchoolVerificationInfo.class);
+            return objectMapper.readValue(jsonInfo, SchoolVerificationInfo.class);
         } catch (JsonProcessingException e) {
             redisTemplate.delete(KEY_PREFIX + siteUserId);
-            throw new CustomException(SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND);
+            throw new CustomException(SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED);
         }
     }
 
