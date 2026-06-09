@@ -3,6 +3,7 @@ package com.example.solidconnection.university.dto;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import java.util.List;
+import java.util.Map;
 
 public record UnivApplyInfoDetailResponse(
         long id,
@@ -17,20 +18,16 @@ public record UnivApplyInfoDetailResponse(
         String backgroundImageUrl,
         String detailsForLocal,
         int studentCapacity,
-        String tuitionFeeType,
         String semesterAvailableForDispatch,
         List<LanguageRequirementResponse> languageRequirements,
         String detailsForLanguage,
         String gpaRequirement,
         String gpaRequirementCriteria,
         String semesterRequirement,
-        String detailsForApply,
-        String detailsForMajor,
         String detailsForAccommodation,
-        String detailsForEnglishCourse,
-        String details,
         String accommodationUrl,
-        String englishCourseUrl) {
+        String englishCourseUrl,
+        Map<String, String> extraInfo) {
 
     public static UnivApplyInfoDetailResponse of(
             HostUniversity university,
@@ -50,7 +47,6 @@ public record UnivApplyInfoDetailResponse(
                 university.getBackgroundImageUrl(),
                 university.getDetailsForLocal(),
                 univApplyInfo.getStudentCapacity(),
-                univApplyInfo.getTuitionFeeType().getKoreanName(),
                 univApplyInfo.getSemesterAvailableForDispatch().getKoreanName(),
                 univApplyInfo.getLanguageRequirements().stream()
                         .map(LanguageRequirementResponse::from)
@@ -59,13 +55,10 @@ public record UnivApplyInfoDetailResponse(
                 univApplyInfo.getGpaRequirement(),
                 univApplyInfo.getGpaRequirementCriteria(),
                 univApplyInfo.getSemesterRequirement(),
-                univApplyInfo.getDetailsForApply(),
-                univApplyInfo.getDetailsForMajor(),
                 univApplyInfo.getDetailsForAccommodation(),
-                univApplyInfo.getDetailsForEnglishCourse(),
-                univApplyInfo.getDetails(),
                 university.getAccommodationUrl(),
-                university.getEnglishCourseUrl()
+                university.getEnglishCourseUrl(),
+                univApplyInfo.getExtraInfo()
         );
     }
 }
