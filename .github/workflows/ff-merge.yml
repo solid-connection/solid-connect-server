@@ -1,0 +1,134 @@
+name: FF-Only Merge to Master
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+jobs:
+  ff-merge:
+    if: |
+      github.event_name == 'pull_request_review' ||
+      (github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: PR 조회 및 조건 검증
+        id: validate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber, headSha;
+
+            if (context.eventName === 'pull_request_review') {
+              const pr = context.payload.pull_request;
+              if (pr.base.ref !== 'master' || pr.head.ref !== 'develop' || pr.state !== 'open') {
+                core.setOutput('ready', 'false');
+                return;
+              }
+              if (context.payload.review.state !== 'approved') {
+                core.setOutput('ready', 'false');
+                return;
+              }
+              prNumber = pr.number;
+              headSha = pr.head.sha;
+            } else {
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                base: 'master',
+                head: `${context.repo.owner}:develop`,
+              });
+
+              if (prs.length === 0) {
+                core.setOutput('ready', 'false');
+                return;
+              }
+
+              prNumber = prs[0].number;
+              headSha = prs[0].head.sha;
+
+              if (context.payload.check_suite.head_sha !== headSha) {
+                core.setOutput('ready', 'false');
+                return;
+              }
+            }
+
+            // 승인 상태 확인
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const latest = {};
+            for (const r of reviews) {
+              if (r.state !== 'COMMENTED') {
+                latest[r.user.login] = r.state;
+              }
+            }
+
+            const values = Object.values(latest);
+            const approved = values.filter(s => s === 'APPROVED').length >= 1;
+            const blocked = values.some(s => s === 'CHANGES_REQUESTED');
+
+            if (!approved || blocked) {
+              core.setOutput('ready', 'false');
+              return;
+            }
+
+            // CI 상태 확인
+            const { data: { check_runs } } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: headSha,
+              per_page: 100,
+            });
+
+            const ciRuns = check_runs.filter(r => r.name !== context.workflow);
+            const allPassed = ciRuns.length > 0 && ciRuns.every(r =>
+              r.status === 'completed' &&
+              ['success', 'skipped', 'neutral'].includes(r.conclusion)
+            );
+
+            if (!allPassed) {
+              core.setOutput('ready', 'false');
+              return;
+            }
+
+            core.setOutput('ready', 'true');
+            core.setOutput('head_sha', headSha);
+
+      - name: Checkout
+        if: steps.validate.outputs.ready == 'true'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+
+      - name: Git 설정
+        if: steps.validate.outputs.ready == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: develop 변경 여부 검증
+        if: steps.validate.outputs.ready == 'true'
+        run: |
+          APPROVED_SHA="${{ steps.validate.outputs.head_sha }}"
+          CURRENT_SHA=$(git rev-parse origin/develop)
+          if [ "$APPROVED_SHA" != "$CURRENT_SHA" ]; then
+            echo "develop이 승인 이후 변경되었습니다."
+            echo "  승인된 SHA: $APPROVED_SHA"
+            echo "  현재 SHA:   $CURRENT_SHA"
+            exit 1
+          fi
+
+      - name: FF-Only merge develop → master
+        if: steps.validate.outputs.ready == 'true'
+        run: |
+          git checkout master
+          git merge --ff-only ${{ steps.validate.outputs.head_sha }}
+          git push origin master
