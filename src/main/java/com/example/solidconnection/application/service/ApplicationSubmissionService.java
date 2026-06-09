@@ -25,6 +25,7 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
@@ -93,27 +94,6 @@ public class ApplicationSubmissionService {
         return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, uniApplyInfos);
     }
 
-    private int resolveMaxChoiceCount(SiteUser siteUser) {
-        if (siteUser.getHomeUniversityId() == null) {
-            return DEFAULT_MAX_CHOICE_COUNT;
-        }
-        return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
-                .map(hu -> hu.getMaxChoiceCount())
-                .orElse(DEFAULT_MAX_CHOICE_COUNT);
-    }
-
-    private void validateChoiceCount(UnivApplyInfoChoiceRequest request, int maxChoiceCount) {
-        if (request.univApplyInfoIds().size() > maxChoiceCount) {
-            throw new CustomException(CHOICE_COUNT_EXCEEDS_LIMIT);
-        }
-    }
-
-    private List<ApplicationChoice> buildChoices(List<Long> univApplyInfoIds) {
-        return IntStream.range(0, univApplyInfoIds.size())
-                .mapToObj(i -> new ApplicationChoice(i + 1, univApplyInfoIds.get(i)))
-                .toList();
-    }
-
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
         GpaScore gpaScore = gpaScoreRepository.findGpaScoreBySiteUserIdAndId(siteUser.getId(), gpaScoreId)
                 .orElseThrow(() -> new CustomException(GPA_SCORE_NOT_FOUND));
@@ -133,17 +113,38 @@ public class ApplicationSubmissionService {
         return languageTestScore;
     }
 
-    private String getRandomNickname() {
-        String randomNickname = NicknameCreator.createRandomNickname();
-        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
-            randomNickname = NicknameCreator.createRandomNickname();
+    private int resolveMaxChoiceCount(SiteUser siteUser) {
+        if (siteUser.getHomeUniversityId() == null) {
+            return DEFAULT_MAX_CHOICE_COUNT;
         }
-        return randomNickname;
+        return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
+                .map(HomeUniversity::getMaxChoiceCount)
+                .orElse(DEFAULT_MAX_CHOICE_COUNT);
+    }
+
+    private void validateChoiceCount(UnivApplyInfoChoiceRequest request, int maxChoiceCount) {
+        if (request.univApplyInfoIds().size() > maxChoiceCount) {
+            throw new CustomException(CHOICE_COUNT_EXCEEDS_LIMIT);
+        }
+    }
+
+    private List<ApplicationChoice> buildChoices(List<Long> univApplyInfoIds) {
+        return IntStream.range(0, univApplyInfoIds.size())
+                .mapToObj(i -> new ApplicationChoice(i + 1, univApplyInfoIds.get(i)))
+                .toList();
     }
 
     private void validateUpdateLimitNotExceed(Application application) {
         if (application.getUpdateCount() >= APPLICATION_UPDATE_COUNT_LIMIT) {
             throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
         }
+    }
+
+    private String getRandomNickname() {
+        String randomNickname = NicknameCreator.createRandomNickname();
+        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
+            randomNickname = NicknameCreator.createRandomNickname();
+        }
+        return randomNickname;
     }
 }
