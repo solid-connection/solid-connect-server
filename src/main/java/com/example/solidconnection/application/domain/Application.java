@@ -5,16 +5,23 @@ import static com.example.solidconnection.common.VerifyStatus.PENDING;
 import com.example.solidconnection.common.BaseEntity;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,13 +36,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Table(indexes = {
         @Index(name = "idx_app_user_term_delete",
-                columnList = "site_user_id, term_id, is_delete"),
-        @Index(name = "idx_app_first_choice_search",
-                columnList = "verify_status, term_id, is_delete, first_choice_university_info_for_apply_id"),
-        @Index(name = "idx_app_second_choice_search",
-                columnList = "verify_status, term_id, is_delete, second_choice_university_info_for_apply_id"),
-        @Index(name = "idx_app_third_choice_search",
-                columnList = "verify_status, term_id, is_delete, third_choice_university_info_for_apply_id")
+                columnList = "site_user_id, term_id, is_delete")
 })
 public class Application extends BaseEntity {
 
@@ -70,17 +71,16 @@ public class Application extends BaseEntity {
     @Column(name = "is_delete", nullable = false)
     private boolean isDelete = false;
 
-    @Column(nullable = false, name = "first_choice_university_info_for_apply_id")
-    private long firstChoiceUnivApplyInfoId;
-
-    @Column(name = "second_choice_university_info_for_apply_id")
-    private Long secondChoiceUnivApplyInfoId;
-
-    @Column(name = "third_choice_university_info_for_apply_id")
-    private Long thirdChoiceUnivApplyInfoId;
-
     @Column(name = "site_user_id", nullable = false)
     private long siteUserId;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "application_choice",
+            joinColumns = @JoinColumn(name = "application_id")
+    )
+    @OrderBy("choiceOrder ASC")
+    private List<ApplicationChoice> choices = new ArrayList<>();
 
     public Application(
             SiteUser siteUser,
@@ -101,39 +101,14 @@ public class Application extends BaseEntity {
             LanguageTest languageTest,
             long termId,
             Integer updateCount,
-            long firstChoiceUnivApplyInfoId,
-            Long secondChoiceUnivApplyInfoId,
-            Long thirdChoiceUnivApplyInfoId,
+            List<ApplicationChoice> choices,
             String nicknameForApply) {
         this.siteUserId = siteUser.getId();
         this.gpa = gpa;
         this.languageTest = languageTest;
         this.termId = termId;
         this.updateCount = updateCount;
-        this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
-        this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
-        this.thirdChoiceUnivApplyInfoId = thirdChoiceUnivApplyInfoId;
-        this.nicknameForApply = nicknameForApply;
-        this.verifyStatus = PENDING;
-    }
-
-    public Application(
-            SiteUser siteUser,
-            Gpa gpa,
-            LanguageTest languageTest,
-            long termId,
-            long firstChoiceUnivApplyInfoId,
-            Long secondChoiceUnivApplyInfoId,
-            Long thirdChoiceUnivApplyInfoId,
-            String nicknameForApply) {
-        this.siteUserId = siteUser.getId();
-        this.gpa = gpa;
-        this.languageTest = languageTest;
-        this.termId = termId;
-        this.updateCount = 1;
-        this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
-        this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
-        this.thirdChoiceUnivApplyInfoId = thirdChoiceUnivApplyInfoId;
+        this.choices = new ArrayList<>(choices);
         this.nicknameForApply = nicknameForApply;
         this.verifyStatus = PENDING;
     }
