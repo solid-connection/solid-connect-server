@@ -83,6 +83,7 @@ public enum ErrorCode {
     SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 이메일 도메인입니다."),
     SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "학교 이메일 인증 요청을 찾을 수 없습니다. 인증 코드 발송을 다시 요청해주세요."),
     SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT(HttpStatus.BAD_REQUEST.value(), "인증 코드가 일치하지 않습니다."),
+    SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "학교 이메일 인증 정보 저장에 실패했습니다."),
 
     // s3
     S3_SERVICE_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "S3 서비스 에러 발생"),

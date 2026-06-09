@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_ALREADY_VERIFIED;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED;
@@ -33,7 +34,6 @@ public class SchoolEmailService {
     private final SiteUserRepository siteUserRepository;
     private final HomeUniversityRepository homeUniversityRepository;
     private final MailService mailService;
-    @Qualifier("redisTemplate")
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -80,7 +80,7 @@ public class SchoolEmailService {
                     TimeUnit.SECONDS
             );
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED);
         }
     }
 
