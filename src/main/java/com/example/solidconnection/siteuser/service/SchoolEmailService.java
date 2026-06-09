@@ -7,7 +7,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAI
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.email.service.EmailService;
+import com.example.solidconnection.common.mail.MailService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.dto.SchoolVerificationInfo;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -32,7 +32,7 @@ public class SchoolEmailService {
 
     private final SiteUserRepository siteUserRepository;
     private final HomeUniversityRepository homeUniversityRepository;
-    private final EmailService emailService;
+    private final MailService mailService;
     @Qualifier("redisTemplate")
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -53,7 +53,7 @@ public class SchoolEmailService {
         String code = generateVerificationCode();
         saveVerificationInfo(siteUserId, new SchoolVerificationInfo(schoolEmail, homeUniversity.getId(), code));
 
-        emailService.sendVerificationEmail(schoolEmail, code);
+        mailService.sendVerificationEmail(schoolEmail, code);
         return schoolEmail;
     }
 

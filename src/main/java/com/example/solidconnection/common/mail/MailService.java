@@ -1,4 +1,4 @@
-package com.example.solidconnection.email.service;
+package com.example.solidconnection.common.mail;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class MailService {
 
     private final JavaMailSender javaMailSender;
 

@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.email.service.EmailService;
+import com.example.solidconnection.common.mail.MailService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
@@ -33,7 +33,7 @@ class SchoolEmailServiceTest {
     private SchoolEmailService schoolEmailService;
 
     @MockitoBean
-    private EmailService emailService;
+    private MailService mailService;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -58,7 +58,7 @@ class SchoolEmailServiceTest {
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
 
             // Then
-            then(emailService).should().sendVerificationEmail(eq("test@inu.ac.kr"), any());
+            then(mailService).should().sendVerificationEmail(eq("test@inu.ac.kr"), any());
         }
 
         @Test
@@ -99,7 +99,7 @@ class SchoolEmailServiceTest {
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inu.ac.kr");
 
             ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
-            then(emailService).should().sendVerificationEmail(any(), codeCaptor.capture());
+            then(mailService).should().sendVerificationEmail(any(), codeCaptor.capture());
             String code = codeCaptor.getValue();
 
             // When
