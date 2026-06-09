@@ -81,7 +81,6 @@ public class ApplicationQueryService {
 
         List<Long> univApplyInfoIds = userLatestApplication.getChoices().stream()
                 .map(ApplicationChoice::getUnivApplyInfoId)
-                .distinct()
                 .collect(Collectors.toList());
 
         if (univApplyInfoIds.isEmpty()) {
