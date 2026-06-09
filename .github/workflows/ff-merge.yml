@@ -51,9 +51,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: develop 변경 여부 검증
+        if: steps.approvals.outputs.ready == 'true'
+        run: |
+          APPROVED_SHA="${{ github.event.pull_request.head.sha }}"
+          CURRENT_SHA=$(git rev-parse origin/develop)
+          if [ "$APPROVED_SHA" != "$CURRENT_SHA" ]; then
+            echo "develop이 승인 이후 변경되었습니다."
+            echo "  승인된 SHA: $APPROVED_SHA"
+            echo "  현재 SHA:   $CURRENT_SHA"
+            exit 1
+          fi
+
       - name: FF-Only merge develop → master
         if: steps.approvals.outputs.ready == 'true'
         run: |
           git checkout master
-          git merge --ff-only origin/develop
+          git merge --ff-only ${{ github.event.pull_request.head.sha }}
           git push origin master
