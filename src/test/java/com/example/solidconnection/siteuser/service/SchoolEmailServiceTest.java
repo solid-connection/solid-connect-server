@@ -50,22 +50,22 @@ class SchoolEmailServiceTest {
 
         @Test
         void 인증_코드가_발급되고_이메일이_발송된다() {
-            // Given
+            // given
             homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
 
-            // When & Then
+            // when & then
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
             then(mailService).should().sendVerificationEmail(eq("test@inha.edu"), any());
         }
 
         @Test
         void 이미_학교_인증된_사용자는_예외가_발생한다() {
-            // Given
+            // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
 
-            // When & Then
+            // when & then
             assertThatThrownBy(() ->
                     schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu"))
                     .isInstanceOf(CustomException.class)
@@ -74,10 +74,10 @@ class SchoolEmailServiceTest {
 
         @Test
         void 지원하지_않는_이메일_도메인은_예외가_발생한다() {
-            // Given
+            // given
             SiteUser siteUser = siteUserFixture.사용자();
 
-            // When & Then
+            // when & then
             assertThatThrownBy(() ->
                     schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@unknown.ac.kr"))
                     .isInstanceOf(CustomException.class)
@@ -91,7 +91,7 @@ class SchoolEmailServiceTest {
 
         @Test
         void 인증_코드가_일치하면_homeUniversityId가_설정되고_인증이_완료된다() {
-            // Given
+            // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
@@ -110,10 +110,10 @@ class SchoolEmailServiceTest {
 
         @Test
         void 인증_정보가_없으면_예외가_발생한다() {
-            // Given
+            // given
             SiteUser siteUser = siteUserFixture.사용자();
 
-            // When & Then
+            // when & then
             assertThatThrownBy(() ->
                     schoolEmailService.confirmSchoolEmail(siteUser.getId(), "123456"))
                     .isInstanceOf(CustomException.class)
@@ -122,12 +122,12 @@ class SchoolEmailServiceTest {
 
         @Test
         void 인증_코드가_다르면_예외가_발생한다() {
-            // Given
+            // given
             homeUniversityFixture.인하대학교();
             SiteUser siteUser = siteUserFixture.사용자();
             schoolEmailService.requestSchoolEmailVerification(siteUser.getId(), "test@inha.edu");
 
-            // When & Then
+            // when & then
             assertThatThrownBy(() ->
                     schoolEmailService.confirmSchoolEmail(siteUser.getId(), "000000"))
                     .isInstanceOf(CustomException.class)
