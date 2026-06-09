@@ -10,3 +10,6 @@ CREATE TABLE application_choice
     CONSTRAINT fk_app_choice_application
         FOREIGN KEY (application_id) REFERENCES application (id)
 );
+
+ALTER TABLE application
+    MODIFY COLUMN first_choice_university_info_for_apply_id BIGINT NULL;
