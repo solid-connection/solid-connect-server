@@ -38,7 +38,6 @@ public class SchoolEmailService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    @Transactional
     public void requestSchoolEmailVerification(long siteUserId, String schoolEmail) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -54,7 +53,12 @@ public class SchoolEmailService {
         String code = generateVerificationCode();
         saveVerificationInfo(siteUserId, new SchoolVerificationInfo(schoolEmail, homeUniversity.getId(), code));
 
-        mailService.sendVerificationEmail(schoolEmail, code);
+        try {
+            mailService.sendVerificationEmail(schoolEmail, code);
+        } catch (Exception e) {
+            redisTemplate.delete(KEY_PREFIX + siteUserId);
+            throw e;
+        }
     }
 
     @Transactional
@@ -103,7 +107,7 @@ public class SchoolEmailService {
         if (atIndex == -1) {
             throw new CustomException(SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED);
         }
-        return email.substring(atIndex + 1);
+        return email.substring(atIndex + 1).toLowerCase();
     }
 
     private String generateVerificationCode() {

@@ -47,6 +47,7 @@ public enum ErrorCode {
     HOST_UNIVERSITY_HAS_REFERENCES(HttpStatus.CONFLICT.value(), "해당 파견 대학을 참조하는 대학 지원 정보가 존재합니다."),
     HOME_UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "협정 대학교를 찾을 수 없습니다."),
     HOME_UNIVERSITY_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 협정 대학입니다."),
+    HOME_UNIVERSITY_EMAIL_DOMAIN_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 사용 중인 이메일 도메인입니다."),
     HOME_UNIVERSITY_HAS_REFERENCES(HttpStatus.CONFLICT.value(), "해당 협정 대학을 참조하는 데이터가 존재합니다."),
     COUNTRY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "국가를 찾을 수 없습니다."),
     COUNTRY_NOT_FOUND_BY_KOREAN_NAME(HttpStatus.NOT_FOUND.value(), "이름에 해당하는 국가를 찾을 수 없습니다."),
