@@ -73,7 +73,7 @@ jobs:
               per_page: 100,
             });
 
-            const ciRuns = check_runs.filter(r => r.name !== context.workflow);
+            const ciRuns = check_runs.filter(r => r.name !== context.job);
             const allPassed = ciRuns.length > 0 && ciRuns.every(r =>
               r.status === 'completed' &&
               ['success', 'skipped', 'neutral'].includes(r.conclusion)
