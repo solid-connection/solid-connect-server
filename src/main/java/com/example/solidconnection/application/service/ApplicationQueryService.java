@@ -15,7 +15,9 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import io.micrometer.common.util.StringUtils;
@@ -32,11 +34,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApplicationQueryService {
 
+    private static final int DEFAULT_MAX_CHOICE_COUNT = 3;
+
     private final ApplicationRepository applicationRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
     private final SiteUserRepository siteUserRepository;
     private final TermRepository termRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
 
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
@@ -59,7 +64,8 @@ public class ApplicationQueryService {
         List<Application> applications = applicationRepository
                 .findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
 
-        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
+        int maxChoiceCount = resolveMaxChoiceCount(siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser, maxChoiceCount);
     }
 
     @Transactional(readOnly = true)
@@ -86,26 +92,31 @@ public class ApplicationQueryService {
                 .findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
         List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
 
-        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
+        int maxChoiceCount = resolveMaxChoiceCount(siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser, maxChoiceCount);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
             List<UnivApplyInfo> univApplyInfos,
             List<Application> applications,
-            SiteUser siteUser) {
-        int maxOrder = applications.stream()
-                .flatMap(a -> a.getChoices().stream())
-                .mapToInt(ApplicationChoice::getChoiceOrder)
-                .max()
-                .orElse(0);
-
+            SiteUser siteUser,
+            int maxChoiceCount) {
         List<List<ApplicantsResponse>> allChoices = new ArrayList<>();
-        for (int order = 1; order <= maxOrder; order++) {
+        for (int order = 1; order <= maxChoiceCount; order++) {
             final int choiceOrder = order;
             Map<Long, List<Application>> choiceMap = buildChoiceMapForOrder(applications, choiceOrder);
             allChoices.add(createUniversityApplicantsResponses(univApplyInfos, choiceMap, siteUser));
         }
         return new ApplicationsResponse(allChoices);
+    }
+
+    private int resolveMaxChoiceCount(SiteUser siteUser) {
+        if (siteUser.getHomeUniversityId() == null) {
+            return DEFAULT_MAX_CHOICE_COUNT;
+        }
+        return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
+                .map(HomeUniversity::getMaxChoiceCount)
+                .orElse(DEFAULT_MAX_CHOICE_COUNT);
     }
 
     private Map<Long, List<Application>> buildChoiceMapForOrder(List<Application> applications, int order) {
