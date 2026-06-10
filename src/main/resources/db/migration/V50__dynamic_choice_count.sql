@@ -9,8 +9,12 @@ CREATE TABLE application_choice
     univ_apply_info_id BIGINT NOT NULL,
     PRIMARY KEY (application_id, choice_order),
     CONSTRAINT fk_app_choice_application
-        FOREIGN KEY (application_id) REFERENCES application (id)
+        FOREIGN KEY (application_id) REFERENCES application (id),
+    CONSTRAINT fk_app_choice_univ_apply_info
+        FOREIGN KEY (univ_apply_info_id) REFERENCES university_info_for_apply (id)
 );
+
+CREATE INDEX idx_app_choice_univ_apply_info_id ON application_choice (univ_apply_info_id);
 
 ALTER TABLE application
     MODIFY COLUMN first_choice_university_info_for_apply_id BIGINT NULL;

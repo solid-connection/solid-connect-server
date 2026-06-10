@@ -78,7 +78,8 @@ public class Application extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "application_choice",
-            joinColumns = @JoinColumn(name = "application_id")
+            joinColumns = @JoinColumn(name = "application_id"),
+            indexes = @Index(name = "idx_app_choice_univ_apply_info_id", columnList = "univ_apply_info_id")
     )
     @OrderBy("choiceOrder ASC")
     @BatchSize(size = 100)
