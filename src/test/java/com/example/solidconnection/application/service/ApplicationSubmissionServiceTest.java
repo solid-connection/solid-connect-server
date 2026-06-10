@@ -33,7 +33,6 @@ import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -121,35 +120,30 @@ class ApplicationSubmissionServiceTest {
         );
     }
 
-    @Nested
-    @DisplayName("최대 지망 수 초과 검증")
-    class 최대_지망_수_초과 {
+    @Test
+    void 출신대학_최대_지망수를_초과하면_예외가_발생한다() {
+        // given
+        HomeUniversity homeUniversity = homeUniversityFixture.인하대학교(2);
+        SiteUser userWithHomeUniv = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, userWithHomeUniv);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, userWithHomeUniv);
+        UnivApplyInfoChoiceRequest choiceRequest = new UnivApplyInfoChoiceRequest(
+                List.of(
+                        괌대학_A_지원_정보.getId(),
+                        버지니아공과대학_지원_정보.getId(),
+                        서던덴마크대학교_지원_정보.getId()
+                )
+        );
 
-        @Test
-        void 출신대학_최대_지망수를_초과하면_예외가_발생한다() {
-            // given
-            HomeUniversity homeUniversity = homeUniversityFixture.인하대학교(2);
-            SiteUser userWithHomeUniv = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
-            GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, userWithHomeUniv);
-            LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, userWithHomeUniv);
-            UnivApplyInfoChoiceRequest choiceRequest = new UnivApplyInfoChoiceRequest(
-                    List.of(
-                            괌대학_A_지원_정보.getId(),
-                            버지니아공과대학_지원_정보.getId(),
-                            서던덴마크대학교_지원_정보.getId()
-                    )
-            );
-
-            // when & then
-            assertThatCode(() ->
-                    applicationSubmissionService.apply(
-                            userWithHomeUniv.getId(),
-                            new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), choiceRequest)
-                    )
-            )
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(CHOICE_COUNT_EXCEEDS_LIMIT.getMessage());
-        }
+        // when & then
+        assertThatCode(() ->
+                applicationSubmissionService.apply(
+                        userWithHomeUniv.getId(),
+                        new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), choiceRequest)
+                )
+        )
+                .isInstanceOf(CustomException.class)
+                .hasMessage(CHOICE_COUNT_EXCEEDS_LIMIT.getMessage());
     }
 
     @Test
