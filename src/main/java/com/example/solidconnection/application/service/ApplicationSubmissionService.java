@@ -7,6 +7,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_N
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
@@ -64,6 +65,7 @@ public class ApplicationSubmissionService {
         int maxChoiceCount = resolveMaxChoiceCount(siteUser);
         validateChoiceCount(choiceRequest, maxChoiceCount);
 
+        List<UnivApplyInfo> univApplyInfos = getValidUnivApplyInfos(choiceRequest.univApplyInfoIds());
         List<ApplicationChoice> choices = buildChoices(choiceRequest.univApplyInfoIds());
 
         Optional<Application> existingApplication =
@@ -89,9 +91,7 @@ public class ApplicationSubmissionService {
         newApplication.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(newApplication);
 
-        List<UnivApplyInfo> uniApplyInfos = univApplyInfoRepository.findAllByIds(choiceRequest.univApplyInfoIds());
-
-        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, uniApplyInfos);
+        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, univApplyInfos);
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
@@ -120,6 +120,14 @@ public class ApplicationSubmissionService {
         return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
                 .map(HomeUniversity::getMaxChoiceCount)
                 .orElse(DEFAULT_MAX_CHOICE_COUNT);
+    }
+
+    private List<UnivApplyInfo> getValidUnivApplyInfos(List<Long> ids) {
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(ids);
+        if (univApplyInfos.size() != ids.size()) {
+            throw new CustomException(UNIV_APPLY_INFO_NOT_FOUND);
+        }
+        return univApplyInfos;
     }
 
     private void validateChoiceCount(UnivApplyInfoChoiceRequest request, int maxChoiceCount) {
