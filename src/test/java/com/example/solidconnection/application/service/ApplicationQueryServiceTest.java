@@ -124,11 +124,11 @@ class ApplicationQueryServiceTest {
             ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), "", "");
 
             // then
-            assertThat(response.choices().get(0)).containsAll(List.of(
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), user1),
                     ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(application2), user1),
                     ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(application3), user1)
-            ));
+            );
         }
 
         @Test
