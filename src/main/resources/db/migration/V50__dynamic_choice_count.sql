@@ -1,5 +1,6 @@
 ALTER TABLE home_university
-    ADD COLUMN max_choice_count INT NOT NULL DEFAULT 3;
+    ADD COLUMN max_choice_count INT NOT NULL DEFAULT 3,
+    ADD CONSTRAINT chk_max_choice_count CHECK (max_choice_count >= 1);
 
 CREATE TABLE application_choice
 (
