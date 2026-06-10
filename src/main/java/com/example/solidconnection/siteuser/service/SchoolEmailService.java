@@ -1,11 +1,11 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_ALREADY_VERIFIED;
-import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED;
-import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_VERIFICATION_INFO_SAVE_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.exception.CustomException;
@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +37,7 @@ public class SchoolEmailService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
+    @Transactional
     public void requestSchoolEmailVerification(long siteUserId, String schoolEmail) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -103,11 +103,7 @@ public class SchoolEmailService {
     }
 
     private String extractEmailDomain(String email) {
-        int atIndex = email.indexOf('@');
-        if (atIndex == -1) {
-            throw new CustomException(SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED);
-        }
-        return email.substring(atIndex + 1).toLowerCase();
+        return email.substring(email.indexOf('@') + 1).toLowerCase();
     }
 
     private String generateVerificationCode() {
