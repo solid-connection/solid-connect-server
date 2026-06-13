@@ -138,11 +138,11 @@ jobs:
               # 1. Active 슬롯 확인 (upstream.conf 기준)
               UPSTREAM_PORT=$(grep -oE "server 127\.0\.0\.1:[0-9]+" /etc/nginx/conf.d/upstream.conf 2>/dev/null | grep -oE "[0-9]+$" || echo "8081")
               if [ "$UPSTREAM_PORT" = "8080" ]; then
-                ACTIVE_SLOT="blue"; ACTIVE_PORT=8080; NEW_SLOT="green"; NEW_PORT=8081; MANAGEMENT_PORT=9081
+                ACTIVE_SLOT="blue"; ACTIVE_PORT=8080; NEW_SLOT="green"; NEW_PORT=8081
               else
-                ACTIVE_SLOT="green"; ACTIVE_PORT=8081; NEW_SLOT="blue"; NEW_PORT=8080; MANAGEMENT_PORT=9080
+                ACTIVE_SLOT="green"; ACTIVE_PORT=8081; NEW_SLOT="blue"; NEW_PORT=8080
               fi
-              echo "Active: ${ACTIVE_SLOT}(${ACTIVE_PORT}) → Deploy: ${NEW_SLOT}(${NEW_PORT}), management: ${MANAGEMENT_PORT}"
+              echo "Active: ${ACTIVE_SLOT}(${ACTIVE_PORT}) → Deploy: ${NEW_SLOT}(${NEW_PORT})"
 
               # 2. Pull 전 디스크 정리 (태그 이미지 최근 2개 유지)
               docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
@@ -160,14 +160,15 @@ jobs:
 
               # 5. 새 컨테이너 시작
               cd "${WORK_DIR}"
-              SLOT="${NEW_SLOT}" APP_PORT="${NEW_PORT}" MANAGEMENT_PORT="${MANAGEMENT_PORT}" OWNER_LOWERCASE="${OWNER_LOWERCASE}" IMAGE_TAG="${IMAGE_TAG_ONLY}" \
-                docker compose -p "${CONTAINER_BASE}-${NEW_SLOT}" -f docker-compose.prod.yml up -d solid-connection-server
+              SLOT="${NEW_SLOT}" APP_PORT="${NEW_PORT}" OWNER_LOWERCASE="${OWNER_LOWERCASE}" IMAGE_TAG="${IMAGE_TAG_ONLY}" \
+                docker compose -p "${CONTAINER_BASE}-${NEW_SLOT}" -f docker-compose.prod.yml up -d
 
               # 6. 헬스 체크 (앱 기동 대기, 최대 150초)
-              echo "Waiting for app on management port ${MANAGEMENT_PORT}..."
+              # /actuator/health 미노출로 포트 응답 여부로 확인 (HTTP 000 = 연결 불가)
+              echo "Waiting for app on port ${NEW_PORT}..."
               for i in $(seq 1 30); do
-                STATUS=$(curl -s --connect-timeout 2 "http://localhost:${MANAGEMENT_PORT}/actuator/health" | grep -o '"status":"UP"' || true)
-                [ "$STATUS" = '"status":"UP"' ] && { echo "App healthy (attempt ${i})"; break; }
+                HTTP=$(curl -s --connect-timeout 2 -o /dev/null -w "%{http_code}" "http://localhost:${NEW_PORT}/" || true)
+                [ "$HTTP" != "000" ] && { echo "App responding (HTTP ${HTTP}, attempt ${i})"; break; }
                 [ "$i" = "30" ] && {
                   echo "Health check timed out after 150s" >&2
                   docker stop "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true

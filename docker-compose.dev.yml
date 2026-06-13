@@ -8,7 +8,6 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SERVER_PORT=${APP_PORT:-8080}
-      - MANAGEMENT_SERVER_PORT=${MANAGEMENT_PORT:-9080}
       - AWS_REGION=ap-northeast-2
       - SPRING_DATA_REDIS_HOST=127.0.0.1
       - SPRING_DATA_REDIS_PORT=6379
