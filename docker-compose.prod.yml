@@ -3,10 +3,11 @@ version: '3.8'
 services:
   solid-connection-server:
     image: ghcr.io/${OWNER_LOWERCASE}/solid-connection-server:${IMAGE_TAG:-latest}
-    container_name: solid-connection-server
+    container_name: solid-connection-server-${SLOT:-blue}
     network_mode: "host"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - SERVER_PORT=${APP_PORT:-8080}
       - AWS_REGION=ap-northeast-2
       - SPRING_DATA_REDIS_HOST=127.0.0.1
       - SPRING_DATA_REDIS_PORT=6379
