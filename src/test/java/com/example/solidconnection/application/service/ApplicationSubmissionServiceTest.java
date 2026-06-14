@@ -123,7 +123,7 @@ class ApplicationSubmissionServiceTest {
     @Test
     void 출신대학_최대_지망수를_초과하면_예외가_발생한다() {
         // given
-        HomeUniversity homeUniversity = homeUniversityFixture.인하대학교(2);
+        HomeUniversity homeUniversity = homeUniversityFixture.최대_2지망_협정대학교();
         SiteUser userWithHomeUniv = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, userWithHomeUniv);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, userWithHomeUniv);

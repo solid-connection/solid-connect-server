@@ -17,10 +17,10 @@ public class HomeUniversityFixture {
                 .create();
     }
 
-    public HomeUniversity 인하대학교(int maxChoiceCount) {
+    public HomeUniversity 최대_2지망_협정대학교() {
         return homeUniversityFixtureBuilder.homeUniversity()
-                .name("인하대학교_" + maxChoiceCount + "지망")
-                .maxChoiceCount(maxChoiceCount)
+                .name("테스트협정대학교_최대2지망")
+                .maxChoiceCount(2)
                 .create();
     }
 
