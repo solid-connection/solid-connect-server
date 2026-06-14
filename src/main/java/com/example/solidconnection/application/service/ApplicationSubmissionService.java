@@ -42,8 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicationSubmissionService {
 
     public static final int APPLICATION_UPDATE_COUNT_LIMIT = 3;
-    private static final int DEFAULT_MAX_CHOICE_COUNT = 3;
-
     private final ApplicationRepository applicationRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
@@ -115,11 +113,11 @@ public class ApplicationSubmissionService {
 
     private int resolveMaxChoiceCount(SiteUser siteUser) {
         if (siteUser.getHomeUniversityId() == null) {
-            return DEFAULT_MAX_CHOICE_COUNT;
+            return HomeUniversity.DEFAULT_MAX_CHOICE_COUNT;
         }
         return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
                 .map(HomeUniversity::getMaxChoiceCount)
-                .orElse(DEFAULT_MAX_CHOICE_COUNT);
+                .orElse(HomeUniversity.DEFAULT_MAX_CHOICE_COUNT);
     }
 
     private List<UnivApplyInfo> getValidUnivApplyInfos(List<Long> ids) {

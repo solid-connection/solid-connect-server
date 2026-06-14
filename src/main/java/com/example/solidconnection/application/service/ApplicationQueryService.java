@@ -34,8 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApplicationQueryService {
 
-    private static final int DEFAULT_MAX_CHOICE_COUNT = 3;
-
     private final ApplicationRepository applicationRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
@@ -111,11 +109,11 @@ public class ApplicationQueryService {
 
     private int resolveMaxChoiceCount(SiteUser siteUser) {
         if (siteUser.getHomeUniversityId() == null) {
-            return DEFAULT_MAX_CHOICE_COUNT;
+            return HomeUniversity.DEFAULT_MAX_CHOICE_COUNT;
         }
         return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
                 .map(HomeUniversity::getMaxChoiceCount)
-                .orElse(DEFAULT_MAX_CHOICE_COUNT);
+                .orElse(HomeUniversity.DEFAULT_MAX_CHOICE_COUNT);
     }
 
     private Map<Long, List<Application>> buildChoiceMapForOrder(List<Application> applications, int order) {
