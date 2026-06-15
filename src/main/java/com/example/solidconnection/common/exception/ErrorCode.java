@@ -60,6 +60,7 @@ public enum ErrorCode {
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
     CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
+    TERM_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 학기입니다."),
     MENTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멘토 지원서가 존재하지 않습니다."),
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신고 내역이 존재하지 않습니다."),
 

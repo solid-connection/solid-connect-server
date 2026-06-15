@@ -39,4 +39,12 @@ public class Term {
         this.name = name;
         this.isCurrent = isCurrent ? true : null;
     }
+
+    public void activate() {
+        this.isCurrent = true;
+    }
+
+    public void deactivate() {
+        this.isCurrent = null;
+    }
 }
