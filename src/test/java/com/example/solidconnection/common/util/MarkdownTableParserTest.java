@@ -41,6 +41,22 @@ class MarkdownTableParserTest {
         }
 
         @Test
+        void 중간_빈_셀이_있어도_이후_컬럼이_올바르게_매핑된다() {
+            String markdown = """
+                    | 대학명 | 인원 | TOEIC |
+                    |--------|------|-------|
+                    | MIT |  | 800 |
+                    """;
+
+            List<Map<String, String>> rows = parser.parse(markdown);
+
+            assertThat(rows.get(0))
+                    .containsEntry("대학명", "MIT")
+                    .doesNotContainKey("인원")
+                    .containsEntry("TOEIC", "800");
+        }
+
+        @Test
         void 빈_셀은_결과_맵에_포함되지_않는다() {
             String markdown = """
                     | 대학명 | 인원 |

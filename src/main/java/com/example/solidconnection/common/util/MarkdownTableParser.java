@@ -30,9 +30,11 @@ public class MarkdownTableParser {
     }
 
     private List<String> parseRow(String line) {
-        return Arrays.stream(line.split("\\|"))
+        String stripped = line.trim();
+        if (stripped.startsWith("|")) stripped = stripped.substring(1);
+        if (stripped.endsWith("|")) stripped = stripped.substring(0, stripped.length() - 1);
+        return Arrays.stream(stripped.split("\\|"))
                 .map(String::trim)
-                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
 
