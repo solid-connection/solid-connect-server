@@ -164,10 +164,11 @@ jobs:
                 docker compose -p "${CONTAINER_BASE}-${NEW_SLOT}" -f docker-compose.prod.yml up -d solid-connection-server
 
               # 6. 헬스 체크 (앱 기동 대기, 최대 150초)
+              # HTTP 200 = UP, 503 = DOWN (single-quote 내부 quoting 문제 없이 상태코드로 판단)
               echo "Waiting for app on management port ${MANAGEMENT_PORT}..."
               for i in $(seq 1 30); do
-                STATUS=$(curl -s --connect-timeout 2 "http://localhost:${MANAGEMENT_PORT}/actuator/health" | grep -o '"status":"UP"' || true)
-                [ "$STATUS" = '"status":"UP"' ] && { echo "App healthy (attempt ${i})"; break; }
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://localhost:${MANAGEMENT_PORT}/actuator/health" || true)
+                [ "$HTTP_CODE" = "200" ] && { echo "App healthy (attempt ${i})"; break; }
                 [ "$i" = "30" ] && {
                   echo "Health check timed out after 150s" >&2
                   docker stop "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
