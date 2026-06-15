@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.repository.custom;
 
 import static com.example.solidconnection.application.domain.QApplication.application;
+import static com.example.solidconnection.university.domain.QUnivApplyInfo.univApplyInfo;
 import static com.example.solidconnection.mentor.domain.QMentor.mentor;
 import static com.example.solidconnection.mentor.domain.QMentorApplication.mentorApplication;
 import static com.example.solidconnection.mentor.domain.QMentoring.mentoring;
@@ -26,9 +27,11 @@ import com.example.solidconnection.admin.dto.UserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.UserSearchCondition;
 import com.example.solidconnection.admin.dto.UserSearchResponse;
 import com.example.solidconnection.siteuser.domain.Role;
+import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.domain.UserStatus;
-import com.example.solidconnection.university.domain.QUnivApplyInfo;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -38,7 +41,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -112,17 +118,6 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     userBan.createdAt
             );
 
-    private static final QUnivApplyInfo firstChoiceUnivApplyInfo = new QUnivApplyInfo("firstChoiceUnivApplyInfo");
-    private static final QUnivApplyInfo secondChoiceUnivApplyInfo = new QUnivApplyInfo("secondChoiceUnivApplyInfo");
-    private static final QUnivApplyInfo thirdChoiceUnivApplyInfo = new QUnivApplyInfo("thirdChoiceUnivApplyInfo");
-
-    private static final ConstructorExpression<UnivApplyInfoResponse> UNIV_APPLY_INFO_RESPONSE_PROJECTION =
-            Projections.constructor(
-                    UnivApplyInfoResponse.class,
-                    firstChoiceUnivApplyInfo.koreanName,
-                    secondChoiceUnivApplyInfo.koreanName,
-                    thirdChoiceUnivApplyInfo.koreanName
-            );
 
     private final JPAQueryFactory queryFactory;
 
@@ -327,21 +322,42 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
     }
 
     private UnivApplyInfoResponse fetchUnivApplyInfo(long userId) {
-        UnivApplyInfoResponse result = queryFactory
-                .select(UNIV_APPLY_INFO_RESPONSE_PROJECTION)
-                .from(application)
-                .leftJoin(firstChoiceUnivApplyInfo).on(firstChoiceUnivApplyInfo.id.eq(application.firstChoiceUnivApplyInfoId))
-                .leftJoin(secondChoiceUnivApplyInfo).on(secondChoiceUnivApplyInfo.id.eq(application.secondChoiceUnivApplyInfoId))
-                .leftJoin(thirdChoiceUnivApplyInfo).on(thirdChoiceUnivApplyInfo.id.eq(application.thirdChoiceUnivApplyInfoId))
-                .where(application.siteUserId.eq(userId))
+        Application latestApplication = queryFactory
+                .selectFrom(application)
+                .where(application.siteUserId.eq(userId), application.isDelete.isFalse())
                 .orderBy(application.createdAt.desc())
                 .fetchFirst();
 
-        if (result == null) {
-            return new UnivApplyInfoResponse(null, null, null);
+        if (latestApplication == null) {
+            return new UnivApplyInfoResponse(List.of());
         }
 
-        return result;
+        List<Long> univApplyInfoIds = latestApplication.getChoices().stream()
+                .sorted(Comparator.comparingInt(ApplicationChoice::getChoiceOrder))
+                .map(ApplicationChoice::getUnivApplyInfoId)
+                .toList();
+
+        if (univApplyInfoIds.isEmpty()) {
+            return new UnivApplyInfoResponse(List.of());
+        }
+
+        List<Tuple> tuples = queryFactory
+                .select(univApplyInfo.id, univApplyInfo.koreanName)
+                .from(univApplyInfo)
+                .where(univApplyInfo.id.in(univApplyInfoIds))
+                .fetch();
+
+        Map<Long, String> nameById = tuples.stream()
+                .collect(Collectors.toMap(
+                        t -> t.get(univApplyInfo.id),
+                        t -> t.get(univApplyInfo.koreanName)
+                ));
+
+        List<String> choiceNames = univApplyInfoIds.stream()
+                .map(nameById::get)
+                .toList();
+
+        return new UnivApplyInfoResponse(choiceNames);
     }
 
 

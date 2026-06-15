@@ -2,6 +2,7 @@ package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.application.service.ApplicationSubmissionService.APPLICATION_UPDATE_COUNT_LIMIT;
 import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
+import static com.example.solidconnection.common.exception.ErrorCode.CHOICE_COUNT_EXCEEDS_LIMIT;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,6 +10,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
@@ -24,8 +26,11 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,17 +61,18 @@ class ApplicationSubmissionServiceTest {
     @Autowired
     private TermFixture termFixture;
 
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
+
     private SiteUser user;
     private UnivApplyInfo 괌대학_A_지원_정보;
     private UnivApplyInfo 버지니아공과대학_지원_정보;
     private UnivApplyInfo 서던덴마크대학교_지원_정보;
-
     private Term term;
 
     @BeforeEach
     void setUp() {
         term = termFixture.현재_학기("2025-2");
-
         user = siteUserFixture.사용자();
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
         버지니아공과대학_지원_정보 = univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
@@ -79,9 +85,11 @@ class ApplicationSubmissionServiceTest {
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
-                괌대학_A_지원_정보.getId(),
-                버지니아공과대학_지원_정보.getId(),
-                서던덴마크대학교_지원_정보.getId()
+                List.of(
+                        괌대학_A_지원_정보.getId(),
+                        버지니아공과대학_지원_정보.getId(),
+                        서던덴마크대학교_지원_정보.getId()
+                )
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
@@ -92,28 +100,50 @@ class ApplicationSubmissionServiceTest {
         Application savedApplication = applicationRepository
                 .findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(user.getId(), term.getId())
                 .orElseThrow();
+        List<ApplicationChoice> savedChoices = savedApplication.getChoices();
         assertAll(
-                () -> assertThat(response.totalApplyCount())
-                        .isEqualTo(APPLICATION_UPDATE_COUNT_LIMIT),
-                () -> assertThat(response.applyCount())
-                        .isEqualTo(savedApplication.getUpdateCount()),
-                () -> assertThat(response.appliedUniversities().firstChoiceUnivApplyInfo())
-                        .isEqualTo(괌대학_A_지원_정보.getKoreanName()),
-                () -> assertThat(response.appliedUniversities().secondChoiceUnivApplyInfo())
-                        .isEqualTo(버지니아공과대학_지원_정보.getKoreanName()),
-                () -> assertThat(response.appliedUniversities().thirdChoiceUnivApplyInfo())
-                        .isEqualTo(서던덴마크대학교_지원_정보.getKoreanName()),
-                () -> assertThat(savedApplication.getVerifyStatus())
-                        .isEqualTo(VerifyStatus.APPROVED),
-                () -> assertThat(savedApplication.isDelete())
-                        .isFalse(),
-                () -> assertThat(savedApplication.getFirstChoiceUnivApplyInfoId())
-                        .isEqualTo(괌대학_A_지원_정보.getId()),
-                () -> assertThat(savedApplication.getSecondChoiceUnivApplyInfoId())
-                        .isEqualTo(버지니아공과대학_지원_정보.getId()),
-                () -> assertThat(savedApplication.getThirdChoiceUnivApplyInfoId())
-                        .isEqualTo(서던덴마크대학교_지원_정보.getId())
+                () -> assertThat(response.totalApplyCount()).isEqualTo(APPLICATION_UPDATE_COUNT_LIMIT),
+                () -> assertThat(response.applyCount()).isEqualTo(savedApplication.getUpdateCount()),
+                () -> assertThat(response.appliedUniversities().choices()).containsExactly(
+                        괌대학_A_지원_정보.getKoreanName(),
+                        버지니아공과대학_지원_정보.getKoreanName(),
+                        서던덴마크대학교_지원_정보.getKoreanName()
+                ),
+                () -> assertThat(savedApplication.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED),
+                () -> assertThat(savedApplication.isDelete()).isFalse(),
+                () -> assertThat(savedChoices).extracting(ApplicationChoice::getUnivApplyInfoId)
+                        .containsExactly(
+                                괌대학_A_지원_정보.getId(),
+                                버지니아공과대학_지원_정보.getId(),
+                                서던덴마크대학교_지원_정보.getId()
+                        )
         );
+    }
+
+    @Test
+    void 출신대학_최대_지망수를_초과하면_예외가_발생한다() {
+        // given
+        HomeUniversity homeUniversity = homeUniversityFixture.최대_2지망_협정대학교();
+        SiteUser userWithHomeUniv = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
+        GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, userWithHomeUniv);
+        LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, userWithHomeUniv);
+        UnivApplyInfoChoiceRequest choiceRequest = new UnivApplyInfoChoiceRequest(
+                List.of(
+                        괌대학_A_지원_정보.getId(),
+                        버지니아공과대학_지원_정보.getId(),
+                        서던덴마크대학교_지원_정보.getId()
+                )
+        );
+
+        // when & then
+        assertThatCode(() ->
+                applicationSubmissionService.apply(
+                        userWithHomeUniv.getId(),
+                        new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), choiceRequest)
+                )
+        )
+                .isInstanceOf(CustomException.class)
+                .hasMessage(CHOICE_COUNT_EXCEEDS_LIMIT.getMessage());
     }
 
     @Test
@@ -122,16 +152,12 @@ class ApplicationSubmissionServiceTest {
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.PENDING, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
-                괌대학_A_지원_정보.getId(),
-                null,
-                null
+                List.of(괌대학_A_지원_정보.getId())
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
-        assertThatCode(() ->
-                               applicationSubmissionService.apply(user.getId(), request)
-        )
+        assertThatCode(() -> applicationSubmissionService.apply(user.getId(), request))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_GPA_SCORE_STATUS.getMessage());
     }
@@ -142,16 +168,12 @@ class ApplicationSubmissionServiceTest {
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.PENDING, user);
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
-                괌대학_A_지원_정보.getId(),
-                null,
-                null
+                List.of(괌대학_A_지원_정보.getId())
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
         // when & then
-        assertThatCode(() ->
-                               applicationSubmissionService.apply(user.getId(), request)
-        )
+        assertThatCode(() -> applicationSubmissionService.apply(user.getId(), request))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(INVALID_LANGUAGE_TEST_SCORE_STATUS.getMessage());
     }
@@ -162,9 +184,7 @@ class ApplicationSubmissionServiceTest {
         GpaScore gpaScore = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user);
         LanguageTestScore languageTestScore = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user);
         UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = new UnivApplyInfoChoiceRequest(
-                괌대학_A_지원_정보.getId(),
-                null,
-                null
+                List.of(괌대학_A_지원_정보.getId())
         );
         ApplyRequest request = new ApplyRequest(gpaScore.getId(), languageTestScore.getId(), univApplyInfoChoiceRequest);
 
@@ -173,9 +193,7 @@ class ApplicationSubmissionServiceTest {
         }
 
         // when & then
-        assertThatCode(() ->
-                               applicationSubmissionService.apply(user.getId(), request)
-        )
+        assertThatCode(() -> applicationSubmissionService.apply(user.getId(), request))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(APPLY_UPDATE_LIMIT_EXCEED.getMessage());
     }

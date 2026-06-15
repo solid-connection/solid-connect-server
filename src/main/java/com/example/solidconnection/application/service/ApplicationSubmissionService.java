@@ -1,14 +1,17 @@
 package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLY_UPDATE_LIMIT_EXCEED;
+import static com.example.solidconnection.common.exception.ErrorCode.CHOICE_COUNT_EXCEEDS_LIMIT;
 import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
@@ -23,12 +26,13 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,29 +42,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicationSubmissionService {
 
     public static final int APPLICATION_UPDATE_COUNT_LIMIT = 3;
-
     private final ApplicationRepository applicationRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
     private final TermRepository termRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
 
-    // 학점 및 어학성적이 모두 유효한 경우에만 지원서 등록이 가능하다.
-    // 기존에 있던 status field 우선 APRROVED로 입력시킨다.
     @Transactional
     public ApplicationSubmissionResponse apply(long siteUserId, ApplyRequest applyRequest) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        UnivApplyInfoChoiceRequest univApplyInfoChoiceRequest = applyRequest.univApplyInfoChoiceRequest();
+        UnivApplyInfoChoiceRequest choiceRequest = applyRequest.univApplyInfoChoiceRequest();
         GpaScore gpaScore = getValidGpaScore(siteUser, applyRequest.gpaScoreId());
         LanguageTestScore languageTestScore = getValidLanguageTestScore(siteUser, applyRequest.languageTestScoreId());
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        Long firstChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.firstChoiceUnivApplyInfoId();
-        Long secondChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.secondChoiceUnivApplyInfoId();
-        Long thirdChoiceUnivApplyInfoId = univApplyInfoChoiceRequest.thirdChoiceUnivApplyInfoId();
+        int maxChoiceCount = resolveMaxChoiceCount(siteUser);
+        validateChoiceCount(choiceRequest, maxChoiceCount);
+
+        List<UnivApplyInfo> univApplyInfos = getValidUnivApplyInfos(choiceRequest.univApplyInfoIds());
+        List<ApplicationChoice> choices = buildChoices(choiceRequest.univApplyInfoIds());
 
         Optional<Application> existingApplication =
                 applicationRepository.findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(siteUser.getId(), term.getId());
@@ -78,26 +82,14 @@ public class ApplicationSubmissionService {
                 languageTestScore.getLanguageTest(),
                 term.getId(),
                 updateCount,
-                firstChoiceUnivApplyInfoId,
-                secondChoiceUnivApplyInfoId,
-                thirdChoiceUnivApplyInfoId,
+                choices,
                 getRandomNickname()
         );
 
         newApplication.setVerifyStatus(VerifyStatus.APPROVED);
         applicationRepository.save(newApplication);
 
-        List<Long> univApplyInfoIds = Stream.of(
-                        firstChoiceUnivApplyInfoId,
-                        secondChoiceUnivApplyInfoId,
-                        thirdChoiceUnivApplyInfoId
-                )
-                .filter(Objects::nonNull)
-                .toList();
-
-        List<UnivApplyInfo> uniApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
-
-        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, uniApplyInfos);
+        return ApplicationSubmissionResponse.of(APPLICATION_UPDATE_COUNT_LIMIT, newApplication, univApplyInfos);
     }
 
     private GpaScore getValidGpaScore(SiteUser siteUser, Long gpaScoreId) {
@@ -119,17 +111,46 @@ public class ApplicationSubmissionService {
         return languageTestScore;
     }
 
-    private String getRandomNickname() {
-        String randomNickname = NicknameCreator.createRandomNickname();
-        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
-            randomNickname = NicknameCreator.createRandomNickname();
+    private int resolveMaxChoiceCount(SiteUser siteUser) {
+        if (siteUser.getHomeUniversityId() == null) {
+            return HomeUniversity.DEFAULT_MAX_CHOICE_COUNT;
         }
-        return randomNickname;
+        return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
+                .map(HomeUniversity::getMaxChoiceCount)
+                .orElse(HomeUniversity.DEFAULT_MAX_CHOICE_COUNT);
+    }
+
+    private List<UnivApplyInfo> getValidUnivApplyInfos(List<Long> ids) {
+        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(ids);
+        if (univApplyInfos.size() != ids.size()) {
+            throw new CustomException(UNIV_APPLY_INFO_NOT_FOUND);
+        }
+        return univApplyInfos;
+    }
+
+    private void validateChoiceCount(UnivApplyInfoChoiceRequest request, int maxChoiceCount) {
+        if (request.univApplyInfoIds().size() > maxChoiceCount) {
+            throw new CustomException(CHOICE_COUNT_EXCEEDS_LIMIT);
+        }
+    }
+
+    private List<ApplicationChoice> buildChoices(List<Long> univApplyInfoIds) {
+        return IntStream.range(0, univApplyInfoIds.size())
+                .mapToObj(i -> new ApplicationChoice(i + 1, univApplyInfoIds.get(i)))
+                .toList();
     }
 
     private void validateUpdateLimitNotExceed(Application application) {
         if (application.getUpdateCount() >= APPLICATION_UPDATE_COUNT_LIMIT) {
             throw new CustomException(APPLY_UPDATE_LIMIT_EXCEED);
         }
+    }
+
+    private String getRandomNickname() {
+        String randomNickname = NicknameCreator.createRandomNickname();
+        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
+            randomNickname = NicknameCreator.createRandomNickname();
+        }
+        return randomNickname;
     }
 }

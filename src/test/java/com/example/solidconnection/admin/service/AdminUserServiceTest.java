@@ -38,6 +38,7 @@ import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.fixture.UniversityFixture;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -191,9 +192,7 @@ public class AdminUserServiceTest {
                     termId,
                     new Gpa(4.0, 4.5, "http://gpa-report.com/test.pdf"),
                     new LanguageTest(LanguageTestType.TOEIC, "900", "http://language-test.com/test.pdf"),
-                    firstChoice.getId(),
-                    secondChoice.getId(),
-                    null
+                    List.of(firstChoice.getId(), secondChoice.getId())
             );
 
             // when

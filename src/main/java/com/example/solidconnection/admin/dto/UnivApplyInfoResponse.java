@@ -1,9 +1,7 @@
 package com.example.solidconnection.admin.dto;
 
-public record UnivApplyInfoResponse(
-        String firstChoiceUnivName,
-        String secondChoiceUnivName,
-        String thirdChoiceUnivName
-) {
+import java.util.List;
+
+public record UnivApplyInfoResponse(List<String> choices) {
 
 }
