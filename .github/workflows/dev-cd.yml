@@ -153,11 +153,10 @@ jobs:
                 docker compose -p "${CONTAINER_BASE}-${NEW_SLOT}" -f docker-compose.dev.yml up -d solid-connection-dev
 
               # 8. 헬스 체크 (앱 기동 대기, 최대 150초)
-              # /actuator/health 미노출로 포트 응답 여부로 확인 (HTTP 000 = 연결 불가)
-              echo "Waiting for app on port ${NEW_PORT}..."
+              echo "Waiting for app on management port ${MANAGEMENT_PORT}..."
               for i in $(seq 1 30); do
-                HTTP=$(curl -s --connect-timeout 2 -o /dev/null -w "%{http_code}" "http://localhost:${NEW_PORT}/" || true)
-                [ "$HTTP" != "000" ] && { echo "App responding (HTTP ${HTTP}, attempt ${i})"; break; }
+                STATUS=$(curl -s --connect-timeout 2 "http://localhost:${MANAGEMENT_PORT}/actuator/health" | grep -o '"status":"UP"' || true)
+                [ "$STATUS" = '"status":"UP"' ] && { echo "App healthy (attempt ${i})"; break; }
                 [ "$i" = "30" ] && {
                   echo "Health check timed out after 150s" >&2
                   docker stop "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
