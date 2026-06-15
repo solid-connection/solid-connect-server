@@ -122,9 +122,9 @@ jobs:
               # 1. Active 슬롯 확인 (upstream.conf 기준)
               UPSTREAM_PORT=$(grep -oE "server 127\.0\.0\.1:[0-9]+" /etc/nginx/conf.d/upstream.conf 2>/dev/null | grep -oE "[0-9]+$" || echo "8081")
               if [ "$UPSTREAM_PORT" = "8080" ]; then
-                ACTIVE_SLOT="blue"; ACTIVE_PORT=8080; NEW_SLOT="green"; NEW_PORT=8081; MANAGEMENT_PORT=9081
+                ACTIVE_SLOT="blue"; ACTIVE_PORT=8080; NEW_SLOT="green"; NEW_PORT=9080; MANAGEMENT_PORT=9081
               else
-                ACTIVE_SLOT="green"; ACTIVE_PORT=8081; NEW_SLOT="blue"; NEW_PORT=8080; MANAGEMENT_PORT=9080
+                ACTIVE_SLOT="green"; ACTIVE_PORT=9080; NEW_SLOT="blue"; NEW_PORT=8080; MANAGEMENT_PORT=8081
               fi
               echo "Active: ${ACTIVE_SLOT}(${ACTIVE_PORT}) → Deploy: ${NEW_SLOT}(${NEW_PORT}), management: ${MANAGEMENT_PORT}"
 
