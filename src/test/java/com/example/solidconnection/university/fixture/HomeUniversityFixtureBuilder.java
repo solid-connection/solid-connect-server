@@ -36,11 +36,6 @@ public class HomeUniversityFixtureBuilder {
 
     public HomeUniversity create() {
         return homeUniversityRepository.findByName(name)
-                .orElseGet(() -> homeUniversityRepository.save(new HomeUniversity(null, name, emailDomain)));
-    }
-
-    public HomeUniversity create() {
-        return homeUniversityRepository.findByName(name)
-                .orElseGet(() -> homeUniversityRepository.save(new HomeUniversity(null, name, maxChoiceCount)));
+                .orElseGet(() -> homeUniversityRepository.save(new HomeUniversity(null, name, maxChoiceCount, emailDomain)));
     }
 }

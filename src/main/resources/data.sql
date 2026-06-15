@@ -49,22 +49,8 @@ VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',
         'CONSIDERING', 'MENTEE',
         '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'); -- 12341234
 
-INSERT INTO home_university (id, name, max_choice_count)
-VALUES (1, '인하대학교', 3);
-INSERT INTO home_university (id, name, email_domain)
-VALUES (1, '인하대학교','inha.edu');
-
-INSERT INTO home_university (id, name, email_domain)
-VALUES (2, '경희대학교','khu.ac.kr');
-
-INSERT INTO home_university (id, name, email_domain)
-VALUES (3, '중앙대학교','cau.ac.kr');
-
-INSERT INTO home_university (id, name, email_domain)
-VALUES (4, '성신여자대학교','sungshin.ac.kr');
-
-INSERT INTO home_university (id, name, email_domain)
-VALUES (5, '인천대학교','inu.ac.kr');
+INSERT INTO home_university (id, name, max_choice_count, email_domain)
+VALUES (1, '인하대학교', 3, 'inha.edu');
 
 INSERT INTO host_university(id, country_code, region_code, english_name, format_name, korean_name,
                             accommodation_url, english_course_url, homepage_url,

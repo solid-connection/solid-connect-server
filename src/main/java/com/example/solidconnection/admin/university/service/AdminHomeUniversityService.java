@@ -50,8 +50,7 @@ public class AdminHomeUniversityService {
     public AdminHomeUniversityResponse createHomeUniversity(AdminHomeUniversityCreateRequest request) {
         validateNameNotExists(request.name());
         validateEmailDomainNotExists(request.emailDomain());
-        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.emailDomain());
-        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.maxChoiceCount());
+        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.maxChoiceCount(), request.emailDomain());
         return AdminHomeUniversityResponse.from(homeUniversityRepository.save(homeUniversity));
     }
 
@@ -83,8 +82,7 @@ public class AdminHomeUniversityService {
                 .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
         validateNameNotDuplicated(request.name(), id);
         validateEmailDomainNotDuplicated(request.emailDomain(), id);
-        homeUniversity.update(request.name(), request.emailDomain());
-        homeUniversity.update(request.name(), request.maxChoiceCount());
+        homeUniversity.update(request.name(), request.maxChoiceCount(), request.emailDomain());
         return AdminHomeUniversityResponse.from(homeUniversity);
     }
 

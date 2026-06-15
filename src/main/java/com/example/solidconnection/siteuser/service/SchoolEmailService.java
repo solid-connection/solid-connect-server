@@ -37,7 +37,7 @@ public class SchoolEmailService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void requestSchoolEmailVerification(long siteUserId, String schoolEmail) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
