@@ -105,151 +105,88 @@ class ApplicationQueryServiceTest {
         void 이번_학기_전체_지원자를_조회한다() {
             // given
             Application application1 = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             Application application2 = applicationFixture.지원서(
-                    user2,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore2.getGpa(),
-                    languageTestScore2.getLanguageTest(),
-                    버지니아공과대학_지원_정보.getId(),
-                    null,
-                    null
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(버지니아공과대학_지원_정보.getId())
             );
             Application application3 = applicationFixture.지원서(
-                    user3,
-                    "nickname3",
-                    term.getId(),
-                    gpaScore3.getGpa(),
-                    languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보.getId(),
-                    null,
-                    null
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
             );
 
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1.getId(),
-                    "",
-                    ""
-            );
+            ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), "", "");
 
             // then
-            assertThat(response.firstChoice()).containsAll(List.of(
-                    ApplicantsResponse.of(괌대학_A_지원_정보,
-                                          List.of(application1), user1),
-                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
-                                          List.of(application2), user1),
-                    ApplicantsResponse.of(서던덴마크대학교_지원_정보,
-                                          List.of(application3), user1)
-            ));
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), user1),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(application2), user1),
+                    ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(application3), user1)
+            );
         }
 
         @Test
         void 이번_학기_특정_지역_지원자를_조회한다() {
-            //given
+            // given
             Application application1 = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             Application application2 = applicationFixture.지원서(
-                    user2,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore2.getGpa(),
-                    languageTestScore2.getLanguageTest(),
-                    버지니아공과대학_지원_정보.getId(),
-                    null,
-                    null
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(버지니아공과대학_지원_정보.getId())
             );
             applicationFixture.지원서(
-                    user3,
-                    "nickname3",
-                    term.getId(),
-                    gpaScore3.getGpa(),
-                    languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보.getId(),
-                    null,
-                    null
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
             );
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1.getId(),
-                    regionFixture.영미권().getCode(),
-                    ""
-            );
+                    user1.getId(), regionFixture.영미권().getCode(), "");
 
             // then
-            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    ApplicantsResponse.of(괌대학_A_지원_정보,
-                                          List.of(application1), user1),
-                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
-                                          List.of(application2), user1)
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), user1),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(application2), user1)
             );
         }
 
         @Test
         void 이번_학기_지원자를_대학_국문_이름으로_필터링해서_조회한다() {
-            //given
+            // given
             Application application1 = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             Application application2 = applicationFixture.지원서(
-                    user2,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore2.getGpa(),
-                    languageTestScore2.getLanguageTest(),
-                    버지니아공과대학_지원_정보.getId(),
-                    null,
-                    null
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(버지니아공과대학_지원_정보.getId())
             );
             applicationFixture.지원서(
-                    user3,
-                    "nickname3",
-                    term.getId(),
-                    gpaScore3.getGpa(),
-                    languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보.getId(),
-                    null,
-                    null
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
             );
 
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1.getId(),
-                    null,
-                    "미국"
-            );
+            ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), null, "미국");
 
             // then
-            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    ApplicantsResponse.of(괌대학_A_지원_정보,
-                                          List.of(application1), user1),
-                    ApplicantsResponse.of(버지니아공과대학_지원_정보,
-                                          List.of(application2), user1)
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), user1),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(application2), user1)
             );
         }
 
@@ -257,37 +194,22 @@ class ApplicationQueryServiceTest {
         void 현재_학기_지원서만_조회되고_이전_학기_지원서는_제외된다() {
             // given
             Term previousTerm = termFixture.이전_학기("2024-2");
-            Application application = applicationFixture.지원서(
-                    user1,
-                    "nickname1_past",
-                    previousTerm.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+            applicationFixture.지원서(
+                    user1, "nickname1_past", previousTerm.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
-
             Application currentApplication = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
 
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1.getId(),
-                    "",
-                    ""
-            );
+            ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), "", "");
 
             // then
-            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
                     ApplicantsResponse.of(괌대학_A_지원_정보, List.of(currentApplication), user1),
                     ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(), user1),
                     ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(), user1)
@@ -298,37 +220,23 @@ class ApplicationQueryServiceTest {
         void 동일_유저의_여러_지원서_중_최신_지원서만_조회된다() {
             // given
             Application firstApplication = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             firstApplication.setIsDeleteTrue();
             applicationRepository.save(firstApplication);
             Application secondApplication = applicationFixture.지원서(
-                    user1,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    버지니아공과대학_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname2", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(버지니아공과대학_지원_정보.getId())
             );
 
             // when
-            ApplicationsResponse response = applicationQueryService.getApplicants(
-                    user1.getId(),
-                    "",
-                    ""
-            );
+            ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), "", "");
 
             // then
-            assertThat(response.firstChoice().stream()
+            assertThat(response.choices().get(0).stream()
                                .flatMap(univ -> univ.applicants().stream())
                                .filter(ApplicantResponse::isMine))
                     .containsExactly(ApplicantResponse.of(secondApplication, true));
@@ -342,42 +250,27 @@ class ApplicationQueryServiceTest {
         void 이번_학기_지원한_대학의_경쟁자_목록을_조회한다() {
             // given
             Application application1 = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             Application application2 = applicationFixture.지원서(
-                    user2,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore2.getGpa(),
-                    languageTestScore2.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             applicationFixture.지원서(
-                    user3,
-                    "nickname3",
-                    term.getId(),
-                    gpaScore3.getGpa(),
-                    languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보.getId(),
-                    null,
-                    null
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
             );
+
             // when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1.getId());
 
             // then
-            assertThat(response.firstChoice()).containsExactlyInAnyOrder(
-                    ApplicantsResponse.of(괌대학_A_지원_정보,
-                                          List.of(application1, application2), user1)
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1, application2), user1)
             );
         }
 
@@ -385,41 +278,26 @@ class ApplicationQueryServiceTest {
         void 이번_학기_지원한_대학_중_미선택이_있을_때_경쟁자_목록을_조회한다() {
             // given
             Application application1 = applicationFixture.지원서(
-                    user1,
-                    "nickname1",
-                    term.getId(),
-                    gpaScore1.getGpa(),
-                    languageTestScore1.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    null,
-                    null
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
             );
             Application application2 = applicationFixture.지원서(
-                    user2,
-                    "nickname2",
-                    term.getId(),
-                    gpaScore2.getGpa(),
-                    languageTestScore2.getLanguageTest(),
-                    괌대학_A_지원_정보.getId(),
-                    버지니아공과대학_지원_정보.getId(),
-                    서던덴마크대학교_지원_정보.getId()
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId(), 버지니아공과대학_지원_정보.getId(), 서던덴마크대학교_지원_정보.getId())
             );
-            Application application3 = applicationFixture.지원서(
-                    user3,
-                    "nickname3",
-                    term.getId(),
-                    gpaScore3.getGpa(),
-                    languageTestScore3.getLanguageTest(),
-                    서던덴마크대학교_지원_정보.getId(),
-                    null,
-                    null
+            applicationFixture.지원서(
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
             );
 
             // when
             ApplicationsResponse response = applicationQueryService.getApplicantsByUserApplications(user1.getId());
 
             // then
-            assertThat(response.firstChoice())
+            assertThat(response.choices().get(0))
                     .hasSize(1)
                     .allSatisfy(uar -> {
                         assertThat(uar.koreanName()).isEqualTo(괌대학_A_지원_정보.getKoreanName());

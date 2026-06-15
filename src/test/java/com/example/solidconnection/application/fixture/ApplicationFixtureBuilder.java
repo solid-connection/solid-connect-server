@@ -1,11 +1,14 @@
 package com.example.solidconnection.application.fixture;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 
@@ -17,9 +20,7 @@ public class ApplicationFixtureBuilder {
 
     private Gpa gpa;
     private LanguageTest languageTest;
-    private Long firstChoiceUnivApplyInfoId;
-    private Long secondChoiceUnivApplyInfoId;
-    private Long thirdChoiceUnivApplyInfoId;
+    private List<Long> univApplyInfoIds = List.of();
     private SiteUser siteUser;
     private String nicknameForApply;
     private long termId;
@@ -38,18 +39,8 @@ public class ApplicationFixtureBuilder {
         return this;
     }
 
-    public ApplicationFixtureBuilder firstChoiceUnivApplyInfoId(Long firstChoiceUnivApplyInfoId) {
-        this.firstChoiceUnivApplyInfoId = firstChoiceUnivApplyInfoId;
-        return this;
-    }
-
-    public ApplicationFixtureBuilder secondChoiceUnivApplyInfoId(Long secondChoiceUnivApplyInfoId) {
-        this.secondChoiceUnivApplyInfoId = secondChoiceUnivApplyInfoId;
-        return this;
-    }
-
-    public ApplicationFixtureBuilder thirdChoiceUnivApplyInfoId(Long thirdChoiceUnivApplyInfoId) {
-        this.thirdChoiceUnivApplyInfoId = thirdChoiceUnivApplyInfoId;
+    public ApplicationFixtureBuilder univApplyInfoIds(List<Long> univApplyInfoIds) {
+        this.univApplyInfoIds = univApplyInfoIds;
         return this;
     }
 
@@ -69,14 +60,16 @@ public class ApplicationFixtureBuilder {
     }
 
     public Application create() {
+        List<ApplicationChoice> choices = IntStream.range(0, univApplyInfoIds.size())
+                .mapToObj(i -> new ApplicationChoice(i + 1, univApplyInfoIds.get(i)))
+                .toList();
         Application application = new Application(
                 siteUser,
                 gpa,
                 languageTest,
                 termId,
-                firstChoiceUnivApplyInfoId,
-                secondChoiceUnivApplyInfoId,
-                thirdChoiceUnivApplyInfoId,
+                1,
+                choices,
                 nicknameForApply
         );
         application.setVerifyStatus(VerifyStatus.APPROVED);

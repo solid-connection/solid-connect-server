@@ -84,7 +84,8 @@ class AdminHomeUniversityServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(homeUniversity.getId()),
-                    () -> assertThat(response.name()).isEqualTo(homeUniversity.getName())
+                    () -> assertThat(response.name()).isEqualTo(homeUniversity.getName()),
+                    () -> assertThat(response.maxChoiceCount()).isEqualTo(homeUniversity.getMaxChoiceCount())
             );
         }
 
@@ -103,7 +104,7 @@ class AdminHomeUniversityServiceTest {
         @Test
         void 유효한_요청으로_협정대학을_생성하면_성공한다() {
             // given
-            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교");
+            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", 3);
 
             // when
             AdminHomeUniversityResponse response = adminHomeUniversityService.createHomeUniversity(request);
@@ -112,7 +113,9 @@ class AdminHomeUniversityServiceTest {
             HomeUniversity saved = homeUniversityRepository.findById(response.id()).orElseThrow();
             assertAll(
                     () -> assertThat(response.name()).isEqualTo("인하대학교"),
-                    () -> assertThat(saved.getName()).isEqualTo("인하대학교")
+                    () -> assertThat(response.maxChoiceCount()).isEqualTo(3),
+                    () -> assertThat(saved.getName()).isEqualTo("인하대학교"),
+                    () -> assertThat(saved.getMaxChoiceCount()).isEqualTo(3)
             );
         }
 
@@ -120,7 +123,7 @@ class AdminHomeUniversityServiceTest {
         void 이미_존재하는_이름으로_생성하면_예외가_발생한다() {
             // given
             homeUniversityFixture.인하대학교();
-            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교");
+            AdminHomeUniversityCreateRequest request = new AdminHomeUniversityCreateRequest("인하대학교", 3);
 
             // when & then
             assertThatCode(() -> adminHomeUniversityService.createHomeUniversity(request))
@@ -136,7 +139,7 @@ class AdminHomeUniversityServiceTest {
         void 유효한_요청으로_협정대학을_수정하면_성공한다() {
             // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
-            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교");
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교", 5);
 
             // when
             AdminHomeUniversityResponse response = adminHomeUniversityService.updateHomeUniversity(homeUniversity.getId(), request);
@@ -145,14 +148,16 @@ class AdminHomeUniversityServiceTest {
             HomeUniversity updated = homeUniversityRepository.findById(homeUniversity.getId()).orElseThrow();
             assertAll(
                     () -> assertThat(response.name()).isEqualTo("연세대학교"),
-                    () -> assertThat(updated.getName()).isEqualTo("연세대학교")
+                    () -> assertThat(response.maxChoiceCount()).isEqualTo(5),
+                    () -> assertThat(updated.getName()).isEqualTo("연세대학교"),
+                    () -> assertThat(updated.getMaxChoiceCount()).isEqualTo(5)
             );
         }
 
         @Test
         void 존재하지_않는_협정대학을_수정하면_예외가_발생한다() {
             // given
-            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교");
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("연세대학교", 3);
 
             // when & then
             assertThatCode(() -> adminHomeUniversityService.updateHomeUniversity(999L, request))
@@ -164,8 +169,8 @@ class AdminHomeUniversityServiceTest {
         void 다른_협정대학의_이름으로_수정하면_예외가_발생한다() {
             // given
             homeUniversityFixture.인하대학교();
-            HomeUniversity other = homeUniversityRepository.save(new HomeUniversity(null, "연세대학교"));
-            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교");
+            HomeUniversity other = homeUniversityRepository.save(new HomeUniversity(null, "연세대학교", 3));
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", 3);
 
             // when & then
             assertThatCode(() -> adminHomeUniversityService.updateHomeUniversity(other.getId(), request))
@@ -177,7 +182,7 @@ class AdminHomeUniversityServiceTest {
         void 같은_이름으로_수정하면_성공한다() {
             // given
             HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
-            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교");
+            AdminHomeUniversityUpdateRequest request = new AdminHomeUniversityUpdateRequest("인하대학교", 3);
 
             // when
             AdminHomeUniversityResponse response = adminHomeUniversityService.updateHomeUniversity(homeUniversity.getId(), request);

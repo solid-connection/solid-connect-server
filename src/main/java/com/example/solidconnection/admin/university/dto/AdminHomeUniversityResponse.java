@@ -4,13 +4,15 @@ import com.example.solidconnection.university.domain.HomeUniversity;
 
 public record AdminHomeUniversityResponse(
         long id,
-        String name
+        String name,
+        int maxChoiceCount
 ) {
 
     public static AdminHomeUniversityResponse from(HomeUniversity homeUniversity) {
         return new AdminHomeUniversityResponse(
                 homeUniversity.getId(),
-                homeUniversity.getName()
+                homeUniversity.getName(),
+                homeUniversity.getMaxChoiceCount()
         );
     }
 }

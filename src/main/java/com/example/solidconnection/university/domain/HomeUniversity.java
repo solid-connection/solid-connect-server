@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class HomeUniversity extends BaseEntity {
 
+    public static final int DEFAULT_MAX_CHOICE_COUNT = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,7 +27,11 @@ public class HomeUniversity extends BaseEntity {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    public void update(String name) {
+    @Column(name = "max_choice_count", nullable = false)
+    private int maxChoiceCount;
+
+    public void update(String name, int maxChoiceCount) {
         this.name = name;
+        this.maxChoiceCount = maxChoiceCount;
     }
 }

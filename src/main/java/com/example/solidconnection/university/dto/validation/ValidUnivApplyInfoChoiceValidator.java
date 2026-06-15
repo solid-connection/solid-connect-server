@@ -2,35 +2,38 @@ package com.example.solidconnection.university.dto.validation;
 
 import static com.example.solidconnection.common.exception.ErrorCode.DUPLICATE_UNIV_APPLY_INFO_CHOICE;
 import static com.example.solidconnection.common.exception.ErrorCode.FIRST_CHOICE_REQUIRED;
-import static com.example.solidconnection.common.exception.ErrorCode.THIRD_CHOICE_REQUIRES_SECOND;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_UNIV_APPLY_INFO_CHOICE;
 
 import com.example.solidconnection.application.dto.UnivApplyInfoChoiceRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
-public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<ValidUnivApplyInfoChoice, UnivApplyInfoChoiceRequest> {
+public class ValidUnivApplyInfoChoiceValidator
+        implements ConstraintValidator<ValidUnivApplyInfoChoice, UnivApplyInfoChoiceRequest> {
 
     @Override
     public boolean isValid(UnivApplyInfoChoiceRequest request, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
 
-        if (isFirstChoiceNotSelected(request)) {
+        List<Long> ids = request.univApplyInfoIds();
+
+        if (ids == null || ids.isEmpty()) {
             context.buildConstraintViolationWithTemplate(FIRST_CHOICE_REQUIRED.getMessage())
                     .addConstraintViolation();
             return false;
         }
 
-        if (isThirdChoiceWithoutSecond(request)) {
-            context.buildConstraintViolationWithTemplate(THIRD_CHOICE_REQUIRES_SECOND.getMessage())
+        if (ids.stream().anyMatch(Objects::isNull)) {
+            context.buildConstraintViolationWithTemplate(INVALID_UNIV_APPLY_INFO_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
         }
 
-        if (isDuplicate(request)) {
+        if (hasDuplicate(ids)) {
             context.buildConstraintViolationWithTemplate(DUPLICATE_UNIV_APPLY_INFO_CHOICE.getMessage())
                     .addConstraintViolation();
             return false;
@@ -39,22 +42,8 @@ public class ValidUnivApplyInfoChoiceValidator implements ConstraintValidator<Va
         return true;
     }
 
-    private boolean isFirstChoiceNotSelected(UnivApplyInfoChoiceRequest request) {
-        return request.firstChoiceUnivApplyInfoId() == null;
-    }
-
-    private boolean isThirdChoiceWithoutSecond(UnivApplyInfoChoiceRequest request) {
-        return request.thirdChoiceUnivApplyInfoId() != null && request.secondChoiceUnivApplyInfoId() == null;
-    }
-
-    private boolean isDuplicate(UnivApplyInfoChoiceRequest request) {
-        Set<Long> uniqueIds = new HashSet<>();
-        return Stream.of(
-                        request.firstChoiceUnivApplyInfoId(),
-                        request.secondChoiceUnivApplyInfoId(),
-                        request.thirdChoiceUnivApplyInfoId()
-                )
-                .filter(Objects::nonNull)
-                .anyMatch(id -> !uniqueIds.add(id));
+    private boolean hasDuplicate(List<Long> ids) {
+        Set<Long> unique = new HashSet<>();
+        return ids.stream().anyMatch(id -> !unique.add(id));
     }
 }

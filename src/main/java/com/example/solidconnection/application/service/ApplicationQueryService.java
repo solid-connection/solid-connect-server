@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TER
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
@@ -14,7 +15,9 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.custom.UnivApplyInfoFilterRepositoryImpl;
 import io.micrometer.common.util.StringUtils;
@@ -22,10 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,11 +39,10 @@ public class ApplicationQueryService {
     private final UnivApplyInfoFilterRepositoryImpl universityFilterRepository;
     private final SiteUserRepository siteUserRepository;
     private final TermRepository termRepository;
+    private final HomeUniversityRepository homeUniversityRepository;
 
-    // todo: 캐싱 정책 변경 시 수정 필요
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
-        // 1. 대학 지원 정보 필터링 (regionCode, keyword)
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         List<String> keywords = StringUtils.isNotBlank(keyword) ? List.of(keyword) : List.of();
@@ -51,18 +50,20 @@ public class ApplicationQueryService {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        List<UnivApplyInfo> univApplyInfos = universityFilterRepository.findAllByRegionCodeAndKeywordsAndTermId(regionCode, keywords, term.getId());
+        List<UnivApplyInfo> univApplyInfos = universityFilterRepository
+                .findAllByRegionCodeAndKeywordsAndTermId(regionCode, keywords, term.getId());
         if (univApplyInfos.isEmpty()) {
-            return new ApplicationsResponse(List.of(), List.of(), List.of());
+            return new ApplicationsResponse(List.of());
         }
 
-        // 2. 조건에 맞는 모든 Application 한 번에 조회
         List<Long> univApplyInfoIds = univApplyInfos.stream()
                 .map(UnivApplyInfo::getId)
                 .toList();
-        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
-        // 3. 지원서 분류 및 DTO 변환
-        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
+        List<Application> applications = applicationRepository
+                .findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
+
+        int maxChoiceCount = resolveMaxChoiceCount(siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser, maxChoiceCount);
     }
 
     @Transactional(readOnly = true)
@@ -73,57 +74,59 @@ public class ApplicationQueryService {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        Application userLatestApplication = applicationRepository.getApplicationBySiteUserIdAndTermId(siteUser.getId(), term.getId());
+        Application userLatestApplication = applicationRepository
+                .getApplicationBySiteUserIdAndTermId(siteUser.getId(), term.getId());
 
-        List<Long> univApplyInfoIds = Stream.of(
-                        userLatestApplication.getFirstChoiceUnivApplyInfoId(),
-                        userLatestApplication.getSecondChoiceUnivApplyInfoId(),
-                        userLatestApplication.getThirdChoiceUnivApplyInfoId()
-                )
-                .filter(Objects::nonNull)
+        List<Long> univApplyInfoIds = userLatestApplication.getChoices().stream()
+                .map(ApplicationChoice::getUnivApplyInfoId)
                 .collect(Collectors.toList());
 
         if (univApplyInfoIds.isEmpty()) {
-            return new ApplicationsResponse(List.of(), List.of(), List.of());
+            return new ApplicationsResponse(List.of());
         }
 
-        List<Application> applications = applicationRepository.findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
+        List<Application> applications = applicationRepository
+                .findAllByUnivApplyInfoIds(univApplyInfoIds, VerifyStatus.APPROVED, term.getId());
         List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByIds(univApplyInfoIds);
 
-        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser);
+        int maxChoiceCount = resolveMaxChoiceCount(siteUser);
+        return classifyApplicationsByChoice(univApplyInfos, applications, siteUser, maxChoiceCount);
     }
 
     private ApplicationsResponse classifyApplicationsByChoice(
             List<UnivApplyInfo> univApplyInfos,
             List<Application> applications,
-            SiteUser siteUser) {
-        Map<Long, List<Application>> firstChoiceMap = createChoiceMap(applications, Application::getFirstChoiceUnivApplyInfoId);
-        Map<Long, List<Application>> secondChoiceMap = createChoiceMap(applications, Application::getSecondChoiceUnivApplyInfoId);
-        Map<Long, List<Application>> thirdChoiceMap = createChoiceMap(applications, Application::getThirdChoiceUnivApplyInfoId);
-
-        List<ApplicantsResponse> firstChoiceApplicants =
-                createUniversityApplicantsResponses(univApplyInfos, firstChoiceMap, siteUser);
-        List<ApplicantsResponse> secondChoiceApplicants =
-                createUniversityApplicantsResponses(univApplyInfos, secondChoiceMap, siteUser);
-        List<ApplicantsResponse> thirdChoiceApplicants =
-                createUniversityApplicantsResponses(univApplyInfos, thirdChoiceMap, siteUser);
-
-        return new ApplicationsResponse(firstChoiceApplicants, secondChoiceApplicants, thirdChoiceApplicants);
+            SiteUser siteUser,
+            int maxChoiceCount) {
+        List<List<ApplicantsResponse>> allChoices = new ArrayList<>();
+        for (int order = 1; order <= maxChoiceCount; order++) {
+            final int choiceOrder = order;
+            Map<Long, List<Application>> choiceMap = buildChoiceMapForOrder(applications, choiceOrder);
+            allChoices.add(createUniversityApplicantsResponses(univApplyInfos, choiceMap, siteUser));
+        }
+        return new ApplicationsResponse(allChoices);
     }
 
-    private Map<Long, List<Application>> createChoiceMap(
-            List<Application> applications,
-            Function<Application, Long> choiceIdExtractor) {
-        Map<Long, List<Application>> choiceMap = new HashMap<>();
-
-        for (Application application : applications) {
-            Long choiceId = choiceIdExtractor.apply(application);
-            if (choiceId != null) {
-                choiceMap.computeIfAbsent(choiceId, k -> new ArrayList<>()).add(application);
-            }
+    private int resolveMaxChoiceCount(SiteUser siteUser) {
+        if (siteUser.getHomeUniversityId() == null) {
+            return HomeUniversity.DEFAULT_MAX_CHOICE_COUNT;
         }
+        return homeUniversityRepository.findById(siteUser.getHomeUniversityId())
+                .map(HomeUniversity::getMaxChoiceCount)
+                .orElse(HomeUniversity.DEFAULT_MAX_CHOICE_COUNT);
+    }
 
-        return choiceMap;
+    private Map<Long, List<Application>> buildChoiceMapForOrder(List<Application> applications, int order) {
+        Map<Long, List<Application>> map = new HashMap<>();
+        for (Application application : applications) {
+            application.getChoices().stream()
+                    .filter(c -> c.getChoiceOrder() == order)
+                    .findFirst()
+                    .ifPresent(choice -> map
+                            .computeIfAbsent(choice.getUnivApplyInfoId(), k -> new ArrayList<>())
+                            .add(application));
+        }
+        return map;
     }
 
     private List<ApplicantsResponse> createUniversityApplicantsResponses(
@@ -143,7 +146,8 @@ public class ApplicationQueryService {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        VerifyStatus verifyStatus = applicationRepository.getApplicationBySiteUserIdAndTermId(siteUser.getId(), term.getId()).getVerifyStatus();
+        VerifyStatus verifyStatus = applicationRepository
+                .getApplicationBySiteUserIdAndTermId(siteUser.getId(), term.getId()).getVerifyStatus();
         if (verifyStatus != VerifyStatus.APPROVED) {
             throw new CustomException(APPLICATION_NOT_APPROVED);
         }
