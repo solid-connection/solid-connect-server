@@ -171,6 +171,9 @@ public enum ErrorCode {
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
 
+    // import
+    INVALID_MARKDOWN_FORMAT(HttpStatus.BAD_REQUEST.value(), "올바른 마크다운 표 형식이 아닙니다."),
+
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "JWT 토큰을 처리할 수 없습니다."),
