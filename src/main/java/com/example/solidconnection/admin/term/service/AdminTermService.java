@@ -41,8 +41,7 @@ public class AdminTermService {
     public AdminTermResponse activateTerm(Long id) {
         Term target = termRepository.findById(id)
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-        termRepository.findByIsCurrentTrue()
-                .ifPresent(Term::deactivate);
+        termRepository.deactivateCurrentTerm();
         target.activate();
         return AdminTermResponse.from(target);
     }
