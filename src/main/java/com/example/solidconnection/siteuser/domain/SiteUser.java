@@ -159,6 +159,10 @@ public class SiteUser extends BaseEntity {
         this.userStatus = status;
     }
 
+    public void verifySchool(Long homeUniversityId) {
+        this.homeUniversityId = homeUniversityId;
+    }
+
     public void becomeMentor() {
         this.role = Role.MENTOR;
     }

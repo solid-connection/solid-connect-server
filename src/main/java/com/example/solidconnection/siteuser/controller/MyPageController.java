@@ -5,12 +5,16 @@ import com.example.solidconnection.common.resolver.AuthorizedUser;
 import com.example.solidconnection.siteuser.dto.LocationUpdateRequest;
 import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
+import com.example.solidconnection.siteuser.dto.SchoolEmailConfirmRequest;
+import com.example.solidconnection.siteuser.dto.SchoolEmailRequest;
 import com.example.solidconnection.siteuser.service.MyPageService;
+import com.example.solidconnection.siteuser.service.SchoolEmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 class MyPageController {
 
     private final MyPageService myPageService;
+    private final SchoolEmailService schoolEmailService;
 
     @GetMapping
     public ResponseEntity<MyPageResponse> getMyPageInfo(
@@ -57,6 +62,24 @@ class MyPageController {
             @RequestBody @Valid LocationUpdateRequest request
     ) {
         myPageService.updateLocation(siteUserId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/school-email")
+    public ResponseEntity<Void> requestSchoolEmailVerification(
+            @AuthorizedUser long siteUserId,
+            @RequestBody @Valid SchoolEmailRequest request
+    ) {
+        schoolEmailService.requestSchoolEmailVerification(siteUserId, request.schoolEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/school-email/confirm")
+    public ResponseEntity<Void> confirmSchoolEmail(
+            @AuthorizedUser long siteUserId,
+            @RequestBody @Valid SchoolEmailConfirmRequest request
+    ) {
+        schoolEmailService.confirmSchoolEmail(siteUserId, request.code());
         return ResponseEntity.ok().build();
     }
 }

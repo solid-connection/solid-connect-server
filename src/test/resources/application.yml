@@ -19,6 +19,11 @@ spring:
         format_sql: true
   flyway:
     enabled: false
+  mail:
+    host: localhost
+    port: 25
+    username: test
+    password: test
 
 # cloud
 cloud:
