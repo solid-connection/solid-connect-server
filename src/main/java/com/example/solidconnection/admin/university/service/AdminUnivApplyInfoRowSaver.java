@@ -34,7 +34,7 @@ public class AdminUnivApplyInfoRowSaver {
     private final RegionRepository regionRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void save(
+    public String save(
             Map<String, String> rowData,
             Map<String, String> columnMappings,
             HomeUniversity homeUniversity,
@@ -46,7 +46,9 @@ public class AdminUnivApplyInfoRowSaver {
             throw new IllegalArgumentException("대학명(universityKoreanName) 컬럼이 매핑되지 않았습니다");
         }
 
+        boolean existed = hostUniversityRepository.findByKoreanName(data.universityKoreanName).isPresent();
         HostUniversity hostUniversity = findOrCreateHostUniversity(data);
+        String createdUniversityName = existed ? null : hostUniversity.getKoreanName();
 
         UnivApplyInfo univApplyInfo = new UnivApplyInfo(
                 null,
@@ -76,6 +78,8 @@ public class AdminUnivApplyInfoRowSaver {
             LanguageRequirement lr = new LanguageRequirement(null, testType, minScore, saved);
             saved.addLanguageRequirements(lr);
         });
+
+        return createdUniversityName;
     }
 
     private HostUniversity findOrCreateHostUniversity(ImportData data) {

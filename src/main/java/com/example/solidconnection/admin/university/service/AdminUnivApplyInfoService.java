@@ -41,17 +41,21 @@ public class AdminUnivApplyInfoService {
 
         int successCount = 0;
         List<FailedRow> failedRows = new ArrayList<>();
+        List<String> createdUniversities = new ArrayList<>();
 
         for (int i = 0; i < rows.size(); i++) {
             try {
-                rowSaver.save(rows.get(i), request.columnMappings(), homeUniversity, request.termId());
+                String createdName = rowSaver.save(rows.get(i), request.columnMappings(), homeUniversity, request.termId());
                 successCount++;
+                if (createdName != null) {
+                    createdUniversities.add(createdName);
+                }
             } catch (Exception e) {
                 failedRows.add(new FailedRow(i + 1, e.getMessage()));
             }
         }
 
-        return new UnivApplyInfoImportResponse(successCount, failedRows);
+        return new UnivApplyInfoImportResponse(successCount, failedRows, createdUniversities);
     }
 
     private void validateTermExists(Long termId) {

@@ -6,19 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public record UnivApplyInfoFieldResponse(
-        List<FieldInfo> structuredFields,
+        List<String> structuredFields,
         List<String> languageTestTypes
 ) {
 
-    public record FieldInfo(
-            String field,
-            List<String> aliases
-    ) {
-    }
-
     public static UnivApplyInfoFieldResponse of() {
-        List<FieldInfo> fields = Arrays.stream(UnivApplyInfoColumn.values())
-                .map(col -> new FieldInfo(col.getFieldName(), col.getAliases()))
+        List<String> fields = Arrays.stream(UnivApplyInfoColumn.values())
+                .map(UnivApplyInfoColumn::getFieldName)
                 .toList();
         List<String> testTypes = Arrays.stream(LanguageTestType.values())
                 .map(Enum::name)
