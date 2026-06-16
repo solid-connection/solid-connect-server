@@ -145,13 +145,13 @@ public class AdminUnivApplyInfoRowSaver {
         try {
             switch (fieldName) {
                 case "universityKoreanName" -> data.universityKoreanName = value;
-                case "englishName" -> data.englishName = value;
-                case "formatName" -> data.formatName = value;
-                case "countryCode" -> data.countryCode = value;
-                case "homepageUrl" -> data.homepageUrl = value;
-                case "englishCourseUrl" -> data.englishCourseUrl = value;
-                case "accommodationUrl" -> data.accommodationUrl = value;
-                case "detailsForLocal" -> data.detailsForLocal = value;
+                case "universityEnglishName" -> data.englishName = value;
+                case "universityFormatName" -> data.formatName = value;
+                case "universityCountryCode" -> data.countryCode = value;
+                case "universityHomepageUrl" -> data.homepageUrl = value;
+                case "universityEnglishCourseUrl" -> data.englishCourseUrl = value;
+                case "universityAccommodationUrl" -> data.accommodationUrl = value;
+                case "universityDetailsForLocal" -> data.detailsForLocal = value;
                 case "studentCapacity" -> data.studentCapacity = Integer.parseInt(value);
                 case "tuitionFeeType" -> data.tuitionFeeType = TuitionFeeType.valueOf(value);
                 case "semesterAvailableForDispatch" -> data.semesterAvailableForDispatch = SemesterAvailableForDispatch.valueOf(value);
