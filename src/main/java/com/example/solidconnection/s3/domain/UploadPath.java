@@ -14,6 +14,8 @@ public enum UploadPath {
     NEWS("news"),
     CHAT("chat/files"),
     MENTOR_PROOF("mentor-proof"),
+    ADMIN_UNIVERSITY_LOGO("admin/logo"),
+    ADMIN_UNIVERSITY_BACKGROUND("admin/background")
     ;
 
     private final String type;

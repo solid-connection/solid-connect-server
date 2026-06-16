@@ -50,12 +50,20 @@ public class S3Service {
      * - 5mb 미만의 파일은 바로 업로드한다.
      * */
     public UploadedFileUrlResponse uploadFile(MultipartFile multipartFile, UploadPath uploadPath) {
+        return uploadFile(multipartFile, uploadPath, null);
+    }
+
+    public UploadedFileUrlResponse uploadFile(
+            MultipartFile multipartFile,
+            UploadPath uploadPath,
+            String subDirectory
+    ) {
         validateFile(multipartFile, uploadPath);
 
         UUID randomUUID = UUID.randomUUID();
         String extension = getFileExtension(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String baseFileName = randomUUID + "." + extension;
-        String fileName = uploadPath.getType() + "/" + baseFileName;
+        String fileName = createFileName(uploadPath, subDirectory, baseFileName);
 
         final boolean shouldResize = uploadPath.isResizable(
                 multipartFile.getSize(), extension, MAX_FILE_SIZE_MB);
@@ -71,6 +79,13 @@ public class S3Service {
         fileUploadService.uploadFile(bucket, originalPath, bytes, contentType);
 
         return new UploadedFileUrlResponse(returnPath);
+    }
+
+    private String createFileName(UploadPath uploadPath, String subDirectory, String baseFileName) {
+        if (subDirectory == null || subDirectory.isBlank()) {
+            return uploadPath.getType() + "/" + baseFileName;
+        }
+        return uploadPath.getType() + "/" + subDirectory + "/" + baseFileName;
     }
 
     private byte[] extractBytes(MultipartFile file) {
