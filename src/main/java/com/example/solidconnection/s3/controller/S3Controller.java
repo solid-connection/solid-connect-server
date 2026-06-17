@@ -1,10 +1,13 @@
 package com.example.solidconnection.s3.controller;
 
 import com.example.solidconnection.common.resolver.AuthorizedUser;
+import com.example.solidconnection.s3.domain.UploadDirectoryName;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.dto.UrlPrefixResponse;
 import com.example.solidconnection.s3.service.S3Service;
+import com.example.solidconnection.security.annotation.RequireRoleAccess;
+import com.example.solidconnection.siteuser.domain.Role;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,6 +78,38 @@ public class S3Controller {
     ) {
         List<UploadedFileUrlResponse> chatImageUrls = s3Service.uploadFiles(files, UploadPath.CHAT);
         return ResponseEntity.ok(chatImageUrls);
+    }
+
+    @RequireRoleAccess(roles = Role.ADMIN)
+    @PostMapping("/admin/university/logo")
+    public ResponseEntity<UploadedFileUrlResponse> uploadAdminUniversityLogo(
+            @AuthorizedUser long adminId,
+            @RequestParam("file") MultipartFile imageFile,
+            @RequestParam("englishName") String englishName
+    ) {
+        String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
+        UploadedFileUrlResponse logoImageUrl = s3Service.uploadFile(
+                imageFile,
+                UploadPath.ADMIN_UNIVERSITY_LOGO,
+                directoryName
+        );
+        return ResponseEntity.ok(logoImageUrl);
+    }
+
+    @RequireRoleAccess(roles = Role.ADMIN)
+    @PostMapping("/admin/university/background")
+    public ResponseEntity<UploadedFileUrlResponse> uploadAdminUniversityBackground(
+            @AuthorizedUser long adminId,
+            @RequestParam("file") MultipartFile imageFile,
+            @RequestParam("englishName") String englishName
+    ) {
+        String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
+        UploadedFileUrlResponse backgroundImageUrl = s3Service.uploadFile(
+                imageFile,
+                UploadPath.ADMIN_UNIVERSITY_BACKGROUND,
+                directoryName
+        );
+        return ResponseEntity.ok(backgroundImageUrl);
     }
 
     @GetMapping("/s3-url-prefix")

@@ -256,6 +256,31 @@ class AdminHostUniversityServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
         }
+
+        @Test
+        void 이미_존재하는_영문명으로_생성하면_예외_응답을_반환한다() {
+            // given
+            HostUniversity existing = universityFixture.괌_대학();
+            Country country = countryFixture.미국();
+            Region region = regionFixture.영미권();
+
+            AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
+                    "신규 대학",
+                    existing.getEnglishName(),
+                    "표시명",
+                    null, null, null,
+                    "https://logo.com/image.png",
+                    "https://background.com/image.png",
+                    null,
+                    country.getCode(),
+                    region.getCode()
+            );
+
+            // when & then
+            assertThatCode(() -> adminHostUniversityService.createHostUniversity(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
+        }
     }
 
     @Nested
@@ -326,6 +351,30 @@ class AdminHostUniversityServiceTest {
             AdminHostUniversityUpdateRequest request = new AdminHostUniversityUpdateRequest(
                     university2.getKoreanName(),
                     "Updated University",
+                    "수정된 표시명",
+                    null, null, null,
+                    "https://logo.com/image.png",
+                    "https://background.com/image.png",
+                    null,
+                    university1.getCountry().getCode(),
+                    university1.getRegion().getCode()
+            );
+
+            // when & then
+            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(university1.getId(), request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
+        }
+
+        @Test
+        void 다른_대학의_영문명으로_수정하면_예외_응답을_반환한다() {
+            // given
+            HostUniversity university1 = universityFixture.괌_대학();
+            HostUniversity university2 = universityFixture.메이지_대학();
+
+            AdminHostUniversityUpdateRequest request = new AdminHostUniversityUpdateRequest(
+                    university1.getKoreanName(),
+                    university2.getEnglishName(),
                     "수정된 표시명",
                     null, null, null,
                     "https://logo.com/image.png",
