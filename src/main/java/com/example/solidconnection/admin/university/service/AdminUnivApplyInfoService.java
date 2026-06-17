@@ -14,6 +14,7 @@ import com.example.solidconnection.university.repository.HomeUniversityRepositor
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,22 +39,16 @@ public class AdminUnivApplyInfoService {
 
         List<Map<String, String>> rows = markdownTableParser.parse(request.markdown());
 
-        int successCount = 0;
         List<String> createdUniversities = new ArrayList<>();
 
         for (Map<String, String> row : rows) {
-            try {
-                String createdName = rowSaver.save(row, request.columnMappings(), homeUniversity, request.termId());
-                successCount++;
-                if (createdName != null) {
-                    createdUniversities.add(createdName);
-                }
-            } catch (Exception e) {
-                // row failed, skip
+            String createdName = rowSaver.save(row, request.columnMappings(), homeUniversity, request.termId());
+            if (createdName != null) {
+                createdUniversities.add(createdName);
             }
         }
 
-        return new UnivApplyInfoImportResponse(successCount, createdUniversities);
+        return new UnivApplyInfoImportResponse(rows.size(), createdUniversities);
     }
 
     private void validateTermExists(Long termId) {

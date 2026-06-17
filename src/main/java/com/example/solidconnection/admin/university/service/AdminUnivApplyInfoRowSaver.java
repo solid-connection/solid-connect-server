@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -37,7 +36,7 @@ public class AdminUnivApplyInfoRowSaver {
     private final CountryRepository countryRepository;
     private final RegionRepository regionRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public String save(
             Map<String, String> rowData,
             Map<String, String> columnMappings,

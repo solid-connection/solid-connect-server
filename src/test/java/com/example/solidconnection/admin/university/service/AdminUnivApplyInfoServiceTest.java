@@ -113,7 +113,7 @@ class AdminUnivApplyInfoServiceTest {
         }
 
         @Test
-        void enum_변환_실패시_해당_행이_실패한다() {
+        void enum_변환_실패시_전체가_실패한다() {
             // given
             String markdown = String.format("""
                     | 대학명 | 파견가능학기 |
@@ -125,14 +125,10 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "파견가능학기", "semesterAvailableForDispatch")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
-            );
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
@@ -200,7 +196,7 @@ class AdminUnivApplyInfoServiceTest {
         }
 
         @Test
-        void 존재하지_않는_대학명_행만_실패하고_나머지는_저장된다() {
+        void 존재하지_않는_대학명이_있으면_전체가_실패한다() {
             // given
             String markdown = String.format("""
                     | 대학명 | 인원 |
@@ -214,18 +210,14 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "인원", "studentCapacity")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isEqualTo(2),
-                    () -> assertThat(univApplyInfoRepository.findAll()).hasSize(2)
-            );
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
-        void 존재하지_않는_국가코드면_행이_실패한다() {
+        void 존재하지_않는_국가코드면_전체가_실패한다() {
             // given
             String markdown = """
                     | 대학명 | 국가코드 |
@@ -237,15 +229,14 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "국가코드", "universityCountryCode")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertThat(response.successCount()).isZero();
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
-        void 대학명이_비어있으면_행이_실패한다() {
+        void 대학명이_비어있으면_전체가_실패한다() {
             // given
             String markdown = """
                     | 대학명 | 국가코드 |
@@ -257,11 +248,10 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "국가코드", "universityCountryCode")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertThat(response.successCount()).isZero();
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
@@ -314,7 +304,7 @@ class AdminUnivApplyInfoServiceTest {
         }
 
         @Test
-        void 선발인원에_정수가_아닌_값이_들어오면_해당_행이_실패한다() {
+        void 선발인원에_정수가_아닌_값이_들어오면_전체가_실패한다() {
             // given
             String markdown = String.format("""
                     | 대학명 | 인원 |
@@ -326,18 +316,14 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "인원", "studentCapacity")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
-            );
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
-        void 길이_제한을_초과하는_값이_들어오면_해당_행이_실패한다() {
+        void 길이_제한을_초과하는_값이_들어오면_전체가_실패한다() {
             // given
             String tooLongValue = "a".repeat(101);
             String markdown = String.format("""
@@ -350,18 +336,14 @@ class AdminUnivApplyInfoServiceTest {
                     Map.of("대학명", "universityKoreanName", "학기요건", "semesterRequirement")
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
-            );
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
 
         @Test
-        void 파싱_오류가_있는_행은_실패_처리된다() {
+        void 파싱_오류가_있는_행이_있으면_전체가_실패한다() {
             // given
             String tooLong = "a".repeat(101);
             String markdown = String.format("""
@@ -378,11 +360,10 @@ class AdminUnivApplyInfoServiceTest {
                     )
             );
 
-            // when
-            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
-
-            // then
-            assertThat(response.successCount()).isZero();
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
+                    .isInstanceOf(CustomException.class);
+            assertThat(univApplyInfoRepository.findAll()).isEmpty();
         }
     }
 }
