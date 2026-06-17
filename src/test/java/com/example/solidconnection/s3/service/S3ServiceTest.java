@@ -110,5 +110,45 @@ public class S3ServiceTest {
                             .doesNotThrowAnyException()
             );
         }
+
+        @Test
+        void 이미지_전용_업로드_경로는_문서_확장자를_허용하지_않는다() {
+            // given
+            MockMultipartFile pdfFile = createMockFile("logo.pdf", 100);
+
+            // when & then
+            assertThatThrownBy(() -> s3Service.uploadFile(
+                    pdfFile,
+                    UploadPath.ADMIN_UNIVERSITY_LOGO,
+                    "university_of_tokyo"
+            ))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining("허용된 형식");
+        }
+
+        @Test
+        void 멘토_증빙_업로드는_이미지_외의_허용된_문서_확장자도_검증을_통과한다() {
+            // given
+            MockMultipartFile pdfFile = createMockFile("proof.pdf", 100);
+
+            // when & then
+            assertThatCode(() -> s3Service.uploadFile(pdfFile, UploadPath.MENTOR_PROOF))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        void 성적_증빙_업로드는_이미지_외의_허용된_문서_확장자도_검증을_통과한다() {
+            // given
+            MockMultipartFile gpaPdfFile = createMockFile("gpa.pdf", 100);
+            MockMultipartFile languageTestPdfFile = createMockFile("language-test.pdf", 100);
+
+            // when & then
+            assertAll(
+                    () -> assertThatCode(() -> s3Service.uploadFile(gpaPdfFile, UploadPath.GPA))
+                            .doesNotThrowAnyException(),
+                    () -> assertThatCode(() -> s3Service.uploadFile(languageTestPdfFile, UploadPath.LANGUAGE_TEST))
+                            .doesNotThrowAnyException()
+            );
+        }
     }
 }
