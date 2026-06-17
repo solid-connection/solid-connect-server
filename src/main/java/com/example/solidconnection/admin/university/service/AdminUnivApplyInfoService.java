@@ -1,6 +1,7 @@
 package com.example.solidconnection.admin.university.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
@@ -34,6 +35,7 @@ public class AdminUnivApplyInfoService {
 
     @Transactional
     public UnivApplyInfoImportResponse importUnivApplyInfos(UnivApplyInfoImportRequest request) {
+        validateColumnMappings(request.columnMappings());
         validateTermExists(request.termId());
         HomeUniversity homeUniversity = findHomeUniversity(request.homeUniversityId());
 
@@ -49,6 +51,14 @@ public class AdminUnivApplyInfoService {
         }
 
         return new UnivApplyInfoImportResponse(rows.size(), createdUniversities);
+    }
+
+    private void validateColumnMappings(Map<String, String> columnMappings) {
+        boolean hasBlankEntry = columnMappings.entrySet().stream()
+                .anyMatch(e -> e.getKey().isBlank() || e.getValue().isBlank());
+        if (hasBlankEntry) {
+            throw new CustomException(INVALID_INPUT, "컬럼 매핑의 키와 값은 공백일 수 없습니다");
+        }
     }
 
     private void validateTermExists(Long termId) {
