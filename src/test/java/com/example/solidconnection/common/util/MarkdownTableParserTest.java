@@ -57,6 +57,21 @@ class MarkdownTableParserTest {
         }
 
         @Test
+        void 셀_내부의_이스케이프된_파이프는_컬럼_구분자가_아닌_값으로_처리된다() {
+            String markdown = """
+                    | 대학명 | 인원 |
+                    |--------|------|
+                    | RWTH Aachen \\| School of Business | 2 |
+                    """;
+
+            List<Map<String, String>> rows = parser.parse(markdown);
+
+            assertThat(rows.get(0))
+                    .containsEntry("대학명", "RWTH Aachen | School of Business")
+                    .containsEntry("인원", "2");
+        }
+
+        @Test
         void 빈_셀은_결과_맵에_포함되지_않는다() {
             String markdown = """
                     | 대학명 | 인원 |

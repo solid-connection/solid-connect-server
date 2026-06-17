@@ -33,8 +33,8 @@ public class MarkdownTableParser {
         String stripped = line.trim();
         if (stripped.startsWith("|")) stripped = stripped.substring(1);
         if (stripped.endsWith("|")) stripped = stripped.substring(0, stripped.length() - 1);
-        return Arrays.stream(stripped.split("\\|"))
-                .map(String::trim)
+        return Arrays.stream(stripped.split("(?<!\\\\)\\|"))
+                .map(cell -> cell.replace("\\|", "|").trim())
                 .collect(Collectors.toList());
     }
 
