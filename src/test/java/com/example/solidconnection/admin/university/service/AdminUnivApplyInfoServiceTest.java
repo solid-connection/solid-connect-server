@@ -74,7 +74,7 @@ class AdminUnivApplyInfoServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(response.structuredFields())
+                    () -> assertThat(response.fields())
                             .hasSize(UnivApplyInfoColumn.values().length),
                     () -> assertThat(response.languageTestTypes())
                             .containsExactlyInAnyOrderElementsOf(

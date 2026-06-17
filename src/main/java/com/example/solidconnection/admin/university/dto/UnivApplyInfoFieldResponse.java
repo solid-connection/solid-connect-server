@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public record UnivApplyInfoFieldResponse(
-        List<String> structuredFields,
+        List<String> fields,
         List<String> languageTestTypes
 ) {
 
