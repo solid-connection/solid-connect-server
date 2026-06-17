@@ -114,7 +114,7 @@ class AdminUnivApplyInfoServiceTest {
         }
 
         @Test
-        void enum_변환_실패시_해당_컬럼은_extraInfo에_저장된다() {
+        void enum_변환_실패시_해당_행이_실패한다() {
             // given
             String markdown = String.format("""
                     | 대학명 | 파견가능학기 |
@@ -130,12 +130,16 @@ class AdminUnivApplyInfoServiceTest {
             UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
 
             // then
-            UnivApplyInfo saved = univApplyInfoRepository.findAll().get(0);
             assertAll(
-                    () -> assertThat(response.successCount()).isEqualTo(1),
-                    () -> assertThat(response.failedRows()).isEmpty(),
-                    () -> assertThat(saved.getSemesterAvailableForDispatch()).isNull(),
-                    () -> assertThat(saved.getExtraInfo()).containsEntry("파견가능학기", "알수없음")
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
+                        assertThat(error.header()).isEqualTo("파견가능학기");
+                        assertThat(error.field()).isEqualTo("semesterAvailableForDispatch");
+                        assertThat(error.value()).isEqualTo("알수없음");
+                        assertThat(error.code()).isEqualTo("INVALID_VALUE");
+                    }),
+                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
             );
         }
 
