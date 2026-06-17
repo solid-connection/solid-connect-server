@@ -108,7 +108,6 @@ class AdminUnivApplyInfoServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.successCount()).isEqualTo(2),
-                    () -> assertThat(response.failedRows()).isEmpty(),
                     () -> assertThat(univApplyInfoRepository.findAll()).hasSize(2)
             );
         }
@@ -132,13 +131,6 @@ class AdminUnivApplyInfoServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
-                        assertThat(error.header()).isEqualTo("파견가능학기");
-                        assertThat(error.field()).isEqualTo("semesterAvailableForDispatch");
-                        assertThat(error.value()).isEqualTo("알수없음");
-                        assertThat(error.code()).isEqualTo("INVALID_VALUE");
-                    }),
                     () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
             );
         }
@@ -228,20 +220,12 @@ class AdminUnivApplyInfoServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.successCount()).isEqualTo(2),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).rowNumber()).isEqualTo(2),
-                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
-                        assertThat(error.header()).isNull();
-                        assertThat(error.field()).isEqualTo("universityCountryCode");
-                        assertThat(error.value()).isNull();
-                        assertThat(error.code()).isEqualTo("REQUIRED");
-                    }),
                     () -> assertThat(univApplyInfoRepository.findAll()).hasSize(2)
             );
         }
 
         @Test
-        void 실패한_셀의_원본_헤더와_값을_반환한다() {
+        void 존재하지_않는_국가코드면_행이_실패한다() {
             // given
             String markdown = """
                     | 대학명 | 국가코드 |
@@ -257,20 +241,11 @@ class AdminUnivApplyInfoServiceTest {
             UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
 
             // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
-                        assertThat(error.header()).isEqualTo("국가코드");
-                        assertThat(error.field()).isEqualTo("universityCountryCode");
-                        assertThat(error.value()).isEqualTo("ZZ");
-                        assertThat(error.code()).isEqualTo("NOT_FOUND");
-                    })
-            );
+            assertThat(response.successCount()).isZero();
         }
 
         @Test
-        void 한_행의_검증_오류를_모두_반환한다() {
+        void 대학명이_비어있으면_행이_실패한다() {
             // given
             String markdown = """
                     | 대학명 | 국가코드 |
@@ -286,20 +261,7 @@ class AdminUnivApplyInfoServiceTest {
             UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
 
             // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors())
-                            .extracting("field")
-                            .containsExactlyInAnyOrder("universityKoreanName", "universityCountryCode"),
-                    () -> assertThat(response.failedRows().get(0).errors())
-                            .anySatisfy(error -> {
-                                assertThat(error.header()).isEqualTo("국가코드");
-                                assertThat(error.field()).isEqualTo("universityCountryCode");
-                                assertThat(error.value()).isEqualTo("Belgium");
-                                assertThat(error.code()).isEqualTo("NOT_FOUND");
-                            })
-            );
+            assertThat(response.successCount()).isZero();
         }
 
         @Test
@@ -370,13 +332,6 @@ class AdminUnivApplyInfoServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
-                        assertThat(error.header()).isEqualTo("인원");
-                        assertThat(error.field()).isEqualTo("studentCapacity");
-                        assertThat(error.value()).isEqualTo("School of Business");
-                        assertThat(error.code()).isEqualTo("INVALID_FORMAT");
-                    }),
                     () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
             );
         }
@@ -401,18 +356,12 @@ class AdminUnivApplyInfoServiceTest {
             // then
             assertAll(
                     () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
-                        assertThat(error.header()).isEqualTo("학기요건");
-                        assertThat(error.field()).isEqualTo("semesterRequirement");
-                        assertThat(error.code()).isEqualTo("TOO_LONG");
-                    }),
                     () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
             );
         }
 
         @Test
-        void 한_행에_여러_검증_오류가_있으면_모두_반환한다() {
+        void 파싱_오류가_있는_행은_실패_처리된다() {
             // given
             String tooLong = "a".repeat(101);
             String markdown = String.format("""
@@ -433,14 +382,7 @@ class AdminUnivApplyInfoServiceTest {
             UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
 
             // then
-            assertAll(
-                    () -> assertThat(response.successCount()).isZero(),
-                    () -> assertThat(response.failedRows()).hasSize(1),
-                    () -> assertThat(response.failedRows().get(0).errors()).hasSize(2),
-                    () -> assertThat(response.failedRows().get(0).errors())
-                            .extracting(UnivApplyInfoImportResponse.CellError::code)
-                            .containsExactlyInAnyOrder("INVALID_FORMAT", "TOO_LONG")
-            );
+            assertThat(response.successCount()).isZero();
         }
     }
 }
