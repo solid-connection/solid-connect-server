@@ -50,6 +50,8 @@ public class AdminUnivApplyInfoService {
                 if (createdName != null) {
                     createdUniversities.add(createdName);
                 }
+            } catch (UnivApplyInfoImportFailureException e) {
+                failedRows.add(new FailedRow(i + 1, e.getMessage(), e.getErrors()));
             } catch (Exception e) {
                 failedRows.add(new FailedRow(i + 1, e.getMessage()));
             }

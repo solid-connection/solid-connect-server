@@ -10,7 +10,21 @@ public record UnivApplyInfoImportResponse(
 
     public record FailedRow(
             int rowNumber,
-            String reason
+            String reason,
+            List<CellError> errors
+    ) {
+
+        public FailedRow(int rowNumber, String reason) {
+            this(rowNumber, reason, List.of());
+        }
+    }
+
+    public record CellError(
+            String header,
+            String field,
+            String value,
+            String code,
+            String message
     ) {
     }
 }

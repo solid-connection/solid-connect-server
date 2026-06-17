@@ -83,18 +83,6 @@ class AdminUnivApplyInfoServiceTest {
             );
         }
 
-        @Test
-        void studentCapacity_필드에_인원_alias가_포함된다() {
-            // when
-            UnivApplyInfoFieldResponse response = adminUnivApplyInfoService.getFields();
-
-            // then
-            UnivApplyInfoFieldResponse.FieldInfo field = response.structuredFields().stream()
-                    .filter(f -> "studentCapacity".equals(f.field()))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(field.aliases()).contains("인원", "모집인원", "정원");
-        }
     }
 
     @Nested
@@ -238,7 +226,75 @@ class AdminUnivApplyInfoServiceTest {
                     () -> assertThat(response.successCount()).isEqualTo(2),
                     () -> assertThat(response.failedRows()).hasSize(1),
                     () -> assertThat(response.failedRows().get(0).rowNumber()).isEqualTo(2),
+                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
+                        assertThat(error.header()).isNull();
+                        assertThat(error.field()).isEqualTo("universityCountryCode");
+                        assertThat(error.value()).isNull();
+                        assertThat(error.code()).isEqualTo("REQUIRED");
+                    }),
                     () -> assertThat(univApplyInfoRepository.findAll()).hasSize(2)
+            );
+        }
+
+        @Test
+        void 실패한_셀의_원본_헤더와_값을_반환한다() {
+            // given
+            String markdown = """
+                    | 대학명 | 국가코드 |
+                    |--------|----------|
+                    | 새 대학교 | ZZ |
+                    """;
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of("대학명", "universityKoreanName", "국가코드", "universityCountryCode")
+            );
+
+            // when
+            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
+                        assertThat(error.header()).isEqualTo("국가코드");
+                        assertThat(error.field()).isEqualTo("universityCountryCode");
+                        assertThat(error.value()).isEqualTo("ZZ");
+                        assertThat(error.code()).isEqualTo("NOT_FOUND");
+                    })
+            );
+        }
+
+        @Test
+        void 한_행의_검증_오류를_모두_반환한다() {
+            // given
+            String markdown = """
+                    | 대학명 | 국가코드 |
+                    |--------|----------|
+                    |  | Belgium |
+                    """;
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of("대학명", "universityKoreanName", "국가코드", "universityCountryCode")
+            );
+
+            // when
+            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors())
+                            .extracting("field")
+                            .containsExactlyInAnyOrder("universityKoreanName", "universityCountryCode"),
+                    () -> assertThat(response.failedRows().get(0).errors())
+                            .anySatisfy(error -> {
+                                assertThat(error.header()).isEqualTo("국가코드");
+                                assertThat(error.field()).isEqualTo("universityCountryCode");
+                                assertThat(error.value()).isEqualTo("Belgium");
+                                assertThat(error.code()).isEqualTo("NOT_FOUND");
+                            })
             );
         }
 

@@ -2,7 +2,7 @@ package com.example.solidconnection.admin.university.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.COUNTRY_NOT_FOUND;
 
-import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse.CellError;
 import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.region.domain.Region;
@@ -16,8 +16,10 @@ import com.example.solidconnection.university.domain.TuitionFeeType;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,13 +43,10 @@ public class AdminUnivApplyInfoRowSaver {
             long termId
     ) {
         ImportData data = buildImportData(rowData, columnMappings);
-
-        if (data.universityKoreanName == null || data.universityKoreanName.isBlank()) {
-            throw new IllegalArgumentException("대학명(universityKoreanName) 컬럼이 매핑되지 않았습니다");
-        }
+        validateImportData(data, rowData, columnMappings);
 
         boolean existed = hostUniversityRepository.findByKoreanName(data.universityKoreanName).isPresent();
-        HostUniversity hostUniversity = findOrCreateHostUniversity(data);
+        HostUniversity hostUniversity = findOrCreateHostUniversity(data, rowData, columnMappings);
         String createdUniversityName = existed ? null : hostUniversity.getKoreanName();
 
         UnivApplyInfo univApplyInfo = new UnivApplyInfo(
@@ -82,19 +81,106 @@ public class AdminUnivApplyInfoRowSaver {
         return createdUniversityName;
     }
 
-    private HostUniversity findOrCreateHostUniversity(ImportData data) {
-        return hostUniversityRepository.findByKoreanName(data.universityKoreanName)
-                .orElseGet(() -> createHostUniversity(data));
+    private void validateImportData(
+            ImportData data,
+            Map<String, String> rowData,
+            Map<String, String> columnMappings
+    ) {
+        List<CellError> errors = new ArrayList<>();
+        boolean universityKoreanNameBlank = data.universityKoreanName == null || data.universityKoreanName.isBlank();
+
+        if (universityKoreanNameBlank) {
+            errors.add(cellError(
+                    rowData,
+                    columnMappings,
+                    "universityKoreanName",
+                    "REQUIRED",
+                    "대학명(universityKoreanName) 컬럼이 매핑되지 않았습니다"
+            ));
+        }
+
+        if (universityKoreanNameBlank) {
+            validateCountryCodeIfPresent(data, rowData, columnMappings, errors);
+            throwIfErrors(errors);
+        }
+
+        boolean universityExists = hostUniversityRepository.findByKoreanName(data.universityKoreanName).isPresent();
+        if (!universityExists && (data.countryCode == null || data.countryCode.isBlank())) {
+            errors.add(cellError(
+                    rowData,
+                    columnMappings,
+                    "universityCountryCode",
+                    "REQUIRED",
+                    "대학 '" + data.universityKoreanName + "'이(가) 존재하지 않습니다. 신규 대학 생성을 위해 국가코드(countryCode) 컬럼을 매핑해 주세요."
+            ));
+        }
+        if (!universityExists) {
+            validateCountryCodeIfPresent(data, rowData, columnMappings, errors);
+        }
+
+        throwIfErrors(errors);
     }
 
-    private HostUniversity createHostUniversity(ImportData data) {
+    private void validateCountryCodeIfPresent(
+            ImportData data,
+            Map<String, String> rowData,
+            Map<String, String> columnMappings,
+            List<CellError> errors
+    ) {
         if (data.countryCode == null || data.countryCode.isBlank()) {
-            throw new IllegalArgumentException(
-                    "대학 '" + data.universityKoreanName + "'이(가) 존재하지 않습니다. 신규 대학 생성을 위해 국가코드(countryCode) 컬럼을 매핑해 주세요.");
+            return;
+        }
+        if (countryRepository.findByCode(data.countryCode).isPresent()) {
+            return;
+        }
+
+        errors.add(cellError(
+                rowData,
+                columnMappings,
+                "universityCountryCode",
+                "NOT_FOUND",
+                COUNTRY_NOT_FOUND.getMessage()
+        ));
+    }
+
+    private void throwIfErrors(List<CellError> errors) {
+        if (errors.isEmpty()) {
+            return;
+        }
+
+        String message = errors.size() == 1 ? errors.get(0).message() : errors.size() + "개 컬럼에 문제가 있습니다.";
+        throw new UnivApplyInfoImportFailureException(message, errors);
+    }
+
+    private HostUniversity findOrCreateHostUniversity(
+            ImportData data,
+            Map<String, String> rowData,
+            Map<String, String> columnMappings
+    ) {
+        return hostUniversityRepository.findByKoreanName(data.universityKoreanName)
+                .orElseGet(() -> createHostUniversity(data, rowData, columnMappings));
+    }
+
+    private HostUniversity createHostUniversity(
+            ImportData data,
+            Map<String, String> rowData,
+            Map<String, String> columnMappings
+    ) {
+        if (data.countryCode == null || data.countryCode.isBlank()) {
+            throwFailure(
+                    rowData,
+                    columnMappings,
+                    "universityCountryCode",
+                    "REQUIRED",
+                    "대학 '" + data.universityKoreanName + "'이(가) 존재하지 않습니다. 신규 대학 생성을 위해 국가코드(countryCode) 컬럼을 매핑해 주세요."
+            );
         }
 
         Country country = countryRepository.findByCode(data.countryCode)
-                .orElseThrow(() -> new CustomException(COUNTRY_NOT_FOUND));
+                .orElseThrow(() -> new UnivApplyInfoImportFailureException(
+                        COUNTRY_NOT_FOUND.getMessage(),
+                        cellError(rowData, columnMappings, "universityCountryCode", "NOT_FOUND", COUNTRY_NOT_FOUND.getMessage())
+                ));
         Region region = regionRepository.findById(country.getRegionCode()).orElse(null);
 
         return hostUniversityRepository.save(new HostUniversity(
@@ -111,6 +197,36 @@ public class AdminUnivApplyInfoRowSaver {
                 country,
                 region
         ));
+    }
+
+    private void throwFailure(
+            Map<String, String> rowData,
+            Map<String, String> columnMappings,
+            String field,
+            String code,
+            String message
+    ) {
+        throw new UnivApplyInfoImportFailureException(message, cellError(rowData, columnMappings, field, code, message));
+    }
+
+    private CellError cellError(
+            Map<String, String> rowData,
+            Map<String, String> columnMappings,
+            String field,
+            String code,
+            String message
+    ) {
+        String header = findHeader(columnMappings, field);
+        String value = header == null ? null : rowData.get(header);
+        return new CellError(header, field, value, code, message);
+    }
+
+    private String findHeader(Map<String, String> columnMappings, String field) {
+        return columnMappings.entrySet().stream()
+                .filter(entry -> field.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     private ImportData buildImportData(Map<String, String> rowData, Map<String, String> columnMappings) {
