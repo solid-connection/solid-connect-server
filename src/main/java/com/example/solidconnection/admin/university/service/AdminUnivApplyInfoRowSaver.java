@@ -81,37 +81,6 @@ public class AdminUnivApplyInfoRowSaver {
         return createdUniversityName;
     }
 
-    private HostUniversity findOrCreateHostUniversity(ImportData data) {
-        return hostUniversityRepository.findByKoreanName(data.universityKoreanName)
-                .orElseGet(() -> createHostUniversity(data));
-    }
-
-    private HostUniversity createHostUniversity(ImportData data) {
-        if (data.countryCode == null || data.countryCode.isBlank()) {
-            throw new CustomException(INVALID_INPUT,
-                    "대학 '" + data.universityKoreanName + "'이(가) 존재하지 않습니다. 신규 대학 생성을 위해 국가코드(countryCode) 컬럼을 매핑해 주세요.");
-        }
-
-        Country country = countryRepository.findByCode(data.countryCode)
-                .orElseThrow(() -> new CustomException(COUNTRY_NOT_FOUND));
-        Region region = regionRepository.findById(country.getRegionCode()).orElse(null);
-
-        return hostUniversityRepository.save(new HostUniversity(
-                null,
-                data.universityKoreanName,
-                data.englishName != null ? data.englishName : "",
-                data.formatName != null ? data.formatName : "",
-                data.homepageUrl,
-                data.englishCourseUrl,
-                data.accommodationUrl,
-                "",
-                "",
-                data.detailsForLocal,
-                country,
-                region
-        ));
-    }
-
     private ImportData buildImportData(Map<String, String> rowData, Map<String, String> columnMappings) {
         ImportData data = new ImportData();
         rowData.forEach((header, value) -> applyField(data, header, value, columnMappings));
@@ -196,6 +165,37 @@ public class AdminUnivApplyInfoRowSaver {
         return Arrays.stream(values)
                 .map(Enum::name)
                 .collect(Collectors.joining(", "));
+    }
+
+    private HostUniversity findOrCreateHostUniversity(ImportData data) {
+        return hostUniversityRepository.findByKoreanName(data.universityKoreanName)
+                .orElseGet(() -> createHostUniversity(data));
+    }
+
+    private HostUniversity createHostUniversity(ImportData data) {
+        if (data.countryCode == null || data.countryCode.isBlank()) {
+            throw new CustomException(INVALID_INPUT,
+                    "대학 '" + data.universityKoreanName + "'이(가) 존재하지 않습니다. 신규 대학 생성을 위해 국가코드(countryCode) 컬럼을 매핑해 주세요.");
+        }
+
+        Country country = countryRepository.findByCode(data.countryCode)
+                .orElseThrow(() -> new CustomException(COUNTRY_NOT_FOUND));
+        Region region = regionRepository.findById(country.getRegionCode()).orElse(null);
+
+        return hostUniversityRepository.save(new HostUniversity(
+                null,
+                data.universityKoreanName,
+                data.englishName != null ? data.englishName : "",
+                data.formatName != null ? data.formatName : "",
+                data.homepageUrl,
+                data.englishCourseUrl,
+                data.accommodationUrl,
+                "",
+                "",
+                data.detailsForLocal,
+                country,
+                region
+        ));
     }
 
     private static class ImportData {

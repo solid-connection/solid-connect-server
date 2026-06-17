@@ -38,7 +38,7 @@ public class AdminTermService {
     }
 
     @Transactional
-    public AdminTermResponse activateTerm(Long id) {
+    public AdminTermResponse activateTerm(long id) {
         Term termToActivate = termRepository.findById(id)
                 .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
         if (!Boolean.TRUE.equals(termToActivate.getIsCurrent())) {

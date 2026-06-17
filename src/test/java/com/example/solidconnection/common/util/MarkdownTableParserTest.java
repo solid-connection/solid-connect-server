@@ -4,16 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@TestContainerSpringBootTest
 @DisplayName("마크다운 표 파서 테스트")
 class MarkdownTableParserTest {
 
-    private final MarkdownTableParser parser = new MarkdownTableParser();
+    @Autowired
+    private MarkdownTableParser parser;
 
     @Nested
     class 정상_파싱 {

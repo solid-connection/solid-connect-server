@@ -39,7 +39,7 @@ public class AdminTermController {
 
     @PatchMapping("/{id}/activate")
     public ResponseEntity<AdminTermResponse> activateTerm(
-            @PathVariable Long id
+            @PathVariable long id
     ) {
         AdminTermResponse response = adminTermService.activateTerm(id);
         return ResponseEntity.ok(response);
