@@ -28,7 +28,7 @@ public class HostUniversity extends BaseEntity {
     @Column(name = "korean_name", nullable = false, unique = true, length = 100)
     private String koreanName;
 
-    @Column(name = "english_name", nullable = false, length = 100)
+    @Column(name = "english_name", nullable = false, length = 200)
     private String englishName;
 
     @Column(name = "format_name", nullable = false, length = 100)

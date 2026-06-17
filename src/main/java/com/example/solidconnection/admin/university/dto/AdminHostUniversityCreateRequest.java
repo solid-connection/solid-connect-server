@@ -9,7 +9,7 @@ public record AdminHostUniversityCreateRequest(
         String koreanName,
 
         @NotBlank(message = "영문 대학명은 필수입니다")
-        @Size(max = 100, message = "영문 대학명은 100자 이하여야 합니다")
+        @Size(max = 200, message = "영문 대학명은 200자 이하여야 합니다")
         String englishName,
 
         @NotBlank(message = "표시 대학명은 필수입니다")

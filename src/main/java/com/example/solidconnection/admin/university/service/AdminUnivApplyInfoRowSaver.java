@@ -141,7 +141,7 @@ public class AdminUnivApplyInfoRowSaver {
     private void applyStructuredField(ImportData data, String header, String fieldName, String value) {
         switch (fieldName) {
             case "universityKoreanName" -> applyWithLength(value, 100, s -> data.universityKoreanName = s);
-            case "universityEnglishName" -> applyWithLength(value, 100, s -> data.englishName = s);
+            case "universityEnglishName" -> applyWithLength(value, 200, s -> data.englishName = s);
             case "universityFormatName" -> applyWithLength(value, 100, s -> data.formatName = s);
             case "universityCountryCode" -> data.countryCode = value;
             case "universityHomepageUrl" -> applyWithLength(value, 500, s -> data.homepageUrl = s);
@@ -172,14 +172,14 @@ public class AdminUnivApplyInfoRowSaver {
                 }
             }
             case "semesterRequirement" -> applyWithLength(value, 100, s -> data.semesterRequirement = s);
-            case "detailsForLanguage" -> applyWithLength(value, 1000, s -> data.detailsForLanguage = s);
+            case "detailsForLanguage" -> applyWithLength(value, 2000, s -> data.detailsForLanguage = s);
             case "gpaRequirement" -> applyWithLength(value, 100, s -> data.gpaRequirement = s);
             case "gpaRequirementCriteria" -> applyWithLength(value, 100, s -> data.gpaRequirementCriteria = s);
-            case "detailsForApply" -> applyWithLength(value, 1000, s -> data.detailsForApply = s);
-            case "detailsForMajor" -> applyWithLength(value, 1000, s -> data.detailsForMajor = s);
-            case "detailsForAccommodation" -> applyWithLength(value, 1000, s -> data.detailsForAccommodation = s);
+            case "detailsForApply" -> applyWithLength(value, 3000, s -> data.detailsForApply = s);
+            case "detailsForMajor" -> applyWithLength(value, 3000, s -> data.detailsForMajor = s);
+            case "detailsForAccommodation" -> applyWithLength(value, 2000, s -> data.detailsForAccommodation = s);
             case "detailsForEnglishCourse" -> applyWithLength(value, 1000, s -> data.detailsForEnglishCourse = s);
-            case "details" -> applyWithLength(value, 1000, s -> data.details = s);
+            case "details" -> applyWithLength(value, 3000, s -> data.details = s);
             default -> data.extraInfo.put(header, value);
         }
     }
