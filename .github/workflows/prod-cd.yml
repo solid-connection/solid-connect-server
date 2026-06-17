@@ -188,3 +188,25 @@ jobs:
 
               echo "Deployment complete. Active: ${NEW_SLOT}(${NEW_PORT})"
             '
+
+      - name: Update Prometheus scrape target (prod)
+        run: |
+          echo "${{ secrets.MONITORING_PRIVATE_KEY }}" > monitoring_key.pem
+          chmod 600 monitoring_key.pem
+
+          UPSTREAM_PORT=$(ssh -i deploy_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.USERNAME }}@${{ secrets.HOST }}" \
+            "grep -oE 'server 127\.0\.0\.1:[0-9]+' /etc/nginx/conf.d/upstream.conf 2>/dev/null | grep -oE '[0-9]+$'")
+
+          if [ "$UPSTREAM_PORT" != "8080" ] && [ "$UPSTREAM_PORT" != "9080" ]; then
+            echo "Unexpected UPSTREAM_PORT: '${UPSTREAM_PORT}'" >&2
+            exit 1
+          fi
+
+          if [ "$UPSTREAM_PORT" = "8080" ]; then NEW_MGMT_PORT=8081; else NEW_MGMT_PORT=9081; fi
+
+          ssh -i monitoring_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.MONITORING_USERNAME }}@${{ secrets.MONITORING_HOST }}" \
+            "echo '[{\"targets\":[\"${{ secrets.HOST }}:${NEW_MGMT_PORT}\"]}]' \
+              | tee ~/solid-connection-monitor/prometheus/targets/prod.json > /dev/null \
+            && echo 'Prometheus target updated: ${{ secrets.HOST }}:${NEW_MGMT_PORT}'"
