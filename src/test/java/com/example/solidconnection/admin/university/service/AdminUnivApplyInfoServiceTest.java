@@ -350,5 +350,97 @@ class AdminUnivApplyInfoServiceTest {
             assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
                     .isInstanceOf(CustomException.class);
         }
+
+        @Test
+        void 선발인원에_정수가_아닌_값이_들어오면_해당_행이_실패한다() {
+            // given
+            String markdown = String.format("""
+                    | 대학명 | 인원 |
+                    |--------|------|
+                    | %s | School of Business |
+                    """, 괌_대학_한국명);
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of("대학명", "universityKoreanName", "인원", "studentCapacity")
+            );
+
+            // when
+            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
+                        assertThat(error.header()).isEqualTo("인원");
+                        assertThat(error.field()).isEqualTo("studentCapacity");
+                        assertThat(error.value()).isEqualTo("School of Business");
+                        assertThat(error.code()).isEqualTo("INVALID_FORMAT");
+                    }),
+                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
+            );
+        }
+
+        @Test
+        void 길이_제한을_초과하는_값이_들어오면_해당_행이_실패한다() {
+            // given
+            String tooLongValue = "a".repeat(101);
+            String markdown = String.format("""
+                    | 대학명 | 학기요건 |
+                    |--------|----------|
+                    | %s | %s |
+                    """, 괌_대학_한국명, tooLongValue);
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of("대학명", "universityKoreanName", "학기요건", "semesterRequirement")
+            );
+
+            // when
+            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors()).singleElement().satisfies(error -> {
+                        assertThat(error.header()).isEqualTo("학기요건");
+                        assertThat(error.field()).isEqualTo("semesterRequirement");
+                        assertThat(error.code()).isEqualTo("TOO_LONG");
+                    }),
+                    () -> assertThat(univApplyInfoRepository.findAll()).isEmpty()
+            );
+        }
+
+        @Test
+        void 한_행에_여러_검증_오류가_있으면_모두_반환한다() {
+            // given
+            String tooLong = "a".repeat(101);
+            String markdown = String.format("""
+                    | 대학명 | 인원 | 학기요건 |
+                    |--------|------|----------|
+                    | %s | 정수아님 | %s |
+                    """, 괌_대학_한국명, tooLong);
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of(
+                        "대학명", "universityKoreanName",
+                        "인원", "studentCapacity",
+                        "학기요건", "semesterRequirement"
+                    )
+            );
+
+            // when
+            UnivApplyInfoImportResponse response = adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.successCount()).isZero(),
+                    () -> assertThat(response.failedRows()).hasSize(1),
+                    () -> assertThat(response.failedRows().get(0).errors()).hasSize(2),
+                    () -> assertThat(response.failedRows().get(0).errors())
+                            .extracting(UnivApplyInfoImportResponse.CellError::code)
+                            .containsExactlyInAnyOrder("INVALID_FORMAT", "TOO_LONG")
+            );
+        }
     }
 }
