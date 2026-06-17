@@ -6,7 +6,6 @@ import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FO
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
-import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse.FailedRow;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.util.MarkdownTableParser;
 import com.example.solidconnection.term.repository.TermRepository;
@@ -40,24 +39,21 @@ public class AdminUnivApplyInfoService {
         List<Map<String, String>> rows = markdownTableParser.parse(request.markdown());
 
         int successCount = 0;
-        List<FailedRow> failedRows = new ArrayList<>();
         List<String> createdUniversities = new ArrayList<>();
 
-        for (int i = 0; i < rows.size(); i++) {
+        for (Map<String, String> row : rows) {
             try {
-                String createdName = rowSaver.save(rows.get(i), request.columnMappings(), homeUniversity, request.termId());
+                String createdName = rowSaver.save(row, request.columnMappings(), homeUniversity, request.termId());
                 successCount++;
                 if (createdName != null) {
                     createdUniversities.add(createdName);
                 }
-            } catch (UnivApplyInfoImportFailureException e) {
-                failedRows.add(new FailedRow(i + 1, e.getMessage(), e.getErrors()));
             } catch (Exception e) {
-                failedRows.add(new FailedRow(i + 1, e.getMessage()));
+                // row failed, skip
             }
         }
 
-        return new UnivApplyInfoImportResponse(successCount, failedRows, createdUniversities);
+        return new UnivApplyInfoImportResponse(successCount, createdUniversities);
     }
 
     private void validateTermExists(Long termId) {
