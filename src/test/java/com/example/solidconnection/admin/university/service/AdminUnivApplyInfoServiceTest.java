@@ -3,10 +3,13 @@ package com.example.solidconnection.admin.university.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
+import com.example.solidconnection.cache.manager.CustomCacheManager;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestContainerSpringBootTest
 @DisplayName("UnivApplyInfo 임포트 서비스 테스트")
@@ -48,6 +52,9 @@ class AdminUnivApplyInfoServiceTest {
 
     @Autowired
     private UniversityFixture universityFixture;
+
+    @MockitoSpyBean
+    private CustomCacheManager cacheManager;
 
     private Term term;
     private HomeUniversity homeUniversity;
@@ -110,6 +117,27 @@ class AdminUnivApplyInfoServiceTest {
                     () -> assertThat(response.successCount()).isEqualTo(2),
                     () -> assertThat(univApplyInfoRepository.findAll()).hasSize(2)
             );
+        }
+
+        @Test
+        void 임포트_성공_시_검색과_추천_캐시가_무효화된다() {
+            // given
+            String markdown = String.format("""
+                    | 대학명 | 인원 |
+                    |--------|------|
+                    | %s | 2 |
+                    """, 괌_대학_한국명);
+            UnivApplyInfoImportRequest request = new UnivApplyInfoImportRequest(
+                    term.getId(), homeUniversity.getId(), markdown,
+                    Map.of("대학명", "universityKoreanName", "인원", "studentCapacity")
+            );
+
+            // when
+            adminUnivApplyInfoService.importUnivApplyInfos(request);
+
+            // then
+            then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");
+            then(cacheManager).should(times(1)).evictUsingPrefix("university:recommend:general");
         }
 
         @Test

@@ -7,6 +7,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FO
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
+import com.example.solidconnection.cache.annotation.DefaultCacheOut;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.util.MarkdownTableParser;
 import com.example.solidconnection.term.repository.TermRepository;
@@ -33,6 +34,11 @@ public class AdminUnivApplyInfoService {
     }
 
     @Transactional
+    @DefaultCacheOut(
+            key = {"univApplyInfoTextSearch", "university:recommend:general"},
+            cacheManager = "customCacheManager",
+            prefix = true
+    )
     public UnivApplyInfoImportResponse importUnivApplyInfos(UnivApplyInfoImportRequest request) {
         validateColumnMappings(request.columnMappings());
         validateTermExists(request.termId());
