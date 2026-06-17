@@ -4,7 +4,7 @@ import com.example.solidconnection.term.domain.Term;
 
 public record AdminTermResponse(
         Long id,
-        String label,
+        String name,
         boolean isCurrent
 ) {
 
