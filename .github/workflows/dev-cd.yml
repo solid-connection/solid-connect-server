@@ -194,8 +194,12 @@ jobs:
 
           if [ "$UPSTREAM_PORT" = "8080" ]; then NEW_MGMT_PORT=8081; else NEW_MGMT_PORT=9081; fi
 
+          PRIVATE_IP=$(ssh -i deploy_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}" \
+            "curl -sf http://169.254.169.254/latest/meta-data/local-ipv4")
+
           ssh -i monitoring_key.pem -o StrictHostKeyChecking=no \
             "${{ secrets.MONITORING_USERNAME }}@${{ secrets.MONITORING_HOST }}" \
-            "echo '[{\"targets\":[\"${{ secrets.DEV_HOST }}:${NEW_MGMT_PORT}\"]}]' \
+            "echo '[{\"targets\":[\"${PRIVATE_IP}:${NEW_MGMT_PORT}\"]}]' \
               | tee ~/solid-connection-monitor/prometheus/targets/stage.json > /dev/null \
-            && echo 'Prometheus target updated: ${{ secrets.DEV_HOST }}:${NEW_MGMT_PORT}'"
+            && echo 'Prometheus target updated: ${PRIVATE_IP}:${NEW_MGMT_PORT}'"
