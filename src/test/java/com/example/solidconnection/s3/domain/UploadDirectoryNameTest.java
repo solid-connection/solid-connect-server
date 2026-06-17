@@ -23,7 +23,9 @@ class UploadDirectoryNameTest {
             String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
 
             // then
-            assertThat(directoryName).isEqualTo("university_of_tokyo");
+            assertThat(directoryName)
+                    .startsWith("university_of_tokyo_")
+                    .matches("university_of_tokyo_[0-9a-f]{12}");
         }
 
         @Test
@@ -35,7 +37,23 @@ class UploadDirectoryNameTest {
             String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
 
             // then
-            assertThat(directoryName).isEqualTo("texas_a_and_m_university_austin");
+            assertThat(directoryName)
+                    .startsWith("texas_a_and_m_university_austin_")
+                    .matches("texas_a_and_m_university_austin_[0-9a-f]{12}");
+        }
+
+        @Test
+        void 같은_slug로_변환되는_서로_다른_영문명은_다른_디렉토리명을_반환한다() {
+            // given
+            String englishName = "Texas A&M University";
+            String normalizedCollisionName = "Texas A and M University";
+
+            // when
+            String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
+            String collisionDirectoryName = UploadDirectoryName.fromUniversityEnglishName(normalizedCollisionName);
+
+            // then
+            assertThat(directoryName).isNotEqualTo(collisionDirectoryName);
         }
 
         @Test
