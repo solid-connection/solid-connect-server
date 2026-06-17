@@ -19,7 +19,9 @@ public class MarkdownTableParser {
         List<String> headers = parseRow(lines[0]);
         return Arrays.stream(lines)
                 .skip(2)
+                .filter(line -> !line.isBlank())
                 .map(line -> buildRowMap(headers, parseRow(line)))
+                .filter(row -> !row.isEmpty())
                 .collect(Collectors.toList());
     }
 

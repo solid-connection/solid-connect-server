@@ -101,6 +101,7 @@ public enum ErrorCode {
     DUPLICATE_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
     INVALID_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 지망 대학교가 포함되어 있습니다."),
     CHOICE_COUNT_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST.value(), "지망 수가 최대 지망 수를 초과했습니다."),
+    NICKNAME_FOR_APPLY_GENERATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "지원서 닉네임 생성에 실패했습니다. 잠시 후 다시 시도해 주세요."),
 
     // community
     INVALID_POST_CATEGORY(HttpStatus.BAD_REQUEST.value(), "잘못된 카테고리명입니다."),

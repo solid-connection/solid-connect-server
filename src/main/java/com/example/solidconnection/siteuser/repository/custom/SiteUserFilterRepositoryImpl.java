@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -355,6 +356,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
 
         List<String> choiceNames = univApplyInfoIds.stream()
                 .map(nameById::get)
+                .filter(Objects::nonNull)
                 .toList();
 
         return new UnivApplyInfoResponse(choiceNames);
