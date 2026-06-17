@@ -17,10 +17,13 @@ import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -86,7 +89,7 @@ public class AdminUnivApplyInfoRowSaver {
             Map<String, String> rowData,
             Map<String, String> columnMappings
     ) {
-        List<CellError> errors = new ArrayList<>();
+        List<CellError> errors = new ArrayList<>(data.parseErrors);
         boolean universityKoreanNameBlank = data.universityKoreanName == null || data.universityKoreanName.isBlank();
 
         if (universityKoreanNameBlank) {
@@ -252,40 +255,92 @@ public class AdminUnivApplyInfoRowSaver {
         } catch (IllegalArgumentException ignored) {
         }
 
-        if (!tryApplyStructuredField(data, targetField, value)) {
-            data.extraInfo.put(header, value);
+        applyStructuredField(data, header, targetField, value);
+    }
+
+    private void applyStructuredField(ImportData data, String header, String fieldName, String value) {
+        switch (fieldName) {
+            case "universityKoreanName" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.universityKoreanName = s);
+            case "universityEnglishName" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.englishName = s);
+            case "universityFormatName" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.formatName = s);
+            case "universityCountryCode" -> data.countryCode = value;
+            case "universityHomepageUrl" -> applyWithLength(data, header, fieldName, value, 500,
+                    s -> data.homepageUrl = s);
+            case "universityEnglishCourseUrl" -> applyWithLength(data, header, fieldName, value, 500,
+                    s -> data.englishCourseUrl = s);
+            case "universityAccommodationUrl" -> applyWithLength(data, header, fieldName, value, 500,
+                    s -> data.accommodationUrl = s);
+            case "universityDetailsForLocal" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForLocal = s);
+            case "studentCapacity" -> {
+                try {
+                    data.studentCapacity = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    data.parseErrors.add(new CellError(header, fieldName, value, "INVALID_FORMAT",
+                            "선발 인원은 정수여야 합니다: '" + value + "'"));
+                }
+            }
+            case "tuitionFeeType" -> {
+                try {
+                    data.tuitionFeeType = TuitionFeeType.valueOf(value);
+                } catch (IllegalArgumentException e) {
+                    data.parseErrors.add(new CellError(header, fieldName, value, "INVALID_VALUE",
+                            "유효하지 않은 등록금 유형입니다. 가능한 값: " + validEnumValues(TuitionFeeType.values())));
+                }
+            }
+            case "semesterAvailableForDispatch" -> {
+                try {
+                    data.semesterAvailableForDispatch = SemesterAvailableForDispatch.valueOf(value);
+                } catch (IllegalArgumentException e) {
+                    data.parseErrors.add(new CellError(header, fieldName, value, "INVALID_VALUE",
+                            "유효하지 않은 파견 가능 학기입니다. 가능한 값: " + validEnumValues(SemesterAvailableForDispatch.values())));
+                }
+            }
+            case "semesterRequirement" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.semesterRequirement = s);
+            case "detailsForLanguage" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForLanguage = s);
+            case "gpaRequirement" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.gpaRequirement = s);
+            case "gpaRequirementCriteria" -> applyWithLength(data, header, fieldName, value, 100,
+                    s -> data.gpaRequirementCriteria = s);
+            case "detailsForApply" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForApply = s);
+            case "detailsForMajor" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForMajor = s);
+            case "detailsForAccommodation" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForAccommodation = s);
+            case "detailsForEnglishCourse" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.detailsForEnglishCourse = s);
+            case "details" -> applyWithLength(data, header, fieldName, value, 1000,
+                    s -> data.details = s);
+            default -> data.extraInfo.put(header, value);
         }
     }
 
-    private boolean tryApplyStructuredField(ImportData data, String fieldName, String value) {
-        try {
-            switch (fieldName) {
-                case "universityKoreanName" -> data.universityKoreanName = value;
-                case "universityEnglishName" -> data.englishName = value;
-                case "universityFormatName" -> data.formatName = value;
-                case "universityCountryCode" -> data.countryCode = value;
-                case "universityHomepageUrl" -> data.homepageUrl = value;
-                case "universityEnglishCourseUrl" -> data.englishCourseUrl = value;
-                case "universityAccommodationUrl" -> data.accommodationUrl = value;
-                case "universityDetailsForLocal" -> data.detailsForLocal = value;
-                case "studentCapacity" -> data.studentCapacity = Integer.parseInt(value);
-                case "tuitionFeeType" -> data.tuitionFeeType = TuitionFeeType.valueOf(value);
-                case "semesterAvailableForDispatch" -> data.semesterAvailableForDispatch = SemesterAvailableForDispatch.valueOf(value);
-                case "semesterRequirement" -> data.semesterRequirement = value;
-                case "detailsForLanguage" -> data.detailsForLanguage = value;
-                case "gpaRequirement" -> data.gpaRequirement = value;
-                case "gpaRequirementCriteria" -> data.gpaRequirementCriteria = value;
-                case "detailsForApply" -> data.detailsForApply = value;
-                case "detailsForMajor" -> data.detailsForMajor = value;
-                case "detailsForAccommodation" -> data.detailsForAccommodation = value;
-                case "detailsForEnglishCourse" -> data.detailsForEnglishCourse = value;
-                case "details" -> data.details = value;
-                default -> { return false; }
-            }
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
+    private void applyWithLength(
+            ImportData data,
+            String header,
+            String fieldName,
+            String value,
+            int maxLength,
+            Consumer<String> setter
+    ) {
+        if (value.length() > maxLength) {
+            data.parseErrors.add(new CellError(header, fieldName, value, "TOO_LONG",
+                    fieldName + " 값이 최대 길이(" + maxLength + "자)를 초과했습니다: " + value.length() + "자"));
+            return;
         }
+        setter.accept(value);
+    }
+
+    private String validEnumValues(Enum<?>[] values) {
+        return Arrays.stream(values)
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
     }
 
     private static class ImportData {
@@ -312,5 +367,6 @@ public class AdminUnivApplyInfoRowSaver {
         String details;
         Map<String, String> extraInfo = new HashMap<>();
         Map<LanguageTestType, String> languageRequirements = new HashMap<>();
+        List<CellError> parseErrors = new ArrayList<>();
     }
 }
