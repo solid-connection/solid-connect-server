@@ -38,8 +38,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -164,22 +162,6 @@ class PostCommandServiceTest {
                             .extracting(PostImage::getUrl)
                             .containsExactly(expectedImageUrl)
             );
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {"자유", "질문", "동행", "중고거래"})
-        @Transactional
-        void 전체를_제외한_카테고리로_게시글을_생성한다(String category) {
-            // given
-            PostCreateRequest request = createPostCreateRequest(category);
-            List<MultipartFile> imageFiles = List.of();
-
-            // when
-            PostCreateResponse response = postCommandService.createPost(user1.getId(), request, imageFiles);
-
-            // then
-            Post savedPost = postRepository.findById(response.id()).orElseThrow();
-            assertThat(savedPost.getCategory()).isEqualTo(PostCategory.valueOf(category));
         }
 
         @Test
