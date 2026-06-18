@@ -16,6 +16,4 @@ public interface HostUniversityRepository extends JpaRepository<HostUniversity, 
     }
 
     Optional<HostUniversity> findByKoreanName(String koreanName);
-
-    Optional<HostUniversity> findByEnglishName(String englishName);
 }
