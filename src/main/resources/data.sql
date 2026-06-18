@@ -43,7 +43,16 @@ VALUES ('BN', '브루나이', 'ASIA'),
        ('KZ', '카자흐스탄', 'ASIA'),
        ('IL', '이스라엘', 'ASIA'),
        ('MY', '말레이시아', 'ASIA'),
-       ('RU', '러시아', 'EUROPE');
+       ('RU', '러시아', 'EUROPE'),
+       ('VN', '베트남', 'ASIA'),
+       ('NZ', '뉴질랜드', 'ASIA'),
+       ('SI', '슬로베니아', 'EUROPE'),
+       ('PL', '폴란드', 'EUROPE'),
+       ('RO', '루마니아', 'EUROPE'),
+       ('UY', '우루과이', 'AMERICAS'),
+       ('MX', '멕시코', 'AMERICAS'),
+       ('MA', '모로코', 'EUROPE'),
+       ('MO', '마카오', 'CHINA');
 
 INSERT INTO term (name, is_current)
 VALUES ('2024-1', true);
