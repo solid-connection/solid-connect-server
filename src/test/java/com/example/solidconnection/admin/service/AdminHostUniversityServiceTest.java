@@ -258,7 +258,7 @@ class AdminHostUniversityServiceTest {
         }
 
         @Test
-        void 이미_존재하는_영문명으로_생성하면_예외_응답을_반환한다() {
+        void 이미_존재하는_영문명이어도_한글명이_다르면_생성한다() {
             // given
             HostUniversity existing = universityFixture.괌_대학();
             Country country = countryFixture.미국();
@@ -276,10 +276,12 @@ class AdminHostUniversityServiceTest {
                     region.getCode()
             );
 
-            // when & then
-            assertThatCode(() -> adminHostUniversityService.createHostUniversity(request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
+            // when
+            AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(request);
+
+            // then
+            assertThat(response.koreanName()).isEqualTo(request.koreanName());
+            assertThat(response.englishName()).isEqualTo(existing.getEnglishName());
         }
     }
 
@@ -367,7 +369,7 @@ class AdminHostUniversityServiceTest {
         }
 
         @Test
-        void 다른_대학의_영문명으로_수정하면_예외_응답을_반환한다() {
+        void 다른_대학의_영문명이어도_한글명이_다르면_수정한다() {
             // given
             HostUniversity university1 = universityFixture.괌_대학();
             HostUniversity university2 = universityFixture.메이지_대학();
@@ -384,10 +386,13 @@ class AdminHostUniversityServiceTest {
                     university1.getRegion().getCode()
             );
 
-            // when & then
-            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(university1.getId(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
+            // when
+            AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(
+                    university1.getId(), request);
+
+            // then
+            assertThat(response.koreanName()).isEqualTo(university1.getKoreanName());
+            assertThat(response.englishName()).isEqualTo(university2.getEnglishName());
         }
 
         @Test
