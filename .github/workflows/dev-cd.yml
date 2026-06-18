@@ -66,7 +66,7 @@ jobs:
           cache-from: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache
           cache-to: type=registry,ref=${{ steps.image_meta.outputs.image_name }}:buildcache,mode=max
 
-      # --- 이미지 정리 (이전 Job에 있던 것) ---
+      # --- 이미지 정리 ---
       - name: Clean up old image versions from GHCR
         uses: snok/container-retention-policy@v2
         with:
@@ -87,7 +87,6 @@ jobs:
       packages: read
 
     steps:
-      # 설정 파일 전송을 위해 코드 체크아웃 (서브모듈 불필요)
       - name: Checkout config files
         uses: actions/checkout@v4
         with:
@@ -96,52 +95,116 @@ jobs:
             docs/infra-config
           sparse-checkout-cone-mode: false
 
-      # --- 설정 파일 전송 ---
       - name: Copy config files to remote
         run: |
           echo "${{ secrets.DEV_PRIVATE_KEY }}" > deploy_key.pem
           chmod 600 deploy_key.pem
-          
+
           scp -i deploy_key.pem \
             -o StrictHostKeyChecking=no \
             ./docker-compose.dev.yml \
             ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}:/home/${{ secrets.DEV_USERNAME }}/solid-connection-dev/
 
-      # --- 서버에서 Docker Pull 및 재시작 ---
-      - name: Run deployment on server
+      - name: Blue/Green deploy
         run: |
           ssh -i deploy_key.pem \
-           -o StrictHostKeyChecking=no \
-           ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }} \
-           '
-            set -e
-          
-            # 1. 환경 변수 설정 (이전 Job의 Output 사용)
-            export OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")
-            export IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
-            export FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
-            export IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
+            -o StrictHostKeyChecking=no \
+            ${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }} \
+            '
+              set -e
+              OWNER_LOWERCASE=$(echo "${{ github.repository_owner }}" | tr "[:upper:]" "[:lower:]")
+              IMAGE_TAG_ONLY="${{ needs.build-and-push.outputs.image_tag }}"
+              FULL_IMAGE_NAME="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev:${IMAGE_TAG_ONLY}"
+              IMAGE_NAME_BASE="ghcr.io/${OWNER_LOWERCASE}/solid-connection-dev"
+              WORK_DIR="/home/${{ secrets.DEV_USERNAME }}/solid-connection-dev"
+              CONTAINER_BASE="solid-connection-dev"
 
-            # 2. Pull 전 정리 (디스크 공간 확보)
-            echo "Cleaning up old tagged images (keeping last 2)..."
-            docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
-            sort -r | \
-            tail -n +3 | \
-            xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" || true
+              # 1. Active 슬롯 확인 (upstream.conf 기준)
+              UPSTREAM_PORT=$(grep -oE "server 127\.0\.0\.1:[0-9]+" /etc/nginx/conf.d/upstream.conf 2>/dev/null | grep -oE "[0-9]+$" || echo "8081")
+              if [ "$UPSTREAM_PORT" = "8080" ]; then
+                ACTIVE_SLOT="blue"; ACTIVE_PORT=8080; NEW_SLOT="green"; NEW_PORT=9080; MANAGEMENT_PORT=9081
+              else
+                ACTIVE_SLOT="green"; ACTIVE_PORT=9080; NEW_SLOT="blue"; NEW_PORT=8080; MANAGEMENT_PORT=8081
+              fi
+              echo "Active: ${ACTIVE_SLOT}(${ACTIVE_PORT}) → Deploy: ${NEW_SLOT}(${NEW_PORT}), management: ${MANAGEMENT_PORT}"
 
-            echo "Pruning dangling images..."
-            docker image prune -f
+              # 2. 작업 디렉토리 이동 (이후 모든 compose 명령 기준)
+              cd "${WORK_DIR}"
 
-            # 3. GHCR 로그인 & Pull
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            echo "Pulling new image: $FULL_IMAGE_NAME"
-            docker pull $FULL_IMAGE_NAME
+              # 3. MySQL 기동 확인 (블루/그린 전환 대상 아님)
+              docker compose -f docker-compose.dev.yml up -d mysql 2>/dev/null || true
 
-            # 4. Spring Boot 앱 재시작
-            echo "Restarting Docker Compose with tag: $IMAGE_TAG_ONLY"
-            cd /home/${{ secrets.DEV_USERNAME }}/solid-connection-dev
-            docker compose -f docker-compose.dev.yml down || true
-            OWNER_LOWERCASE=$OWNER_LOWERCASE IMAGE_TAG=$IMAGE_TAG_ONLY docker compose -f docker-compose.dev.yml up -d
+              # 4. Pull 전 디스크 정리 (태그 이미지 최근 2개 유지)
+              docker images "${IMAGE_NAME_BASE}" --format "{{.Tag}}" | \
+                grep -v buildcache | sort -r | tail -n +3 | \
+                xargs -I {} docker rmi "${IMAGE_NAME_BASE}:{}" 2>/dev/null || true
+              docker image prune -f
 
-            echo "Deployment finished successfully."
-            '     
+              # 5. GHCR 로그인 & Pull
+              echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+              docker pull "${FULL_IMAGE_NAME}"
+
+              # 6. 새 슬롯 잔여 컨테이너 정리
+              docker stop "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
+              docker rm   "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
+
+              # 7. 새 컨테이너 시작
+              SLOT="${NEW_SLOT}" APP_PORT="${NEW_PORT}" MANAGEMENT_PORT="${MANAGEMENT_PORT}" OWNER_LOWERCASE="${OWNER_LOWERCASE}" IMAGE_TAG="${IMAGE_TAG_ONLY}" \
+                docker compose -p "${CONTAINER_BASE}-${NEW_SLOT}" -f docker-compose.dev.yml up -d solid-connection-dev
+
+              # 8. 헬스 체크 (앱 기동 대기, 최대 150초)
+              # HTTP 200 = UP, 503 = DOWN (single-quote 내부 quoting 문제 없이 상태코드로 판단)
+              echo "Waiting for app on management port ${MANAGEMENT_PORT}..."
+              for i in $(seq 1 30); do
+                HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://localhost:${MANAGEMENT_PORT}/actuator/health" || true)
+                [ "$HTTP_CODE" = "200" ] && { echo "App healthy (attempt ${i})"; break; }
+                [ "$i" = "30" ] && {
+                  echo "Health check timed out after 150s" >&2
+                  docker stop "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
+                  docker rm   "${CONTAINER_BASE}-${NEW_SLOT}" 2>/dev/null || true
+                  exit 1
+                }
+                sleep 5
+              done
+
+              # 9. Nginx upstream 전환 (무중단)
+              sudo sed -i "s|server 127.0.0.1:[0-9]*;|server 127.0.0.1:${NEW_PORT};|" /etc/nginx/conf.d/upstream.conf
+              sudo nginx -s reload
+              echo "Traffic switched → ${NEW_SLOT}(${NEW_PORT})"
+
+              # 10. 구 컨테이너 종료
+              docker compose -p "${CONTAINER_BASE}-${ACTIVE_SLOT}" -f docker-compose.dev.yml down 2>/dev/null || true
+
+              echo "Deployment complete. Active: ${NEW_SLOT}(${NEW_PORT})"
+            '
+
+      - name: Update Prometheus scrape target (stage)
+        run: |
+          echo "${{ secrets.MONITORING_PRIVATE_KEY }}" > monitoring_key.pem
+          chmod 600 monitoring_key.pem
+
+          UPSTREAM_PORT=$(ssh -i deploy_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}" \
+            "grep -oE 'server 127\.0\.0\.1:[0-9]+' /etc/nginx/conf.d/upstream.conf 2>/dev/null | grep -oE '[0-9]+$'")
+
+          if [ "$UPSTREAM_PORT" != "8080" ] && [ "$UPSTREAM_PORT" != "9080" ]; then
+            echo "Unexpected UPSTREAM_PORT: '${UPSTREAM_PORT}'" >&2
+            exit 1
+          fi
+
+          if [ "$UPSTREAM_PORT" = "8080" ]; then NEW_MGMT_PORT=8081; else NEW_MGMT_PORT=9081; fi
+
+          PRIVATE_IP=$(ssh -i deploy_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.DEV_USERNAME }}@${{ secrets.DEV_HOST }}" \
+            "TOKEN=\$(curl -sf -X PUT 'http://169.254.169.254/latest/api/token' -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600') && curl -sf -H \"X-aws-ec2-metadata-token: \$TOKEN\" http://169.254.169.254/latest/meta-data/local-ipv4")
+
+          if [ -z "$PRIVATE_IP" ]; then
+            echo "Failed to retrieve private IP" >&2
+            exit 1
+          fi
+
+          ssh -i monitoring_key.pem -o StrictHostKeyChecking=no \
+            "${{ secrets.MONITORING_USERNAME }}@${{ secrets.MONITORING_HOST }}" \
+            "echo '[{\"targets\":[\"${PRIVATE_IP}:${NEW_MGMT_PORT}\"]}]' \
+              | tee ~/solid-connection-monitor/prometheus/targets/stage.json > /dev/null \
+            && echo 'Prometheus target updated: ${PRIVATE_IP}:${NEW_MGMT_PORT}'"

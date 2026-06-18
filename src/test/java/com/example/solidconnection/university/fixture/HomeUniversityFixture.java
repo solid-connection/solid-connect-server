@@ -14,6 +14,7 @@ public class HomeUniversityFixture {
         return homeUniversityFixtureBuilder.homeUniversity()
                 .name("인하대학교")
                 .maxChoiceCount(3)
+                .emailDomain("inha.edu")
                 .create();
     }
 
@@ -21,6 +22,7 @@ public class HomeUniversityFixture {
         return homeUniversityFixtureBuilder.homeUniversity()
                 .name("테스트협정대학교_최대2지망")
                 .maxChoiceCount(2)
+                .emailDomain("inha.ac.kr")
                 .create();
     }
 
@@ -28,6 +30,7 @@ public class HomeUniversityFixture {
         return homeUniversityFixtureBuilder.homeUniversity()
                 .name("인천대학교")
                 .maxChoiceCount(3)
+                .emailDomain("inu.ac.kr")
                 .create();
     }
 }

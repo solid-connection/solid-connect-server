@@ -65,6 +65,9 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.awaitility:awaitility:4.2.0'
 
+    // Mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     // Etc
     implementation platform('software.amazon.awssdk:bom:2.41.4')
     implementation 'software.amazon.awssdk:s3'

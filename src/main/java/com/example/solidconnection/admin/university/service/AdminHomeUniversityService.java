@@ -1,6 +1,7 @@
 package com.example.solidconnection.admin.university.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_ALREADY_EXISTS;
+import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_EMAIL_DOMAIN_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_HAS_REFERENCES;
 import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_NOT_FOUND;
 
@@ -48,7 +49,8 @@ public class AdminHomeUniversityService {
     )
     public AdminHomeUniversityResponse createHomeUniversity(AdminHomeUniversityCreateRequest request) {
         validateNameNotExists(request.name());
-        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.maxChoiceCount());
+        validateEmailDomainNotExists(request.emailDomain());
+        HomeUniversity homeUniversity = new HomeUniversity(null, request.name(), request.maxChoiceCount(), request.emailDomain());
         return AdminHomeUniversityResponse.from(homeUniversityRepository.save(homeUniversity));
     }
 
@@ -56,6 +58,16 @@ public class AdminHomeUniversityService {
         homeUniversityRepository.findByName(name)
                 .ifPresent(existing -> {
                     throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
+                });
+    }
+
+    private void validateEmailDomainNotExists(String emailDomain) {
+        if (emailDomain == null || emailDomain.isBlank()) {
+            return;
+        }
+        homeUniversityRepository.findByEmailDomain(emailDomain)
+                .ifPresent(existing -> {
+                    throw new CustomException(HOME_UNIVERSITY_EMAIL_DOMAIN_ALREADY_EXISTS);
                 });
     }
 
@@ -69,7 +81,8 @@ public class AdminHomeUniversityService {
         HomeUniversity homeUniversity = homeUniversityRepository.findById(id)
                 .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
         validateNameNotDuplicated(request.name(), id);
-        homeUniversity.update(request.name(), request.maxChoiceCount());
+        validateEmailDomainNotDuplicated(request.emailDomain(), id);
+        homeUniversity.update(request.name(), request.maxChoiceCount(), request.emailDomain());
         return AdminHomeUniversityResponse.from(homeUniversity);
     }
 
@@ -78,6 +91,18 @@ public class AdminHomeUniversityService {
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(excludeId)) {
                         throw new CustomException(HOME_UNIVERSITY_ALREADY_EXISTS);
+                    }
+                });
+    }
+
+    private void validateEmailDomainNotDuplicated(String emailDomain, Long excludeId) {
+        if (emailDomain == null || emailDomain.isBlank()) {
+            return;
+        }
+        homeUniversityRepository.findByEmailDomain(emailDomain)
+                .ifPresent(existing -> {
+                    if (!existing.getId().equals(excludeId)) {
+                        throw new CustomException(HOME_UNIVERSITY_EMAIL_DOMAIN_ALREADY_EXISTS);
                     }
                 });
     }

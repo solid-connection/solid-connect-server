@@ -65,8 +65,8 @@ VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',
         'CONSIDERING', 'ADMIN',
         '$2a$10$etoPG1B6Ua9Lj2VwruWKGurpMdToxl06g2WGHVk1mFKGfXyKgA5Pm', 'EMAIL'); -- Admin@1234
 
-INSERT INTO home_university (id, name, max_choice_count)
-VALUES (1, '인하대학교', 3);
+INSERT INTO home_university (id, name, max_choice_count, email_domain)
+VALUES (1, '인하대학교', 3, 'inha.edu');
 
 INSERT INTO host_university(id, country_code, region_code, english_name, format_name, korean_name,
                             accommodation_url, english_course_url, homepage_url,

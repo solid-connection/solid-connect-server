@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicationSubmissionService {
 
     public static final int APPLICATION_UPDATE_COUNT_LIMIT = 3;
-
     private final ApplicationRepository applicationRepository;
     private final GpaScoreRepository gpaScoreRepository;
     private final LanguageTestScoreRepository languageTestScoreRepository;

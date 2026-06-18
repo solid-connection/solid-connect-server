@@ -67,6 +67,7 @@ public class AdminHostUniversityService {
     )
     public AdminHostUniversityDetailResponse createHostUniversity(AdminHostUniversityCreateRequest request) {
         validateKoreanNameNotExists(request.koreanName());
+        validateEnglishNameNotExists(request.englishName());
 
         Country country = findCountryByCode(request.countryCode());
         Region region = findRegionByCode(request.regionCode());
@@ -97,6 +98,13 @@ public class AdminHostUniversityService {
                 });
     }
 
+    private void validateEnglishNameNotExists(String englishName) {
+        hostUniversityRepository.findByEnglishName(englishName)
+                .ifPresent(existingUniversity -> {
+                    throw new CustomException(HOST_UNIVERSITY_ALREADY_EXISTS);
+                });
+    }
+
     @Transactional
     @DefaultCacheOut(
             key = {"univApplyInfoTextSearch", "university:recommend:general"},
@@ -108,6 +116,7 @@ public class AdminHostUniversityService {
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
 
         validateKoreanNameNotDuplicated(request.koreanName(), id);
+        validateEnglishNameNotDuplicated(request.englishName(), id);
 
         Country country = findCountryByCode(request.countryCode());
         Region region = findRegionByCode(request.regionCode());
@@ -133,6 +142,15 @@ public class AdminHostUniversityService {
 
     private void validateKoreanNameNotDuplicated(String koreanName, Long excludeId) {
         hostUniversityRepository.findByKoreanName(koreanName)
+                .ifPresent(existingUniversity -> {
+                    if (!existingUniversity.getId().equals(excludeId)) {
+                        throw new CustomException(HOST_UNIVERSITY_ALREADY_EXISTS);
+                    }
+                });
+    }
+
+    private void validateEnglishNameNotDuplicated(String englishName, Long excludeId) {
+        hostUniversityRepository.findByEnglishName(englishName)
                 .ifPresent(existingUniversity -> {
                     if (!existingUniversity.getId().equals(excludeId)) {
                         throw new CustomException(HOST_UNIVERSITY_ALREADY_EXISTS);
