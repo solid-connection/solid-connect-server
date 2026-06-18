@@ -136,6 +136,56 @@ class PostQueryServiceTest {
     }
 
     @Test
+    void 동행_카테고리로_조회시_해당_카테고리의_게시글만_조회한다() {
+        // given
+        Post 동행_게시글 = postFixture.게시글(
+                "동행 제목",
+                "동행 내용",
+                false,
+                PostCategory.동행,
+                boardFixture.자유게시판(),
+                user
+        );
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
+                BoardCode.FREE.name(),
+                PostCategory.동행.name(),
+                null
+        );
+
+        // then
+        assertThat(actualResponses)
+                .extracting(PostListResponse::id)
+                .containsExactly(동행_게시글.getId());
+    }
+
+    @Test
+    void 중고거래_카테고리로_조회시_해당_카테고리의_게시글만_조회한다() {
+        // given
+        Post 중고거래_게시글 = postFixture.게시글(
+                "중고거래 제목",
+                "중고거래 내용",
+                false,
+                PostCategory.중고거래,
+                boardFixture.자유게시판(),
+                user
+        );
+
+        // when
+        List<PostListResponse> actualResponses = postQueryService.findPostsByCodeAndPostCategoryOrderByCreatedAtDesc(
+                BoardCode.FREE.name(),
+                PostCategory.중고거래.name(),
+                null
+        );
+
+        // then
+        assertThat(actualResponses)
+                .extracting(PostListResponse::id)
+                .containsExactly(중고거래_게시글.getId());
+    }
+
+    @Test
     void 전체_카테고리로_조회시_해당_게시판의_모든_게시글을_조회한다() {
         // given
         List<Post> posts = List.of(post4, post3, post2, post1);

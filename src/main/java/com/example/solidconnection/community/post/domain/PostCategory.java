@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public enum PostCategory {
-    전체, 자유, 질문;
+    전체, 자유, 질문, 동행, 중고거래;
 
     private static final Set<String> NAMES = Arrays.stream(values())
             .map(Enum::name)
