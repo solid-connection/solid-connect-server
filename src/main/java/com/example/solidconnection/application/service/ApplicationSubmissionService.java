@@ -7,6 +7,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_N
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_GPA_SCORE_STATUS;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_LANGUAGE_TEST_SCORE_STATUS;
+import static com.example.solidconnection.common.exception.ErrorCode.NICKNAME_FOR_APPLY_GENERATE_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -147,10 +148,12 @@ public class ApplicationSubmissionService {
     }
 
     private String getRandomNickname() {
-        String randomNickname = NicknameCreator.createRandomNickname();
-        while (applicationRepository.existsByNicknameForApply(randomNickname)) {
-            randomNickname = NicknameCreator.createRandomNickname();
+        for (int attempt = 0; attempt < 10; attempt++) {
+            String candidate = NicknameCreator.createRandomNickname();
+            if (!applicationRepository.existsByNicknameForApply(candidate)) {
+                return candidate;
+            }
         }
-        return randomNickname;
+        throw new CustomException(NICKNAME_FOR_APPLY_GENERATE_FAILED);
     }
 }

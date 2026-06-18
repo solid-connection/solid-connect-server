@@ -19,7 +19,6 @@ public record AdminHomeUniversityUpdateRequest(
                 message = "올바른 이메일 도메인 형식이 아닙니다 (예: inha.edu, inu.ac.kr)"
         )
         String emailDomain
-
 ) {
 
 }

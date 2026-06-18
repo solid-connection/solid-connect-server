@@ -61,6 +61,7 @@ public enum ErrorCode {
     BLOCK_USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "차단 대상 사용자를 찾을 수 없습니다."),
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 학기입니다."),
     CURRENT_TERM_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "현재 학기를 찾을 수 없습니다."),
+    TERM_ALREADY_EXISTS(HttpStatus.CONFLICT.value(), "이미 존재하는 학기입니다."),
     MENTOR_APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "멘토 지원서가 존재하지 않습니다."),
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "신고 내역이 존재하지 않습니다."),
 
@@ -109,6 +110,7 @@ public enum ErrorCode {
     DUPLICATE_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "지망 선택이 중복되었습니다."),
     INVALID_UNIV_APPLY_INFO_CHOICE(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 지망 대학교가 포함되어 있습니다."),
     CHOICE_COUNT_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST.value(), "지망 수가 최대 지망 수를 초과했습니다."),
+    NICKNAME_FOR_APPLY_GENERATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "지원서 닉네임 생성에 실패했습니다. 잠시 후 다시 시도해 주세요."),
 
     // community
     INVALID_POST_CATEGORY(HttpStatus.BAD_REQUEST.value(), "잘못된 카테고리명입니다."),
@@ -179,6 +181,9 @@ public enum ErrorCode {
 
     // database
     DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT.value(), "데이터베이스 무결성 제약조건 위반이 발생했습니다."),
+
+    // import
+    INVALID_MARKDOWN_FORMAT(HttpStatus.BAD_REQUEST.value(), "올바른 마크다운 표 형식이 아닙니다."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),

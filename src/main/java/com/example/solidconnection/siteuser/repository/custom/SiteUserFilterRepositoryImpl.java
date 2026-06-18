@@ -1,13 +1,13 @@
 package com.example.solidconnection.siteuser.repository.custom;
 
 import static com.example.solidconnection.application.domain.QApplication.application;
-import static com.example.solidconnection.university.domain.QUnivApplyInfo.univApplyInfo;
 import static com.example.solidconnection.mentor.domain.QMentor.mentor;
 import static com.example.solidconnection.mentor.domain.QMentorApplication.mentorApplication;
 import static com.example.solidconnection.mentor.domain.QMentoring.mentoring;
 import static com.example.solidconnection.report.domain.QReport.report;
 import static com.example.solidconnection.siteuser.domain.QSiteUser.siteUser;
 import static com.example.solidconnection.siteuser.domain.QUserBan.userBan;
+import static com.example.solidconnection.university.domain.QUnivApplyInfo.univApplyInfo;
 import static java.time.ZoneOffset.UTC;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -26,9 +26,9 @@ import com.example.solidconnection.admin.dto.UnivApplyInfoResponse;
 import com.example.solidconnection.admin.dto.UserInfoDetailResponse;
 import com.example.solidconnection.admin.dto.UserSearchCondition;
 import com.example.solidconnection.admin.dto.UserSearchResponse;
-import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.ApplicationChoice;
+import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.querydsl.core.Tuple;
@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -117,7 +118,6 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     BannedHistoryResponse.class,
                     userBan.createdAt
             );
-
 
     private final JPAQueryFactory queryFactory;
 
@@ -355,6 +355,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
 
         List<String> choiceNames = univApplyInfoIds.stream()
                 .map(nameById::get)
+                .filter(Objects::nonNull)
                 .toList();
 
         return new UnivApplyInfoResponse(choiceNames);
