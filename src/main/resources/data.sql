@@ -63,7 +63,22 @@ VALUES ('test@test.email', 'yonso', 'https://github.com/nayonsoso.png',
         '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'), -- 12341234
        ('admin@test.email', 'admin', 'https://github.com/nayonsoso.png',
         'CONSIDERING', 'ADMIN',
-        '$2a$10$etoPG1B6Ua9Lj2VwruWKGurpMdToxl06g2WGHVk1mFKGfXyKgA5Pm', 'EMAIL'); -- Admin@1234
+        '$2a$10$etoPG1B6Ua9Lj2VwruWKGurpMdToxl06g2WGHVk1mFKGfXyKgA5Pm', 'EMAIL'), -- Admin@1234
+       ('after1@test.email', '교환완료자1', 'https://github.com/nayonsoso.png',
+        'AFTER_EXCHANGE', 'MENTEE',
+        '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'), -- 12341234
+       ('studying1@test.email', '파견중유저1', 'https://github.com/nayonsoso.png',
+        'STUDYING_ABROAD', 'MENTEE',
+        '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'), -- 12341234
+       ('approved1@test.email', '승인된멘토1', 'https://github.com/nayonsoso.png',
+        'AFTER_EXCHANGE', 'MENTOR',
+        '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'), -- 12341234
+       ('rejected1@test.email', '거절된유저1', 'https://github.com/nayonsoso.png',
+        'AFTER_EXCHANGE', 'MENTEE',
+        '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'), -- 12341234
+       ('score1@test.email', '성적보유자1', 'https://github.com/nayonsoso.png',
+        'CONSIDERING', 'MENTEE',
+        '$2a$10$psmwlxPfqWnIlq9JrlQJkuXr1XtjRNsyVOgcTWYZub5jFfn0TML76', 'EMAIL'); -- 12341234
 
 INSERT INTO home_university (id, name, max_choice_count, email_domain)
 VALUES (1, '인하대학교', 3, 'inha.edu');
@@ -288,3 +303,42 @@ VALUES ('EUROPE', '유럽권'),
        ('AMERICAS', '미주권'),
        ('ASIA', '아시아권'),
        ('FREE', '자유게시판');
+
+-- 성적 관리 테스트 데이터
+-- site_user ID: 1(yonso), 3(교환완료자1), 4(파견중유저1), 7(성적보유자1)
+INSERT INTO gpa_score (gpa, gpa_criteria, gpa_report_url, verify_status, rejected_reason, site_user_id)
+VALUES (3.5, 4.5, 'https://example.com/gpa/yonso.pdf', 'PENDING', NULL, 1),
+       (3.8, 4.5, 'https://example.com/gpa/after1.pdf', 'APPROVED', NULL, 3),
+       (3.2, 4.5, 'https://example.com/gpa/studying1.pdf', 'REJECTED', '성적표 진위 확인 불가', 4),
+       (4.0, 4.5, 'https://example.com/gpa/score1.pdf', 'PENDING', NULL, 7);
+
+INSERT INTO language_test_score (language_test_type, language_test_score, language_test_report_url, verify_status, rejected_reason, site_user_id)
+VALUES ('TOEFL_IBT', '85', 'https://example.com/lang/yonso.pdf', 'PENDING', NULL, 1),
+       ('IELTS', '7.0', 'https://example.com/lang/after1.pdf', 'APPROVED', NULL, 3),
+       ('TOEIC', '800', 'https://example.com/lang/studying1.pdf', 'REJECTED', '성적표 유효기간 만료', 4),
+       ('TOEFL_IBT', '90', 'https://example.com/lang/score1.pdf', 'PENDING', NULL, 7);
+
+-- 멘토 승격 요청 테스트 데이터
+-- PENDING(CATALOG): site_user 3 → 심사 대기 중, 카탈로그 대학 선택
+-- PENDING(OTHER): site_user 4 → 심사 대기 중, 대학 미선택 (assignUniversity 기능 테스트용)
+-- APPROVED: site_user 5 → 이미 승인됨
+-- REJECTED: site_user 6 → 거절됨
+INSERT INTO mentor_application (site_user_id, country_code, university_id, university_select_type,
+                                mentor_proof_url, term_id, rejected_reason,
+                                exchange_status, mentor_application_status, approved_at)
+VALUES (3, 'US', 1, 'CATALOG',
+        'https://example.com/proof/after1.pdf', 1, NULL,
+        'AFTER_EXCHANGE', 'PENDING', NULL),
+       (4, 'JP', NULL, 'OTHER',
+        'https://example.com/proof/studying1.pdf', 1, NULL,
+        'STUDYING_ABROAD', 'PENDING', NULL),
+       (5, 'US', 1, 'CATALOG',
+        'https://example.com/proof/approved1.pdf', 1, NULL,
+        'AFTER_EXCHANGE', 'APPROVED', NOW()),
+       (6, 'US', 2, 'CATALOG',
+        'https://example.com/proof/rejected1.pdf', 1, '파견 증빙 서류 불충분',
+        'AFTER_EXCHANGE', 'REJECTED', NULL);
+
+-- APPROVED 멘토 신청에 대응하는 mentor 레코드 (site_user 5)
+INSERT INTO mentor (site_user_id, university_id, term_id, mentee_count, has_badge)
+VALUES (5, 1, 1, 0, false);
