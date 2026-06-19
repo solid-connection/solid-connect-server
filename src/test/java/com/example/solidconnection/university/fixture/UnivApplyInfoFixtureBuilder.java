@@ -1,7 +1,6 @@
 package com.example.solidconnection.university.fixture;
 
 import static com.example.solidconnection.university.domain.SemesterAvailableForDispatch.ONE_SEMESTER;
-import static com.example.solidconnection.university.domain.TuitionFeeType.HOME_UNIVERSITY_PAYMENT;
 
 import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.HostUniversity;
@@ -48,10 +47,9 @@ public class UnivApplyInfoFixtureBuilder {
 
     public UnivApplyInfo create() {
         UnivApplyInfo univApplyInfo = new UnivApplyInfo(
-                null, termId, homeUniversity, koreanName, 1, HOME_UNIVERSITY_PAYMENT, ONE_SEMESTER,
+                null, termId, homeUniversity, koreanName, 1, ONE_SEMESTER,
                 "1", "detailsForLanguage", "gpaRequirement",
-                "gpaRequirementCriteria", "detailsForApply", "detailsForMajor",
-                "detailsForAccommodation", "detailsForEnglishCourse", "details",
+                "gpaRequirementCriteria", "detailsForAccommodation",
                 null, new HashSet<>(), university
         );
         return univApplyInfoRepository.save(univApplyInfo);

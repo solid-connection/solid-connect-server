@@ -13,7 +13,6 @@ import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.LanguageTestType;
 import com.example.solidconnection.university.domain.SemesterAvailableForDispatch;
-import com.example.solidconnection.university.domain.TuitionFeeType;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
@@ -55,17 +54,12 @@ public class AdminUnivApplyInfoRowSaver {
                 homeUniversity,
                 data.universityKoreanName,
                 data.studentCapacity,
-                data.tuitionFeeType,
                 data.semesterAvailableForDispatch,
                 data.semesterRequirement,
                 data.detailsForLanguage,
                 data.gpaRequirement,
                 data.gpaRequirementCriteria,
-                data.detailsForApply,
-                data.detailsForMajor,
                 data.detailsForAccommodation,
-                data.detailsForEnglishCourse,
-                data.details,
                 data.extraInfo.isEmpty() ? null : data.extraInfo,
                 new HashSet<>(),
                 hostUniversity
@@ -124,14 +118,6 @@ public class AdminUnivApplyInfoRowSaver {
                     throw new CustomException(INVALID_INPUT, "선발 인원은 정수여야 합니다: '" + value + "'");
                 }
             }
-            case "tuitionFeeType" -> {
-                try {
-                    data.tuitionFeeType = TuitionFeeType.valueOf(value);
-                } catch (IllegalArgumentException e) {
-                    throw new CustomException(INVALID_INPUT,
-                            "유효하지 않은 등록금 유형입니다. 가능한 값: " + validEnumValues(TuitionFeeType.values()));
-                }
-            }
             case "semesterAvailableForDispatch" -> {
                 try {
                     data.semesterAvailableForDispatch = SemesterAvailableForDispatch.valueOf(value);
@@ -144,11 +130,7 @@ public class AdminUnivApplyInfoRowSaver {
             case "detailsForLanguage" -> applyWithLength(value, 2000, s -> data.detailsForLanguage = s);
             case "gpaRequirement" -> applyWithLength(value, 100, s -> data.gpaRequirement = s);
             case "gpaRequirementCriteria" -> applyWithLength(value, 100, s -> data.gpaRequirementCriteria = s);
-            case "detailsForApply" -> applyWithLength(value, 3000, s -> data.detailsForApply = s);
-            case "detailsForMajor" -> applyWithLength(value, 3000, s -> data.detailsForMajor = s);
             case "detailsForAccommodation" -> applyWithLength(value, 2000, s -> data.detailsForAccommodation = s);
-            case "detailsForEnglishCourse" -> applyWithLength(value, 1000, s -> data.detailsForEnglishCourse = s);
-            case "details" -> applyWithLength(value, 3000, s -> data.details = s);
             default -> data.extraInfo.put(header, value);
         }
     }
@@ -209,17 +191,12 @@ public class AdminUnivApplyInfoRowSaver {
         String accommodationUrl;
         String detailsForLocal;
         Integer studentCapacity;
-        TuitionFeeType tuitionFeeType;
         SemesterAvailableForDispatch semesterAvailableForDispatch;
         String semesterRequirement;
         String detailsForLanguage;
         String gpaRequirement;
         String gpaRequirementCriteria;
-        String detailsForApply;
-        String detailsForMajor;
         String detailsForAccommodation;
-        String detailsForEnglishCourse;
-        String details;
         Map<String, String> extraInfo = new HashMap<>();
         Map<LanguageTestType, String> languageRequirements = new HashMap<>();
     }

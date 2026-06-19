@@ -51,10 +51,6 @@ public class UnivApplyInfo extends BaseEntity {
     @Column(name = "student_capacity")
     private Integer studentCapacity;
 
-    @Column(name = "tuition_fee_type")
-    @Enumerated(EnumType.STRING)
-    private TuitionFeeType tuitionFeeType;
-
     @Column(name = "semester_available_for_dispatch")
     @Enumerated(EnumType.STRING)
     private SemesterAvailableForDispatch semesterAvailableForDispatch;
@@ -71,20 +67,8 @@ public class UnivApplyInfo extends BaseEntity {
     @Column(name = "gpa_requirement_criteria", length = 100)
     private String gpaRequirementCriteria;
 
-    @Column(name = "details_for_apply", length = 3000)
-    private String detailsForApply;
-
-    @Column(name = "details_for_major", length = 3000)
-    private String detailsForMajor;
-
     @Column(name = "details_for_accommodation", length = 2000)
     private String detailsForAccommodation;
-
-    @Column(name = "details_for_english_course", length = 1000)
-    private String detailsForEnglishCourse;
-
-    @Column(name = "details", length = 3000)
-    private String details;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "extra_info", columnDefinition = "JSON")
