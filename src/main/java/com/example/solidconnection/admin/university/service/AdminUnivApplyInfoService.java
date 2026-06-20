@@ -146,8 +146,8 @@ public class AdminUnivApplyInfoService {
                 request.extraInfo()
         );
 
-        univApplyInfo.clearLanguageRequirements();
         if (request.languageRequirements() != null) {
+            univApplyInfo.clearLanguageRequirements();
             request.languageRequirements().forEach(lr -> {
                 LanguageRequirement languageRequirement = new LanguageRequirement(
                         null, lr.languageTestType(), lr.minScore(), univApplyInfo
