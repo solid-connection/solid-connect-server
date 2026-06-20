@@ -101,7 +101,7 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 메이지대학_지원_정보 = univApplyInfoFixture.메이지대학_지원_정보(term.getId());
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(null);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(null, null, null);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -120,7 +120,7 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 대학지원정보_아 = univApplyInfoFixture.아칸소주립대학_지원_정보(term.getId());
 
             // when
-            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+            UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
 
             // then
             assertThat(response.univApplyInfoPreviews())
@@ -139,8 +139,8 @@ class UnivApplyInfoQueryServiceTest {
             UnivApplyInfo 괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
 
             // when
-            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
-            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+            UnivApplyInfoPreviewResponses firstResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
+            UnivApplyInfoPreviewResponses secondResponse = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
 
             // then
             assertThatCode(() -> {
@@ -148,7 +148,7 @@ class UnivApplyInfoQueryServiceTest {
                 List<Long> secondResponseIds = extractIds(secondResponse);
                 assertThat(firstResponseIds).isEqualTo(secondResponseIds);
             }).doesNotThrowAnyException();
-            then(univApplyInfoRepository).should(times(1)).findAllByText(text, term.getId());
+            then(univApplyInfoRepository).should(times(1)).findAllByText(text, term.getId(), null);
         }
 
         private List<Long> extractIds(UnivApplyInfoPreviewResponses responses) {
@@ -170,7 +170,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -189,7 +189,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.메이지대학_지원_정보(term.getId());
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -208,7 +208,7 @@ class UnivApplyInfoQueryServiceTest {
                 univApplyInfoFixture.메이지대학_지원_정보(term.getId());
 
                 // when
-                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text);
+                UnivApplyInfoPreviewResponses response = univApplyInfoQueryService.searchUnivApplyInfoByText(text, null, null);
 
                 // then
                 assertThat(response.univApplyInfoPreviews())
@@ -216,6 +216,72 @@ class UnivApplyInfoQueryServiceTest {
                                 UnivApplyInfoPreviewResponse.of(린츠_카톨릭대학_지원_정보, term.getName()),
                                 UnivApplyInfoPreviewResponse.of(서던덴마크대학교_지원_정보, term.getName())
                         );
+            }
+        }
+
+        @Nested
+        class homeUniversityId_필터링 {
+
+            @Test
+            void homeUniversityId를_지정하면_해당_국내대학의_지원_정보만_반환한다() {
+                // given
+                UnivApplyInfo 괌대학_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+                Long homeUniversityId = 괌대학_지원_정보.getHomeUniversity().getId();
+
+                // when
+                UnivApplyInfoPreviewResponses response =
+                        univApplyInfoQueryService.searchUnivApplyInfoByText(null, homeUniversityId, null);
+
+                // then
+                assertThat(response.univApplyInfoPreviews())
+                        .hasSize(1)
+                        .allMatch(r -> r.id() == 괌대학_지원_정보.getId());
+            }
+
+            @Test
+            void homeUniversityId가_null이면_전체_지원_정보를_반환한다() {
+                // given
+                univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+                univApplyInfoFixture.메이지대학_지원_정보(term.getId());
+
+                // when
+                UnivApplyInfoPreviewResponses response =
+                        univApplyInfoQueryService.searchUnivApplyInfoByText(null, null, null);
+
+                // then
+                assertThat(response.univApplyInfoPreviews()).hasSize(2);
+            }
+        }
+
+        @Nested
+        class termId_필터링 {
+
+            @Test
+            void termId를_지정하면_해당_학기의_지원_정보만_반환한다() {
+                // given
+                Term 다른학기 = termFixture.이전_학기("2024-2");
+                univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+                univApplyInfoFixture.메이지대학_지원_정보(다른학기.getId());
+
+                // when
+                UnivApplyInfoPreviewResponses response =
+                        univApplyInfoQueryService.searchUnivApplyInfoByText(null, null, 다른학기.getId());
+
+                // then
+                assertThat(response.univApplyInfoPreviews()).hasSize(1);
+            }
+
+            @Test
+            void termId가_null이면_현재_학기를_사용한다() {
+                // given
+                univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
+
+                // when
+                UnivApplyInfoPreviewResponses response =
+                        univApplyInfoQueryService.searchUnivApplyInfoByText(null, null, null);
+
+                // then
+                assertThat(response.univApplyInfoPreviews()).hasSize(1);
             }
         }
     }

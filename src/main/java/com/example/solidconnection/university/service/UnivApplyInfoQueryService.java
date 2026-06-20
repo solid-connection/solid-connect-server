@@ -44,15 +44,27 @@ public class UnivApplyInfoQueryService {
     @Transactional(readOnly = true)
     // todo: 현재 레디스 관련 에러 발생중으로 임시 주석처리, 추후 원인 분석 후 적용 필요
     @ThunderingHerdCaching(key = "univApplyInfoTextSearch:{0}", cacheManager = "customCacheManager", ttlSec = 86400)
-    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(String text) {
-        Term term = termRepository.findByIsCurrentTrue()
-                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
-
-        List<UnivApplyInfo> univApplyInfos = univApplyInfoRepository.findAllByText(text, term.getId());
+    public UnivApplyInfoPreviewResponses searchUnivApplyInfoByText(
+            String text,
+            Long homeUniversityId,
+            Long termId
+    ) {
+        Term term = resolveTerm(termId);
+        List<UnivApplyInfo> univApplyInfos =
+                univApplyInfoRepository.findAllByText(text, term.getId(), homeUniversityId);
 
         List<UnivApplyInfoPreviewResponse> responses = univApplyInfos.stream()
                 .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
                 .toList();
         return new UnivApplyInfoPreviewResponses(responses);
+    }
+
+    private Term resolveTerm(Long termId) {
+        if (termId != null) {
+            return termRepository.findById(termId)
+                    .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
+        }
+        return termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
     }
 }
