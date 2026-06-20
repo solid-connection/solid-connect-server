@@ -36,5 +36,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                 .orElseThrow(() -> new CustomException(APPLICATION_NOT_FOUND));
     }
 
+    @Query("""
+           SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
+           FROM Application a
+           JOIN a.choices c
+           WHERE c.univApplyInfoId = :univApplyInfoId
+               AND a.isDelete = false
+           """)
+    boolean existsByChoicesUnivApplyInfoId(@Param("univApplyInfoId") long univApplyInfoId);
+
     void deleteAllBySiteUserId(long siteUserId);
 }

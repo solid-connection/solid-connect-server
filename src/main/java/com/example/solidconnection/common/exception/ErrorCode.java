@@ -36,6 +36,7 @@ public enum ErrorCode {
     // data not found
     UNIV_APPLY_INFO_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "존재하지 않는 대학교 지원 정보입니다."),
     UNIV_APPLY_INFO_NOT_FOUND_FOR_TERM(HttpStatus.NOT_FOUND.value(), "해당하는 대학교가 이번 모집 기간에 열리지 않았습니다."),
+    UNIV_APPLY_INFO_HAS_REFERENCES(HttpStatus.CONFLICT.value(), "해당 대학 지원 정보를 참조하는 데이터가 존재합니다."),
     APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "사용자의 대학 지원 정보를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "회원을 찾을 수 없습니다."),
     UNIVERSITY_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "대학교를 찾을 수 없습니다."),

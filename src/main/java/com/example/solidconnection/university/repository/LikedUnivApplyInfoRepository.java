@@ -31,5 +31,7 @@ public interface LikedUnivApplyInfoRepository extends JpaRepository<LikedUnivApp
 
     boolean existsBySiteUserIdAndUnivApplyInfoId(long siteUserId, long univApplyInfoId);
 
+    boolean existsByUnivApplyInfoId(long univApplyInfoId);
+
     void deleteAllBySiteUserId(long siteUserId);
 }
