@@ -18,6 +18,6 @@ public record AdminUnivApplyInfoCreateRequest(
         String gpaRequirementCriteria,
         String detailsForAccommodation,
         Map<String, String> extraInfo,
-        @Valid List<AdminUnivApplyInfoLanguageRequirementRequest> languageRequirements
+        @Valid List<@NotNull AdminUnivApplyInfoLanguageRequirementRequest> languageRequirements
 ) {
 }
