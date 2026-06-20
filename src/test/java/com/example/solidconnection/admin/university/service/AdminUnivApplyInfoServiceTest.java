@@ -6,23 +6,39 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoCreateRequest;
+import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoLanguageRequirementRequest;
+import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoResponse;
+import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoUpdateRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
+import com.example.solidconnection.application.domain.Gpa;
+import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.cache.manager.CustomCacheManager;
 import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.HomeUniversity;
+import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
+import com.example.solidconnection.university.domain.SemesterAvailableForDispatch;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfoColumn;
 import com.example.solidconnection.university.fixture.HomeUniversityFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixtureBuilder;
 import com.example.solidconnection.university.fixture.UniversityFixture;
 import com.example.solidconnection.university.repository.LanguageRequirementRepository;
+import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestContainerSpringBootTest
-@DisplayName("UnivApplyInfo 임포트 서비스 테스트")
+@DisplayName("UnivApplyInfo 서비스 테스트")
 class AdminUnivApplyInfoServiceTest {
 
     @Autowired
@@ -45,6 +61,9 @@ class AdminUnivApplyInfoServiceTest {
     private LanguageRequirementRepository languageRequirementRepository;
 
     @Autowired
+    private LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
+
+    @Autowired
     private TermFixture termFixture;
 
     @Autowired
@@ -53,11 +72,21 @@ class AdminUnivApplyInfoServiceTest {
     @Autowired
     private UniversityFixture universityFixture;
 
+    @Autowired
+    private UnivApplyInfoFixtureBuilder univApplyInfoFixtureBuilder;
+
+    @Autowired
+    private SiteUserFixture siteUserFixture;
+
+    @Autowired
+    private ApplicationFixture applicationFixture;
+
     @MockitoSpyBean
     private CustomCacheManager cacheManager;
 
     private Term term;
     private HomeUniversity homeUniversity;
+    private HostUniversity hostUniversity;
 
     private static final String 괌_대학_한국명 = "괌 대학";
     private static final String 버지니아_대학_한국명 = "버지니아 공과 대학";
@@ -67,7 +96,7 @@ class AdminUnivApplyInfoServiceTest {
     void setUp() {
         term = termFixture.현재_학기("2025-2");
         homeUniversity = homeUniversityFixture.인하대학교();
-        universityFixture.괌_대학();
+        hostUniversity = universityFixture.괌_대학();
         universityFixture.버지니아_공과_대학();
     }
 
@@ -392,6 +421,226 @@ class AdminUnivApplyInfoServiceTest {
             assertThatCode(() -> adminUnivApplyInfoService.importUnivApplyInfos(request))
                     .isInstanceOf(CustomException.class);
             assertThat(univApplyInfoRepository.findAll()).isEmpty();
+        }
+    }
+
+    @Nested
+    class 지원_정보_생성 {
+
+        @Test
+        void 유효한_요청으로_지원_정보를_생성하면_성공한다() {
+            // given
+            AdminUnivApplyInfoCreateRequest request = new AdminUnivApplyInfoCreateRequest(
+                    term.getId(), homeUniversity.getId(), hostUniversity.getId(),
+                    5, SemesterAvailableForDispatch.ONE_SEMESTER,
+                    "1학기 이상", "TOEIC 700 이상", "3.0 이상", "4.5",
+                    "기숙사 제공", null, List.of()
+            );
+
+            // when
+            AdminUnivApplyInfoResponse response = adminUnivApplyInfoService.createUnivApplyInfo(request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isNotNull(),
+                    () -> assertThat(response.termId()).isEqualTo(term.getId()),
+                    () -> assertThat(response.homeUniversityId()).isEqualTo(homeUniversity.getId()),
+                    () -> assertThat(response.hostUniversityId()).isEqualTo(hostUniversity.getId()),
+                    () -> assertThat(response.studentCapacity()).isEqualTo(5),
+                    () -> assertThat(univApplyInfoRepository.findById(response.id())).isPresent()
+            );
+        }
+
+        @Test
+        void 언어_요건을_포함하여_생성하면_언어_요건도_저장된다() {
+            // given
+            var languageRequests = List.of(
+                    new AdminUnivApplyInfoLanguageRequirementRequest(LanguageTestType.TOEIC, "700")
+            );
+            AdminUnivApplyInfoCreateRequest request = new AdminUnivApplyInfoCreateRequest(
+                    term.getId(), homeUniversity.getId(), hostUniversity.getId(),
+                    null, null, null, null, null, null, null, null, languageRequests
+            );
+
+            // when
+            AdminUnivApplyInfoResponse response = adminUnivApplyInfoService.createUnivApplyInfo(request);
+
+            // then
+            assertThat(response.languageRequirements())
+                    .hasSize(1)
+                    .anyMatch(lr -> lr.languageTestType() == LanguageTestType.TOEIC
+                            && "700".equals(lr.minScore()));
+        }
+
+        @Test
+        void 존재하지_않는_termId로_생성하면_예외가_발생한다() {
+            // given
+            AdminUnivApplyInfoCreateRequest request = new AdminUnivApplyInfoCreateRequest(
+                    invalidId, homeUniversity.getId(), hostUniversity.getId(),
+                    null, null, null, null, null, null, null, null, List.of()
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.createUnivApplyInfo(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.TERM_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_homeUniversityId로_생성하면_예외가_발생한다() {
+            // given
+            AdminUnivApplyInfoCreateRequest request = new AdminUnivApplyInfoCreateRequest(
+                    term.getId(), invalidId, hostUniversity.getId(),
+                    null, null, null, null, null, null, null, null, List.of()
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.createUnivApplyInfo(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.HOME_UNIVERSITY_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 존재하지_않는_hostUniversityId로_생성하면_예외가_발생한다() {
+            // given
+            AdminUnivApplyInfoCreateRequest request = new AdminUnivApplyInfoCreateRequest(
+                    term.getId(), homeUniversity.getId(), invalidId,
+                    null, null, null, null, null, null, null, null, List.of()
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.createUnivApplyInfo(request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIVERSITY_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 지원_정보_수정 {
+
+        @Test
+        void 유효한_요청으로_지원_정보를_수정하면_성공한다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+            AdminUnivApplyInfoUpdateRequest request = new AdminUnivApplyInfoUpdateRequest(
+                    10, SemesterAvailableForDispatch.TWO_SEMESTER,
+                    "2학기 이상", "TOEFL 80 이상", "3.5 이상", "4.5",
+                    "기숙사 없음", Map.of("비고", "테스트"), List.of()
+            );
+
+            // when
+            AdminUnivApplyInfoResponse response = adminUnivApplyInfoService.updateUnivApplyInfo(univApplyInfo.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.studentCapacity()).isEqualTo(10),
+                    () -> assertThat(response.semesterAvailableForDispatch()).isEqualTo(SemesterAvailableForDispatch.TWO_SEMESTER),
+                    () -> assertThat(response.extraInfo()).containsEntry("비고", "테스트")
+            );
+        }
+
+        @Test
+        void 수정_시_언어_요건이_기존_것과_교체된다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+            var newLanguageRequirements = List.of(
+                    new AdminUnivApplyInfoLanguageRequirementRequest(LanguageTestType.TOEFL_IBT, "80")
+            );
+            AdminUnivApplyInfoUpdateRequest request = new AdminUnivApplyInfoUpdateRequest(
+                    null, null, null, null, null, null, null, null, newLanguageRequirements
+            );
+
+            // when
+            AdminUnivApplyInfoResponse response = adminUnivApplyInfoService.updateUnivApplyInfo(univApplyInfo.getId(), request);
+
+            // then
+            assertThat(response.languageRequirements())
+                    .hasSize(1)
+                    .anyMatch(lr -> lr.languageTestType() == LanguageTestType.TOEFL_IBT
+                            && "80".equals(lr.minScore()));
+        }
+
+        @Test
+        void 존재하지_않는_id로_수정하면_예외가_발생한다() {
+            // given
+            AdminUnivApplyInfoUpdateRequest request = new AdminUnivApplyInfoUpdateRequest(
+                    null, null, null, null, null, null, null, null, List.of()
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.updateUnivApplyInfo(invalidId, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIV_APPLY_INFO_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    class 지원_정보_삭제 {
+
+        @Test
+        void 참조가_없는_지원_정보를_삭제하면_성공한다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+
+            // when
+            adminUnivApplyInfoService.deleteUnivApplyInfo(univApplyInfo.getId());
+
+            // then
+            assertThat(univApplyInfoRepository.findById(univApplyInfo.getId())).isEmpty();
+        }
+
+        @Test
+        void 존재하지_않는_id로_삭제하면_예외가_발생한다() {
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.deleteUnivApplyInfo(invalidId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIV_APPLY_INFO_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void LikedUnivApplyInfo가_참조하는_지원_정보를_삭제하면_예외가_발생한다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+            SiteUser siteUser = siteUserFixture.사용자();
+            likedUnivApplyInfoRepository.save(
+                    LikedUnivApplyInfo.builder()
+                            .siteUserId(siteUser.getId())
+                            .univApplyInfoId(univApplyInfo.getId())
+                            .build()
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.deleteUnivApplyInfo(univApplyInfo.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIV_APPLY_INFO_HAS_REFERENCES.getMessage());
+        }
+
+        @Test
+        void ApplicationChoice가_참조하는_지원_정보를_삭제하면_예외가_발생한다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+            SiteUser siteUser = siteUserFixture.사용자();
+            applicationFixture.지원서(
+                    siteUser, "테스트닉네임", term.getId(),
+                    new Gpa(4.0, 4.5, "url"),
+                    new LanguageTest(LanguageTestType.TOEIC, "800", "url"),
+                    List.of(univApplyInfo.getId())
+            );
+
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.deleteUnivApplyInfo(univApplyInfo.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIV_APPLY_INFO_HAS_REFERENCES.getMessage());
         }
     }
 }
