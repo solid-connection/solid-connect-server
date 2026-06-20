@@ -84,7 +84,7 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByText(String text, Long termId) {
+    public List<UnivApplyInfo> findAllByText(String text, Long termId, Long homeUniversityId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
         QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
@@ -98,7 +98,10 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(region).on(country.regionCode.eq(region.code))
                 .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
-                .where(termIdEq(univApplyInfo, termId));
+                .where(
+                        termIdEq(univApplyInfo, termId),
+                        homeUniversityIdEq(homeUniversity, homeUniversityId)
+                );
 
         // text 가 비어있다면 모든 대학 지원 정보를 id 오름차순으로 정렬하여 반환
         if (text == null || text.isBlank()) {
@@ -125,5 +128,12 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         return base.where(where)
                 .orderBy(rank.asc(), univApplyInfo.id.asc())
                 .fetch();
+    }
+
+    private BooleanExpression homeUniversityIdEq(QHomeUniversity homeUniversity, Long homeUniversityId) {
+        if (homeUniversityId == null) {
+            return null;
+        }
+        return homeUniversity.id.eq(homeUniversityId);
     }
 }

@@ -84,6 +84,30 @@ public class UnivApplyInfo extends BaseEntity {
         this.languageRequirements.add(languageRequirements);
     }
 
+    public void update(
+            Integer studentCapacity,
+            SemesterAvailableForDispatch semesterAvailableForDispatch,
+            String semesterRequirement,
+            String detailsForLanguage,
+            String gpaRequirement,
+            String gpaRequirementCriteria,
+            String detailsForAccommodation,
+            Map<String, String> extraInfo
+    ) {
+        if (studentCapacity != null) this.studentCapacity = studentCapacity;
+        if (semesterAvailableForDispatch != null) this.semesterAvailableForDispatch = semesterAvailableForDispatch;
+        if (semesterRequirement != null) this.semesterRequirement = semesterRequirement;
+        if (detailsForLanguage != null) this.detailsForLanguage = detailsForLanguage;
+        if (gpaRequirement != null) this.gpaRequirement = gpaRequirement;
+        if (gpaRequirementCriteria != null) this.gpaRequirementCriteria = gpaRequirementCriteria;
+        if (detailsForAccommodation != null) this.detailsForAccommodation = detailsForAccommodation;
+        if (extraInfo != null) this.extraInfo = extraInfo;
+    }
+
+    public void clearLanguageRequirements() {
+        this.languageRequirements.clear();
+    }
+
     public void updateExtraInfo(Map<String, String> extraInfo) {
         this.extraInfo = extraInfo;
     }

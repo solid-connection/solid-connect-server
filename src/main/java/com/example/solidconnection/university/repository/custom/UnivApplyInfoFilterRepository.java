@@ -7,5 +7,5 @@ public interface UnivApplyInfoFilterRepository {
 
     List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long term);
 
-    List<UnivApplyInfo> findAllByText(String text, Long termId);
+    List<UnivApplyInfo> findAllByText(String text, Long termId, Long homeUniversityId);
 }
