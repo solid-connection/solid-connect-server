@@ -12,9 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +47,7 @@ public class AdminUnivApplyInfoController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<AdminUnivApplyInfoResponse> updateUnivApplyInfo(
-            @PathVariable Long id,
+            @PathVariable long id,
             @Valid @RequestBody AdminUnivApplyInfoUpdateRequest request
     ) {
         return ResponseEntity.ok(adminUnivApplyInfoService.updateUnivApplyInfo(id, request));
@@ -55,7 +55,7 @@ public class AdminUnivApplyInfoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUnivApplyInfo(
-            @PathVariable Long id
+            @PathVariable long id
     ) {
         adminUnivApplyInfoService.deleteUnivApplyInfo(id);
         return ResponseEntity.ok().build();

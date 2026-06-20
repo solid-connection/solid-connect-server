@@ -22,11 +22,10 @@ import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.domain.LanguageRequirement;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
-import com.example.solidconnection.university.repository.LanguageRequirementRepository;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +44,6 @@ public class AdminUnivApplyInfoService {
     private final AdminUnivApplyInfoRowSaver rowSaver;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final HostUniversityRepository hostUniversityRepository;
-    private final LanguageRequirementRepository languageRequirementRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
     private final ApplicationRepository applicationRepository;
 
@@ -76,6 +74,24 @@ public class AdminUnivApplyInfoService {
         }
 
         return new UnivApplyInfoImportResponse(rows.size(), createdUniversities);
+    }
+
+    private void validateColumnMappings(Map<String, String> columnMappings) {
+        boolean hasBlankEntry = columnMappings.entrySet().stream()
+                .anyMatch(e -> e.getKey().isBlank() || e.getValue().isBlank());
+        if (hasBlankEntry) {
+            throw new CustomException(INVALID_INPUT, "컬럼 매핑의 키와 값은 공백일 수 없습니다");
+        }
+    }
+
+    private void validateTermExists(Long termId) {
+        termRepository.findById(termId)
+                .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
+    }
+
+    private HomeUniversity findHomeUniversity(Long homeUniversityId) {
+        return homeUniversityRepository.findById(homeUniversityId)
+                .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
     }
 
     @Transactional
@@ -131,7 +147,7 @@ public class AdminUnivApplyInfoService {
             cacheManager = "customCacheManager",
             prefix = true
     )
-    public AdminUnivApplyInfoResponse updateUnivApplyInfo(Long id, AdminUnivApplyInfoUpdateRequest request) {
+    public AdminUnivApplyInfoResponse updateUnivApplyInfo(long id, AdminUnivApplyInfoUpdateRequest request) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.findById(id)
                 .orElseThrow(() -> new CustomException(UNIV_APPLY_INFO_NOT_FOUND));
 
@@ -165,35 +181,18 @@ public class AdminUnivApplyInfoService {
             cacheManager = "customCacheManager",
             prefix = true
     )
-    public void deleteUnivApplyInfo(Long id) {
+    public void deleteUnivApplyInfo(long id) {
         UnivApplyInfo univApplyInfo = univApplyInfoRepository.findById(id)
                 .orElseThrow(() -> new CustomException(UNIV_APPLY_INFO_NOT_FOUND));
         validateNoReferences(id);
         univApplyInfoRepository.delete(univApplyInfo);
     }
 
-    private void validateNoReferences(Long id) {
+    private void validateNoReferences(long id) {
         if (likedUnivApplyInfoRepository.existsByUnivApplyInfoId(id)
                 || applicationRepository.existsByChoicesUnivApplyInfoId(id)) {
             throw new CustomException(UNIV_APPLY_INFO_HAS_REFERENCES);
         }
     }
 
-    private void validateColumnMappings(Map<String, String> columnMappings) {
-        boolean hasBlankEntry = columnMappings.entrySet().stream()
-                .anyMatch(e -> e.getKey().isBlank() || e.getValue().isBlank());
-        if (hasBlankEntry) {
-            throw new CustomException(INVALID_INPUT, "컬럼 매핑의 키와 값은 공백일 수 없습니다");
-        }
-    }
-
-    private void validateTermExists(Long termId) {
-        termRepository.findById(termId)
-                .orElseThrow(() -> new CustomException(TERM_NOT_FOUND));
-    }
-
-    private HomeUniversity findHomeUniversity(Long homeUniversityId) {
-        return homeUniversityRepository.findById(homeUniversityId)
-                .orElseThrow(() -> new CustomException(HOME_UNIVERSITY_NOT_FOUND));
-    }
 }

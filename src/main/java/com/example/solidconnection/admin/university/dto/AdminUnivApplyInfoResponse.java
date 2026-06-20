@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 public record AdminUnivApplyInfoResponse(
-        Long id,
+        long id,
         long termId,
         Long homeUniversityId,
-        Long hostUniversityId,
+        long hostUniversityId,
         String koreanName,
         Integer studentCapacity,
         SemesterAvailableForDispatch semesterAvailableForDispatch,

@@ -442,7 +442,7 @@ class AdminUnivApplyInfoServiceTest {
 
             // then
             assertAll(
-                    () -> assertThat(response.id()).isNotNull(),
+                    () -> assertThat(response.id()).isPositive(),
                     () -> assertThat(response.termId()).isEqualTo(term.getId()),
                     () -> assertThat(response.homeUniversityId()).isEqualTo(homeUniversity.getId()),
                     () -> assertThat(response.hostUniversityId()).isEqualTo(hostUniversity.getId()),
