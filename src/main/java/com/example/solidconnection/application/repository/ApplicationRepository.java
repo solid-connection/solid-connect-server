@@ -41,7 +41,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
            FROM Application a
            JOIN a.choices c
            WHERE c.univApplyInfoId = :univApplyInfoId
-               AND a.isDelete = false
            """)
     boolean existsByChoicesUnivApplyInfoId(@Param("univApplyInfoId") long univApplyInfoId);
 
