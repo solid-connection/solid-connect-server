@@ -14,8 +14,11 @@ public final class UploadDirectoryName {
     private UploadDirectoryName() {
     }
 
-    public static String fromUniversityEnglishName(String englishName) {
+    public static String fromUniversityNames(String englishName, String koreanName) {
         if (englishName == null || englishName.isBlank()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+        if (koreanName == null || koreanName.isBlank()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
@@ -30,7 +33,7 @@ public final class UploadDirectoryName {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
-        return directoryName + "_" + hash(englishName.trim());
+        return directoryName + "_" + hash(koreanName.trim());
     }
 
     private static String hash(String value) {

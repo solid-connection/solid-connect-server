@@ -78,7 +78,7 @@ public class S3Service {
 
         fileUploadService.uploadFile(bucket, originalPath, bytes, contentType);
 
-        return new UploadedFileUrlResponse(returnPath);
+        return new UploadedFileUrlResponse(returnPath, originalPath);
     }
 
     private String createFileName(UploadPath uploadPath, String subDirectory, String baseFileName) {
@@ -139,6 +139,13 @@ public class S3Service {
 
     public void deletePostImage(String url) {
         deleteFile(url);
+    }
+
+    public void deleteUploadedFile(UploadedFileUrlResponse uploadedFile) {
+        if (uploadedFile == null) {
+            return;
+        }
+        deleteFile(uploadedFile.deletionKey());
     }
 
     private void deleteFile(String fileName) {

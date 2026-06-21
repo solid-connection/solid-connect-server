@@ -18,18 +18,25 @@ import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.repository.CountryRepository;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.repository.RegionRepository;
+import com.example.solidconnection.s3.domain.UploadDirectoryName;
+import com.example.solidconnection.s3.domain.UploadPath;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
+import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminHostUniversityService {
 
     private final HostUniversityRepository hostUniversityRepository;
@@ -37,6 +44,7 @@ public class AdminHostUniversityService {
     private final RegionRepository regionRepository;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final CustomCacheManager cacheManager;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public Page<AdminHostUniversityResponse> getHostUniversities(
@@ -65,29 +73,51 @@ public class AdminHostUniversityService {
             cacheManager = "customCacheManager",
             prefix = true
     )
-    public AdminHostUniversityDetailResponse createHostUniversity(AdminHostUniversityCreateRequest request) {
+    public AdminHostUniversityDetailResponse createHostUniversity(
+            AdminHostUniversityCreateRequest request,
+            MultipartFile logoFile,
+            MultipartFile backgroundFile
+    ) {
         validateKoreanNameNotExists(request.koreanName());
 
         Country country = findCountryByCode(request.countryCode());
         Region region = findRegionByCode(request.regionCode());
+        String directoryName = UploadDirectoryName.fromUniversityNames(request.englishName(), request.koreanName());
+        UploadedFileUrlResponse logoImage = null;
+        UploadedFileUrlResponse backgroundImage = null;
 
-        HostUniversity hostUniversity = new HostUniversity(
-                null,
-                request.koreanName(),
-                request.englishName(),
-                request.formatName(),
-                request.homepageUrl(),
-                request.englishCourseUrl(),
-                request.accommodationUrl(),
-                request.logoImageUrl(),
-                request.backgroundImageUrl(),
-                request.detailsForLocal(),
-                country,
-                region
-        );
+        try {
+            logoImage = uploadUniversityImage(
+                    logoFile,
+                    UploadPath.ADMIN_UNIVERSITY_LOGO,
+                    directoryName
+            );
+            backgroundImage = uploadUniversityImage(
+                    backgroundFile,
+                    UploadPath.ADMIN_UNIVERSITY_BACKGROUND,
+                    directoryName
+            );
 
-        HostUniversity savedHostUniversity = hostUniversityRepository.save(hostUniversity);
-        return AdminHostUniversityDetailResponse.from(savedHostUniversity);
+            HostUniversity hostUniversity = new HostUniversity(
+                    null,
+                    request.koreanName(),
+                    request.englishName(),
+                    request.formatName(),
+                    request.homepageUrl(),
+                    request.englishCourseUrl(),
+                    request.accommodationUrl(),
+                    logoImage.fileUrl(),
+                    backgroundImage.fileUrl(),
+                    request.detailsForLocal(),
+                    country,
+                    region
+            );
+            HostUniversity savedHostUniversity = hostUniversityRepository.saveAndFlush(hostUniversity);
+            return AdminHostUniversityDetailResponse.from(savedHostUniversity);
+        } catch (RuntimeException e) {
+            deleteUploadedImages(logoImage, backgroundImage);
+            throw e;
+        }
     }
 
     private void validateKoreanNameNotExists(String koreanName) {
@@ -103,7 +133,12 @@ public class AdminHostUniversityService {
             cacheManager = "customCacheManager",
             prefix = true
     )
-    public AdminHostUniversityDetailResponse updateHostUniversity(Long id, AdminHostUniversityUpdateRequest request) {
+    public AdminHostUniversityDetailResponse updateHostUniversity(
+            Long id,
+            AdminHostUniversityUpdateRequest request,
+            MultipartFile logoFile,
+            MultipartFile backgroundFile
+    ) {
         HostUniversity hostUniversity = hostUniversityRepository.findById(id)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
 
@@ -111,24 +146,84 @@ public class AdminHostUniversityService {
 
         Country country = findCountryByCode(request.countryCode());
         Region region = findRegionByCode(request.regionCode());
+        String directoryName = UploadDirectoryName.fromUniversityNames(request.englishName(), request.koreanName());
+        UploadedFileUrlResponse logoImage = null;
+        UploadedFileUrlResponse backgroundImage = null;
 
-        hostUniversity.update(
-                request.koreanName(),
-                request.englishName(),
-                request.formatName(),
-                request.homepageUrl(),
-                request.englishCourseUrl(),
-                request.accommodationUrl(),
-                request.logoImageUrl(),
-                request.backgroundImageUrl(),
-                request.detailsForLocal(),
-                country,
-                region
-        );
+        try {
+            logoImage = uploadUniversityImageIfExists(
+                    logoFile,
+                    UploadPath.ADMIN_UNIVERSITY_LOGO,
+                    directoryName
+            );
+            backgroundImage = uploadUniversityImageIfExists(
+                    backgroundFile,
+                    UploadPath.ADMIN_UNIVERSITY_BACKGROUND,
+                    directoryName
+            );
 
-        evictUnivApplyInfoDetailCaches(id);
+            hostUniversity.update(
+                    request.koreanName(),
+                    request.englishName(),
+                    request.formatName(),
+                    request.homepageUrl(),
+                    request.englishCourseUrl(),
+                    request.accommodationUrl(),
+                    getImageUrlOrDefault(logoImage, hostUniversity.getLogoImageUrl()),
+                    getImageUrlOrDefault(backgroundImage, hostUniversity.getBackgroundImageUrl()),
+                    request.detailsForLocal(),
+                    country,
+                    region
+            );
+            hostUniversityRepository.flush();
+            evictUnivApplyInfoDetailCaches(id);
+            return AdminHostUniversityDetailResponse.from(hostUniversity);
+        } catch (RuntimeException e) {
+            deleteUploadedImages(logoImage, backgroundImage);
+            throw e;
+        }
+    }
 
-        return AdminHostUniversityDetailResponse.from(hostUniversity);
+    private UploadedFileUrlResponse uploadUniversityImage(
+            MultipartFile imageFile,
+            UploadPath uploadPath,
+            String directoryName
+    ) {
+        return s3Service.uploadFile(imageFile, uploadPath, directoryName);
+    }
+
+    private UploadedFileUrlResponse uploadUniversityImageIfExists(
+            MultipartFile imageFile,
+            UploadPath uploadPath,
+            String directoryName
+    ) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            return null;
+        }
+        return uploadUniversityImage(imageFile, uploadPath, directoryName);
+    }
+
+    private String getImageUrlOrDefault(UploadedFileUrlResponse uploadedImage, String defaultImageUrl) {
+        if (uploadedImage == null) {
+            return defaultImageUrl;
+        }
+        return uploadedImage.fileUrl();
+    }
+
+    private void deleteUploadedImages(UploadedFileUrlResponse... uploadedImages) {
+        for (UploadedFileUrlResponse uploadedImage : uploadedImages) {
+            if (uploadedImage != null) {
+                try {
+                    s3Service.deleteUploadedFile(uploadedImage);
+                } catch (RuntimeException deleteException) {
+                    log.warn(
+                            "Failed to delete uploaded university image. fileUrl={}",
+                            uploadedImage.fileUrl(),
+                            deleteException
+                    );
+                }
+            }
+        }
     }
 
     private void validateKoreanNameNotDuplicated(String koreanName, Long excludeId) {

@@ -1,6 +1,12 @@
 package com.example.solidconnection.s3.dto;
 
-public record UploadedFileUrlResponse(
-        String fileUrl) {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public record UploadedFileUrlResponse(
+        String fileUrl,
+        @JsonIgnore String deletionKey) {
+
+    public UploadedFileUrlResponse(String fileUrl) {
+        this(fileUrl, fileUrl);
+    }
 }
