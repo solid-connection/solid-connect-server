@@ -41,8 +41,10 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.HostUniversity;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.LikedUnivApplyInfo;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import java.time.LocalDateTime;
@@ -91,6 +93,9 @@ class MyPageServiceTest {
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
+
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
 
     @Autowired
     private RegionFixture regionFixture;
@@ -143,8 +148,22 @@ class MyPageServiceTest {
                 // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount),
                 () -> assertThat(response.interestedCountries().get(0)).isEqualTo(country.getKoreanName()),
-                () -> assertThat(response.attendedUniversity()).isNull()
+                () -> assertThat(response.attendedUniversity()).isNull(),
+                () -> assertThat(response.homeUniversityName()).isNull()
         );
+    }
+
+    @Test
+    void 학교_인증된_멘티의_마이페이지_정보를_조회하면_국내_대학교_이름을_반환한다() {
+        // given
+        HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
+        SiteUser verifiedUser = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
+
+        // when
+        MyPageResponse response = myPageService.getMyPageInfo(verifiedUser.getId());
+
+        // then
+        assertThat(response.homeUniversityName()).isEqualTo(homeUniversity.getName());
     }
 
     @Test
@@ -167,7 +186,8 @@ class MyPageServiceTest {
                 // todo : 좋아요한 게시물 수 반환 기능 추가와 함께 수정요망
                 () -> assertThat(response.likedUnivApplyInfoCount()).isEqualTo(likedUnivApplyInfoCount),
                 () -> assertThat(response.attendedUniversity()).isEqualTo(괌대학.getKoreanName()),
-                () -> assertThat(response.interestedCountries()).isNull()
+                () -> assertThat(response.interestedCountries()).isNull(),
+                () -> assertThat(response.homeUniversityName()).isNull()
         );
     }
 

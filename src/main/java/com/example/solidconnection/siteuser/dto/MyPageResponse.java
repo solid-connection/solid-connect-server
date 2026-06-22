@@ -25,9 +25,18 @@ public record MyPageResponse(
         List<String> interestedCountries,
 
         @JsonInclude(NON_NULL)
-        String attendedUniversity) {
+        String attendedUniversity,
 
-    public static MyPageResponse of(SiteUser siteUser, int likedUnivApplyInfoCount, List<String> interestedCountries, String attendedUniversity) {
+        @JsonInclude(NON_NULL)
+        String homeUniversityName) {
+
+    public static MyPageResponse of(
+            SiteUser siteUser,
+            int likedUnivApplyInfoCount,
+            List<String> interestedCountries,
+            String attendedUniversity,
+            String homeUniversityName
+    ) {
         return new MyPageResponse(
                 siteUser.getNickname(),
                 siteUser.getProfileImageUrl(),
@@ -38,7 +47,8 @@ public record MyPageResponse(
                 0, // TODO: 멘토 기능 생기면 업데이트 필요
                 likedUnivApplyInfoCount,
                 interestedCountries,
-                attendedUniversity
+                attendedUniversity,
+                homeUniversityName
         );
     }
 }
