@@ -31,7 +31,7 @@ public class HostUniversity extends BaseEntity {
     @Column(name = "english_name", nullable = false, length = 200)
     private String englishName;
 
-    @Column(name = "format_name", nullable = false, length = 100)
+    @Column(name = "format_name", nullable = false, length = 200)
     private String formatName;
 
     @Column(name = "homepage_url", length = 500)
