@@ -25,14 +25,6 @@ public record AdminHostUniversityUpdateRequest(
         @Size(max = 500, message = "숙소 URL은 500자 이하여야 합니다")
         String accommodationUrl,
 
-        @NotBlank(message = "로고 이미지 URL은 필수입니다")
-        @Size(max = 500, message = "로고 이미지 URL은 500자 이하여야 합니다")
-        String logoImageUrl,
-
-        @NotBlank(message = "배경 이미지 URL은 필수입니다")
-        @Size(max = 500, message = "배경 이미지 URL은 500자 이하여야 합니다")
-        String backgroundImageUrl,
-
         @Size(max = 1000, message = "상세 정보는 1000자 이하여야 합니다")
         String detailsForLocal,
 

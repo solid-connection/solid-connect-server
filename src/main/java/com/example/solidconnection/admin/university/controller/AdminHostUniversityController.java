@@ -11,15 +11,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin/host-universities")
@@ -44,20 +46,33 @@ public class AdminHostUniversityController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminHostUniversityDetailResponse> createHostUniversity(
-            @Valid @RequestBody AdminHostUniversityCreateRequest request
+            @Valid @RequestPart("request") AdminHostUniversityCreateRequest request,
+            @RequestPart("logoFile") MultipartFile logoFile,
+            @RequestPart("backgroundFile") MultipartFile backgroundFile
     ) {
-        AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(request);
+        AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(
+                request,
+                logoFile,
+                backgroundFile
+        );
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{host-university-id}")
+    @PutMapping(value = "/{host-university-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdminHostUniversityDetailResponse> updateHostUniversity(
             @PathVariable("host-university-id") Long hostUniversityId,
-            @Valid @RequestBody AdminHostUniversityUpdateRequest request
+            @Valid @RequestPart("request") AdminHostUniversityUpdateRequest request,
+            @RequestPart(value = "logoFile", required = false) MultipartFile logoFile,
+            @RequestPart(value = "backgroundFile", required = false) MultipartFile backgroundFile
     ) {
-        AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(hostUniversityId, request);
+        AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(
+                hostUniversityId,
+                request,
+                logoFile,
+                backgroundFile
+        );
         return ResponseEntity.ok(response);
     }
 

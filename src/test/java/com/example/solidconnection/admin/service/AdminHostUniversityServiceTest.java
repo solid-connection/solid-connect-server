@@ -2,7 +2,12 @@ package com.example.solidconnection.admin.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 
 import com.example.solidconnection.admin.university.dto.AdminHostUniversityCreateRequest;
@@ -18,6 +23,9 @@ import com.example.solidconnection.location.country.domain.Country;
 import com.example.solidconnection.location.country.fixture.CountryFixture;
 import com.example.solidconnection.location.region.domain.Region;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
+import com.example.solidconnection.s3.domain.UploadPath;
+import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
+import com.example.solidconnection.s3.service.S3Service;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.university.domain.HostUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
@@ -31,6 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @TestContainerSpringBootTest
@@ -57,6 +67,29 @@ class AdminHostUniversityServiceTest {
 
     @MockitoSpyBean
     private CustomCacheManager cacheManager;
+
+    @MockitoBean
+    private S3Service s3Service;
+
+    private MockMultipartFile createImageFile(String name) {
+        return new MockMultipartFile("file", name, "image/png", new byte[100]);
+    }
+
+    private void stubUniversityImageUpload() {
+        given(s3Service.uploadFile(any(), eq(UploadPath.ADMIN_UNIVERSITY_LOGO), anyString()))
+                .willReturn(new UploadedFileUrlResponse("admin/logo/test/logo.png"));
+        given(s3Service.uploadFile(any(), eq(UploadPath.ADMIN_UNIVERSITY_BACKGROUND), anyString()))
+                .willReturn(new UploadedFileUrlResponse("admin/background/test/background.png"));
+    }
+
+    private UploadedFileUrlResponse stubLogoUploadAndBackgroundUploadFailure() {
+        UploadedFileUrlResponse logoImage = new UploadedFileUrlResponse("admin/logo/test/logo.png");
+        given(s3Service.uploadFile(any(), eq(UploadPath.ADMIN_UNIVERSITY_LOGO), anyString()))
+                .willReturn(logoImage);
+        given(s3Service.uploadFile(any(), eq(UploadPath.ADMIN_UNIVERSITY_BACKGROUND), anyString()))
+                .willThrow(new RuntimeException("background upload failed"));
+        return logoImage;
+    }
 
     @Nested
     class 목록_조회 {
@@ -206,6 +239,7 @@ class AdminHostUniversityServiceTest {
             // given
             Country country = countryFixture.미국();
             Region region = regionFixture.영미권();
+            stubUniversityImageUpload();
 
             AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
                     "테스트 대학",
@@ -214,15 +248,17 @@ class AdminHostUniversityServiceTest {
                     "https://homepage.com",
                     "https://english-course.com",
                     "https://accommodation.com",
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     "상세 정보",
                     country.getCode(),
                     region.getCode()
             );
 
             // when
-            AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(request);
+            AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            );
 
             // then
             assertThat(response.koreanName()).isEqualTo(request.koreanName());
@@ -230,6 +266,8 @@ class AdminHostUniversityServiceTest {
 
             HostUniversity savedUniversity = hostUniversityRepository.findById(response.id()).orElseThrow();
             assertThat(savedUniversity.getKoreanName()).isEqualTo(request.koreanName());
+            assertThat(savedUniversity.getLogoImageUrl()).isEqualTo("admin/logo/test/logo.png");
+            assertThat(savedUniversity.getBackgroundImageUrl()).isEqualTo("admin/background/test/background.png");
         }
 
         @Test
@@ -244,15 +282,17 @@ class AdminHostUniversityServiceTest {
                     "New English Name",
                     "표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     country.getCode(),
                     region.getCode()
             );
 
             // when & then
-            assertThatCode(() -> adminHostUniversityService.createHostUniversity(request))
+            assertThatCode(() -> adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            ))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
         }
@@ -263,25 +303,86 @@ class AdminHostUniversityServiceTest {
             HostUniversity existing = universityFixture.괌_대학();
             Country country = countryFixture.미국();
             Region region = regionFixture.영미권();
+            stubUniversityImageUpload();
 
             AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
                     "신규 대학",
                     existing.getEnglishName(),
                     "표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     country.getCode(),
                     region.getCode()
             );
 
             // when
-            AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(request);
+            AdminHostUniversityDetailResponse response = adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            );
 
             // then
             assertThat(response.koreanName()).isEqualTo(request.koreanName());
             assertThat(response.englishName()).isEqualTo(existing.getEnglishName());
+        }
+
+        @Test
+        void 배경_이미지_업로드가_실패하면_이미_업로드된_로고_이미지를_삭제한다() {
+            // given
+            Country country = countryFixture.미국();
+            Region region = regionFixture.영미권();
+            UploadedFileUrlResponse logoImage = stubLogoUploadAndBackgroundUploadFailure();
+
+            AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
+                    "테스트 대학",
+                    "Test University",
+                    "테스트 대학",
+                    null, null, null,
+                    null,
+                    country.getCode(),
+                    region.getCode()
+            );
+
+            // when & then
+            assertThatCode(() -> adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            ))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("background upload failed");
+            then(s3Service).should().deleteUploadedFile(logoImage);
+        }
+
+        @Test
+        void 보상_삭제가_실패해도_원래_예외를_반환한다() {
+            // given
+            Country country = countryFixture.미국();
+            Region region = regionFixture.영미권();
+            UploadedFileUrlResponse logoImage = stubLogoUploadAndBackgroundUploadFailure();
+            willThrow(new RuntimeException("delete failed"))
+                    .given(s3Service)
+                    .deleteUploadedFile(logoImage);
+
+            AdminHostUniversityCreateRequest request = new AdminHostUniversityCreateRequest(
+                    "테스트 대학",
+                    "Test University",
+                    "테스트 대학",
+                    null, null, null,
+                    null,
+                    country.getCode(),
+                    region.getCode()
+            );
+
+            // when & then
+            assertThatCode(() -> adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            ))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("background upload failed");
         }
     }
 
@@ -292,6 +393,8 @@ class AdminHostUniversityServiceTest {
         void 유효한_정보로_대학을_수정하면_성공한다() {
             // given
             HostUniversity university = universityFixture.괌_대학();
+            String originLogoImageUrl = university.getLogoImageUrl();
+            String originBackgroundImageUrl = university.getBackgroundImageUrl();
             Country country = countryFixture.일본();
             Region region = regionFixture.아시아();
 
@@ -301,8 +404,6 @@ class AdminHostUniversityServiceTest {
                     "수정된 표시명",
                     "https://new-homepage.com",
                     null, null,
-                    "https://new-logo.com/image.png",
-                    "https://new-background.com/image.png",
                     "수정된 상세 정보",
                     country.getCode(),
                     region.getCode()
@@ -310,7 +411,11 @@ class AdminHostUniversityServiceTest {
 
             // when
             AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(
-                    university.getId(), request);
+                    university.getId(),
+                    request,
+                    null,
+                    null
+            );
 
             // then
             assertThat(response.koreanName()).isEqualTo(request.koreanName());
@@ -318,6 +423,66 @@ class AdminHostUniversityServiceTest {
 
             HostUniversity updatedUniversity = hostUniversityRepository.findById(university.getId()).orElseThrow();
             assertThat(updatedUniversity.getKoreanName()).isEqualTo(request.koreanName());
+            assertThat(updatedUniversity.getLogoImageUrl()).isEqualTo(originLogoImageUrl);
+            assertThat(updatedUniversity.getBackgroundImageUrl()).isEqualTo(originBackgroundImageUrl);
+        }
+
+        @Test
+        void 이미지_파일을_함께_전달하면_업로드된_이미지_URL로_수정한다() {
+            // given
+            HostUniversity university = universityFixture.괌_대학();
+            stubUniversityImageUpload();
+
+            AdminHostUniversityUpdateRequest request = new AdminHostUniversityUpdateRequest(
+                    university.getKoreanName(),
+                    university.getEnglishName(),
+                    "수정된 표시명",
+                    null, null, null,
+                    null,
+                    university.getCountry().getCode(),
+                    university.getRegion().getCode()
+            );
+
+            // when
+            adminHostUniversityService.updateHostUniversity(
+                    university.getId(),
+                    request,
+                    createImageFile("new-logo.png"),
+                    createImageFile("new-background.png")
+            );
+
+            // then
+            HostUniversity updatedUniversity = hostUniversityRepository.findById(university.getId()).orElseThrow();
+            assertThat(updatedUniversity.getLogoImageUrl()).isEqualTo("admin/logo/test/logo.png");
+            assertThat(updatedUniversity.getBackgroundImageUrl()).isEqualTo("admin/background/test/background.png");
+        }
+
+        @Test
+        void 배경_이미지_업로드가_실패하면_이미_업로드된_로고_이미지를_삭제한다() {
+            // given
+            HostUniversity university = universityFixture.괌_대학();
+            UploadedFileUrlResponse logoImage = stubLogoUploadAndBackgroundUploadFailure();
+
+            AdminHostUniversityUpdateRequest request = new AdminHostUniversityUpdateRequest(
+                    university.getKoreanName(),
+                    university.getEnglishName(),
+                    "수정된 표시명",
+                    null, null, null,
+                    null,
+                    university.getCountry().getCode(),
+                    university.getRegion().getCode()
+            );
+
+            // when & then
+            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(
+                    university.getId(),
+                    request,
+                    createImageFile("new-logo.png"),
+                    createImageFile("new-background.png")
+            ))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("background upload failed");
+            then(s3Service).should().deleteUploadedFile(logoImage);
         }
 
         @Test
@@ -331,15 +496,13 @@ class AdminHostUniversityServiceTest {
                     "Updated University",
                     "수정된 표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     country.getCode(),
                     region.getCode()
             );
 
             // when & then
-            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(999L, request))
+            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(999L, request, null, null))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.UNIVERSITY_NOT_FOUND.getMessage());
         }
@@ -355,15 +518,13 @@ class AdminHostUniversityServiceTest {
                     "Updated University",
                     "수정된 표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     university1.getCountry().getCode(),
                     university1.getRegion().getCode()
             );
 
             // when & then
-            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(university1.getId(), request))
+            assertThatCode(() -> adminHostUniversityService.updateHostUniversity(university1.getId(), request, null, null))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.HOST_UNIVERSITY_ALREADY_EXISTS.getMessage());
         }
@@ -379,8 +540,6 @@ class AdminHostUniversityServiceTest {
                     university2.getEnglishName(),
                     "수정된 표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     university1.getCountry().getCode(),
                     university1.getRegion().getCode()
@@ -388,7 +547,11 @@ class AdminHostUniversityServiceTest {
 
             // when
             AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(
-                    university1.getId(), request);
+                    university1.getId(),
+                    request,
+                    null,
+                    null
+            );
 
             // then
             assertThat(response.koreanName()).isEqualTo(university1.getKoreanName());
@@ -405,8 +568,6 @@ class AdminHostUniversityServiceTest {
                     "Updated English Name",
                     "수정된 표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     university.getCountry().getCode(),
                     university.getRegion().getCode()
@@ -414,7 +575,11 @@ class AdminHostUniversityServiceTest {
 
             // when
             AdminHostUniversityDetailResponse response = adminHostUniversityService.updateHostUniversity(
-                    university.getId(), request);
+                    university.getId(),
+                    request,
+                    null,
+                    null
+            );
 
             // then
             assertThat(response.koreanName()).isEqualTo(university.getKoreanName());
@@ -477,15 +642,18 @@ class AdminHostUniversityServiceTest {
                     "캐시 테스트 대학",
                     "https://homepage.com",
                     null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     country.getCode(),
                     region.getCode()
             );
+            stubUniversityImageUpload();
 
             // when
-            adminHostUniversityService.createHostUniversity(request);
+            adminHostUniversityService.createHostUniversity(
+                    request,
+                    createImageFile("logo.png"),
+                    createImageFile("background.png")
+            );
 
             // then
             then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");
@@ -510,15 +678,13 @@ class AdminHostUniversityServiceTest {
                     "Updated University",
                     "수정된 표시명",
                     null, null, null,
-                    "https://logo.com/image.png",
-                    "https://background.com/image.png",
                     null,
                     country.getCode(),
                     region.getCode()
             );
 
             // when
-            adminHostUniversityService.updateHostUniversity(university.getId(), request);
+            adminHostUniversityService.updateHostUniversity(university.getId(), request, null, null);
 
             // then
             then(cacheManager).should(times(1)).evictUsingPrefix("univApplyInfoTextSearch");

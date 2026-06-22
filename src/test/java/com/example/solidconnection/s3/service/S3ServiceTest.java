@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.then;
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.UploadPath;
@@ -12,10 +13,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 @DisplayName("S3 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -24,6 +28,8 @@ public class S3ServiceTest {
     private static final long MAX_FILE_SIZE_MB = 1024 * 1024 * 5;
     @InjectMocks
     private S3Service s3Service;
+    @Mock
+    private S3Client s3Client;
     @Mock
     private FileUploadService fileUploadService;
 
@@ -149,6 +155,27 @@ public class S3ServiceTest {
                     () -> assertThatCode(() -> s3Service.uploadFile(languageTestPdfFile, UploadPath.LANGUAGE_TEST))
                             .doesNotThrowAnyException()
             );
+        }
+    }
+
+    @Nested
+    class 파일_삭제 {
+
+        @Test
+        void 업로드된_파일을_삭제할_때_삭제용_key를_사용한다() {
+            // given
+            UploadedFileUrlResponse uploadedFile = new UploadedFileUrlResponse(
+                    "resize/profile/test.webp",
+                    "original/profile/test.jpg"
+            );
+
+            // when
+            s3Service.deleteUploadedFile(uploadedFile);
+
+            // then
+            ArgumentCaptor<DeleteObjectRequest> requestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+            then(s3Client).should().deleteObject(requestCaptor.capture());
+            assertThat(requestCaptor.getValue().key()).isEqualTo("original/profile/test.jpg");
         }
     }
 }

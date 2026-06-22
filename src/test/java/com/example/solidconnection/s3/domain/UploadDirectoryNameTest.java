@@ -18,9 +18,10 @@ class UploadDirectoryNameTest {
         void 대학_영문명의_공백을_언더스코어로_변환한다() {
             // given
             String englishName = "University of Tokyo";
+            String koreanName = "도쿄대학교";
 
             // when
-            String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
+            String directoryName = UploadDirectoryName.fromUniversityNames(englishName, koreanName);
 
             // then
             assertThat(directoryName)
@@ -32,9 +33,10 @@ class UploadDirectoryNameTest {
         void 특수문자를_제거하고_앰퍼샌드는_and로_변환한다() {
             // given
             String englishName = "Texas A&M University, Austin";
+            String koreanName = "텍사스 A&M 대학교 오스틴";
 
             // when
-            String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
+            String directoryName = UploadDirectoryName.fromUniversityNames(englishName, koreanName);
 
             // then
             assertThat(directoryName)
@@ -43,17 +45,25 @@ class UploadDirectoryNameTest {
         }
 
         @Test
-        void 같은_slug로_변환되는_서로_다른_영문명은_다른_디렉토리명을_반환한다() {
+        void 같은_영문명이어도_한글명이_다르면_다른_디렉토리명을_반환한다() {
             // given
-            String englishName = "Texas A&M University";
-            String normalizedCollisionName = "Texas A and M University";
+            String englishName = "University of California";
+            String koreanName = "캘리포니아대학교";
+            String duplicateEnglishKoreanName = "캘리포니아대학";
 
             // when
-            String directoryName = UploadDirectoryName.fromUniversityEnglishName(englishName);
-            String collisionDirectoryName = UploadDirectoryName.fromUniversityEnglishName(normalizedCollisionName);
+            String directoryName = UploadDirectoryName.fromUniversityNames(englishName, koreanName);
+            String duplicateEnglishDirectoryName = UploadDirectoryName.fromUniversityNames(
+                    englishName,
+                    duplicateEnglishKoreanName
+            );
 
             // then
-            assertThat(directoryName).isNotEqualTo(collisionDirectoryName);
+            assertThat(directoryName)
+                    .startsWith("university_of_california_")
+                    .isNotEqualTo(duplicateEnglishDirectoryName);
+            assertThat(duplicateEnglishDirectoryName)
+                    .startsWith("university_of_california_");
         }
 
         @Test
@@ -62,7 +72,17 @@ class UploadDirectoryNameTest {
             String blankName = " ";
 
             // when & then
-            assertThatThrownBy(() -> UploadDirectoryName.fromUniversityEnglishName(blankName))
+            assertThatThrownBy(() -> UploadDirectoryName.fromUniversityNames(blankName, "한글명"))
+                    .isInstanceOf(CustomException.class);
+        }
+
+        @Test
+        void 한글명이_공백_문자열이면_예외가_발생한다() {
+            // given
+            String blankKoreanName = " ";
+
+            // when & then
+            assertThatThrownBy(() -> UploadDirectoryName.fromUniversityNames("University of Tokyo", blankKoreanName))
                     .isInstanceOf(CustomException.class);
         }
     }
