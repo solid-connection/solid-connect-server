@@ -27,7 +27,6 @@ public record MyPageResponse(
         @JsonInclude(NON_NULL)
         String attendedUniversity,
 
-        @JsonInclude(NON_NULL)
         String homeUniversityName) {
 
     public static MyPageResponse of(
