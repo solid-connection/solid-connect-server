@@ -83,10 +83,8 @@ class UnivApplyInfoQueryServiceTest {
             Long invalidUnivApplyInfoId = 9999L;
 
             // when & then
-            assertThatExceptionOfType(RuntimeException.class)
+            assertThatExceptionOfType(CustomException.class)
                     .isThrownBy(() -> univApplyInfoQueryService.getUnivApplyInfoDetail(invalidUnivApplyInfoId))
-                    .havingRootCause()
-                    .isInstanceOf(CustomException.class)
                     .withMessage(UNIV_APPLY_INFO_NOT_FOUND.getMessage());
         }
     }
