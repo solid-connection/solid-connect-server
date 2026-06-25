@@ -7,6 +7,7 @@ import static com.example.solidconnection.redis.RedisConstants.REFRESH_LIMIT_PER
 
 import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.cache.manager.CacheManager;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.util.RedisUtils;
 import java.time.Duration;
 import java.util.UUID;
@@ -114,6 +115,8 @@ public class ThunderingHerdCachingAspect {
             } else {
                 return onLockFailed.call();
             }
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Error during executeWithLock", e);
         } finally {
@@ -150,6 +153,8 @@ public class ThunderingHerdCachingAspect {
     private Object proceedJoinPoint(ProceedingJoinPoint joinPoint) {
         try {
             return joinPoint.proceed();
+        } catch (CustomException e) {
+            throw e;
         } catch (Throwable e) {
             throw new RuntimeException("Error during proceedJoinPoint", e);
         }
