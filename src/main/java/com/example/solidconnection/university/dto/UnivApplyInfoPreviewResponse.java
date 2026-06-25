@@ -14,7 +14,7 @@ public record UnivApplyInfoPreviewResponse(
         String country,
         String logoImageUrl,
         String backgroundImageUrl,
-        int studentCapacity,
+        Integer studentCapacity,
         List<LanguageRequirementResponse> languageRequirements) {
 
     public static UnivApplyInfoPreviewResponse of(UnivApplyInfo univApplyInfo, String termName) {
