@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public record ApplicantsResponse(
         String koreanName,
-        int studentCapacity,
+        Integer studentCapacity,
         String region,
         String country,
         List<ApplicantResponse> applicants) {
