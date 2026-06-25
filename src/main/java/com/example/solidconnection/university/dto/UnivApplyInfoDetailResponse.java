@@ -17,7 +17,7 @@ public record UnivApplyInfoDetailResponse(
         String logoImageUrl,
         String backgroundImageUrl,
         String detailsForLocal,
-        int studentCapacity,
+        Integer studentCapacity,
         String semesterAvailableForDispatch,
         List<LanguageRequirementResponse> languageRequirements,
         String detailsForLanguage,
