@@ -2,7 +2,6 @@ package com.example.solidconnection.university.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
 
-import com.example.solidconnection.cache.annotation.ThunderingHerdCaching;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.repository.TermRepository;
@@ -47,7 +46,7 @@ public class UnivApplyInfoRecommendService {
 
         // 맞춤 추천 대학교의 수가 6개보다 적다면, 일반 추천 대학교를 부족한 수 만큼 불러온다.
         if (trimmedRecommends.size() < RECOMMEND_UNIV_APPLY_INFO_NUM) {
-            trimmedRecommends.addAll(getGeneralRecommendsExcludingSelected(trimmedRecommends));
+            return new UnivApplyInfoRecommendsResponse(getPersonalRecommendPreviewsWithGeneralFallback(trimmedRecommends, term));
         }
 
         return new UnivApplyInfoRecommendsResponse(trimmedRecommends.stream()
@@ -55,9 +54,29 @@ public class UnivApplyInfoRecommendService {
                                                            .toList());
     }
 
-    private List<UnivApplyInfo> getGeneralRecommendsExcludingSelected(List<UnivApplyInfo> alreadyPicked) {
-        List<UnivApplyInfo> generalRecommend = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
-        generalRecommend.removeAll(alreadyPicked);
+    private List<UnivApplyInfoPreviewResponse> getPersonalRecommendPreviewsWithGeneralFallback(
+            List<UnivApplyInfo> personalRecommends,
+            Term term
+    ) {
+        List<UnivApplyInfoPreviewResponse> recommendPreviews = new ArrayList<>(personalRecommends.stream()
+                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
+                .toList());
+        recommendPreviews.addAll(getGeneralRecommendsExcludingSelected(personalRecommends, term));
+
+        return recommendPreviews;
+    }
+
+    private List<UnivApplyInfoPreviewResponse> getGeneralRecommendsExcludingSelected(
+            List<UnivApplyInfo> alreadyPicked,
+            Term term
+    ) {
+        List<Long> alreadyPickedIds = alreadyPicked.stream()
+                .map(UnivApplyInfo::getId)
+                .toList();
+        List<UnivApplyInfoPreviewResponse> generalRecommend = new ArrayList<>(generalUnivApplyInfoRecommendService
+                .getGeneralRecommends(term.getId(), term.getName())
+                .recommendedUniversities());
+        generalRecommend.removeIf(univApplyInfo -> alreadyPickedIds.contains(univApplyInfo.id()));
         Collections.shuffle(generalRecommend);
         int needed = RECOMMEND_UNIV_APPLY_INFO_NUM - alreadyPicked.size();
         return generalRecommend.subList(0, Math.min(needed, generalRecommend.size()));
@@ -67,15 +86,10 @@ public class UnivApplyInfoRecommendService {
      * 공통 추천 대학교를 불러온다.
      * */
     @Transactional(readOnly = true)
-    @ThunderingHerdCaching(key = "university:recommend:general", cacheManager = "customCacheManager", ttlSec = 86400)
     public UnivApplyInfoRecommendsResponse getGeneralRecommends() {
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
-        List<UnivApplyInfo> generalRecommends = new ArrayList<>(generalUnivApplyInfoRecommendService.getGeneralRecommends());
-
-        return new UnivApplyInfoRecommendsResponse(generalRecommends.stream()
-                                                           .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
-                                                           .toList());
+        return generalUnivApplyInfoRecommendService.getGeneralRecommends(term.getId(), term.getName());
     }
 }

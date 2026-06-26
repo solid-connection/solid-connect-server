@@ -78,7 +78,6 @@ class UnivApplyInfoRecommendServiceTest {
         univApplyInfoFixture.그라츠공과대학_지원_정보(term.getId());
         univApplyInfoFixture.린츠_카톨릭대학_지원_정보(term.getId());
         univApplyInfoFixture.메이지대학_지원_정보(term.getId());
-        generalUnivApplyInfoRecommendService.init();
     }
 
     @Test
@@ -148,9 +147,8 @@ class UnivApplyInfoRecommendServiceTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
-                                .toList()
+                        generalUnivApplyInfoRecommendService.getGeneralRecommends(term.getId(), term.getName())
+                                .recommendedUniversities()
                 );
     }
 
@@ -163,9 +161,8 @@ class UnivApplyInfoRecommendServiceTest {
         assertThat(response.recommendedUniversities())
                 .hasSize(RECOMMEND_UNIV_APPLY_INFO_NUM)
                 .containsExactlyInAnyOrderElementsOf(
-                        generalUnivApplyInfoRecommendService.getGeneralRecommends().stream()
-                                .map(univApplyInfo -> UnivApplyInfoPreviewResponse.of(univApplyInfo, term.getName()))
-                                .toList()
+                        generalUnivApplyInfoRecommendService.getGeneralRecommends(term.getId(), term.getName())
+                                .recommendedUniversities()
                 );
     }
 }
