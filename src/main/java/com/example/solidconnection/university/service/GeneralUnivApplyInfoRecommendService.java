@@ -27,7 +27,7 @@ public class GeneralUnivApplyInfoRecommendService {
 
     @Transactional(readOnly = true)
     @ThunderingHerdCaching(
-            key = "university:recommend:general:{0}",
+            key = "university:recommend:general:{0}:{1}",
             cacheManager = "customCacheManager",
             ttlSec = GENERAL_RECOMMEND_CACHE_TTL_SEC
     )

@@ -44,6 +44,7 @@ class GeneralUnivApplyInfoRecommendServiceTest {
     @BeforeEach
     void setUp() {
         term = termFixture.현재_학기("2025-2");
+        cacheManager.evictUsingPrefix("university:recommend:general:" + term.getId());
 
         currentTermUnivApplyInfos = List.of(
                 univApplyInfoFixture.괌대학_A_지원_정보(term.getId()),
@@ -92,7 +93,7 @@ class GeneralUnivApplyInfoRecommendServiceTest {
                 term.getId(),
                 term.getName()
         );
-        cacheManager.evict("university:recommend:general:" + term.getId());
+        cacheManager.evictUsingPrefix("university:recommend:general:" + term.getId());
         UnivApplyInfoRecommendsResponse responseAfterCacheEvict = generalUnivApplyInfoRecommendService.getGeneralRecommends(
                 term.getId(),
                 term.getName()
