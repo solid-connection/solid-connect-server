@@ -20,7 +20,9 @@ import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.LanguageTestType;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +56,9 @@ class ScoreServiceTest {
     @Autowired
     private LanguageTestScoreFixture languageTestScoreFixture;
 
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
+
     private SiteUser user;
 
     @BeforeEach
@@ -77,12 +82,34 @@ class ScoreServiceTest {
     }
 
     @Test
+    void GPA_점수_상태를_조회할_때_사용자의_모학교명을_반환한다() {
+        // given
+        HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
+        user = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
+
+        // when
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
+
+        // then
+        assertThat(response.homeUniversityName()).isEqualTo(homeUniversity.getName());
+    }
+
+    @Test
     void GPA_점수가_없는_경우_빈_리스트를_반환한다() {
         // when
         GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
         // then
         assertThat(response.gpaScoreStatusResponseList()).isEmpty();
+    }
+
+    @Test
+    void 모학교가_없는_사용자의_GPA_점수_상태를_조회하면_모학교명은_null이다() {
+        // when
+        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
+
+        // then
+        assertThat(response.homeUniversityName()).isNull();
     }
 
     @Test
