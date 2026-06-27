@@ -90,12 +90,13 @@ public class ThunderingHerdCachingAspect {
 
     private Object refreshCache(ProceedingJoinPoint joinPoint, CacheManager cacheManager, Object cachedValue, Long ttl, String key) {
         return executeWithLock(
-                redisUtils.getRefreshLockKey(key),
+                redisUtils.getCreateLockKey(key),
                 () -> {
                     log.info("갱신락 흭득하였습니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());
                     try {
                         Object result = proceedJoinPoint(joinPoint);
                         cacheManager.put(key, result, ttl);
+                        redisTemplate.convertAndSend(CREATE_CHANNEL.getValue(), key);
                         log.info("캐시 갱신을 마쳤습니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());
                         return result;
                     } catch (CustomException e) {
