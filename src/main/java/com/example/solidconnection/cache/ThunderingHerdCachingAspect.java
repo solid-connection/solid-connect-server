@@ -63,7 +63,7 @@ public class ThunderingHerdCachingAspect {
 
         if (redisUtils.isCacheExpiringSoon(key, ttl, Double.valueOf(REFRESH_LIMIT_PERCENT.getValue()))) {
             log.info("Cache hit, but TTL is expiring soon. Key: {}, Thread: {}", key, Thread.currentThread().getName());
-            return refreshCache(cachedValue, ttl, key);
+            return refreshCache(joinPoint, cacheManager, cachedValue, ttl, key);
         }
 
         log.info("Cache hit. Key: {}, Thread: {}", key, Thread.currentThread().getName());
@@ -88,14 +88,24 @@ public class ThunderingHerdCachingAspect {
         );
     }
 
-    private Object refreshCache(Object cachedValue, Long ttl, String key) {
+    private Object refreshCache(ProceedingJoinPoint joinPoint, CacheManager cacheManager, Object cachedValue, Long ttl, String key) {
         return executeWithLock(
-                redisUtils.getRefreshLockKey(key),
+                redisUtils.getCreateLockKey(key),
                 () -> {
                     log.info("갱신락 흭득하였습니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());
-                    redisTemplate.opsForValue().getAndExpire(key, Duration.ofSeconds(ttl));
-                    log.info("TTL 갱신을 마쳤습니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());
-                    return cachedValue;
+                    try {
+                        Object result = proceedJoinPoint(joinPoint);
+                        cacheManager.put(key, result, ttl);
+                        redisTemplate.convertAndSend(CREATE_CHANNEL.getValue(), key);
+                        log.info("캐시 갱신을 마쳤습니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());
+                        return result;
+                    } catch (CustomException e) {
+                        throw e;
+                    } catch (RuntimeException e) {
+                        log.warn("캐시 갱신 중 오류가 발생하여 기존 캐시값을 반환합니다. Key: {}, Thread: {}",
+                                key, Thread.currentThread().getName(), e);
+                        return cachedValue;
+                    }
                 },
                 () -> {
                     log.info("갱신락 흭득에 실패하였습니다. 캐시의 값을 바로 반환합니다. Key: {}, Thread: {}", key, Thread.currentThread().getName());

@@ -58,6 +58,11 @@ public class RedisUtils {
 
     public boolean isCacheExpiringSoon(String key, Long defaultTtl, Double percent) {
         Long leftTtl = redisTemplate.getExpire(key);
-        return defaultTtl != null && ((double) leftTtl / defaultTtl) * 100 < percent;
+        if (defaultTtl == null || defaultTtl <= 0
+                || leftTtl == null || leftTtl < 0
+                || percent == null || percent <= 0 || percent > 100) {
+            return false;
+        }
+        return ((double) leftTtl / defaultTtl) * 100 < percent;
     }
 }
