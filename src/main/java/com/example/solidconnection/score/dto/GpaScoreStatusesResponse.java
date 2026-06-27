@@ -3,10 +3,14 @@ package com.example.solidconnection.score.dto;
 import java.util.List;
 
 public record GpaScoreStatusesResponse(
+        String homeUniversityName,
         List<GpaScoreStatusResponse> gpaScoreStatusResponseList
 ) {
 
-    public static GpaScoreStatusesResponse from(List<GpaScoreStatusResponse> gpaScoreStatusResponseList) {
-        return new GpaScoreStatusesResponse(gpaScoreStatusResponseList);
+    public static GpaScoreStatusesResponse of(
+            String homeUniversityName,
+            List<GpaScoreStatusResponse> gpaScoreStatusResponseList
+    ) {
+        return new GpaScoreStatusesResponse(homeUniversityName, gpaScoreStatusResponseList);
     }
 }

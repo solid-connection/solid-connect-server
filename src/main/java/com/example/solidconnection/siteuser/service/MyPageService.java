@@ -25,10 +25,9 @@ import com.example.solidconnection.siteuser.dto.MyPageResponse;
 import com.example.solidconnection.siteuser.dto.PasswordUpdateRequest;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.university.domain.HostUniversity;
-import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.repository.HostUniversityRepository;
-import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
+import com.example.solidconnection.university.service.HomeUniversityQueryService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -51,7 +50,7 @@ public class MyPageService {
     private final CountryRepository countryRepository;
     private final MentorRepository mentorRepository;
     private final HostUniversityRepository hostUniversityRepository;
-    private final HomeUniversityRepository homeUniversityRepository;
+    private final HomeUniversityQueryService homeUniversityQueryService;
     private final S3Service s3Service;
     private final InterestedCountryService interestedCountryService;
     private final InterestedRegionService interestedRegionService;
@@ -67,7 +66,7 @@ public class MyPageService {
 
         List<String> interestedCountries = null;
         String universityKoreanName = null;
-        String homeUniversityName = findHomeUniversityName(siteUser);
+        String homeUniversityName = homeUniversityQueryService.findNameByNullableId(siteUser.getHomeUniversityId());
         if (siteUser.getRole() == Role.MENTEE) {
             interestedCountries = countryRepository.findKoreanNamesBySiteUserId(siteUser.getId());
         } else if (siteUser.getRole() == Role.MENTOR) {
@@ -84,17 +83,6 @@ public class MyPageService {
                 universityKoreanName,
                 homeUniversityName
         );
-    }
-
-    private String findHomeUniversityName(SiteUser siteUser) {
-        Long homeUniversityId = siteUser.getHomeUniversityId();
-        if (homeUniversityId == null) {
-            return null;
-        }
-
-        HomeUniversity homeUniversity = homeUniversityRepository.findById(homeUniversityId)
-                .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
-        return homeUniversity.getName();
     }
 
     /*
