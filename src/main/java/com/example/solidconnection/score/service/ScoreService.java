@@ -1,6 +1,5 @@
 package com.example.solidconnection.score.service;
 
-import static com.example.solidconnection.common.exception.ErrorCode.UNIVERSITY_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Gpa;
@@ -21,8 +20,7 @@ import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
-import com.example.solidconnection.university.domain.HomeUniversity;
-import com.example.solidconnection.university.repository.HomeUniversityRepository;
+import com.example.solidconnection.university.service.HomeUniversityQueryService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +36,7 @@ public class ScoreService {
     private final S3Service s3Service;
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
-    private final HomeUniversityRepository homeUniversityRepository;
+    private final HomeUniversityQueryService homeUniversityQueryService;
 
     @Transactional
     public Long submitGpaScore(long siteUserId, GpaScoreRequest gpaScoreRequest, MultipartFile file) {
@@ -67,7 +65,7 @@ public class ScoreService {
     public GpaScoreStatusesResponse getGpaScoreStatus(long siteUserId) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        String homeUniversityName = findHomeUniversityName(siteUser);
+        String homeUniversityName = homeUniversityQueryService.findNameByRequiredId(siteUser.getHomeUniversityId());
         List<GpaScoreStatusResponse> gpaScoreStatusResponseList =
                 gpaScoreRepository.findBySiteUserId(siteUser.getId())
                         .stream()
@@ -75,17 +73,6 @@ public class ScoreService {
                         .toList();
 
         return GpaScoreStatusesResponse.of(homeUniversityName, gpaScoreStatusResponseList);
-    }
-
-    private String findHomeUniversityName(SiteUser siteUser) {
-        Long homeUniversityId = siteUser.getHomeUniversityId();
-        if (homeUniversityId == null) {
-            return null;
-        }
-
-        HomeUniversity homeUniversity = homeUniversityRepository.findById(homeUniversityId)
-                .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
-        return homeUniversity.getName();
     }
 
     @Transactional(readOnly = true)

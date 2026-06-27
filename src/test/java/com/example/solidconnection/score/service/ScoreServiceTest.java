@@ -1,9 +1,11 @@
 package com.example.solidconnection.score.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
 import com.example.solidconnection.s3.service.S3Service;
@@ -59,11 +61,13 @@ class ScoreServiceTest {
     @Autowired
     private HomeUniversityFixture homeUniversityFixture;
 
+    private HomeUniversity homeUniversity;
     private SiteUser user;
 
     @BeforeEach
     void setUp() {
-        user = siteUserFixture.사용자();
+        homeUniversity = homeUniversityFixture.인하대학교();
+        user = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
     }
 
     @Test
@@ -83,10 +87,6 @@ class ScoreServiceTest {
 
     @Test
     void GPA_점수_상태를_조회할_때_사용자의_모학교명을_반환한다() {
-        // given
-        HomeUniversity homeUniversity = homeUniversityFixture.인하대학교();
-        user = siteUserFixture.국내_대학_정보_소지_사용자(homeUniversity.getId());
-
         // when
         GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
 
@@ -104,12 +104,14 @@ class ScoreServiceTest {
     }
 
     @Test
-    void 모학교가_없는_사용자의_GPA_점수_상태를_조회하면_모학교명은_null이다() {
-        // when
-        GpaScoreStatusesResponse response = scoreService.getGpaScoreStatus(user.getId());
+    void 모학교가_없는_사용자의_GPA_점수_상태를_조회하면_예외가_발생한다() {
+        // given
+        user = siteUserFixture.사용자();
 
+        // when
         // then
-        assertThat(response.homeUniversityName()).isNull();
+        assertThatThrownBy(() -> scoreService.getGpaScoreStatus(user.getId()))
+                .hasMessage(ErrorCode.SCHOOL_EMAIL_NOT_VERIFIED.getMessage());
     }
 
     @Test
