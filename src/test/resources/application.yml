@@ -97,6 +97,10 @@ token:
     cookie-domain: "test.domain.com"
     storage-key-prefix: "REFRESH"
     expire-time: 10m
+  admin-refresh:
+    cookie-domain: "test.domain.com"
+    storage-key-prefix: "ADMIN_REFRESH"
+    expire-time: 10m
   sign-up:
     storage-key-prefix: "SIGN_UP"
     expire-time: 10m
