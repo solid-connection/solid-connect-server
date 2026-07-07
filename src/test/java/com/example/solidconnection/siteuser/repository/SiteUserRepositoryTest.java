@@ -88,4 +88,22 @@ class SiteUserRepositoryTest {
                     .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
+
+    @Nested
+    class 인증된_학교_이메일은_중복될_수_없다 {
+
+        @Test
+        void 인증된_학교_이메일이_동일한_사용자를_저장하면_예외가_발생한다() {
+            // given
+            SiteUser user1 = createSiteUser("email1", "nickname1", AuthType.KAKAO);
+            SiteUser user2 = createSiteUser("email2", "nickname2", AuthType.KAKAO);
+            user1.verifySchool(1L, "test@inha.edu");
+            user2.verifySchool(1L, "test@inha.edu");
+            siteUserRepository.save(user1);
+
+            // when, then
+            assertThatCode(() -> siteUserRepository.saveAndFlush(user2))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
 }
