@@ -30,6 +30,10 @@ import lombok.Setter;
         @UniqueConstraint(
                 name = "uk_site_user_nickname",
                 columnNames = {"nickname"}
+        ),
+        @UniqueConstraint(
+                name = "uk_site_user_verified_school_email",
+                columnNames = {"verified_school_email"}
         )
 })
 public class SiteUser extends BaseEntity {
@@ -53,6 +57,9 @@ public class SiteUser extends BaseEntity {
     @Setter
     @Column(name = "home_university_id", nullable = true)
     private Long homeUniversityId;
+
+    @Column(name = "verified_school_email", nullable = true, length = 100)
+    private String verifiedSchoolEmail;
 
     @Setter
     @Column(name = "profile_image_url", length = 500)
@@ -159,8 +166,9 @@ public class SiteUser extends BaseEntity {
         this.userStatus = status;
     }
 
-    public void verifySchool(Long homeUniversityId) {
+    public void verifySchool(Long homeUniversityId, String verifiedSchoolEmail) {
         this.homeUniversityId = homeUniversityId;
+        this.verifiedSchoolEmail = verifiedSchoolEmail;
     }
 
     public void becomeMentor() {
