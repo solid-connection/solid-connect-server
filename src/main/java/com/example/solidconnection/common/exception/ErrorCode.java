@@ -83,6 +83,7 @@ public enum ErrorCode {
 
     // school email verification
     SCHOOL_EMAIL_ALREADY_VERIFIED(HttpStatus.BAD_REQUEST.value(), "이미 학교 이메일 인증이 완료되었습니다."),
+    SCHOOL_EMAIL_ALREADY_USED(HttpStatus.CONFLICT.value(), "이미 인증에 사용된 학교 이메일입니다."),
     SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 학교 이메일 도메인입니다."),
     SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "학교 이메일 인증 요청을 찾을 수 없습니다. 인증 코드 발송을 다시 요청해주세요."),
     SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT(HttpStatus.BAD_REQUEST.value(), "인증 코드가 일치하지 않습니다."),

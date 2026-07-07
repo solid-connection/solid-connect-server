@@ -1,6 +1,7 @@
 package com.example.solidconnection.siteuser.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_ALREADY_VERIFIED;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_ALREADY_USED;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED;
@@ -17,9 +18,11 @@ import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.repository.HomeUniversityRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,15 +49,17 @@ public class SchoolEmailService {
             throw new CustomException(SCHOOL_EMAIL_ALREADY_VERIFIED);
         }
 
-        String domain = extractEmailDomain(schoolEmail);
+        String normalizedSchoolEmail = normalizeSchoolEmail(schoolEmail);
+        String domain = extractEmailDomain(normalizedSchoolEmail);
         HomeUniversity homeUniversity = homeUniversityRepository.findByEmailDomain(domain)
                 .orElseThrow(() -> new CustomException(SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED));
+        validateVerifiedSchoolEmailNotDuplicated(normalizedSchoolEmail);
 
         String code = generateVerificationCode();
-        saveVerificationInfo(siteUserId, new SchoolVerificationInfo(schoolEmail, homeUniversity.getId(), code));
+        saveVerificationInfo(siteUserId, new SchoolVerificationInfo(normalizedSchoolEmail, homeUniversity.getId(), code));
 
         try {
-            mailService.sendVerificationEmail(schoolEmail, code);
+            mailService.sendVerificationEmail(normalizedSchoolEmail, code);
         } catch (Exception e) {
             redisTemplate.delete(KEY_PREFIX + siteUserId);
             throw e;
@@ -72,8 +77,19 @@ public class SchoolEmailService {
             throw new CustomException(SCHOOL_EMAIL_CONFIRM_CODE_DIFFERENT);
         }
 
-        siteUser.verifySchool(info.getHomeUniversityId());
+        String verifiedSchoolEmail = normalizeSchoolEmail(info.getSchoolEmail());
+        validateVerifiedSchoolEmailNotDuplicated(verifiedSchoolEmail);
+        siteUser.verifySchool(info.getHomeUniversityId(), verifiedSchoolEmail);
+        flushVerifiedSchoolEmail();
         redisTemplate.delete(KEY_PREFIX + siteUserId);
+    }
+
+    private void flushVerifiedSchoolEmail() {
+        try {
+            siteUserRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(SCHOOL_EMAIL_ALREADY_USED);
+        }
     }
 
     private void saveVerificationInfo(long siteUserId, SchoolVerificationInfo info) {
@@ -95,15 +111,57 @@ public class SchoolEmailService {
             throw new CustomException(SCHOOL_EMAIL_CONFIRM_REQUEST_NOT_FOUND);
         }
         try {
-            return objectMapper.readValue(jsonInfo, SchoolVerificationInfo.class);
+            SchoolVerificationInfo info = objectMapper.readValue(jsonInfo, SchoolVerificationInfo.class);
+            validateVerificationInfo(siteUserId, info);
+            return info;
         } catch (JsonProcessingException e) {
-            redisTemplate.delete(KEY_PREFIX + siteUserId);
-            throw new CustomException(SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED);
+            throw corruptedVerificationInfoException(siteUserId);
         }
     }
 
+    private void validateVerificationInfo(long siteUserId, SchoolVerificationInfo info) {
+        if (info == null
+                || isBlank(info.getSchoolEmail())
+                || !hasEmailDomain(info.getSchoolEmail())
+                || info.getHomeUniversityId() == null
+                || isBlank(info.getCode())
+                || !homeUniversityRepository.existsById(info.getHomeUniversityId())) {
+            throw corruptedVerificationInfoException(siteUserId);
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private CustomException corruptedVerificationInfoException(long siteUserId) {
+        redisTemplate.delete(KEY_PREFIX + siteUserId);
+        return new CustomException(SCHOOL_EMAIL_VERIFICATION_INFO_CORRUPTED);
+    }
+
+    private void validateVerifiedSchoolEmailNotDuplicated(String verifiedSchoolEmail) {
+        if (siteUserRepository.existsByVerifiedSchoolEmail(verifiedSchoolEmail)) {
+            throw new CustomException(SCHOOL_EMAIL_ALREADY_USED);
+        }
+    }
+
+    private String normalizeSchoolEmail(String schoolEmail) {
+        return schoolEmail.trim().toLowerCase(Locale.ROOT);
+    }
+
     private String extractEmailDomain(String email) {
-        return email.substring(email.indexOf('@') + 1).toLowerCase();
+        if (!hasEmailDomain(email)) {
+            throw new CustomException(SCHOOL_EMAIL_DOMAIN_NOT_SUPPORTED);
+        }
+        return email.substring(email.indexOf('@') + 1);
+    }
+
+    private boolean hasEmailDomain(String email) {
+        if (email == null) {
+            return false;
+        }
+        int atIndex = email.indexOf('@');
+        return atIndex > 0 && atIndex < email.length() - 1;
     }
 
     private String generateVerificationCode() {
