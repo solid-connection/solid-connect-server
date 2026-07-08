@@ -22,6 +22,9 @@ public class UpdateViewCountService {
     public void updateViewCount(String key) {
         Long postId = postRedisManager.getPostIdFromPostViewCountRedisKey(key);
         Long viewCount = postRedisManager.getAndDeleteViewCount(key);
+        if (viewCount == null) {
+            return;
+        }
         postRepository.increaseViewCount(postId, viewCount);
     }
 }

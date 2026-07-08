@@ -20,6 +20,8 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long>, SiteU
 
     boolean existsByNickname(String nickname);
 
+    boolean existsByVerifiedSchoolEmail(String verifiedSchoolEmail);
+
     @Query("SELECT u FROM SiteUser u WHERE u.quitedAt <= :cutoffDate")
     List<SiteUser> findUsersToBeRemoved(@Param("cutoffDate") LocalDate cutoffDate);
 
