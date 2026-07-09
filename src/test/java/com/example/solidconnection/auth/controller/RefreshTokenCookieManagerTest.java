@@ -61,7 +61,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("Path=/"),
                 () -> assertThat(header).contains("Max-Age=" + tokenProperties.refresh().expireTime().toSeconds()),
                 () -> assertThat(header).contains("Domain=" + domain),
-                () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
+                () -> assertThat(header).contains("SameSite=" + SameSite.STRICT.attributeValue())
         );
     }
 
@@ -83,7 +83,7 @@ class RefreshTokenCookieManagerTest {
                 () -> assertThat(header).contains("Path=/"),
                 () -> assertThat(header).contains("Max-Age=0"),
                 () -> assertThat(header).contains("Domain=" + domain),
-                () -> assertThat(header).contains("SameSite=" + SameSite.LAX.attributeValue())
+                () -> assertThat(header).contains("SameSite=" + SameSite.STRICT.attributeValue())
         );
     }
 
