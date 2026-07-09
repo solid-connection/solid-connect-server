@@ -1,0 +1,55 @@
+name: Post View Count Concurrency Test (x50)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  repeat-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run test 50 times
+        run: |
+          set +e
+          FAIL_COUNT=0
+          for i in $(seq 1 50); do
+            echo "=== Run $i/50 ==="
+            ./gradlew test --tests "com.example.solidconnection.concurrency.PostViewCountConcurrencyTest.게시글을_조회할_때_조회수_동시성_문제를_해결한다" --rerun-tasks
+            STATUS=$?
+            mkdir -p build/repeat-test-results/run-$i
+            cp -r build/test-results/test/. build/repeat-test-results/run-$i/ 2>/dev/null || true
+            if [ $STATUS -ne 0 ]; then
+              FAIL_COUNT=$((FAIL_COUNT + 1))
+              echo "Run $i FAILED"
+            fi
+          done
+          echo "Total failures: $FAIL_COUNT / 50"
+          if [ $FAIL_COUNT -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: 'build/repeat-test-results/**/TEST-*.xml'
