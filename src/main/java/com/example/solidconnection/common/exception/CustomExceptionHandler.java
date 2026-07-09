@@ -1,5 +1,6 @@
 package com.example.solidconnection.common.exception;
 
+import static com.example.solidconnection.common.exception.ErrorCode.ADMIN_REFRESH_TOKEN_EXPIRED;
 import static com.example.solidconnection.common.exception.ErrorCode.DATA_INTEGRITY_VIOLATION;
 import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
 import static com.example.solidconnection.common.exception.ErrorCode.JSON_PARSING_FAILED;
@@ -7,6 +8,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.JWT_EXCEPTI
 import static com.example.solidconnection.common.exception.ErrorCode.NOT_DEFINED_ERROR;
 import static com.example.solidconnection.common.exception.ErrorCode.REFRESH_TOKEN_EXPIRED;
 
+import com.example.solidconnection.admin.auth.controller.AdminRefreshTokenCookieManager;
 import com.example.solidconnection.auth.controller.RefreshTokenCookieManager;
 import com.example.solidconnection.auth.exception.AuthException;
 import com.example.solidconnection.common.response.ErrorResponse;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CustomExceptionHandler {
 
     private final RefreshTokenCookieManager refreshTokenCookieManager;
+    private final AdminRefreshTokenCookieManager adminRefreshTokenCookieManager;
 
     @ExceptionHandler(AuthException.class)
     protected ResponseEntity<ErrorResponse> handleAuthException(
@@ -39,6 +42,9 @@ public class CustomExceptionHandler {
         log.error("인증 예외 발생 : {}", ex.getMessage());
         if (ex.getErrorCode().equals(REFRESH_TOKEN_EXPIRED)) {
             refreshTokenCookieManager.deleteCookie(response);
+        }
+        if (ex.getErrorCode().equals(ADMIN_REFRESH_TOKEN_EXPIRED)) {
+            adminRefreshTokenCookieManager.deleteCookie(response);
         }
         ErrorResponse errorResponse = new ErrorResponse(ex);
         return ResponseEntity

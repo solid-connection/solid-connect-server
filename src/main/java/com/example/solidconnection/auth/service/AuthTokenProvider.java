@@ -3,6 +3,7 @@ package com.example.solidconnection.auth.service;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.AdminRefreshToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.Subject;
 import com.example.solidconnection.auth.token.config.TokenProperties;
@@ -54,6 +55,16 @@ public class AuthTokenProvider {
         return tokenStorage.saveToken(subject, refreshToken);
     }
 
+    public AdminRefreshToken generateAndSaveAdminRefreshToken(SiteUser siteUser) {
+        Subject subject = toSubject(siteUser);
+        String token = tokenProvider.generateToken(
+                subject,
+                tokenProperties.adminRefresh().expireTime()
+        );
+        AdminRefreshToken adminRefreshToken = new AdminRefreshToken(token);
+        return tokenStorage.saveToken(subject, adminRefreshToken);
+    }
+
     /*
      * 유효한 리프레시 토큰인지 확인한다.
      * - 요청된 토큰과 같은 subject 의 리프레시 토큰을 조회한다.
@@ -66,9 +77,21 @@ public class AuthTokenProvider {
                 .orElse(false);
     }
 
+    public boolean isValidAdminRefreshToken(String requestedAdminRefreshToken) {
+        Subject subject = tokenProvider.parseSubject(requestedAdminRefreshToken);
+        return tokenStorage.findToken(subject, AdminRefreshToken.class)
+                .map(foundToken -> Objects.equals(foundToken, requestedAdminRefreshToken))
+                .orElse(false);
+    }
+
     public void deleteRefreshTokenByAccessToken(String accessToken) {
         Subject subject = tokenProvider.parseSubject(accessToken);
         tokenStorage.deleteToken(subject, RefreshToken.class);
+    }
+
+    public void deleteAdminRefreshTokenByAccessToken(String accessToken) {
+        Subject subject = tokenProvider.parseSubject(accessToken);
+        tokenStorage.deleteToken(subject, AdminRefreshToken.class);
     }
 
     public SiteUser parseSiteUser(String token) {

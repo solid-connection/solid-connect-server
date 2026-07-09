@@ -1,6 +1,7 @@
 package com.example.solidconnection.auth.token.config;
 
 import com.example.solidconnection.auth.domain.AccessToken;
+import com.example.solidconnection.auth.domain.AdminRefreshToken;
 import com.example.solidconnection.auth.domain.RefreshToken;
 import com.example.solidconnection.auth.domain.SignUpToken;
 import com.example.solidconnection.auth.domain.Token;
@@ -13,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record TokenProperties(
         TokenConfig access,
         TokenConfig refresh,
+        TokenConfig adminRefresh,
         TokenConfig signUp,
         TokenConfig blackList
 ) {
@@ -32,6 +34,7 @@ public record TokenProperties(
         tokenConfigs = Map.of(
                 AccessToken.class, access,
                 RefreshToken.class, refresh,
+                AdminRefreshToken.class, adminRefresh,
                 SignUpToken.class, signUp
         );
     }

@@ -49,7 +49,7 @@ public class RefreshTokenCookieManager {
                 .path(PATH)
                 .maxAge(maxAge)
                 .domain(properties.cookieDomain())
-                .sameSite(SameSite.LAX.attributeValue())
+                .sameSite(SameSite.STRICT.attributeValue())
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
