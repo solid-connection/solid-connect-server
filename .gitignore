@@ -39,6 +39,8 @@ out/
 
 ### Claude Code ###
 .claude/settings.local.json
+.omc/
+docs/superpowers/
 
 ### Serena ###
 .serena/

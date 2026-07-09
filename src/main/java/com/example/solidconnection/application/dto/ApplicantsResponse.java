@@ -11,6 +11,8 @@ public record ApplicantsResponse(
         Integer studentCapacity,
         String region,
         String country,
+        String logoImageUrl,
+        String backgroundImageUrl,
         List<ApplicantResponse> applicants) {
 
     public static ApplicantsResponse of(UnivApplyInfo univApplyInfo, List<Application> applications, SiteUser siteUser) {
@@ -19,6 +21,8 @@ public record ApplicantsResponse(
                 univApplyInfo.getStudentCapacity(),
                 univApplyInfo.getUniversity().getRegion().getKoreanName(),
                 univApplyInfo.getUniversity().getCountry().getKoreanName(),
+                univApplyInfo.getUniversity().getLogoImageUrl(),
+                univApplyInfo.getUniversity().getBackgroundImageUrl(),
                 applications.stream()
                         .map(application -> ApplicantResponse.of(application, isUsers(application, siteUser)))
                         .toList());
