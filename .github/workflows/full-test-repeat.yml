@@ -1,0 +1,59 @@
+name: Full Test Suite Repeat
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeat_count:
+        description: '전체 테스트를 반복할 횟수'
+        required: true
+        default: '10'
+
+jobs:
+  repeat-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Run full test suite N times
+        run: |
+          set +e
+          REPEAT_COUNT="${{ github.event.inputs.repeat_count }}"
+          FAIL_COUNT=0
+          for i in $(seq 1 "$REPEAT_COUNT"); do
+            echo "=== Run $i/$REPEAT_COUNT ==="
+            ./gradlew test --rerun-tasks
+            STATUS=$?
+            mkdir -p "build/repeat-test-results/run-$i"
+            cp -r build/test-results/test/. "build/repeat-test-results/run-$i/" 2>/dev/null || true
+            if [ $STATUS -ne 0 ]; then
+              FAIL_COUNT=$((FAIL_COUNT + 1))
+              echo "Run $i FAILED"
+            fi
+          done
+          echo "Total failures: $FAIL_COUNT / $REPEAT_COUNT"
+          if [ "$FAIL_COUNT" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: 'build/repeat-test-results/**/TEST-*.xml'
