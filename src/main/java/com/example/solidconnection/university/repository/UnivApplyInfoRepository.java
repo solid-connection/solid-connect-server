@@ -71,6 +71,8 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
 
     boolean existsByHomeUniversityId(Long homeUniversityId);
 
+    long countByTermId(long termId);
+
     @Query("""
            SELECT uai.id
            FROM UnivApplyInfo uai

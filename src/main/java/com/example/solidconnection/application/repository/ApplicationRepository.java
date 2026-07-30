@@ -3,6 +3,7 @@ package com.example.solidconnection.application.repository;
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
+import com.example.solidconnection.application.dto.ApplicationUniversityPreviewResponse;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import java.util.List;
@@ -26,6 +27,32 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
            """)
     List<Application> findAllByUnivApplyInfoIds(
             @Param("univApplyInfoIds") List<Long> univApplyInfoIds,
+            @Param("status") VerifyStatus status,
+            @Param("termId") long termId);
+
+    @Query("""
+           SELECT DISTINCT new com.example.solidconnection.application.dto.ApplicationUniversityPreviewResponse(
+               uai.id,
+               uai.koreanName,
+               uai.studentCapacity,
+               region.koreanName,
+               country.koreanName,
+               university.logoImageUrl,
+               university.backgroundImageUrl
+           )
+           FROM Application application
+           JOIN application.choices choice
+           JOIN UnivApplyInfo uai ON uai.id = choice.univApplyInfoId
+           JOIN uai.university university
+           JOIN university.region region
+           JOIN university.country country
+           WHERE application.verifyStatus = :status
+               AND application.termId = :termId
+               AND application.isDelete = false
+               AND uai.termId = :termId
+           ORDER BY uai.koreanName
+           """)
+    List<ApplicationUniversityPreviewResponse> findApplicantUniversityPreviews(
             @Param("status") VerifyStatus status,
             @Param("termId") long termId);
 

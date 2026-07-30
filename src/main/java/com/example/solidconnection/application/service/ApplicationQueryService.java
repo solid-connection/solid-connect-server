@@ -7,6 +7,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicationPreviewResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
@@ -40,6 +41,20 @@ public class ApplicationQueryService {
     private final SiteUserRepository siteUserRepository;
     private final TermRepository termRepository;
     private final HomeUniversityRepository homeUniversityRepository;
+
+    @Transactional(readOnly = true)
+    public ApplicationPreviewResponse getApplicantUniversityPreviews(long siteUserId) {
+        siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
+        return new ApplicationPreviewResponse(
+                univApplyInfoRepository.countByTermId(term.getId()),
+                applicationRepository.findApplicantUniversityPreviews(VerifyStatus.APPROVED, term.getId())
+        );
+    }
 
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
