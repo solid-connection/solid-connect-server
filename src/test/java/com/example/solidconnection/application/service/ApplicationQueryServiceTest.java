@@ -22,7 +22,9 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixtureBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +50,12 @@ class ApplicationQueryServiceTest {
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
+
+    @Autowired
+    private UnivApplyInfoFixtureBuilder univApplyInfoFixtureBuilder;
+
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
 
     @Autowired
     private GpaScoreFixture gpaScoreFixture;
@@ -104,8 +112,10 @@ class ApplicationQueryServiceTest {
     class 지원_현황_미리보기_조회_테스트 {
 
         @Test
-        void 현재_학기에_승인되고_삭제되지_않은_지원서의_대학만_중복_없이_조회한다() {
+        void 자신의_모교에_속한_지원_대학만_중복_없이_조회한다() {
             // given
+            SiteUser inhaUniversityUser = siteUserFixture.국내_대학_정보_소지_사용자(
+                    괌대학_A_지원_정보.getHomeUniversity().getId());
             applicationFixture.지원서(
                     user1, "nickname1", term.getId(),
                     gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
@@ -116,6 +126,17 @@ class ApplicationQueryServiceTest {
                     gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
                     List.of(괌대학_A_지원_정보.getId())
             );
+            UnivApplyInfo 인천대학교_전용_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("인천대학교 전용 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(homeUniversityFixture.인천대학교())
+                    .create();
+            applicationFixture.지원서(
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(인천대학교_전용_지원_정보.getId())
+            );
             Application deletedApplication = applicationFixture.지원서(
                     user3, "nickname3", term.getId(),
                     gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
@@ -125,7 +146,8 @@ class ApplicationQueryServiceTest {
             applicationRepository.save(deletedApplication);
 
             // when
-            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(user1.getId());
+            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(
+                    inhaUniversityUser.getId());
 
             // then
             assertThat(response.totalUniversityCount()).isEqualTo(3);
@@ -138,7 +160,8 @@ class ApplicationQueryServiceTest {
         @Test
         void 성적과_지원서를_제출하지_않은_로그인_사용자도_미리보기를_조회할_수_있다() {
             // given
-            SiteUser signedInUserWithoutScores = siteUserFixture.사용자(4, "signed-in-only");
+            SiteUser signedInUserWithoutScores = siteUserFixture.국내_대학_정보_소지_사용자(
+                    괌대학_A_지원_정보.getHomeUniversity().getId());
             applicationFixture.지원서(
                     user2, "nickname2", term.getId(),
                     gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
@@ -154,6 +177,16 @@ class ApplicationQueryServiceTest {
             assertThat(response.universities()).containsExactly(
                     ApplicationUniversityPreviewResponse.from(괌대학_A_지원_정보)
             );
+        }
+
+        @Test
+        void 모교가_등록되지_않은_사용자에게는_빈_미리보기를_반환한다() {
+            // when
+            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(user1.getId());
+
+            // then
+            assertThat(response.totalUniversityCount()).isZero();
+            assertThat(response.universities()).isEmpty();
         }
     }
 

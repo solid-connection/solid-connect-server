@@ -50,11 +50,13 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                AND application.termId = :termId
                AND application.isDelete = false
                AND uai.termId = :termId
+               AND uai.homeUniversity.id = :homeUniversityId
            ORDER BY uai.koreanName
            """)
     List<ApplicationUniversityPreviewResponse> findApplicantUniversityPreviews(
             @Param("status") VerifyStatus status,
-            @Param("termId") long termId);
+            @Param("termId") long termId,
+            @Param("homeUniversityId") long homeUniversityId);
 
     Optional<Application> findTopBySiteUserIdAndTermIdAndIsDeleteFalseOrderByIdDesc(long siteUserId, long termId);
 

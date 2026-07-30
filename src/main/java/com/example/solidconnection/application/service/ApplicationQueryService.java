@@ -44,15 +44,22 @@ public class ApplicationQueryService {
 
     @Transactional(readOnly = true)
     public ApplicationPreviewResponse getApplicantUniversityPreviews(long siteUserId) {
-        siteUserRepository.findById(siteUserId)
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (siteUser.getHomeUniversityId() == null) {
+            return new ApplicationPreviewResponse(0, List.of());
+        }
 
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
         return new ApplicationPreviewResponse(
-                univApplyInfoRepository.countByTermId(term.getId()),
-                applicationRepository.findApplicantUniversityPreviews(VerifyStatus.APPROVED, term.getId())
+                univApplyInfoRepository.countByTermIdAndHomeUniversityId(term.getId(), siteUser.getHomeUniversityId()),
+                applicationRepository.findApplicantUniversityPreviews(
+                        VerifyStatus.APPROVED,
+                        term.getId(),
+                        siteUser.getHomeUniversityId())
         );
     }
 
