@@ -31,7 +31,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             @Param("termId") long termId);
 
     @Query("""
-           SELECT DISTINCT new com.example.solidconnection.application.dto.ApplicationUniversityPreviewResponse(
+           SELECT new com.example.solidconnection.application.dto.ApplicationUniversityPreviewResponse(
                uai.id,
                uai.koreanName,
                uai.studentCapacity,
@@ -40,17 +40,21 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
                university.logoImageUrl,
                university.backgroundImageUrl
            )
-           FROM Application application
-           JOIN application.choices choice
-           JOIN UnivApplyInfo uai ON uai.id = choice.univApplyInfoId
+           FROM UnivApplyInfo uai
            JOIN uai.university university
            JOIN university.region region
            JOIN university.country country
-           WHERE application.verifyStatus = :status
-               AND application.termId = :termId
-               AND application.isDelete = false
-               AND uai.termId = :termId
+           WHERE uai.termId = :termId
                AND uai.homeUniversity.id = :homeUniversityId
+               AND EXISTS (
+                   SELECT application.id
+                   FROM Application application
+                   JOIN application.choices choice
+                   WHERE choice.univApplyInfoId = uai.id
+                       AND application.verifyStatus = :status
+                       AND application.termId = :termId
+                       AND application.isDelete = false
+               )
            ORDER BY uai.koreanName
            """)
     List<ApplicationUniversityPreviewResponse> findApplicantUniversityPreviews(

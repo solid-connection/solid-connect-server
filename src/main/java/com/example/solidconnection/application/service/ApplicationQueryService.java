@@ -2,6 +2,7 @@ package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_NOT_VERIFIED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
@@ -48,7 +49,7 @@ public class ApplicationQueryService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         if (siteUser.getHomeUniversityId() == null) {
-            return new ApplicationPreviewResponse(0, List.of());
+            throw new CustomException(SCHOOL_EMAIL_NOT_VERIFIED);
         }
 
         Term term = termRepository.findByIsCurrentTrue()

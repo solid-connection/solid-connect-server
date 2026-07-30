@@ -1,6 +1,8 @@
 package com.example.solidconnection.application.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_NOT_VERIFIED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplicantResponse;
@@ -11,6 +13,7 @@ import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -109,6 +112,7 @@ class ApplicationQueryServiceTest {
     }
 
     @Nested
+    @DisplayName("지원 현황 미리보기 조회")
     class 지원_현황_미리보기_조회_테스트 {
 
         @Test
@@ -144,13 +148,39 @@ class ApplicationQueryServiceTest {
             );
             deletedApplication.setIsDeleteTrue();
             applicationRepository.save(deletedApplication);
+            UnivApplyInfo 승인_대기_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("승인 대기 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(괌대학_A_지원_정보.getHomeUniversity())
+                    .create();
+            Application pendingApplication = applicationFixture.지원서(
+                    user1, "pending-nickname", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(승인_대기_지원_정보.getId())
+            );
+            pendingApplication.setVerifyStatus(VerifyStatus.PENDING);
+            applicationRepository.save(pendingApplication);
+            UnivApplyInfo 승인_거절_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("승인 거절 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(괌대학_A_지원_정보.getHomeUniversity())
+                    .create();
+            Application rejectedApplication = applicationFixture.지원서(
+                    user2, "rejected-nickname", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(승인_거절_지원_정보.getId())
+            );
+            rejectedApplication.setVerifyStatus(VerifyStatus.REJECTED);
+            applicationRepository.save(rejectedApplication);
 
             // when
             ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(
                     inhaUniversityUser.getId());
 
             // then
-            assertThat(response.totalUniversityCount()).isEqualTo(3);
+            assertThat(response.totalUniversityCount()).isEqualTo(5);
             assertThat(response.universities()).containsExactly(
                     ApplicationUniversityPreviewResponse.from(괌대학_A_지원_정보),
                     ApplicationUniversityPreviewResponse.from(버지니아공과대학_지원_정보)
@@ -180,13 +210,12 @@ class ApplicationQueryServiceTest {
         }
 
         @Test
-        void 모교가_등록되지_않은_사용자에게는_빈_미리보기를_반환한다() {
+        void 모교가_등록되지_않은_사용자는_미리보기를_조회할_수_없다() {
             // when
-            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(user1.getId());
-
             // then
-            assertThat(response.totalUniversityCount()).isZero();
-            assertThat(response.universities()).isEmpty();
+            assertThatThrownBy(() -> applicationQueryService.getApplicantUniversityPreviews(user1.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(SCHOOL_EMAIL_NOT_VERIFIED.getMessage());
         }
     }
 
