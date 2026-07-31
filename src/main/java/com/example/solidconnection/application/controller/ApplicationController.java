@@ -1,5 +1,6 @@
 package com.example.solidconnection.application.controller;
 
+import com.example.solidconnection.application.dto.ApplicationPreviewResponse;
 import com.example.solidconnection.application.dto.ApplicationSubmissionResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.dto.ApplyRequest;
@@ -35,6 +36,14 @@ public class ApplicationController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(applicationSubmissionResponse);
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<ApplicationPreviewResponse> getApplicationPreview(
+            @AuthorizedUser long siteUserId
+    ) {
+        ApplicationPreviewResponse result = applicationQueryService.getApplicantUniversityPreviews(siteUserId);
+        return ResponseEntity.ok(result);
     }
 
     // @RequireRoleAccess(roles = {Role.ADMIN}) // todo : 추후 어드민 페이지에서 권한 변경 기능 추가 필요

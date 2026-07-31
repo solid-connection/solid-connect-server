@@ -2,11 +2,13 @@ package com.example.solidconnection.application.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.APPLICATION_NOT_APPROVED;
 import static com.example.solidconnection.common.exception.ErrorCode.CURRENT_TERM_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_NOT_VERIFIED;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicationPreviewResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
@@ -40,6 +42,27 @@ public class ApplicationQueryService {
     private final SiteUserRepository siteUserRepository;
     private final TermRepository termRepository;
     private final HomeUniversityRepository homeUniversityRepository;
+
+    @Transactional(readOnly = true)
+    public ApplicationPreviewResponse getApplicantUniversityPreviews(long siteUserId) {
+        SiteUser siteUser = siteUserRepository.findById(siteUserId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (siteUser.getHomeUniversityId() == null) {
+            throw new CustomException(SCHOOL_EMAIL_NOT_VERIFIED);
+        }
+
+        Term term = termRepository.findByIsCurrentTrue()
+                .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
+
+        return new ApplicationPreviewResponse(
+                univApplyInfoRepository.countByTermIdAndHomeUniversityId(term.getId(), siteUser.getHomeUniversityId()),
+                applicationRepository.findApplicantUniversityPreviews(
+                        VerifyStatus.APPROVED,
+                        term.getId(),
+                        siteUser.getHomeUniversityId())
+        );
+    }
 
     @Transactional(readOnly = true)
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {

@@ -1,14 +1,19 @@
 package com.example.solidconnection.application.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.SCHOOL_EMAIL_NOT_VERIFIED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.dto.ApplicantResponse;
 import com.example.solidconnection.application.dto.ApplicantsResponse;
+import com.example.solidconnection.application.dto.ApplicationPreviewResponse;
+import com.example.solidconnection.application.dto.ApplicationUniversityPreviewResponse;
 import com.example.solidconnection.application.dto.ApplicationsResponse;
 import com.example.solidconnection.application.fixture.ApplicationFixture;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.location.region.fixture.RegionFixture;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.domain.LanguageTestScore;
@@ -20,7 +25,9 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
+import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
+import com.example.solidconnection.university.fixture.UnivApplyInfoFixtureBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +53,12 @@ class ApplicationQueryServiceTest {
 
     @Autowired
     private UnivApplyInfoFixture univApplyInfoFixture;
+
+    @Autowired
+    private UnivApplyInfoFixtureBuilder univApplyInfoFixtureBuilder;
+
+    @Autowired
+    private HomeUniversityFixture homeUniversityFixture;
 
     @Autowired
     private GpaScoreFixture gpaScoreFixture;
@@ -96,6 +109,114 @@ class ApplicationQueryServiceTest {
         괌대학_A_지원_정보 = univApplyInfoFixture.괌대학_A_지원_정보(term.getId());
         버지니아공과대학_지원_정보 = univApplyInfoFixture.버지니아공과대학_지원_정보(term.getId());
         서던덴마크대학교_지원_정보 = univApplyInfoFixture.서던덴마크대학교_지원_정보(term.getId());
+    }
+
+    @Nested
+    @DisplayName("지원 현황 미리보기 조회")
+    class 지원_현황_미리보기_조회_테스트 {
+
+        @Test
+        void 자신의_모교에_속한_지원_대학만_중복_없이_조회한다() {
+            // given
+            SiteUser inhaUniversityUser = siteUserFixture.국내_대학_정보_소지_사용자(
+                    괌대학_A_지원_정보.getHomeUniversity().getId());
+            applicationFixture.지원서(
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId(), 버지니아공과대학_지원_정보.getId())
+            );
+            applicationFixture.지원서(
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
+            );
+            UnivApplyInfo 인천대학교_전용_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("인천대학교 전용 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(homeUniversityFixture.인천대학교())
+                    .create();
+            applicationFixture.지원서(
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(인천대학교_전용_지원_정보.getId())
+            );
+            Application deletedApplication = applicationFixture.지원서(
+                    user3, "nickname3", term.getId(),
+                    gpaScore3.getGpa(), languageTestScore3.getLanguageTest(),
+                    List.of(서던덴마크대학교_지원_정보.getId())
+            );
+            deletedApplication.setIsDeleteTrue();
+            applicationRepository.save(deletedApplication);
+            UnivApplyInfo 승인_대기_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("승인 대기 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(괌대학_A_지원_정보.getHomeUniversity())
+                    .create();
+            Application pendingApplication = applicationFixture.지원서(
+                    user1, "pending-nickname", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(승인_대기_지원_정보.getId())
+            );
+            pendingApplication.setVerifyStatus(VerifyStatus.PENDING);
+            applicationRepository.save(pendingApplication);
+            UnivApplyInfo 승인_거절_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("승인 거절 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(괌대학_A_지원_정보.getHomeUniversity())
+                    .create();
+            Application rejectedApplication = applicationFixture.지원서(
+                    user2, "rejected-nickname", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(승인_거절_지원_정보.getId())
+            );
+            rejectedApplication.setVerifyStatus(VerifyStatus.REJECTED);
+            applicationRepository.save(rejectedApplication);
+
+            // when
+            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(
+                    inhaUniversityUser.getId());
+
+            // then
+            assertThat(response.totalUniversityCount()).isEqualTo(5);
+            assertThat(response.universities()).containsExactly(
+                    ApplicationUniversityPreviewResponse.from(괌대학_A_지원_정보),
+                    ApplicationUniversityPreviewResponse.from(버지니아공과대학_지원_정보)
+            );
+        }
+
+        @Test
+        void 성적과_지원서를_제출하지_않은_로그인_사용자도_미리보기를_조회할_수_있다() {
+            // given
+            SiteUser signedInUserWithoutScores = siteUserFixture.국내_대학_정보_소지_사용자(
+                    괌대학_A_지원_정보.getHomeUniversity().getId());
+            applicationFixture.지원서(
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
+            );
+
+            // when
+            ApplicationPreviewResponse response = applicationQueryService.getApplicantUniversityPreviews(
+                    signedInUserWithoutScores.getId());
+
+            // then
+            assertThat(response.totalUniversityCount()).isEqualTo(3);
+            assertThat(response.universities()).containsExactly(
+                    ApplicationUniversityPreviewResponse.from(괌대학_A_지원_정보)
+            );
+        }
+
+        @Test
+        void 모교가_등록되지_않은_사용자는_미리보기를_조회할_수_없다() {
+            // when
+            // then
+            assertThatThrownBy(() -> applicationQueryService.getApplicantUniversityPreviews(user1.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(SCHOOL_EMAIL_NOT_VERIFIED.getMessage());
+        }
     }
 
     @Nested
