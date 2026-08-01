@@ -253,6 +253,39 @@ class ApplicationQueryServiceTest {
         }
 
         @Test
+        void 다른_모교_소속_지원_정보와_지원자는_전체_조회_응답에_포함되지_않는다() {
+            // given
+            SiteUser inhaUniversityUser = siteUserFixture.국내_대학_정보_소지_사용자(
+                    괌대학_A_지원_정보.getHomeUniversity().getId());
+            Application application1 = applicationFixture.지원서(
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
+            );
+            UnivApplyInfo 인천대학교_전용_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("인천대학교 전용 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(homeUniversityFixture.인천대학교())
+                    .create();
+            applicationFixture.지원서(
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(인천대학교_전용_지원_정보.getId())
+            );
+
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicants(inhaUniversityUser.getId(), "", "");
+
+            // then
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), inhaUniversityUser),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(), inhaUniversityUser),
+                    ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(), inhaUniversityUser)
+            );
+        }
+
+        @Test
         void 이번_학기_특정_지역_지원자를_조회한다() {
             // given
             Application application1 = applicationFixture.지원서(

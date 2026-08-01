@@ -74,7 +74,12 @@ public class ApplicationQueryService {
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
         List<UnivApplyInfo> univApplyInfos = universityFilterRepository
-                .findAllByRegionCodeAndKeywordsAndTermId(regionCode, keywords, term.getId());
+                .findAllByRegionCodeAndKeywordsAndTermId(
+                        regionCode,
+                        keywords,
+                        term.getId(),
+                        siteUser.getHomeUniversityId()
+                );
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of());
         }

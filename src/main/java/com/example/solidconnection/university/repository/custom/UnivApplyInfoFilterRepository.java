@@ -5,7 +5,12 @@ import java.util.List;
 
 public interface UnivApplyInfoFilterRepository {
 
-    List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long term);
+    List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(
+            String regionCode,
+            List<String> keywords,
+            Long term,
+            Long homeUniversityId
+    );
 
     List<UnivApplyInfo> findAllByText(String text, Long termId, Long homeUniversityId);
 }
