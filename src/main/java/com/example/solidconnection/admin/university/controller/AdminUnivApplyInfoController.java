@@ -38,6 +38,13 @@ public class AdminUnivApplyInfoController {
         return ResponseEntity.ok(adminUnivApplyInfoService.importUnivApplyInfos(request));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminUnivApplyInfoResponse> getUnivApplyInfo(
+            @PathVariable long id
+    ) {
+        return ResponseEntity.ok(adminUnivApplyInfoService.getUnivApplyInfo(id));
+    }
+
     @PostMapping
     public ResponseEntity<AdminUnivApplyInfoResponse> createUnivApplyInfo(
             @Valid @RequestBody AdminUnivApplyInfoCreateRequest request
