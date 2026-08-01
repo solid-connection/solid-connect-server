@@ -516,6 +516,43 @@ class AdminUnivApplyInfoServiceTest {
     }
 
     @Nested
+    class 지원_정보_단건_조회 {
+
+        @Test
+        void 존재하는_id로_조회하면_상세_정보를_반환한다() {
+            // given
+            UnivApplyInfo univApplyInfo = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId()).koreanName("괌대학(A형)")
+                    .university(hostUniversity).homeUniversity(homeUniversity).create();
+
+            // when
+            AdminUnivApplyInfoResponse response = adminUnivApplyInfoService.getUnivApplyInfo(univApplyInfo.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(univApplyInfo.getId()),
+                    () -> assertThat(response.termId()).isEqualTo(term.getId()),
+                    () -> assertThat(response.homeUniversityId()).isEqualTo(homeUniversity.getId()),
+                    () -> assertThat(response.hostUniversityId()).isEqualTo(hostUniversity.getId()),
+                    () -> assertThat(response.studentCapacity()).isEqualTo(univApplyInfo.getStudentCapacity()),
+                    () -> assertThat(response.semesterRequirement()).isEqualTo(univApplyInfo.getSemesterRequirement()),
+                    () -> assertThat(response.detailsForLanguage()).isEqualTo(univApplyInfo.getDetailsForLanguage()),
+                    () -> assertThat(response.gpaRequirement()).isEqualTo(univApplyInfo.getGpaRequirement()),
+                    () -> assertThat(response.gpaRequirementCriteria()).isEqualTo(univApplyInfo.getGpaRequirementCriteria()),
+                    () -> assertThat(response.detailsForAccommodation()).isEqualTo(univApplyInfo.getDetailsForAccommodation())
+            );
+        }
+
+        @Test
+        void 존재하지_않는_id로_조회하면_예외가_발생한다() {
+            // when & then
+            assertThatCode(() -> adminUnivApplyInfoService.getUnivApplyInfo(invalidId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.UNIV_APPLY_INFO_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
     class 지원_정보_수정 {
 
         @Test

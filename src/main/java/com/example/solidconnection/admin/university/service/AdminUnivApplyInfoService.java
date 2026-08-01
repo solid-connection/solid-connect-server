@@ -141,6 +141,13 @@ public class AdminUnivApplyInfoService {
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public AdminUnivApplyInfoResponse getUnivApplyInfo(long id) {
+        UnivApplyInfo univApplyInfo = univApplyInfoRepository.findById(id)
+                .orElseThrow(() -> new CustomException(UNIV_APPLY_INFO_NOT_FOUND));
+        return AdminUnivApplyInfoResponse.from(univApplyInfo);
+    }
+
     @Transactional
     @DefaultCacheOut(
             key = {"univApplyInfoTextSearch", "university:recommend:general"},
