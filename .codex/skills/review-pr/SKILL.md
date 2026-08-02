@@ -6,7 +6,7 @@ args: <PR 번호> (예: /review-pr 666)
 
 # Pull Request 리뷰 가이드
 
-이 skill은 solid-connect-server 프로젝트의 Pull Request를 체계적으로 리뷰합니다.
+이 skill은 solid-connect-server 프로젝트의 Pull Request를 체계적으로 리뷰합니다. 안전하고 읽기 전용 또는 되돌릴 수 있는 단계는 확인을 묻지 않고 진행하며, 운영상 예외는 최종 리뷰에 보고합니다.
 
 ## 사용법
 
