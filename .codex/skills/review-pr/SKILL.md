@@ -151,7 +151,7 @@ mcp__serena__search_for_pattern "import.*\\*"  # 와일드카드 import 검색
 - Given-When-Then 구조 준수
 - Fixture 패턴 사용 (FixtureBuilder + Fixture)
 
-👉 **참고:** `.claude/skills/test/SKILL.md`
+👉 **참고:** `.codex/skills/test/SKILL.md`
 
 ---
 
@@ -288,5 +288,5 @@ Grep --pattern "@Column" --glob "*.java" --path src/main/java/.../domain
 ## 참고 자료
 
 - **프로젝트 컨벤션**: `CLAUDE.md` - 전체 개발 컨벤션
-- **테스트 가이드**: `.claude/skills/test/SKILL.md` - 테스트 작성 가이드
+- **테스트 가이드**: `.codex/skills/test/SKILL.md` - 테스트 작성 가이드
 - **개발 컨벤션 위키**: https://github.com/solid-connection/solid-connect-server/wiki/개발-컨벤션-정리

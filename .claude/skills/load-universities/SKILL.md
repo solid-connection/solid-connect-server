@@ -21,7 +21,7 @@ Use this skill when the user asks to ingest or upsert Solid Connection universit
 - Runner: `scripts/ingest_universities.py`
 - CSV template: `templates/university_ingestion_template.csv`
 
-The `.claude/skills/load-universities` and `.codex/skills/load-universities` copies must stay behaviorally identical.
+The `.claude/skills/load-universities`, `.codex/skills/load-universities`, and `.cursor/skills/load-universities` copies must stay behaviorally identical.
 
 ## Input Schema
 
