@@ -64,9 +64,7 @@ Preflight only:
 python3 .cursor/skills/load-universities/scripts/ingest_universities.py \
   --mode preflight \
   --input path/to/universities.csv \
-  --assets-dir path/to/assets \
-  --admin-email "$SOLID_CONNECT_ADMIN_EMAIL" \
-  --admin-password "$SOLID_CONNECT_ADMIN_PASSWORD"
+  --assets-dir path/to/assets
 ```
 
 Apply and verify:
@@ -75,10 +73,10 @@ Apply and verify:
 python3 .cursor/skills/load-universities/scripts/ingest_universities.py \
   --mode apply \
   --input path/to/universities.xlsx \
-  --assets-dir path/to/assets \
-  --admin-email "$SOLID_CONNECT_ADMIN_EMAIL" \
-  --admin-password "$SOLID_CONNECT_ADMIN_PASSWORD"
+  --assets-dir path/to/assets
 ```
+
+When no access token or complete email/password pair is supplied, the runner prompts for the stage admin email and a hidden password in an interactive terminal. It never writes either value to files or reports. Non-interactive runs must use an access token or explicit credentials.
 
 Token-based authentication is also supported:
 
@@ -92,7 +90,7 @@ python3 .cursor/skills/load-universities/scripts/ingest_universities.py \
 ## Workflow
 
 1. Validate the input file and dev base URL before authenticating.
-2. Authenticate with either `--access-token` or admin email/password.
+2. Authenticate with an access token, explicit credentials, or the interactive terminal prompt.
 3. Parse every CSV/XLSX row and validate all required fields before mutation.
 4. Read existing terms, home universities, and host universities through admin APIs.
 5. If a host university is missing and either required image is absent, stop with JSON status `needs-assets`. This is a successful preflight result and performs zero mutations.

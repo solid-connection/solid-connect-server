@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import getpass
 import json
 import mimetypes
 import os
@@ -626,6 +627,18 @@ def output(payload: dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
 
 
+def prompt_for_admin_credentials() -> tuple[str, str]:
+    if not sys.stdin.isatty():
+        raise IngestionError(
+            "provide --access-token or both --admin-email and --admin-password when stdin is not interactive"
+        )
+    email = input("Stage admin email: ").strip()
+    password = getpass.getpass("Stage admin password: ")
+    if not email or not password:
+        raise IngestionError("stage admin email and password are required")
+    return email, password
+
+
 def self_test() -> None:
     sample = [{
         "term_name": "2026-1",
@@ -703,7 +716,7 @@ def main(argv: list[str]) -> int:
         api = ApiClient(base_url, args.access_token)
         if not api.access_token:
             if not args.admin_email or not args.admin_password:
-                raise IngestionError("provide --access-token or both --admin-email and --admin-password")
+                args.admin_email, args.admin_password = prompt_for_admin_credentials()
             api.sign_in(args.admin_email, args.admin_password)
         plan, indexes = build_plan(rows, api, args.assets_dir)
         if args.manifest_output:
