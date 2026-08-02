@@ -382,7 +382,7 @@ class AdminUnivApplyInfoServiceTest {
         @Test
         void 길이_제한을_초과하는_값이_들어오면_전체가_실패한다() {
             // given
-            String tooLongValue = "a".repeat(101);
+            String tooLongValue = "a".repeat(2001);
             String markdown = String.format("""
                     | 대학명 | 학기요건 |
                     |--------|----------|
