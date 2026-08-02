@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__serena__list_dir",
+      "mcp__serena__read_file",
+      "mcp__serena__find_file",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_symbol",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__search_for_pattern",
+      "WebFetch(domain:javadoc.io)",
+      "WebFetch(domain:www.baeldung.com)",
+      "WebFetch(domain:michael-simons.github.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__serena__replace_content",
+      "mcp__serena__create_text_file",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew compileTestJava:*)",
+      "Bash(./gradlew clean test:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh pr commits:*)",
+      "Bash(gh api:*)",
+      "Bash(git fetch:*)",
+      "Bash(cd:*)"
+    ]
+  }
+}
