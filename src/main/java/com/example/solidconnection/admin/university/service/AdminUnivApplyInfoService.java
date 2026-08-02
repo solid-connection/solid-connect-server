@@ -1,7 +1,6 @@
 package com.example.solidconnection.admin.university.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.HOME_UNIVERSITY_NOT_FOUND;
-import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_HAS_REFERENCES;
 import static com.example.solidconnection.common.exception.ErrorCode.UNIV_APPLY_INFO_NOT_FOUND;
@@ -11,12 +10,9 @@ import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoCreate
 import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoResponse;
 import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoUpdateRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
-import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
-import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
 import com.example.solidconnection.application.repository.ApplicationRepository;
 import com.example.solidconnection.cache.annotation.DefaultCacheOut;
 import com.example.solidconnection.common.exception.CustomException;
-import com.example.solidconnection.common.util.MarkdownTableParser;
 import com.example.solidconnection.term.repository.TermRepository;
 import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.HostUniversity;
@@ -26,10 +22,8 @@ import com.example.solidconnection.university.repository.HomeUniversityRepositor
 import com.example.solidconnection.university.repository.HostUniversityRepository;
 import com.example.solidconnection.university.repository.LikedUnivApplyInfoRepository;
 import com.example.solidconnection.university.repository.UnivApplyInfoRepository;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +34,6 @@ public class AdminUnivApplyInfoService {
 
     private final TermRepository termRepository;
     private final HomeUniversityRepository homeUniversityRepository;
-    private final MarkdownTableParser markdownTableParser;
-    private final AdminUnivApplyInfoRowSaver rowSaver;
     private final UnivApplyInfoRepository univApplyInfoRepository;
     private final HostUniversityRepository hostUniversityRepository;
     private final LikedUnivApplyInfoRepository likedUnivApplyInfoRepository;
@@ -49,39 +41,6 @@ public class AdminUnivApplyInfoService {
 
     public UnivApplyInfoFieldResponse getFields() {
         return UnivApplyInfoFieldResponse.of();
-    }
-
-    @Transactional
-    @DefaultCacheOut(
-            key = {"univApplyInfoTextSearch", "university:recommend:general"},
-            cacheManager = "customCacheManager",
-            prefix = true
-    )
-    public UnivApplyInfoImportResponse importUnivApplyInfos(UnivApplyInfoImportRequest request) {
-        validateColumnMappings(request.columnMappings());
-        validateTermExists(request.termId());
-        HomeUniversity homeUniversity = findHomeUniversity(request.homeUniversityId());
-
-        List<Map<String, String>> rows = markdownTableParser.parse(request.markdown());
-
-        List<String> createdUniversities = new ArrayList<>();
-
-        for (Map<String, String> row : rows) {
-            String createdName = rowSaver.save(row, request.columnMappings(), homeUniversity, request.termId());
-            if (createdName != null) {
-                createdUniversities.add(createdName);
-            }
-        }
-
-        return new UnivApplyInfoImportResponse(rows.size(), createdUniversities);
-    }
-
-    private void validateColumnMappings(Map<String, String> columnMappings) {
-        boolean hasBlankEntry = columnMappings.entrySet().stream()
-                .anyMatch(e -> e.getKey().isBlank() || e.getValue().isBlank());
-        if (hasBlankEntry) {
-            throw new CustomException(INVALID_INPUT, "컬럼 매핑의 키와 값은 공백일 수 없습니다");
-        }
     }
 
     private void validateTermExists(Long termId) {
@@ -139,6 +98,19 @@ public class AdminUnivApplyInfoService {
     private HostUniversity findHostUniversity(Long hostUniversityId) {
         return hostUniversityRepository.findById(hostUniversityId)
                 .orElseThrow(() -> new CustomException(UNIVERSITY_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminUnivApplyInfoResponse> findUnivApplyInfos(
+            long termId,
+            long homeUniversityId,
+            long hostUniversityId
+    ) {
+        return univApplyInfoRepository.findAllByTermIdAndHomeUniversityIdAndUniversityId(
+                        termId, homeUniversityId, hostUniversityId)
+                .stream()
+                .map(AdminUnivApplyInfoResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)

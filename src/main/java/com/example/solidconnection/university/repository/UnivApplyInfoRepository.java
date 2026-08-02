@@ -74,6 +74,22 @@ public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Lo
     long countByTermIdAndHomeUniversityId(long termId, long homeUniversityId);
 
     @Query("""
+           SELECT DISTINCT uai
+           FROM UnivApplyInfo uai
+           LEFT JOIN FETCH uai.languageRequirements lr
+           LEFT JOIN FETCH uai.homeUniversity hu
+           JOIN FETCH uai.university u
+           WHERE uai.termId = :termId
+             AND hu.id = :homeUniversityId
+             AND u.id = :hostUniversityId
+           """)
+    List<UnivApplyInfo> findAllByTermIdAndHomeUniversityIdAndUniversityId(
+            @Param("termId") long termId,
+            @Param("homeUniversityId") long homeUniversityId,
+            @Param("hostUniversityId") long hostUniversityId
+    );
+
+    @Query("""
            SELECT uai.id
            FROM UnivApplyInfo uai
            WHERE uai.university.id = :universityId

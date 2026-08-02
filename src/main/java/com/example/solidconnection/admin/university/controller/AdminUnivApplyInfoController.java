@@ -4,10 +4,9 @@ import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoCreate
 import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoResponse;
 import com.example.solidconnection.admin.university.dto.AdminUnivApplyInfoUpdateRequest;
 import com.example.solidconnection.admin.university.dto.UnivApplyInfoFieldResponse;
-import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportRequest;
-import com.example.solidconnection.admin.university.dto.UnivApplyInfoImportResponse;
 import com.example.solidconnection.admin.university.service.AdminUnivApplyInfoService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -31,11 +31,15 @@ public class AdminUnivApplyInfoController {
         return ResponseEntity.ok(adminUnivApplyInfoService.getFields());
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<UnivApplyInfoImportResponse> importUnivApplyInfos(
-            @Valid @RequestBody UnivApplyInfoImportRequest request
+    @GetMapping
+    public ResponseEntity<List<AdminUnivApplyInfoResponse>> findUnivApplyInfos(
+            @RequestParam long termId,
+            @RequestParam long homeUniversityId,
+            @RequestParam long hostUniversityId
     ) {
-        return ResponseEntity.ok(adminUnivApplyInfoService.importUnivApplyInfos(request));
+        return ResponseEntity.ok(
+                adminUnivApplyInfoService.findUnivApplyInfos(termId, homeUniversityId, hostUniversityId)
+        );
     }
 
     @GetMapping("/{id}")
