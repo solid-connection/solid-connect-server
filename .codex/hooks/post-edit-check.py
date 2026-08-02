@@ -43,6 +43,7 @@ if "@Entity" in content:
                 warnings.append(f"L{i + 1}: Entity 필드에 @Column 누락 가능성: {line.strip()}")
 
 if warnings:
-    print(f"[컨벤션 체크 - {file_path.split('/')[-1]}]")
+    print(f"[컨벤션 체크 - {file_path.split('/')[-1]}]", file=sys.stderr)
     for w in warnings:
-        print(f"  - {w}")
+        print(f"  - {w}", file=sys.stderr)
+    sys.exit(2)
