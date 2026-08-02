@@ -126,9 +126,9 @@ public class AdminUnivApplyInfoRowSaver {
                             "유효하지 않은 파견 가능 학기입니다. 가능한 값: " + validEnumValues(SemesterAvailableForDispatch.values()));
                 }
             }
-            case "semesterRequirement" -> applyWithLength(value, 100, s -> data.semesterRequirement = s);
-            case "detailsForLanguage" -> applyWithLength(value, 2000, s -> data.detailsForLanguage = s);
-            case "gpaRequirement" -> applyWithLength(value, 100, s -> data.gpaRequirement = s);
+            case "semesterRequirement" -> applyWithLength(value, 2000, s -> data.semesterRequirement = s);
+            case "detailsForLanguage" -> applyWithLength(value, 4000, s -> data.detailsForLanguage = s);
+            case "gpaRequirement" -> applyWithLength(value, 2000, s -> data.gpaRequirement = s);
             case "gpaRequirementCriteria" -> applyWithLength(value, 100, s -> data.gpaRequirementCriteria = s);
             case "detailsForAccommodation" -> applyWithLength(value, 2000, s -> data.detailsForAccommodation = s);
             default -> data.extraInfo.put(header, value);

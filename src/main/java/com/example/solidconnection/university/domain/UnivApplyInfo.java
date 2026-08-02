@@ -55,13 +55,13 @@ public class UnivApplyInfo extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SemesterAvailableForDispatch semesterAvailableForDispatch;
 
-    @Column(name = "semester_requirement", length = 100)
+    @Column(name = "semester_requirement", length = 2000)
     private String semesterRequirement;
 
-    @Column(name = "details_for_language", length = 2000)
+    @Column(name = "details_for_language", length = 4000)
     private String detailsForLanguage;
 
-    @Column(name = "gpa_requirement", length = 100)
+    @Column(name = "gpa_requirement", length = 2000)
     private String gpaRequirement;
 
     @Column(name = "gpa_requirement_criteria", length = 100)
