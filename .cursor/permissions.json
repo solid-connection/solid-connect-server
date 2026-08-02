@@ -1,0 +1,26 @@
+{
+  "mcpAllowlist": [
+    "serena:list_dir",
+    "serena:read_file",
+    "serena:find_file",
+    "serena:get_symbols_overview",
+    "serena:find_symbol",
+    "serena:think_about_collected_information",
+    "serena:search_for_pattern",
+    "serena:replace_content",
+    "serena:create_text_file"
+  ],
+  "terminalAllowlist": [
+    "./gradlew test",
+    "./gradlew compileTestJava",
+    "./gradlew clean test",
+    "gh pr view",
+    "gh pr diff",
+    "gh pr checks",
+    "gh run view",
+    "gh pr commits",
+    "gh api",
+    "git fetch",
+    "cd"
+  ]
+}
