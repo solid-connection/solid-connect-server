@@ -74,6 +74,19 @@ public class SiteUserFixture {
                 .create();
     }
 
+    public SiteUser 국내_대학_정보_소지_사용자(int index, String nickname, Long homeUniversityId) {
+        return siteUserFixtureBuilder.siteUser()
+                .email("university" + index + "@example.com")
+                .authType(AuthType.EMAIL)
+                .nickname(nickname)
+                .homeUniversityId(homeUniversityId)
+                .profileImageUrl("profileImageUrl")
+                .role(Role.MENTEE)
+                .password("password123")
+                .userStatus(UserStatus.ACTIVE)
+                .create();
+    }
+
     public SiteUser 멘토(int index, String nickname) {
         return siteUserFixtureBuilder.siteUser()
                 .email("mentor" + index + "@example.com")

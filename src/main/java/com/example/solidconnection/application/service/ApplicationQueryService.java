@@ -68,13 +68,19 @@ public class ApplicationQueryService {
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        if (siteUser.getHomeUniversityId() == null) {
+            throw new CustomException(SCHOOL_EMAIL_NOT_VERIFIED);
+        }
+
         List<String> keywords = StringUtils.isNotBlank(keyword) ? List.of(keyword) : List.of();
 
         Term term = termRepository.findByIsCurrentTrue()
                 .orElseThrow(() -> new CustomException(CURRENT_TERM_NOT_FOUND));
 
         List<UnivApplyInfo> univApplyInfos = universityFilterRepository
-                .findAllByRegionCodeAndKeywordsAndTermId(regionCode, keywords, term.getId());
+                .findAllByRegionCodeAndKeywordsAndTermIdAndHomeUniversityId(
+                        regionCode, keywords, term.getId(), siteUser.getHomeUniversityId());
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of());
         }
