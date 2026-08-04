@@ -82,7 +82,7 @@ public class ApplicationQueryService {
 
         List<UnivApplyInfo> univApplyInfos = universityFilterRepository
                 .findAllByRegionCodeAndKeywordsAndTermIdAndHomeUniversityId(
-                        regionCode, keywords, term.getId(), siteUser.getHomeUniversityId());
+                        regionCode, keywords, term.getId(), homeUniversityId);
         if (univApplyInfos.isEmpty()) {
             return new ApplicationsResponse(List.of());
         }
