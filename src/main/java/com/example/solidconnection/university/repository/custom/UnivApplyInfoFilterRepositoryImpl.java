@@ -31,7 +31,12 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
     }
 
     @Override
-    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermId(String regionCode, List<String> keywords, Long termId) {
+    public List<UnivApplyInfo> findAllByRegionCodeAndKeywordsAndTermIdAndHomeUniversityId(
+            String regionCode,
+            List<String> keywords,
+            Long termId,
+            long homeUniversityId
+    ) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
         QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
@@ -42,12 +47,13 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .selectFrom(univApplyInfo)
                 .join(univApplyInfo.university, university).fetchJoin()
                 .join(university.country, country).fetchJoin()
-                .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
+                .join(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
                 .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         regionCodeEq(country, regionCode)
                                 .and(countryOrUniversityContainsKeyword(country, university, keywords))
                                 .and(univApplyInfo.termId.eq(termId))
+                                .and(homeUniversity.id.eq(homeUniversityId))
                 )
                 .distinct()
                 .fetch();

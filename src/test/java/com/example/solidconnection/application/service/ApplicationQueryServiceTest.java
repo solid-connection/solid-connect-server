@@ -24,6 +24,7 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import com.example.solidconnection.term.domain.Term;
 import com.example.solidconnection.term.fixture.TermFixture;
+import com.example.solidconnection.university.domain.HomeUniversity;
 import com.example.solidconnection.university.domain.UnivApplyInfo;
 import com.example.solidconnection.university.fixture.HomeUniversityFixture;
 import com.example.solidconnection.university.fixture.UnivApplyInfoFixture;
@@ -93,16 +94,17 @@ class ApplicationQueryServiceTest {
     @BeforeEach
     void setUp() {
         term = termFixture.현재_학기("2025-2");
+        HomeUniversity 인하대학교 = homeUniversityFixture.인하대학교();
 
-        user1 = siteUserFixture.사용자(1, "test1");
+        user1 = siteUserFixture.국내_대학_정보_소지_사용자(1, "test1", 인하대학교.getId());
         gpaScore1 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user1);
         languageTestScore1 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user1);
 
-        user2 = siteUserFixture.사용자(2, "test2");
+        user2 = siteUserFixture.국내_대학_정보_소지_사용자(2, "test2", 인하대학교.getId());
         gpaScore2 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user2);
         languageTestScore2 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user2);
 
-        user3 = siteUserFixture.사용자(3, "test3");
+        user3 = siteUserFixture.국내_대학_정보_소지_사용자(3, "test3", 인하대학교.getId());
         gpaScore3 = gpaScoreFixture.GPA_점수(VerifyStatus.APPROVED, user3);
         languageTestScore3 = languageTestScoreFixture.어학_점수(VerifyStatus.APPROVED, user3);
 
@@ -211,9 +213,13 @@ class ApplicationQueryServiceTest {
 
         @Test
         void 모교가_등록되지_않은_사용자는_미리보기를_조회할_수_없다() {
+            // given
+            SiteUser userWithoutHomeUniversity = siteUserFixture.사용자(4, "test4");
+
             // when
             // then
-            assertThatThrownBy(() -> applicationQueryService.getApplicantUniversityPreviews(user1.getId()))
+            assertThatThrownBy(() -> applicationQueryService.getApplicantUniversityPreviews(
+                    userWithoutHomeUniversity.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(SCHOOL_EMAIL_NOT_VERIFIED.getMessage());
         }
@@ -361,6 +367,50 @@ class ApplicationQueryServiceTest {
                                .flatMap(univ -> univ.applicants().stream())
                                .filter(ApplicantResponse::isMine))
                     .containsExactly(ApplicantResponse.of(secondApplication, true));
+        }
+
+        @Test
+        void 다른_모교의_지원_대학과_지원자는_조회되지_않는다() {
+            // given
+            UnivApplyInfo 인천대학교_전용_지원_정보 = univApplyInfoFixtureBuilder.univApplyInfo()
+                    .termId(term.getId())
+                    .koreanName("인천대학교 전용 교환 대학")
+                    .university(서던덴마크대학교_지원_정보.getUniversity())
+                    .homeUniversity(homeUniversityFixture.인천대학교())
+                    .create();
+            Application application1 = applicationFixture.지원서(
+                    user1, "nickname1", term.getId(),
+                    gpaScore1.getGpa(), languageTestScore1.getLanguageTest(),
+                    List.of(괌대학_A_지원_정보.getId())
+            );
+            applicationFixture.지원서(
+                    user2, "nickname2", term.getId(),
+                    gpaScore2.getGpa(), languageTestScore2.getLanguageTest(),
+                    List.of(인천대학교_전용_지원_정보.getId())
+            );
+
+            // when
+            ApplicationsResponse response = applicationQueryService.getApplicants(user1.getId(), "", "");
+
+            // then
+            assertThat(response.choices().get(0)).containsExactlyInAnyOrder(
+                    ApplicantsResponse.of(괌대학_A_지원_정보, List.of(application1), user1),
+                    ApplicantsResponse.of(버지니아공과대학_지원_정보, List.of(), user1),
+                    ApplicantsResponse.of(서던덴마크대학교_지원_정보, List.of(), user1)
+            );
+        }
+
+        @Test
+        void 모교가_등록되지_않은_사용자는_지원자_목록을_조회할_수_없다() {
+            // given
+            SiteUser userWithoutHomeUniversity = siteUserFixture.사용자(4, "test4");
+
+            // when
+            // then
+            assertThatThrownBy(() -> applicationQueryService.getApplicants(
+                    userWithoutHomeUniversity.getId(), "", ""))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(SCHOOL_EMAIL_NOT_VERIFIED.getMessage());
         }
     }
 
