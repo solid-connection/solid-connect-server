@@ -60,7 +60,8 @@ public class ApplicationQueryService {
                 applicationRepository.findApplicantUniversityPreviews(
                         VerifyStatus.APPROVED,
                         term.getId(),
-                        siteUser.getHomeUniversityId())
+                        siteUser.getHomeUniversityId()
+                )
         );
     }
 
@@ -68,8 +69,9 @@ public class ApplicationQueryService {
     public ApplicationsResponse getApplicants(long siteUserId, String regionCode, String keyword) {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        Long homeUniversityId = siteUser.getHomeUniversityId();
 
-        if (siteUser.getHomeUniversityId() == null) {
+        if (homeUniversityId == null) {
             throw new CustomException(SCHOOL_EMAIL_NOT_VERIFIED);
         }
 
