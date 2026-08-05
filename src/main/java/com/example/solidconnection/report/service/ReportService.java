@@ -4,6 +4,8 @@ import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatParticipantRepository;
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.post.domain.Post;
@@ -28,6 +30,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatParticipantRepository chatParticipantRepository;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional
     public void createReport(long reporterId, ReportRequest request) {
@@ -39,6 +42,7 @@ public class ReportService {
 
         Report report = new Report(reporterId, reportedId, request.reportType(), request.targetType(), request.targetId());
         reportRepository.save(report);
+        discordNotifier.notifyReviewRequested(DiscordNotificationType.REPORT, "신고자 ID: " + reporterId);
     }
 
     private void validateReporterAndReportedExists(long reporterId, long reportedId) {
