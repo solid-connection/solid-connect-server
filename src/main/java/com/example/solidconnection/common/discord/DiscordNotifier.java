@@ -1,0 +1,50 @@
+package com.example.solidconnection.common.discord;
+
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+@RequiredArgsConstructor
+@EnableAsync
+@Slf4j
+public class DiscordNotifier {
+
+    private static final String ADMIN_PAGE_URL = "https://admins.solid-connection.com";
+
+    private final RestTemplate restTemplate;
+
+    @Value("${discord.webhook-url:}")
+    private String webhookUrl;
+
+    @Value("${spring.profiles.active:local}")
+    private String environment;
+
+    @Async
+    public void notifyReviewRequested(DiscordNotificationType type, String applicantInfo) {
+        if (webhookUrl.isBlank()) {
+            return;
+        }
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(Map.of("content", buildMessage(type, applicantInfo)), headers);
+            restTemplate.postForEntity(webhookUrl, request, Void.class);
+        } catch (Exception e) {
+            log.error("Discord 검수 알림 전송 실패. type={}, applicantInfo={}", type, applicantInfo, e);
+        }
+    }
+
+    private String buildMessage(DiscordNotificationType type, String applicantInfo) {
+        return "[%s] %s 검수 요청이 등록되었습니다.\n신청자: %s\n관리자 페이지: %s"
+                .formatted(environment.toUpperCase(), type.getDisplayName(), applicantInfo, ADMIN_PAGE_URL);
+    }
+}
