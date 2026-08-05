@@ -25,7 +25,7 @@ public class DiscordNotifier {
     @Value("${discord.webhook-url:}")
     private String webhookUrl;
 
-    @Value("${spring.profiles.active:local}")
+    @Value("${spring.profiles.active:}")
     private String environment;
 
     @Async
