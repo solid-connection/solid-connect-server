@@ -5,6 +5,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPL
 import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FOUND;
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
@@ -35,6 +37,7 @@ public class MentorApplicationService {
     private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
     private final TermRepository termRepository;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional
     public void submitMentorApplication(
@@ -60,6 +63,7 @@ public class MentorApplicationService {
                 mentorApplicationRequest.exchangeStatus()
         );
         mentorApplicationRepository.save(mentorApplication);
+        discordNotifier.notifyReviewRequested(DiscordNotificationType.MENTOR_APPLICATION, siteUser.getNickname());
     }
 
     private void ensureNoPendingOrApprovedMentorApplication(long siteUserId) {
