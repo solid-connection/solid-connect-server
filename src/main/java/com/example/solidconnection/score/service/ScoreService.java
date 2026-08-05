@@ -4,6 +4,8 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -37,6 +39,7 @@ public class ScoreService {
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
     private final HomeUniversityQueryService homeUniversityQueryService;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional
     public Long submitGpaScore(long siteUserId, GpaScoreRequest gpaScoreRequest, MultipartFile file) {
@@ -46,6 +49,7 @@ public class ScoreService {
         Gpa gpa = new Gpa(gpaScoreRequest.gpa(), gpaScoreRequest.gpaCriteria(), uploadedFile.fileUrl());
         GpaScore newGpaScore = new GpaScore(gpa, siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);
+        discordNotifier.notifyReviewRequested(DiscordNotificationType.GPA_SCORE, siteUser.getNickname());
         return savedNewGpaScore.getId();
     }
 
@@ -58,6 +62,7 @@ public class ScoreService {
                                                      languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
         LanguageTestScore newScore = new LanguageTestScore(languageTest, siteUser);
         LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);
+        discordNotifier.notifyReviewRequested(DiscordNotificationType.LANGUAGE_TEST_SCORE, siteUser.getNickname());
         return savedNewScore.getId();
     }
 
