@@ -42,7 +42,7 @@ public class ReportService {
 
         Report report = new Report(reporterId, reportedId, request.reportType(), request.targetType(), request.targetId());
         reportRepository.save(report);
-        discordNotifier.notifyReviewRequested(DiscordNotificationType.REPORT, "신고자 ID: " + reporterId);
+        discordNotifier.notify(DiscordNotificationType.REPORT, "신고자 ID: " + reporterId);
     }
 
     private void validateReporterAndReportedExists(long reporterId, long reportedId) {

@@ -29,7 +29,7 @@ public class DiscordNotifier {
     private String environment;
 
     @Async
-    public void notifyReviewRequested(DiscordNotificationType type, String applicantInfo) {
+    public void notify(DiscordNotificationType type, String applicantInfo) {
         if (webhookUrl.isBlank()) {
             return;
         }
