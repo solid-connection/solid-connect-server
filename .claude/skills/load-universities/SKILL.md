@@ -10,7 +10,7 @@ Use this skill when asked to load university exchange information from a univers
 ## Scope and Safety
 
 - Before any workbook inspection, authentication, or API request, ask the operator to choose the target environment: `local` or `stage`. Do not infer or reuse an environment from an earlier import.
-- Target only the selected environment through `/admin/**` APIs: `local` uses `http://localhost:8080`; `stage` uses `https://stage.solid-connection.com`. Never target prod or an arbitrary URL.
+- Target only the selected environment through `/admin/**` APIs: `local` uses `http://localhost:8080`; `stage` uses `https://api.stage.solid-connection.com`. Never target prod or an arbitrary URL.
 - Do not create or maintain parsers, mappings, templates, or configuration keyed by a home university, term, workbook layout, sheet, or header.
 - Treat the workbook as evidence, not as an API payload. The agent interprets it for this one import and prepares a transient canonical payload only after review.
 - Never mutate data while extraction questions are unresolved. Require an explicit user confirmation to apply the entire file.

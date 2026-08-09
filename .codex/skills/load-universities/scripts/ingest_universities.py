@@ -23,7 +23,7 @@ from urllib.request import Request, urlopen
 from xml.etree import ElementTree
 
 
-APPROVED_DEV_BASE_URL = "https://stage.solid-connection.com"
+APPROVED_DEV_BASE_URL = "https://api.stage.solid-connection.com"
 TERM_RE = re.compile(r"^\d{4}-\d$")
 ALLOWED_SEMESTERS = {
     "ONE_SEMESTER",
