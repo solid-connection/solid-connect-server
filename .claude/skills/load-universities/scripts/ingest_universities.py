@@ -375,18 +375,27 @@ def fetch_all_home_universities(api: ApiClient) -> dict[str, dict[str, Any]]:
 
 
 def fetch_all_host_universities(api: ApiClient) -> dict[str, dict[str, Any]]:
+    # GET /admin/host-universities uses a 1-indexed page contract (page=1 is
+    # the first page), unlike Spring Data's usual 0-indexed default. size is
+    # capped server-side at 50 regardless of what's requested here.
     by_name: dict[str, dict[str, Any]] = {}
-    page = 0
+    page = 1
     while True:
-        response = api.request_json("GET", "/admin/host-universities", query={"page": page, "size": 100})
+        response = api.request_json("GET", "/admin/host-universities", query={"page": page, "size": 50})
         for item in response.get("content", []):
             for name_key in ("koreanName", "englishName", "formatName"):
                 name = item.get(name_key)
                 if name:
                     by_name[name] = item
+                    # parse_rows() always strips field values via clean(), so a DB
+                    # record whose name has stray whitespace (a data-entry artifact)
+                    # would otherwise never match row.host_korean_name/english_name.
+                    stripped = name.strip()
+                    if stripped and stripped != name:
+                        by_name[stripped] = item
         total_pages = int(response.get("totalPages", 0))
         page += 1
-        if page >= total_pages:
+        if page > total_pages:
             break
     return by_name
 
@@ -617,6 +626,11 @@ def verify_row(api: ApiClient, row: ParsedRow, apply_info_id: int, term_id: int,
         actual = fetched.get(key)
         if key == "languageRequirements":
             actual = sorted(actual or [], key=lambda lr: (lr.get("languageTestType"), lr.get("minScore")))
+        if key == "koreanName" and isinstance(actual, str) and actual.strip() == expected_value:
+            # parse_rows() always strips field values via clean(), so a DB record whose
+            # name has stray whitespace (a data-entry artifact) would otherwise always
+            # mismatch against the stripped row.host_korean_name.
+            continue
         if actual != expected_value:
             mismatches.append({"field": key, "expected": expected_value, "actual": actual})
     if mismatches:
