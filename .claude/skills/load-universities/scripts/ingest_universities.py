@@ -375,9 +375,6 @@ def fetch_all_home_universities(api: ApiClient) -> dict[str, dict[str, Any]]:
 
 
 def fetch_all_host_universities(api: ApiClient) -> dict[str, dict[str, Any]]:
-    # GET /admin/host-universities uses a 1-indexed page contract (page=1 is
-    # the first page), unlike Spring Data's usual 0-indexed default. size is
-    # capped server-side at 50 regardless of what's requested here.
     by_name: dict[str, dict[str, Any]] = {}
     page = 1
     while True:
