@@ -24,6 +24,7 @@ from xml.etree import ElementTree
 
 
 APPROVED_DEV_BASE_URL = "https://api.stage.solid-connection.com"
+APPROVED_LOCAL_BASE_URL = "http://localhost:8080"
 TERM_RE = re.compile(r"^\d{4}-\d$")
 ALLOWED_SEMESTERS = {
     "ONE_SEMESTER",
@@ -351,7 +352,7 @@ class ApiClient:
 
 def enforce_dev_url(base_url: str) -> str:
     normalized = base_url.rstrip("/")
-    if normalized != APPROVED_DEV_BASE_URL:
+    if normalized not in (APPROVED_DEV_BASE_URL, APPROVED_LOCAL_BASE_URL):
         raise IngestionError(f"refusing non-dev target: {base_url}")
     return normalized
 
