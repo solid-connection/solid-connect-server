@@ -384,9 +384,6 @@ def fetch_all_host_universities(api: ApiClient) -> dict[str, dict[str, Any]]:
                 name = item.get(name_key)
                 if name:
                     by_name[name] = item
-                    # parse_rows() always strips field values via clean(), so a DB
-                    # record whose name has stray whitespace (a data-entry artifact)
-                    # would otherwise never match row.host_korean_name/english_name.
                     stripped = name.strip()
                     if stripped and stripped != name:
                         by_name[stripped] = item
@@ -624,9 +621,6 @@ def verify_row(api: ApiClient, row: ParsedRow, apply_info_id: int, term_id: int,
         if key == "languageRequirements":
             actual = sorted(actual or [], key=lambda lr: (lr.get("languageTestType"), lr.get("minScore")))
         if key == "koreanName" and isinstance(actual, str) and actual.strip() == expected_value:
-            # parse_rows() always strips field values via clean(), so a DB record whose
-            # name has stray whitespace (a data-entry artifact) would otherwise always
-            # mismatch against the stripped row.host_korean_name.
             continue
         if actual != expected_value:
             mismatches.append({"field": key, "expected": expected_value, "actual": actual})
