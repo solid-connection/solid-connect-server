@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "command -v python3 >/dev/null 2>&1 && exec python3 .cursor/hooks/post-edit-check.py || exec python .cursor/hooks/post-edit-check.py"
+      }
+    ],
+    "stop": [
+      {
+        "command": "command -v python3 >/dev/null 2>&1 && exec python3 .cursor/hooks/notify.py || exec python .cursor/hooks/notify.py"
+      }
+    ]
+  }
+}

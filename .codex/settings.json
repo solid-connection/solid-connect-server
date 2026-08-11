@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/notify.py 2>/dev/null || python .claude/hooks/notify.py"
+            "command": "command -v python3 >/dev/null 2>&1 && exec python3 .codex/hooks/notify.py || exec python .codex/hooks/notify.py"
           }
         ]
       }
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 && exec python3 .claude/hooks/post-edit-check.py || exec python .claude/hooks/post-edit-check.py"
+            "command": "command -v python3 >/dev/null 2>&1 && exec python3 .codex/hooks/post-edit-check.py || exec python .codex/hooks/post-edit-check.py"
           }
         ]
       }

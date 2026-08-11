@@ -3,8 +3,21 @@ import json
 import sys
 import re
 
+
+def resolve_file_path(data: dict) -> str:
+    file_path = data.get("file_path", "")
+    if file_path:
+        return file_path
+
+    tool_input = data.get("tool_input", {})
+    if isinstance(tool_input, dict):
+        return tool_input.get("file_path", "")
+
+    return ""
+
+
 data = json.load(sys.stdin)
-file_path = data.get("tool_input", {}).get("file_path", "")
+file_path = resolve_file_path(data)
 
 if not file_path.endswith(".java") or not file_path:
     sys.exit(0)

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "permissions": {
+    "allow": [
+      "Mcp(serena:*)",
+      "Shell(./gradlew)",
+      "Shell(gh)",
+      "Shell(git)",
+      "Shell(cd)",
+      "WebFetch(javadoc.io)",
+      "WebFetch(www.baeldung.com)",
+      "WebFetch(michael-simons.github.io)",
+      "WebFetch(raw.githubusercontent.com)"
+    ]
+  }
+}
