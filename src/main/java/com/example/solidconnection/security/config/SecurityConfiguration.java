@@ -65,6 +65,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/connect/**").authenticated()
                         .requestMatchers("/admin/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole(ADMIN.name())
+                        // 내부 전용 경로는 사용자 토큰이 없는 인프라가 호출하므로 공유 토큰으로 직접 인증하고, 외부 접근은 nginx 에서 차단한다.
+                        .requestMatchers("/internal/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(exception -> exception

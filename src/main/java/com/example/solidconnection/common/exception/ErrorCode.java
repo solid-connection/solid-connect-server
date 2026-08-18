@@ -191,6 +191,9 @@ public enum ErrorCode {
     // import
     INVALID_MARKDOWN_FORMAT(HttpStatus.BAD_REQUEST.value(), "올바른 마크다운 표 형식이 아닙니다."),
 
+    // internal alarm
+    INTERNAL_ALARM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "요청을 인증할 수 없습니다."),
+
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "JWT 토큰을 처리할 수 없습니다."),
