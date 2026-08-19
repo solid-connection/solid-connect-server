@@ -107,3 +107,9 @@ token:
   black-list:
     storage-key-prefix: "BLACKLIST"
     expire-time: 10m
+discord:
+  webhook-url: "https://discord.test/webhooks/legacy"
+  db-backup-fail-alarm:
+    webhook-url: "https://discord.test/webhooks/db-backup"
+internal-alarm:
+  token: "test-internal-alarm-token"

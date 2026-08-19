@@ -1,5 +1,6 @@
 package com.example.solidconnection.alarm.service;
 
+import static com.example.solidconnection.common.exception.ErrorCode.DB_BACKUP_ALARM_SEND_FAILED;
 import static com.example.solidconnection.common.exception.ErrorCode.INTERNAL_ALARM_UNAUTHORIZED;
 
 import com.example.solidconnection.alarm.config.DbBackupAlarmProperties;
@@ -18,16 +19,24 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 /*
- * - DB EC2 는 private subnet 에 있어 Discord 로 직접 요청할 수 없다.
- * - 따라서 백업 실패 이벤트를 전달받아 Discord 로 중계한다.
+ * - DB EC2 는 private subnet 에 있어 Discord 로 직접 요청할 수 없다. 따라서 백업 실패 이벤트를 전달받아 Discord 로 중계한다.
+ * - 같은 실패가 반복될 때 알림이 쌓이지 않도록 억제 간격을 점점 늘린다.
+ * - 억제 상태는 Redis 에 두고 원자적 연산으로 갱신하므로, 서버가 여러 대여도 한 대만 알림을 보낸다.
  * */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DbBackupAlarmService {
 
-    private static final String SUPPRESSION_KEY_PREFIX = "db-backup-alarm:";
-    private static final Duration SUPPRESSION_TTL = Duration.ofMinutes(10);
+    private static final String MUTE_KEY_PREFIX = "db-backup-alarm:mute:";
+    private static final String COUNT_KEY_PREFIX = "db-backup-alarm:count:";
+    private static final Duration COUNT_TTL = Duration.ofHours(12);
+    private static final List<Duration> MUTE_DURATIONS = List.of(
+            Duration.ofMinutes(5),
+            Duration.ofMinutes(15),
+            Duration.ofHours(1),
+            Duration.ofHours(6)
+    );
     private static final String ROLE_MENTION_FORMAT = "<@&%s>";
     private static final String EMPTY_DETAIL = "-";
 
@@ -42,17 +51,25 @@ public class DbBackupAlarmService {
     public void alarmBackupFailure(String token, DbBackupAlarmRequest request) {
         validateToken(token);
 
-        String suppressionKey = buildSuppressionKey(request);
-        if (isSuppressed(suppressionKey)) {
+        String alarmKey = buildAlarmKey(request);
+        String muteKey = MUTE_KEY_PREFIX + alarmKey;
+        String countKey = COUNT_KEY_PREFIX + alarmKey;
+
+        if (!acquireAlarmGate(muteKey)) {
             return;
         }
+        long alarmCount = increaseAlarmCount(countKey);
+        Duration muteDuration = resolveMuteDuration(alarmCount);
+        extendAlarmGate(muteKey, muteDuration);
+
         boolean isSent = discordWebhookSender.send(
                 dbBackupAlarmProperties.webhookUrl(),
-                buildMessage(request),
+                buildMessage(request, alarmCount, muteDuration),
                 mentionableRoleIds()
         );
         if (!isSent) {
-            releaseSuppression(suppressionKey);
+            releaseAlarmGate(muteKey, countKey);
+            throw new CustomException(DB_BACKUP_ALARM_SEND_FAILED);
         }
     }
 
@@ -73,31 +90,70 @@ public class DbBackupAlarmService {
         }
     }
 
-    private String buildSuppressionKey(DbBackupAlarmRequest request) {
-        return SUPPRESSION_KEY_PREFIX + request.type().name() + ":" + request.instanceId();
+    private String buildAlarmKey(DbBackupAlarmRequest request) {
+        return request.type().name() + ":" + request.instanceId();
     }
 
     /*
-     * - 같은 유형과 인스턴스의 알림이 반복되면 일정 시간 동안 전송하지 않는다.
-     * - Redis 를 사용할 수 없을 때는 알림 누락을 막기 위해 억제하지 않는다.
+     * - setIfAbsent 는 원자적이므로 여러 서버가 동시에 요청받아도 한 대만 통과한다.
+     * - 통과하지 못하면 억제 중이거나 다른 서버가 방금 알림을 보낸 것이므로 전송하지 않는다.
+     * - Redis 를 사용할 수 없을 때는 알림 누락을 막기 위해 통과시킨다.
      * */
-    private boolean isSuppressed(String suppressionKey) {
+    private boolean acquireAlarmGate(String muteKey) {
         try {
-            Boolean isFirstAlarm = redisTemplate.opsForValue().setIfAbsent(suppressionKey, "1", SUPPRESSION_TTL);
-            return !Boolean.TRUE.equals(isFirstAlarm);
+            Boolean isAcquired = redisTemplate.opsForValue()
+                    .setIfAbsent(muteKey, "1", MUTE_DURATIONS.getFirst());
+            return Boolean.TRUE.equals(isAcquired);
         } catch (Exception e) {
-            log.error("백업 알림 중복 억제 상태를 확인하지 못해 알림을 그대로 전송합니다. key={}", suppressionKey, e);
-            return false;
+            log.error("백업 알림 억제 상태를 확인하지 못해 알림을 그대로 전송합니다. key={}", muteKey, e);
+            return true;
         }
     }
 
-    private String buildMessage(DbBackupAlarmRequest request) {
-        return buildRoleMention() + "[%s] MySQL 백업 알림: %s\n인스턴스: %s\n발생 시각: %s\n상세: %s"
+    /*
+     * - 게이트를 통과한 요청만 카운트하므로 서버가 여러 대여도 연속 발생 횟수가 부풀지 않는다.
+     * */
+    private long increaseAlarmCount(String countKey) {
+        try {
+            Long alarmCount = redisTemplate.opsForValue().increment(countKey);
+            redisTemplate.expire(countKey, COUNT_TTL);
+            if (alarmCount == null) {
+                return 1L;
+            }
+            return alarmCount;
+        } catch (Exception e) {
+            log.error("백업 알림 연속 발생 횟수를 증가하지 못했습니다. key={}", countKey, e);
+            return 1L;
+        }
+    }
+
+    private Duration resolveMuteDuration(long alarmCount) {
+        int index = (int) Math.min(alarmCount, MUTE_DURATIONS.size()) - 1;
+        return MUTE_DURATIONS.get(Math.max(index, 0));
+    }
+
+    /*
+     * - 최초 잠금은 가장 짧은 간격으로 걸어두고, 연속 발생 횟수에 맞는 간격으로 늘린다.
+     * */
+    private void extendAlarmGate(String muteKey, Duration muteDuration) {
+        try {
+            redisTemplate.expire(muteKey, muteDuration);
+        } catch (Exception e) {
+            log.error("백업 알림 억제 간격을 늘리지 못했습니다. key={}", muteKey, e);
+        }
+    }
+
+    private String buildMessage(DbBackupAlarmRequest request, long alarmCount, Duration muteDuration) {
+        return buildRoleMention()
+                + "[%s] [%s] MySQL 백업 알림: %s\n인스턴스: %s\n발생 시각: %s\n연속 발생: %d회 (다음 %s 동안 같은 알림을 보내지 않습니다)\n상세: %s"
                 .formatted(
                         environment.toUpperCase(),
+                        request.type().getSeverity().getDisplayName(),
                         request.type().getDisplayName(),
                         request.instanceId(),
                         request.occurredAt(),
+                        alarmCount,
+                        formatDuration(muteDuration),
                         resolveDetail(request.detail())
                 );
     }
@@ -111,6 +167,14 @@ public class DbBackupAlarmService {
             return "";
         }
         return ROLE_MENTION_FORMAT.formatted(mentionRoleId) + "\n";
+    }
+
+    private String formatDuration(Duration duration) {
+        long hours = duration.toHours();
+        if (hours > 0) {
+            return hours + "시간";
+        }
+        return duration.toMinutes() + "분";
     }
 
     private String resolveDetail(String detail) {
@@ -129,13 +193,15 @@ public class DbBackupAlarmService {
     }
 
     /*
-     * - 전송에 실패하면 억제 상태를 되돌려 다음 백업 주기의 알림이 막히지 않게 한다.
+     * - 전송에 실패하면 억제와 횟수를 되돌려 다음 요청이 다시 알림을 시도할 수 있게 한다.
+     * - dump 는 하루 한 번 실행되므로 실패를 그대로 두면 그날의 알림이 사라진다.
      * */
-    private void releaseSuppression(String suppressionKey) {
+    private void releaseAlarmGate(String muteKey, String countKey) {
         try {
-            redisTemplate.delete(suppressionKey);
+            redisTemplate.delete(muteKey);
+            redisTemplate.opsForValue().decrement(countKey);
         } catch (Exception e) {
-            log.error("백업 알림 중복 억제 상태를 해제하지 못했습니다. key={}", suppressionKey, e);
+            log.error("백업 알림 억제 상태를 해제하지 못했습니다. key={}", muteKey, e);
         }
     }
 }

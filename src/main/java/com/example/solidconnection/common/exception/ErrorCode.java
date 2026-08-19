@@ -193,6 +193,7 @@ public enum ErrorCode {
 
     // internal alarm
     INTERNAL_ALARM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "요청을 인증할 수 없습니다."),
+    DB_BACKUP_ALARM_SEND_FAILED(HttpStatus.BAD_GATEWAY.value(), "알림 전송에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // general
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
