@@ -12,10 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
 /*
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
  * - 억제 상태는 Redis 에 두고 원자적 연산으로 갱신하므로, 서버가 여러 대여도 한 대만 알림을 보낸다.
  * */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class DbBackupAlarmService {
 
@@ -44,9 +44,24 @@ public class DbBackupAlarmService {
     private final DbBackupAlarmProperties dbBackupAlarmProperties;
     private final InternalAlarmAuthProperties internalAlarmAuthProperties;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisScript<Long> releaseDbBackupAlarmLuaScript;
 
     @Value("${spring.profiles.active:}")
     private String environment;
+
+    public DbBackupAlarmService(
+            DiscordWebhookSender discordWebhookSender,
+            DbBackupAlarmProperties dbBackupAlarmProperties,
+            InternalAlarmAuthProperties internalAlarmAuthProperties,
+            RedisTemplate<String, String> redisTemplate,
+            @Qualifier("releaseDbBackupAlarmScript") RedisScript<Long> releaseDbBackupAlarmLuaScript
+    ) {
+        this.discordWebhookSender = discordWebhookSender;
+        this.dbBackupAlarmProperties = dbBackupAlarmProperties;
+        this.internalAlarmAuthProperties = internalAlarmAuthProperties;
+        this.redisTemplate = redisTemplate;
+        this.releaseDbBackupAlarmLuaScript = releaseDbBackupAlarmLuaScript;
+    }
 
     public void alarmBackupFailure(String token, DbBackupAlarmRequest request) {
         validateToken(token);
@@ -195,11 +210,11 @@ public class DbBackupAlarmService {
     /*
      * - 전송에 실패하면 억제와 횟수를 되돌려 다음 요청이 다시 알림을 시도할 수 있게 한다.
      * - dump 는 하루 한 번 실행되므로 실패를 그대로 두면 그날의 알림이 사라진다.
+     * - 억제 해제와 횟수 감소를 나누어 실행하면 그 사이에 다른 서버가 증가시킨 횟수를 잘못 줄이므로 lua 로 함께 처리한다.
      * */
     private void releaseAlarmGate(String muteKey, String countKey) {
         try {
-            redisTemplate.delete(muteKey);
-            redisTemplate.opsForValue().decrement(countKey);
+            redisTemplate.execute(releaseDbBackupAlarmLuaScript, List.of(muteKey, countKey));
         } catch (Exception e) {
             log.error("백업 알림 억제 상태를 해제하지 못했습니다. key={}", muteKey, e);
         }

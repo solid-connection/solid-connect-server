@@ -29,7 +29,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -49,12 +51,17 @@ class DbBackupAlarmServiceTest {
     private static final String INSTANCE_ID = "i-0c5d57927ef9ca426";
     private static final Instant OCCURRED_AT = Instant.parse("2026-08-18T03:00:00Z");
     private static final String MUTE_KEY_PREFIX = "db-backup-alarm:mute:";
+    private static final String COUNT_KEY_PREFIX = "db-backup-alarm:count:";
 
     @Autowired
     private DbBackupAlarmService dbBackupAlarmService;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    @Qualifier("releaseDbBackupAlarmScript")
+    private RedisScript<Long> releaseDbBackupAlarmLuaScript;
 
     @MockitoBean
     private DiscordWebhookSender discordWebhookSender;
@@ -71,6 +78,10 @@ class DbBackupAlarmServiceTest {
 
     private String 억제_키(DbBackupAlarmType type, String instanceId) {
         return MUTE_KEY_PREFIX + type.name() + ":" + instanceId;
+    }
+
+    private String 발생_횟수_키(DbBackupAlarmType type, String instanceId) {
+        return COUNT_KEY_PREFIX + type.name() + ":" + instanceId;
     }
 
     @Nested
@@ -341,6 +352,39 @@ class DbBackupAlarmServiceTest {
 
             // then
             verify(discordWebhookSender, times(2)).send(anyString(), contains(instanceId), anyList());
+        }
+
+        @Test
+        void 전송에_실패하면_연속_발생_횟수_키를_남기지_않아_음수가_되지_않는다() {
+            // given
+            String instanceId = "i-count-floor-target";
+            String countKey = 발생_횟수_키(DbBackupAlarmType.DUMP_FAILED, instanceId);
+            reset(discordWebhookSender);
+            when(discordWebhookSender.send(anyString(), anyString(), anyList())).thenReturn(false);
+            DbBackupAlarmRequest request = 백업_알림_요청(DbBackupAlarmType.DUMP_FAILED, instanceId);
+
+            // when
+            assertThatThrownBy(() -> dbBackupAlarmService.alarmBackupFailure(VALID_TOKEN, request))
+                    .isInstanceOf(CustomException.class);
+
+            // then
+            assertThat(redisTemplate.opsForValue().get(countKey)).isNull();
+        }
+
+        @Test
+        void 연속_발생_횟수가_없는_상태에서_되돌려도_음수가_되지_않는다() {
+            // given
+            String muteKey = 억제_키(DbBackupAlarmType.DUMP_FAILED, "i-script-floor-target");
+            String countKey = 발생_횟수_키(DbBackupAlarmType.DUMP_FAILED, "i-script-floor-target");
+
+            // when - 증가가 반영되지 않은 상태를 재현한다
+            Long remainingCount = redisTemplate.execute(releaseDbBackupAlarmLuaScript, List.of(muteKey, countKey));
+
+            // then
+            assertAll(
+                    () -> assertThat(remainingCount).isZero(),
+                    () -> assertThat(redisTemplate.opsForValue().get(countKey)).isNull()
+            );
         }
 
         @Test
