@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class DiscordNotifier {
 
-    private static final String ADMIN_PAGE_URL = "https://admins.solid-connection.com";
+    private static final String ADMIN_PAGE_URL = "https://www.admins.solid-connection.com";
 
     private final RestTemplate restTemplate;
 
