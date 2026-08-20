@@ -69,4 +69,10 @@ public class RedisConfig {
         Resource scriptSource = new ClassPathResource("scripts/incrViewCount.lua");
         return RedisScript.of(scriptSource, Long.class);
     }
+
+    @Bean(name = "releaseDbBackupAlarmScript")
+    public RedisScript<Long> releaseDbBackupAlarmLuaScript() {
+        Resource scriptSource = new ClassPathResource("scripts/releaseDbBackupAlarm.lua");
+        return RedisScript.of(scriptSource, Long.class);
+    }
 }
