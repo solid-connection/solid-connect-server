@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @EnableAsync
 public class DiscordNotifier {
 
-    private static final String ADMIN_PAGE_URL = "https://admins.solid-connection.com";
+    private static final String ADMIN_PAGE_URL = "https://www.admins.solid-connection.com";
 
     private final DiscordWebhookSender discordWebhookSender;
 
@@ -23,14 +23,19 @@ public class DiscordNotifier {
 
     @Async
     public void notify(DiscordNotificationType type, String applicantInfo) {
-        if (webhookUrl.isBlank()) {
+        if (webhookUrl.isBlank() || "local".equalsIgnoreCase(environment)) {
             return;
         }
         discordWebhookSender.send(webhookUrl, buildMessage(type, applicantInfo));
     }
 
     private String buildMessage(DiscordNotificationType type, String applicantInfo) {
-        return "[%s] %s 검수 요청이 등록되었습니다.\n신청자: %s\n관리자 페이지: %s"
-                .formatted(environment.toUpperCase(), type.getDisplayName(), applicantInfo, ADMIN_PAGE_URL);
+        String body = "%s 검수 요청이 등록되었습니다.\n신청자: %s\n관리자 페이지: %s"
+                .formatted(type.getDisplayName(), applicantInfo, ADMIN_PAGE_URL);
+        return switch (environment.toLowerCase()) {
+            case "prod" -> body;
+            case "dev" -> "[개발 서버 알림입니다]\n" + body;
+            default -> "[%s]\n%s".formatted(environment.toUpperCase(), body);
+        };
     }
 }
