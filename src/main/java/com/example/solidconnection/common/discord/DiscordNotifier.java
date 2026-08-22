@@ -30,7 +30,7 @@ public class DiscordNotifier {
 
     @Async
     public void notify(DiscordNotificationType type, String applicantInfo) {
-        if (webhookUrl.isBlank()) {
+        if (webhookUrl.isBlank() || "local".equalsIgnoreCase(environment)) {
             return;
         }
         try {
