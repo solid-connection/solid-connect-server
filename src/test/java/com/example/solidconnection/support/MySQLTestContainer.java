@@ -18,7 +18,9 @@ public class MySQLTestContainer implements ApplicationContextInitializer<Configu
         TestPropertyValues.of(
                 "spring.datasource.url=" + CONTAINER.getJdbcUrl(),
                 "spring.datasource.username=" + CONTAINER.getUsername(),
-                "spring.datasource.password=" + CONTAINER.getPassword()
+                "spring.datasource.password=" + CONTAINER.getPassword(),
+                "spring.datasource.hikari.maximum-pool-size=2",
+                "spring.datasource.hikari.minimum-idle=0"
         ).applyTo(applicationContext.getEnvironment());
     }
 }
