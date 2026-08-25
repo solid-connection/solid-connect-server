@@ -8,6 +8,9 @@ import com.example.solidconnection.admin.dto.GpaScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.DiscordReactionEmoji;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminGpaScoreService {
 
     private final GpaScoreRepository gpaScoreRepository;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional(readOnly = true)
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition scoreSearchCondition, Pageable pageable) {
@@ -41,6 +45,18 @@ public class AdminGpaScoreService {
                 request.verifyStatus(),
                 request.verifyStatus() == VerifyStatus.REJECTED ? request.rejectedReason() : null
         );
+        publishReaction(gpaScoreId, request.verifyStatus());
         return GpaScoreResponse.from(gpaScore);
+    }
+
+    private void publishReaction(long gpaScoreId, VerifyStatus verifyStatus) {
+        String emoji = switch (verifyStatus) {
+            case APPROVED -> DiscordReactionEmoji.APPROVED.getValue();
+            case REJECTED -> DiscordReactionEmoji.REJECTED.getValue();
+            case PENDING -> null;
+        };
+        if (emoji != null) {
+            discordNotifier.addReaction(DiscordNotificationType.GPA_SCORE, gpaScoreId, emoji);
+        }
     }
 }

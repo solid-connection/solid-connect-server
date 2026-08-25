@@ -62,8 +62,12 @@ public class MentorApplicationService {
                 term.getId(),
                 mentorApplicationRequest.exchangeStatus()
         );
-        mentorApplicationRepository.save(mentorApplication);
-        discordNotifier.notify(DiscordNotificationType.MENTOR_APPLICATION, siteUser.getNickname());
+        MentorApplication savedMentorApplication = mentorApplicationRepository.save(mentorApplication);
+        discordNotifier.notify(
+                DiscordNotificationType.MENTOR_APPLICATION,
+                savedMentorApplication.getId(),
+                siteUser.getNickname()
+        );
     }
 
     private void ensureNoPendingOrApprovedMentorApplication(long siteUserId) {

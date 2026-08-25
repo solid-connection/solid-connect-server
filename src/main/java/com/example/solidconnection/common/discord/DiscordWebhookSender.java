@@ -2,8 +2,8 @@ package com.example.solidconnection.common.discord;
 
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,11 +18,14 @@ import org.springframework.web.client.RestTemplate;
  * - webhook url 은 경로에 인증 토큰을 포함하므로 로그와 메트릭에 남기지 않는다.
  * */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class DiscordWebhookSender {
 
     private final RestTemplate discordWebhookRestTemplate;
+
+    public DiscordWebhookSender(@Qualifier("discordWebhookRestTemplate") RestTemplate discordWebhookRestTemplate) {
+        this.discordWebhookRestTemplate = discordWebhookRestTemplate;
+    }
 
     public boolean send(String webhookUrl, String content) {
         return send(webhookUrl, content, List.of());
@@ -48,6 +51,15 @@ public class DiscordWebhookSender {
             log.error("Discord 알림 전송에 실패했습니다. exception={}", e.getClass().getSimpleName());
             return false;
         }
+    }
+
+    public DiscordMessageResponse sendAndGetMessage(String webhookUrl, String content) {
+        String waitUrl = webhookUrl + (webhookUrl.contains("?") ? "&wait=true" : "?wait=true");
+        return discordWebhookRestTemplate.postForObject(
+                waitUrl,
+                buildRequest(content, List.of()),
+                DiscordMessageResponse.class
+        );
     }
 
     private HttpEntity<Map<String, Object>> buildRequest(String content, List<String> mentionableRoleIds) {

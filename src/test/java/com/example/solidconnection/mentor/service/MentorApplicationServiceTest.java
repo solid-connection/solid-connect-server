@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.BDDMockito.given;
 
+import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
 import com.example.solidconnection.mentor.domain.UniversitySelectType;
@@ -53,6 +54,9 @@ public class MentorApplicationServiceTest {
 
     @MockitoBean
     private S3Service s3Service;
+
+    @MockitoBean
+    private DiscordNotifier discordNotifier;
 
     private SiteUser user;
     private Term term;

@@ -8,6 +8,9 @@ import com.example.solidconnection.admin.dto.LanguageTestScoreUpdateRequest;
 import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.DiscordReactionEmoji;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminLanguageTestScoreService {
 
     private final LanguageTestScoreRepository languageTestScoreRepository;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional(readOnly = true)
     public Page<LanguageTestScoreSearchResponse> searchLanguageTestScores(ScoreSearchCondition scoreSearchCondition, Pageable pageable) {
@@ -41,6 +45,18 @@ public class AdminLanguageTestScoreService {
                 request.verifyStatus(),
                 request.verifyStatus() == VerifyStatus.REJECTED ? request.rejectedReason() : null
         );
+        publishReaction(languageTestScoreId, request.verifyStatus());
         return LanguageTestScoreResponse.from(languageTestScore);
+    }
+
+    private void publishReaction(long languageTestScoreId, VerifyStatus verifyStatus) {
+        String emoji = switch (verifyStatus) {
+            case APPROVED -> DiscordReactionEmoji.APPROVED.getValue();
+            case REJECTED -> DiscordReactionEmoji.REJECTED.getValue();
+            case PENDING -> null;
+        };
+        if (emoji != null) {
+            discordNotifier.addReaction(DiscordNotificationType.LANGUAGE_TEST_SCORE, languageTestScoreId, emoji);
+        }
     }
 }
