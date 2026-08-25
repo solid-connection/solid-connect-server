@@ -44,6 +44,21 @@ class DiscordWebhookSenderTest {
         return requestCaptor.getValue();
     }
 
+    @Test
+    void 디스코드_메시지_식별자_확보를_위해_wait_true로_전송한다() {
+        // given
+        String waitUrl = WEBHOOK_URL + "?wait=true";
+        DiscordMessageResponse expected = new DiscordMessageResponse("message-id", "channel-id");
+        when(restTemplate.postForObject(eq(waitUrl), any(), eq(DiscordMessageResponse.class)))
+                .thenReturn(expected);
+
+        // when
+        DiscordMessageResponse response = discordWebhookSender.sendAndGetMessage(WEBHOOK_URL, CONTENT);
+
+        // then
+        assertThat(response).isEqualTo(expected);
+    }
+
     @Nested
     @DisplayName("메시지 전송")
     class 메시지를_전송한다 {

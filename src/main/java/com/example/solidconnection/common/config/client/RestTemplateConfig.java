@@ -32,4 +32,12 @@ public class RestTemplateConfig {
         requestFactory.setReadTimeout((int) TIMEOUT.toMillis());
         return new RestTemplate(requestFactory);
     }
+
+    @Bean
+    public RestTemplate discordBotRestTemplate() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout((int) TIMEOUT.toMillis());
+        requestFactory.setReadTimeout((int) TIMEOUT.toMillis());
+        return new RestTemplate(requestFactory);
+    }
 }

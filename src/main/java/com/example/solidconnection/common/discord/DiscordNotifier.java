@@ -1,5 +1,6 @@
 package com.example.solidconnection.common.discord;
 
+import com.example.solidconnection.common.discord.service.DiscordNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +15,8 @@ public class DiscordNotifier {
     private static final String ADMIN_PAGE_URL = "https://www.admins.solid-connection.com";
 
     private final DiscordWebhookSender discordWebhookSender;
+    private final DiscordNotificationService discordNotificationService;
+    private final DiscordReactionClient discordReactionClient;
 
     @Value("${discord.webhook-url:}")
     private String webhookUrl;
@@ -27,6 +30,26 @@ public class DiscordNotifier {
             return;
         }
         discordWebhookSender.send(webhookUrl, buildMessage(type, applicantInfo));
+    }
+
+    public void notify(DiscordNotificationType type, long reviewId, String applicantInfo) {
+        if (webhookUrl.isBlank() || "local".equalsIgnoreCase(environment)) {
+            return;
+        }
+        DiscordMessageResponse response = discordWebhookSender.sendAndGetMessage(
+                webhookUrl,
+                buildMessage(type, applicantInfo)
+        );
+        discordNotificationService.save(type, reviewId, response.channelId(), response.id());
+    }
+
+    public void addReaction(DiscordNotificationType type, long reviewId, String emoji) {
+        discordNotificationService.findByReviewTypeAndReviewId(type, reviewId)
+                .ifPresent(message -> discordReactionClient.addReaction(
+                        message.getDiscordChannelId(),
+                        message.getDiscordMessageId(),
+                        emoji
+                ));
     }
 
     private String buildMessage(DiscordNotificationType type, String applicantInfo) {
