@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.example.solidconnection.common.VerifyStatus;
+import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -48,6 +49,9 @@ class ScoreServiceTest {
 
     @MockitoBean
     private S3Service s3Service;
+
+    @MockitoBean
+    private DiscordNotifier discordNotifier;
 
     @Autowired
     private SiteUserFixture siteUserFixture;

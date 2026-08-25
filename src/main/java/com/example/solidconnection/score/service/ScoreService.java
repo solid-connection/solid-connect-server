@@ -49,7 +49,7 @@ public class ScoreService {
         Gpa gpa = new Gpa(gpaScoreRequest.gpa(), gpaScoreRequest.gpaCriteria(), uploadedFile.fileUrl());
         GpaScore newGpaScore = new GpaScore(gpa, siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);
-        discordNotifier.notify(DiscordNotificationType.GPA_SCORE, siteUser.getNickname());
+        discordNotifier.notify(DiscordNotificationType.GPA_SCORE, savedNewGpaScore.getId(), siteUser.getNickname());
         return savedNewGpaScore.getId();
     }
 
@@ -62,7 +62,7 @@ public class ScoreService {
                                                      languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
         LanguageTestScore newScore = new LanguageTestScore(languageTest, siteUser);
         LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);
-        discordNotifier.notify(DiscordNotificationType.LANGUAGE_TEST_SCORE, siteUser.getNickname());
+        discordNotifier.notify(DiscordNotificationType.LANGUAGE_TEST_SCORE, savedNewScore.getId(), siteUser.getNickname());
         return savedNewScore.getId();
     }
 

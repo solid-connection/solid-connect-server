@@ -9,6 +9,9 @@ import com.example.solidconnection.admin.dto.MentorApplicationHistoryResponse;
 import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
+import com.example.solidconnection.common.discord.DiscordNotificationType;
+import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.DiscordReactionEmoji;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
@@ -35,6 +38,7 @@ public class AdminMentorApplicationService {
     private final HostUniversityRepository hostUniversityRepository;
     private final SiteUserRepository siteUserRepository;
     private final MentorRepository mentorRepository;
+    private final DiscordNotifier discordNotifier;
 
     @Transactional(readOnly = true)
     public Page<MentorApplicationSearchResponse> searchMentorApplications(
@@ -63,6 +67,7 @@ public class AdminMentorApplicationService {
         );
 
         mentorRepository.save(mentor);
+        publishReaction(mentorApplicationId, DiscordReactionEmoji.APPROVED.getValue());
     }
 
     private void validateUserCanCreateMentor(long siteUserId) {
@@ -80,6 +85,11 @@ public class AdminMentorApplicationService {
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
         mentorApplication.reject(request.rejectedReason());
+        publishReaction(mentorApplicationId, DiscordReactionEmoji.REJECTED.getValue());
+    }
+
+    private void publishReaction(long mentorApplicationId, String emoji) {
+        discordNotifier.addReaction(DiscordNotificationType.MENTOR_APPLICATION, mentorApplicationId, emoji);
     }
 
     @Transactional(readOnly = true)
