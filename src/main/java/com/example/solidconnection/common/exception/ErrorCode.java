@@ -196,6 +196,7 @@ public enum ErrorCode {
     DB_BACKUP_ALARM_SEND_FAILED(HttpStatus.BAD_GATEWAY.value(), "알림 전송에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // general
+    INVALID_PAGE_PARAMETER(HttpStatus.BAD_REQUEST.value(), "유효하지 않은 페이지 번호입니다. page는 1 이상의 정수여야 합니다."),
     JSON_PARSING_FAILED(HttpStatus.BAD_REQUEST.value(), "JSON 파싱을 할 수 없습니다."),
     JWT_EXCEPTION(HttpStatus.BAD_REQUEST.value(), "JWT 토큰을 처리할 수 없습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST.value(), "값을 입력할 수 없습니다."),

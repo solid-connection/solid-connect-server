@@ -1,7 +1,10 @@
 package com.example.solidconnection.common.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.solidconnection.common.exception.CustomException;
+import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
@@ -39,9 +42,14 @@ class CustomPageableHandlerMethodArgumentResolverTest {
         return Stream.of(
                 Arguments.of("null", null),
                 Arguments.of("빈 문자열", ""),
-                Arguments.of("0", "0"),
-                Arguments.of("음수", "-1"),
                 Arguments.of("문자열", "invalid")
+        );
+    }
+
+    static Stream<Arguments> provideOutOfRangePageParameters() {
+        return Stream.of(
+                Arguments.of("0", "0"),
+                Arguments.of("음수", "-1")
         );
     }
 
@@ -108,6 +116,20 @@ class CustomPageableHandlerMethodArgumentResolverTest {
 
         // then
         assertThat(pageable.getPageNumber()).isEqualTo(DEFAULT_PAGE);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideOutOfRangePageParameters")
+    void 페이지_파라미터가_1_미만이면_예외를_던진다(String testName, String pageParam) {
+        // given
+        request.setParameter(PAGE_PARAMETER, pageParam);
+
+        // when & then
+        assertThatThrownBy(() -> customPageableHandlerMethodArgumentResolver
+                .resolveArgument(parameter, null, webRequest, null))
+                .isInstanceOf(CustomException.class)
+                .extracting(exception -> ((CustomException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_PAGE_PARAMETER);
     }
 
     @ParameterizedTest(name = "{0}")
