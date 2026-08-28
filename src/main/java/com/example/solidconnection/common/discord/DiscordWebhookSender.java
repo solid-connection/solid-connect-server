@@ -6,14 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 /*
- * - Discord Webhook 으로 메시지를 전송한다.
- * - 알림 전송 실패가 호출한 기능을 실패시키지 않도록 예외를 격리하고, 전송 여부를 반환해 후속 처리를 맡긴다.
+ * - Discord Webhook 으로 메시지를 전송하고 편집한다.
+ * - send() 만 예외를 격리하고 전송 여부를 반환한다.
+ *   sendAndGetMessage() 와 editMessage() 는 호출한 기능이 결과를 알아야 하므로 예외를 전파한다.
  * - 채널별로 webhook url 이 다르므로 url 을 인자로 받는다.
  * - webhook url 은 경로에 인증 토큰을 포함하므로 로그와 메트릭에 남기지 않는다.
  * */
@@ -60,6 +62,28 @@ public class DiscordWebhookSender {
                 buildRequest(content, List.of()),
                 DiscordMessageResponse.class
         );
+    }
+
+    /*
+     * - webhook 이 보낸 메시지는 봇 권한 없이 webhook 토큰만으로 편집할 수 있다.
+     * - PATCH 는 content 를 통째로 덮어쓴다.
+     * */
+    public void editMessage(String webhookUrl, String messageId, String content) {
+        discordWebhookRestTemplate.exchange(
+                messageUrl(webhookUrl, messageId),
+                HttpMethod.PATCH,
+                buildRequest(content, List.of()),
+                Void.class
+        );
+    }
+
+    // webhook url 에 쿼리스트링이 붙어 있을 수 있으므로 경로 뒤에 이어붙이지 않는다.
+    private String messageUrl(String webhookUrl, String messageId) {
+        int queryIndex = webhookUrl.indexOf('?');
+        if (queryIndex < 0) {
+            return webhookUrl + "/messages/" + messageId;
+        }
+        return webhookUrl.substring(0, queryIndex) + "/messages/" + messageId + webhookUrl.substring(queryIndex);
     }
 
     private HttpEntity<Map<String, Object>> buildRequest(String content, List<String> mentionableRoleIds) {

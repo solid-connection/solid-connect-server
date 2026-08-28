@@ -1,6 +1,7 @@
 package com.example.solidconnection.common.discord;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -104,6 +106,65 @@ class DiscordWebhookSenderTest {
 
             // then
             assertThat(isSent).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("메시지 편집")
+    class 메시지를_편집한다 {
+
+        private static final String MESSAGE_ID = "message-id";
+
+        private HttpEntity<Map<String, Object>> 편집된_요청(String expectedUrl) {
+            ArgumentCaptor<HttpEntity<Map<String, Object>>> requestCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+            verify(restTemplate).exchange(eq(expectedUrl), eq(HttpMethod.PATCH), requestCaptor.capture(), eq(Void.class));
+            return requestCaptor.getValue();
+        }
+
+        @Test
+        void 메시지_경로로_content_를_전송한다() {
+            // when
+            discordWebhookSender.editMessage(WEBHOOK_URL, MESSAGE_ID, CONTENT);
+
+            // then
+            HttpEntity<Map<String, Object>> request = 편집된_요청(WEBHOOK_URL + "/messages/" + MESSAGE_ID);
+            assertAll(
+                    () -> assertThat(request.getBody()).containsEntry("content", CONTENT),
+                    () -> assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON)
+            );
+        }
+
+        @Test
+        void 멘션_허용_범위를_전송할_때와_동일하게_제한한다() {
+            // when
+            discordWebhookSender.editMessage(WEBHOOK_URL, MESSAGE_ID, "@everyone 검수 완료");
+
+            // then
+            assertThat(편집된_요청(WEBHOOK_URL + "/messages/" + MESSAGE_ID).getBody())
+                    .containsEntry("allowed_mentions", Map.of("parse", List.of(), "roles", List.of()));
+        }
+
+        @Test
+        void webhook_url_에_쿼리스트링이_있으면_경로_뒤가_아니라_쿼리_앞에_붙인다() {
+            // given
+            String urlWithQuery = WEBHOOK_URL + "?thread_id=123";
+
+            // when
+            discordWebhookSender.editMessage(urlWithQuery, MESSAGE_ID, CONTENT);
+
+            // then
+            편집된_요청(WEBHOOK_URL + "/messages/" + MESSAGE_ID + "?thread_id=123");
+        }
+
+        @Test
+        void 편집이_실패하면_예외를_전파한다() {
+            // given
+            when(restTemplate.exchange(anyString(), eq(HttpMethod.PATCH), any(), eq(Void.class)))
+                    .thenThrow(new RestClientException("discord unavailable"));
+
+            // when & then
+            assertThatThrownBy(() -> discordWebhookSender.editMessage(WEBHOOK_URL, MESSAGE_ID, CONTENT))
+                    .isInstanceOf(RestClientException.class);
         }
     }
 
