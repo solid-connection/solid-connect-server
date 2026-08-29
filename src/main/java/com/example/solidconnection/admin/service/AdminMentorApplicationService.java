@@ -67,7 +67,7 @@ public class AdminMentorApplicationService {
         );
 
         mentorRepository.save(mentor);
-        publishReaction(mentorApplicationId, DiscordReactionEmoji.APPROVED.getValue());
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReactionEmoji.APPROVED.getValue());
     }
 
     private void validateUserCanCreateMentor(long siteUserId) {
@@ -85,11 +85,18 @@ public class AdminMentorApplicationService {
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
         mentorApplication.reject(request.rejectedReason());
-        publishReaction(mentorApplicationId, DiscordReactionEmoji.REJECTED.getValue());
+        SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReactionEmoji.REJECTED.getValue());
     }
 
-    private void publishReaction(long mentorApplicationId, String emoji) {
-        discordNotifier.addReaction(DiscordNotificationType.MENTOR_APPLICATION, mentorApplicationId, emoji);
+    private void publishReviewResult(long mentorApplicationId, String applicantInfo, String marker) {
+        discordNotifier.markReviewResult(
+                DiscordNotificationType.MENTOR_APPLICATION,
+                mentorApplicationId,
+                applicantInfo,
+                marker
+        );
     }
 
     @Transactional(readOnly = true)

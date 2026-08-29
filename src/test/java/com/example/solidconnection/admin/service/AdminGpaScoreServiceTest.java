@@ -1,5 +1,7 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.common.discord.DiscordNotifier;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
@@ -33,6 +35,12 @@ class AdminGpaScoreServiceTest {
 
     @Autowired
     private AdminGpaScoreService adminGpaScoreService;
+
+    /*
+     * - 테스트 설정의 discord.webhook-url 이 비어 있지 않아 실제 요청이 나갈 수 있으므로 목으로 대체한다.
+     * */
+    @MockitoBean
+    private DiscordNotifier discordNotifier;
 
     @Autowired
     private SiteUserFixture siteUserFixture;

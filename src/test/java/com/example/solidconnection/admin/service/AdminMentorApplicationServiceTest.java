@@ -1,5 +1,7 @@
 package com.example.solidconnection.admin.service;
 
+import com.example.solidconnection.common.discord.DiscordNotifier;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_ALREADY_EXISTS;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_ALREADY_CONFIRMED;
 import static com.example.solidconnection.common.exception.ErrorCode.MENTOR_APPLICATION_NOT_FOUND;
@@ -49,6 +51,12 @@ class AdminMentorApplicationServiceTest {
 
     @Autowired
     private AdminMentorApplicationService adminMentorApplicationService;
+
+    /*
+     * - 테스트 설정의 discord.webhook-url 이 비어 있지 않아 실제 요청이 나갈 수 있으므로 목으로 대체한다.
+     * */
+    @MockitoBean
+    private DiscordNotifier discordNotifier;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
