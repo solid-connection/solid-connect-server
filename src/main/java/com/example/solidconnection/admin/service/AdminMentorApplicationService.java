@@ -11,7 +11,7 @@ import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
 import com.example.solidconnection.common.discord.DiscordNotifier;
-import com.example.solidconnection.common.discord.DiscordReactionEmoji;
+import com.example.solidconnection.common.discord.DiscordReviewMarker;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
@@ -67,7 +67,7 @@ public class AdminMentorApplicationService {
         );
 
         mentorRepository.save(mentor);
-        publishReaction(mentorApplicationId, DiscordReactionEmoji.APPROVED.getValue());
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReviewMarker.APPROVED.getValue());
     }
 
     private void validateUserCanCreateMentor(long siteUserId) {
@@ -85,11 +85,18 @@ public class AdminMentorApplicationService {
                 .orElseThrow(() -> new CustomException(MENTOR_APPLICATION_NOT_FOUND));
 
         mentorApplication.reject(request.rejectedReason());
-        publishReaction(mentorApplicationId, DiscordReactionEmoji.REJECTED.getValue());
+        SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReviewMarker.REJECTED.getValue());
     }
 
-    private void publishReaction(long mentorApplicationId, String emoji) {
-        discordNotifier.addReaction(DiscordNotificationType.MENTOR_APPLICATION, mentorApplicationId, emoji);
+    private void publishReviewResult(long mentorApplicationId, String applicantInfo, String marker) {
+        discordNotifier.markReviewResult(
+                DiscordNotificationType.MENTOR_APPLICATION,
+                mentorApplicationId,
+                applicantInfo,
+                marker
+        );
     }
 
     @Transactional(readOnly = true)

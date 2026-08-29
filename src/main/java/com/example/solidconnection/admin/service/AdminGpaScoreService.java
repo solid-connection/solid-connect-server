@@ -1,6 +1,7 @@
 package com.example.solidconnection.admin.service;
 
 import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_NOT_FOUND;
+import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
@@ -10,10 +11,12 @@ import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
 import com.example.solidconnection.common.discord.DiscordNotifier;
-import com.example.solidconnection.common.discord.DiscordReactionEmoji;
+import com.example.solidconnection.common.discord.DiscordReviewMarker;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
+import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminGpaScoreService {
 
     private final GpaScoreRepository gpaScoreRepository;
+    private final SiteUserRepository siteUserRepository;
     private final DiscordNotifier discordNotifier;
 
     @Transactional(readOnly = true)
@@ -45,18 +49,26 @@ public class AdminGpaScoreService {
                 request.verifyStatus(),
                 request.verifyStatus() == VerifyStatus.REJECTED ? request.rejectedReason() : null
         );
-        publishReaction(gpaScoreId, request.verifyStatus());
+        publishReviewResult(gpaScore, request.verifyStatus());
         return GpaScoreResponse.from(gpaScore);
     }
 
-    private void publishReaction(long gpaScoreId, VerifyStatus verifyStatus) {
-        String emoji = switch (verifyStatus) {
-            case APPROVED -> DiscordReactionEmoji.APPROVED.getValue();
-            case REJECTED -> DiscordReactionEmoji.REJECTED.getValue();
+    private void publishReviewResult(GpaScore gpaScore, VerifyStatus verifyStatus) {
+        String marker = switch (verifyStatus) {
+            case APPROVED -> DiscordReviewMarker.APPROVED.getValue();
+            case REJECTED -> DiscordReviewMarker.REJECTED.getValue();
             case PENDING -> null;
         };
-        if (emoji != null) {
-            discordNotifier.addReaction(DiscordNotificationType.GPA_SCORE, gpaScoreId, emoji);
+        if (marker == null) {
+            return;
         }
+        SiteUser siteUser = siteUserRepository.findById(gpaScore.getSiteUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        discordNotifier.markReviewResult(
+                DiscordNotificationType.GPA_SCORE,
+                gpaScore.getId(),
+                siteUser.getNickname(),
+                marker
+        );
     }
 }

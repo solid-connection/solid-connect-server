@@ -3,7 +3,7 @@ package com.example.solidconnection.common.discord;
 import lombok.Getter;
 
 @Getter
-public enum DiscordReactionEmoji {
+public enum DiscordReviewMarker {
 
     APPROVED("✅"),
     REJECTED("❌"),
@@ -11,7 +11,7 @@ public enum DiscordReactionEmoji {
 
     private final String value;
 
-    DiscordReactionEmoji(String value) {
+    DiscordReviewMarker(String value) {
         this.value = value;
     }
 }
