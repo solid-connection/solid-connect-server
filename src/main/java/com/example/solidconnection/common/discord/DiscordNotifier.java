@@ -1,14 +1,12 @@
 package com.example.solidconnection.common.discord;
 
 import com.example.solidconnection.common.discord.service.DiscordNotificationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @EnableAsync
 public class DiscordNotifier {
 
@@ -17,12 +15,22 @@ public class DiscordNotifier {
     private final DiscordWebhookSender discordWebhookSender;
     private final DiscordNotificationService discordNotificationService;
     private final DiscordReactionClient discordReactionClient;
+    private final String webhookUrl;
+    private final String environment;
 
-    @Value("${discord.webhook-url:}")
-    private String webhookUrl;
-
-    @Value("${spring.profiles.active:}")
-    private String environment;
+    public DiscordNotifier(
+            DiscordWebhookSender discordWebhookSender,
+            DiscordNotificationService discordNotificationService,
+            DiscordReactionClient discordReactionClient,
+            @Value("${discord.webhook-url:}") String webhookUrl,
+            @Value("${spring.profiles.active:}") String environment
+    ) {
+        this.discordWebhookSender = discordWebhookSender;
+        this.discordNotificationService = discordNotificationService;
+        this.discordReactionClient = discordReactionClient;
+        this.webhookUrl = webhookUrl;
+        this.environment = environment;
+    }
 
     @Async
     public void notify(DiscordNotificationType type, String applicantInfo) {
