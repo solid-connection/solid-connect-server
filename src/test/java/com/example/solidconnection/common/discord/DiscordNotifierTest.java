@@ -76,7 +76,7 @@ class DiscordNotifierTest {
             then(discordWebhookSender).should()
                     .editMessage(eq(WEBHOOK_URL), eq(MESSAGE_ID), contentCaptor.capture());
             String content = contentCaptor.getValue();
-            assertThat(content).startsWith("✅ ").contains("홍길동").contains("[개발 서버 알림입니다]");
+            assertThat(content).startsWith("(승인되었습니다.) ").contains("홍길동").contains("[개발 서버 알림입니다]");
         }
 
         @Test
@@ -92,8 +92,8 @@ class DiscordNotifierTest {
             then(discordWebhookSender).should()
                     .editMessage(anyString(), anyString(), contentCaptor.capture());
             String content = contentCaptor.getValue();
-            assertThat(content).startsWith("❌ ");
-            assertThat(content).doesNotContain("✅");
+            assertThat(content).startsWith("(반려되었습니다.) ");
+            assertThat(content).doesNotContain("승인되었습니다");
         }
     }
 
