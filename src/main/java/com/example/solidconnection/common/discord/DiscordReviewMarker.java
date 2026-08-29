@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum DiscordReviewMarker {
 
-    APPROVED("✅"),
-    REJECTED("❌"),
+    APPROVED("(승인되었습니다.)"),
+    REJECTED("(반려되었습니다.)"),
     ;
 
     private final String value;
