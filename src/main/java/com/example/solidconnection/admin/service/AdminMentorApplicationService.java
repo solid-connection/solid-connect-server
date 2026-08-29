@@ -11,7 +11,7 @@ import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
 import com.example.solidconnection.common.discord.DiscordNotifier;
-import com.example.solidconnection.common.discord.DiscordReactionEmoji;
+import com.example.solidconnection.common.discord.DiscordReviewMarker;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
@@ -67,7 +67,7 @@ public class AdminMentorApplicationService {
         );
 
         mentorRepository.save(mentor);
-        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReactionEmoji.APPROVED.getValue());
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReviewMarker.APPROVED.getValue());
     }
 
     private void validateUserCanCreateMentor(long siteUserId) {
@@ -87,7 +87,7 @@ public class AdminMentorApplicationService {
         mentorApplication.reject(request.rejectedReason());
         SiteUser siteUser = siteUserRepository.findById(mentorApplication.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReactionEmoji.REJECTED.getValue());
+        publishReviewResult(mentorApplicationId, siteUser.getNickname(), DiscordReviewMarker.REJECTED.getValue());
     }
 
     private void publishReviewResult(long mentorApplicationId, String applicantInfo, String marker) {

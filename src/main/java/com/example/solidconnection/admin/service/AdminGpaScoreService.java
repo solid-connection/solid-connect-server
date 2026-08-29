@@ -11,7 +11,7 @@ import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
 import com.example.solidconnection.common.discord.DiscordNotifier;
-import com.example.solidconnection.common.discord.DiscordReactionEmoji;
+import com.example.solidconnection.common.discord.DiscordReviewMarker;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
@@ -55,8 +55,8 @@ public class AdminGpaScoreService {
 
     private void publishReviewResult(GpaScore gpaScore, VerifyStatus verifyStatus) {
         String marker = switch (verifyStatus) {
-            case APPROVED -> DiscordReactionEmoji.APPROVED.getValue();
-            case REJECTED -> DiscordReactionEmoji.REJECTED.getValue();
+            case APPROVED -> DiscordReviewMarker.APPROVED.getValue();
+            case REJECTED -> DiscordReviewMarker.REJECTED.getValue();
             case PENDING -> null;
         };
         if (marker == null) {

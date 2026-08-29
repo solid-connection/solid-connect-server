@@ -70,7 +70,7 @@ class DiscordNotifierTest {
             ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
 
             // when
-            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue());
+            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue());
 
             // then
             then(discordWebhookSender).should()
@@ -86,7 +86,7 @@ class DiscordNotifierTest {
             ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
 
             // when
-            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.REJECTED.getValue());
+            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.REJECTED.getValue());
 
             // then
             then(discordWebhookSender).should()
@@ -107,7 +107,7 @@ class DiscordNotifierTest {
             discordNotifier = notifierWith("", "dev");
 
             // when
-            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue());
+            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue());
 
             // then
             then(discordNotificationService).should(never()).findByReviewTypeAndReviewId(any(), anyLong());
@@ -120,7 +120,7 @@ class DiscordNotifierTest {
             discordNotifier = notifierWith(WEBHOOK_URL, "local");
 
             // when
-            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue());
+            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue());
 
             // then
             then(discordNotificationService).should(never()).findByReviewTypeAndReviewId(any(), anyLong());
@@ -134,7 +134,7 @@ class DiscordNotifierTest {
                     .willReturn(Optional.empty());
 
             // when
-            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue());
+            discordNotifier.markReviewResult(REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue());
 
             // then
             then(discordWebhookSender).should(never()).editMessage(anyString(), anyString(), anyString());
@@ -156,7 +156,7 @@ class DiscordNotifierTest {
 
             // when & then
             assertThatCode(() -> discordNotifier.markReviewResult(
-                    REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue()))
+                    REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue()))
                     .doesNotThrowAnyException();
         }
 
@@ -171,7 +171,7 @@ class DiscordNotifierTest {
 
             // when & then
             assertThatThrownBy(() -> discordNotifier.markReviewResult(
-                    REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReactionEmoji.APPROVED.getValue()))
+                    REVIEW_TYPE, REVIEW_ID, "홍길동", DiscordReviewMarker.APPROVED.getValue()))
                     .isInstanceOf(HttpServerErrorException.class);
         }
     }
