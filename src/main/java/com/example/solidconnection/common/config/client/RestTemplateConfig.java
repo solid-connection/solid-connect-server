@@ -6,7 +6,6 @@ import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -35,13 +34,5 @@ public class RestTemplateConfig {
                 .build(ClientHttpRequestFactorySettings.defaults()
                         .withConnectTimeout(TIMEOUT)
                         .withReadTimeout(TIMEOUT)));
-    }
-
-    @Bean
-    public RestTemplate discordBotRestTemplate() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout((int) TIMEOUT.toMillis());
-        requestFactory.setReadTimeout((int) TIMEOUT.toMillis());
-        return new RestTemplate(requestFactory);
     }
 }
