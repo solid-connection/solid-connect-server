@@ -232,6 +232,10 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
         if (siteUserIds.isEmpty()) {
             return Map.of();
         }
+        // PR 리뷰 반영(2026-09-21): 동시 요청으로 같은 유저에게 활성 차단이 2건 이상 생길 수 있어(user_ban에
+        // 유저당 활성 차단 1건 제약이 없고, validateNotAlreadyBanned도 check-then-act라 race가 가능)
+        // 단순 toMap은 중복 키에서 IllegalStateException을 던진다. expiredAt 내림차순으로 정렬해
+        // 가장 나중에 만료되는 차단을 남기는 merge function을 추가했다.
         return queryFactory
                 .select(userBan.bannedUserId, userBan.duration)
                 .from(userBan)
@@ -240,11 +244,13 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                         userBan.isExpired.eq(false),
                         userBan.expiredAt.after(ZonedDateTime.now(UTC))
                 )
+                .orderBy(userBan.expiredAt.desc())
                 .fetch()
                 .stream()
                 .collect(Collectors.toMap(
                         tuple -> tuple.get(userBan.bannedUserId),
-                        tuple -> tuple.get(userBan.duration)
+                        tuple -> tuple.get(userBan.duration),
+                        (first, duplicate) -> first
                 ));
     }
 

@@ -1,4 +1,5 @@
 ALTER TABLE post ADD INDEX idx_post_board_code_category_created_at (board_code, category, created_at);
+ALTER TABLE post ADD INDEX idx_post_board_code_created_at (board_code, created_at);
 ALTER TABLE post_image ADD INDEX idx_post_image_post_id (post_id);
 ALTER TABLE post_like ADD INDEX idx_post_like_post_id (post_id);
 
