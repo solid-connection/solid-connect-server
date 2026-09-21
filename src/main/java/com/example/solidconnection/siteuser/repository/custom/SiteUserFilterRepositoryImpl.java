@@ -155,12 +155,8 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 );
     }
 
-    // 1차 쿼리 개선(2026-09-21, 미커밋 로컬 검증용):
-    // 기존에는 siteUser 각 row마다 report 테이블 전체를 훑는 상관 서브쿼리(MAX(report.id) WHERE reported_id=...)를
-    // leftJoin으로 실행해서, 페이지당 20건이라도 report(대량 테이블)를 20번 반복 스캔했다.
-    // -> siteUser를 먼저 페이징해서 "이 페이지에 필요한 20개 id"를 확정한 뒤,
-    //    report/userBan은 그 id 목록(IN절)에 대해서만 한 번씩 배치 조회하도록 분리했다.
-    //    (MentorBatchQueryRepository 등 기존 코드베이스의 배치조회 패턴과 동일)
+    // siteUser를 먼저 페이징해 이 페이지에 필요한 id 목록을 확정한 뒤, report/userBan은 그 id 목록(IN절)에
+    // 대해서만 한 번씩 배치 조회한다. row마다 상관 서브쿼리로 대량 테이블을 반복 스캔하는 것을 피하기 위함이다.
     @Override
     public Page<RestrictedUserSearchResponse> searchRestrictedUsers(
             RestrictedUserSearchCondition condition,
@@ -232,10 +228,9 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
         if (siteUserIds.isEmpty()) {
             return Map.of();
         }
-        // PR 리뷰 반영(2026-09-21): 동시 요청으로 같은 유저에게 활성 차단이 2건 이상 생길 수 있어(user_ban에
-        // 유저당 활성 차단 1건 제약이 없고, validateNotAlreadyBanned도 check-then-act라 race가 가능)
-        // 단순 toMap은 중복 키에서 IllegalStateException을 던진다. expiredAt 내림차순으로 정렬해
-        // 가장 나중에 만료되는 차단을 남기는 merge function을 추가했다.
+        // user_ban에 유저당 활성 차단 1건 제약이 없어 동시 요청 등으로 활성 차단이 2건 이상 존재할 수 있다.
+        // 단순 toMap은 중복 키에서 IllegalStateException을 던지므로, expiredAt 내림차순으로 정렬해
+        // 가장 나중에 만료되는 차단을 남기는 merge function을 사용한다.
         return queryFactory
                 .select(userBan.bannedUserId, userBan.duration)
                 .from(userBan)
