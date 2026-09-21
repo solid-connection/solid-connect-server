@@ -89,12 +89,17 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         return univApplyInfo.termId.eq(givenTermId);
     }
 
+    // 1차 쿼리 개선(2026-09-21, 미커밋 로컬 검증용):
+    // languageRequirements(1:N)를 fetchJoin으로 같이 가져오면 uia 1건당 최소 2행으로 fan-out되는데,
+    // 이 메서드는 .distinct()도 없어서 결과 List<UnivApplyInfo>에 같은 uia가 중복 원소로 들어가는
+    // 정합성 문제까지 있었다(EXPLAIN 상으로도 uia 6,019건인데 조인 결과가 12,875행으로 늘어나는 것으로 확인).
+    // languageRequirements는 필터/정렬에 쓰이지 않으므로 메인 쿼리에서 fetchJoin을 제거하고,
+    // UnivApplyInfo.languageRequirements에 @BatchSize를 추가해 필요한 시점에 IN절 배치 쿼리로 지연 로딩되게 했다.
     @Override
     public List<UnivApplyInfo> findAllByText(String text, Long termId, Long homeUniversityId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
         QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
-        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
 
@@ -103,7 +108,6 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(university.country, country).fetchJoin()
                 .join(region).on(country.regionCode.eq(region.code))
                 .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
-                .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         termIdEq(univApplyInfo, termId),
                         homeUniversityIdEq(homeUniversity, homeUniversityId)

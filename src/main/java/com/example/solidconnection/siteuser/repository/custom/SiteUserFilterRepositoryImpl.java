@@ -30,6 +30,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.domain.UserBanDuration;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
@@ -154,35 +155,19 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 );
     }
 
+    // 1차 쿼리 개선(2026-09-21, 미커밋 로컬 검증용):
+    // 기존에는 siteUser 각 row마다 report 테이블 전체를 훑는 상관 서브쿼리(MAX(report.id) WHERE reported_id=...)를
+    // leftJoin으로 실행해서, 페이지당 20건이라도 report(대량 테이블)를 20번 반복 스캔했다.
+    // -> siteUser를 먼저 페이징해서 "이 페이지에 필요한 20개 id"를 확정한 뒤,
+    //    report/userBan은 그 id 목록(IN절)에 대해서만 한 번씩 배치 조회하도록 분리했다.
+    //    (MentorBatchQueryRepository 등 기존 코드베이스의 배치조회 패턴과 동일)
     @Override
     public Page<RestrictedUserSearchResponse> searchRestrictedUsers(
             RestrictedUserSearchCondition condition,
             Pageable pageable
     ) {
-        List<RestrictedUserSearchResponse> content = queryFactory
-                .select(RESTRICTED_USER_SEARCH_RESPONSE_PROJECTION)
-                .from(siteUser)
-
-                // 최신 신고 내역 조회
-                .leftJoin(report).on(
-                        report.reportedId.eq(siteUser.id)
-                                .and(
-                                        report.id.eq(
-                                                JPAExpressions
-                                                        .select(report.id.max())
-                                                        .from(report)
-                                                        .where(report.reportedId.eq(siteUser.id))
-                                        )
-                                )
-                )
-
-                // 최신 차단 내역 조회
-                .leftJoin(userBan).on(
-                        userBan.bannedUserId.eq(siteUser.id)
-                                .and(userBan.isExpired.eq(false))
-                                .and(userBan.expiredAt.after(ZonedDateTime.now(UTC)))
-                )
-
+        List<SiteUser> siteUsers = queryFactory
+                .selectFrom(siteUser)
                 .where(
                         roleEq(condition.role()),
                         isRestrictedUser(),
@@ -194,9 +179,73 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<Long> siteUserIds = siteUsers.stream().map(SiteUser::getId).toList();
+
+        Map<Long, ReportedInfoResponse> latestReportedInfoBySiteUserId = findLatestReportedInfoBySiteUserIds(siteUserIds);
+        Map<Long, UserBanDuration> activeBanDurationBySiteUserId = findActiveBanDurationBySiteUserIds(siteUserIds);
+
+        List<RestrictedUserSearchResponse> content = siteUsers.stream()
+                .map(su -> new RestrictedUserSearchResponse(
+                        su.getId(),
+                        su.getNickname(),
+                        su.getRole(),
+                        su.getUserStatus(),
+                        latestReportedInfoBySiteUserId.get(su.getId()),
+                        new BannedInfoResponse(
+                                su.getUserStatus() == UserStatus.BANNED,
+                                activeBanDurationBySiteUserId.get(su.getId())
+                        )
+                ))
+                .toList();
+
         Long totalCount = createRestrictedUserCountQuery(condition).fetchOne();
 
         return new PageImpl<>(content, pageable, totalCount != null ? totalCount : 0L);
+    }
+
+    private Map<Long, ReportedInfoResponse> findLatestReportedInfoBySiteUserIds(List<Long> siteUserIds) {
+        if (siteUserIds.isEmpty()) {
+            return Map.of();
+        }
+        return queryFactory
+                .select(report.reportedId, REPORTED_INFO_RESPONSE_PROJECTION)
+                .from(report)
+                .where(
+                        report.reportedId.in(siteUserIds),
+                        report.id.in(
+                                JPAExpressions
+                                        .select(report.id.max())
+                                        .from(report)
+                                        .where(report.reportedId.in(siteUserIds))
+                                        .groupBy(report.reportedId)
+                        )
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(report.reportedId),
+                        tuple -> tuple.get(REPORTED_INFO_RESPONSE_PROJECTION)
+                ));
+    }
+
+    private Map<Long, UserBanDuration> findActiveBanDurationBySiteUserIds(List<Long> siteUserIds) {
+        if (siteUserIds.isEmpty()) {
+            return Map.of();
+        }
+        return queryFactory
+                .select(userBan.bannedUserId, userBan.duration)
+                .from(userBan)
+                .where(
+                        userBan.bannedUserId.in(siteUserIds),
+                        userBan.isExpired.eq(false),
+                        userBan.expiredAt.after(ZonedDateTime.now(UTC))
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(userBan.bannedUserId),
+                        tuple -> tuple.get(userBan.duration)
+                ));
     }
 
 

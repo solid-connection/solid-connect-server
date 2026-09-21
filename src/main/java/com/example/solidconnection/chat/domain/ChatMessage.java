@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Where;
 
@@ -25,6 +26,7 @@ import org.hibernate.annotations.Where;
 public class ChatMessage extends BaseEntity {
 
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private final List<ChatAttachment> chatAttachments = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

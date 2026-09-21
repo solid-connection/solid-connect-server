@@ -15,10 +15,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long>, UnivApplyInfoFilterRepository {
 
+    // 1차 쿼리 개선(2026-09-21, 미커밋 로컬 검증용):
+    // languageRequirements(1:N) fetch join 때문에 uia 1건당 여러 행으로 fan-out되어
+    // SELECT DISTINCT + 임시테이블(dedup)이 매번 발생했다. languageRequirements는 필터링에
+    // 쓰이지 않으므로 join을 제거하고(따라서 DISTINCT도 불필요해짐), UnivApplyInfo.languageRequirements의
+    // @BatchSize로 필요할 때 배치 조회되게 위임했다.
     @Query("""
-               SELECT DISTINCT uai
+               SELECT uai
                FROM UnivApplyInfo uai
-               LEFT JOIN FETCH uai.languageRequirements lr
                LEFT JOIN FETCH uai.homeUniversity hu
                JOIN FETCH uai.university u
                LEFT JOIN FETCH u.country c
