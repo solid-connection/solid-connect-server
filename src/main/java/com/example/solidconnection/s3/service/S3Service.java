@@ -134,6 +134,9 @@ public class S3Service {
         SiteUser siteUser = siteUserRepository.findById(siteUserId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         String key = siteUser.getProfileImageUrl();
+        if (key == null || key.isBlank()) {
+            return;
+        }
         deleteFile(key);
     }
 

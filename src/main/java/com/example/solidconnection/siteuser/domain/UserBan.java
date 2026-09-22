@@ -27,7 +27,7 @@ public class UserBan extends BaseEntity {
     @Column(name = "banned_user_id", nullable = false)
     private Long bannedUserId;
 
-    @Column(name = "banned_by", nullable = false)
+    @Column(name = "banned_by")
     private Long bannedBy;
 
     @Column(name = "duration", nullable = false)
