@@ -17,5 +17,5 @@ public interface ChatReadStatusRepository extends JpaRepository<ChatReadStatus, 
                    """, nativeQuery = true)
     void upsertReadStatus(@Param("chatRoomId") long chatRoomId, @Param("chatParticipantId") long chatParticipantId);
 
-    void deleteAllByChatParticipantIdIn(List<Long> chatParticipantIds);
+    void deleteAllByChatRoomIdIn(List<Long> chatRoomIds);
 }

@@ -67,4 +67,13 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
                    AND cm.sender_id IN (SELECT cp.id FROM chat_participant cp WHERE cp.site_user_id IN :siteUserIds)
                    """, nativeQuery = true)
     void bulkUpdateReportedChatMessagesIsDeleted(@Param("siteUserIds") List<Long> siteUserIds, @Param("isDeleted") boolean isDeleted);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+                       UPDATE chat_message cm SET cm.is_deleted = false
+                       WHERE cm.chat_room_id IN :chatRoomIds
+                   """, nativeQuery = true)
+    void unmarkDeletedByChatRoomIdIn(@Param("chatRoomIds") List<Long> chatRoomIds);
+
+    void deleteAllByChatRoomIdIn(List<Long> chatRoomIds);
 }
