@@ -4,6 +4,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.INVALID_POS
 
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.community.post.domain.Post;
+import com.example.solidconnection.community.post.domain.PostCategory;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -25,6 +26,26 @@ public interface PostRepository extends JpaRepository<Post, Long> {
            ORDER BY p.createdAt DESC
            """)
     List<Post> findByBoardCodeExcludingBlockedUsersOrderByCreatedAtDesc(@Param("boardCode") String boardCode, @Param("siteUserId") Long siteUserId);
+
+    @Query("""
+           SELECT p FROM Post p
+           WHERE p.boardCode = :boardCode
+           AND (:category = com.example.solidconnection.community.post.domain.PostCategory.전체 OR p.category = :category)
+           ORDER BY p.createdAt DESC
+           """)
+    List<Post> findByBoardCodeAndCategoryOrderByCreatedAtDesc(@Param("boardCode") String boardCode, @Param("category") PostCategory category);
+
+    @Query("""
+           SELECT p FROM Post p
+           WHERE p.boardCode = :boardCode
+           AND (:category = com.example.solidconnection.community.post.domain.PostCategory.전체 OR p.category = :category)
+           AND p.siteUserId NOT IN (
+               SELECT ub.blockedId FROM UserBlock ub WHERE ub.blockerId = :siteUserId
+           )
+           ORDER BY p.createdAt DESC
+           """)
+    List<Post> findByBoardCodeAndCategoryExcludingBlockedUsersOrderByCreatedAtDesc(
+            @Param("boardCode") String boardCode, @Param("category") PostCategory category, @Param("siteUserId") Long siteUserId);
 
     @EntityGraph(attributePaths = {"postImageList"})
     Optional<Post> findPostById(Long id);

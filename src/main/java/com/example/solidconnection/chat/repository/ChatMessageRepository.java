@@ -12,9 +12,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
+    // 컬렉션(chatAttachments)을 fetch join하면서 Pageable을 쓰면 Hibernate가 SQL LIMIT을 적용하지
+    // 못하고 전체를 로드한 뒤 메모리에서 페이징한다. 필요 시 ChatMessage.chatAttachments의 @BatchSize로
+    // 지연 로딩되게 위임하고 여기서는 fetch join을 쓰지 않는다.
     @Query("""
            SELECT cm FROM ChatMessage cm
-           LEFT JOIN FETCH cm.chatAttachments
            WHERE cm.chatRoom.id = :roomId
            ORDER BY cm.createdAt DESC
            """)

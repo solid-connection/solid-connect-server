@@ -25,7 +25,6 @@ import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import com.example.solidconnection.siteuser.repository.UserBlockRepository;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +50,11 @@ public class PostQueryService {
 
         List<Post> postList;
         if (siteUserId != null) {
-            postList = postRepository.findByBoardCodeExcludingBlockedUsersOrderByCreatedAtDesc(boardCode, siteUserId);
+            postList = postRepository.findByBoardCodeAndCategoryExcludingBlockedUsersOrderByCreatedAtDesc(boardCode, postCategory, siteUserId);
         } else {
-            postList = postRepository.findByBoardCodeOrderByCreatedAtDesc(boardCode);
+            postList = postRepository.findByBoardCodeAndCategoryOrderByCreatedAtDesc(boardCode, postCategory);
         }
-        return PostListResponse.from(getPostListByPostCategory(postList, postCategory));
+        return PostListResponse.from(postList);
     }
 
     @Transactional(readOnly = true)
@@ -106,15 +105,6 @@ public class PostQueryService {
             throw new CustomException(INVALID_POST_CATEGORY);
         }
         return PostCategory.valueOf(category);
-    }
-
-    private List<Post> getPostListByPostCategory(List<Post> postList, PostCategory postCategory) {
-        if (postCategory.equals(PostCategory.전체)) {
-            return postList;
-        }
-        return postList.stream()
-                .filter(post -> post.getCategory().equals(postCategory))
-                .collect(Collectors.toList());
     }
 
     private void validatedIsBlockedByMe(Post post, SiteUser siteUser) {

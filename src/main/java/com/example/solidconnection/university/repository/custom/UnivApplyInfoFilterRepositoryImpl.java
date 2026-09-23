@@ -89,12 +89,14 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
         return univApplyInfo.termId.eq(givenTermId);
     }
 
+    // languageRequirements(1:N)는 필터/정렬에 쓰이지 않으므로 fetchJoin하지 않는다. 여기서 fetchJoin하면
+    // uia 1건당 fan-out되고 이 메서드에는 .distinct()도 없어 결과에 같은 uia가 중복으로 들어간다.
+    // 필요 시 UnivApplyInfo.languageRequirements의 @BatchSize로 지연 로딩된다.
     @Override
     public List<UnivApplyInfo> findAllByText(String text, Long termId, Long homeUniversityId) {
         QUnivApplyInfo univApplyInfo = QUnivApplyInfo.univApplyInfo;
         QHostUniversity university = QHostUniversity.hostUniversity;
         QHomeUniversity homeUniversity = QHomeUniversity.homeUniversity;
-        QLanguageRequirement languageRequirement = QLanguageRequirement.languageRequirement;
         QCountry country = QCountry.country;
         QRegion region = QRegion.region;
 
@@ -103,7 +105,6 @@ public class UnivApplyInfoFilterRepositoryImpl implements UnivApplyInfoFilterRep
                 .join(university.country, country).fetchJoin()
                 .join(region).on(country.regionCode.eq(region.code))
                 .leftJoin(univApplyInfo.homeUniversity, homeUniversity).fetchJoin()
-                .leftJoin(univApplyInfo.languageRequirements, languageRequirement).fetchJoin()
                 .where(
                         termIdEq(univApplyInfo, termId),
                         homeUniversityIdEq(homeUniversity, homeUniversityId)
