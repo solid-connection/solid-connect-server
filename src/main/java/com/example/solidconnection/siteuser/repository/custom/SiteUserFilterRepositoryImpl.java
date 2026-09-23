@@ -74,6 +74,8 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     report.reportType
             );
 
+    private static final ReportedInfoResponse EMPTY_REPORTED_INFO_RESPONSE = new ReportedInfoResponse(null, null, null);
+
     private static final ConstructorExpression<BannedInfoResponse> BANNED_INFO_RESPONSE_PROJECTION =
             Projections.constructor(
                     BannedInfoResponse.class,
@@ -186,7 +188,7 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                         su.getNickname(),
                         su.getRole(),
                         su.getUserStatus(),
-                        latestReportedInfoBySiteUserId.get(su.getId()),
+                        latestReportedInfoBySiteUserId.getOrDefault(su.getId(), EMPTY_REPORTED_INFO_RESPONSE),
                         new BannedInfoResponse(
                                 su.getUserStatus() == UserStatus.BANNED,
                                 activeBanDurationBySiteUserId.get(su.getId())
