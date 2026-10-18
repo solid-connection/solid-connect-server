@@ -15,6 +15,15 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 
     void deleteAllByChatRoomIdIn(List<Long> chatRoomIds);
 
-    @Query("SELECT cp.chatRoom.id FROM ChatParticipant cp WHERE cp.siteUserId = :siteUserId")
-    List<Long> findAllChatRoomIdsBySiteUserId(@Param("siteUserId") long siteUserId);
+    @Query("""
+           SELECT cp.chatRoom.id FROM ChatParticipant cp
+           WHERE cp.siteUserId = :siteUserId AND cp.chatRoom.isGroup = :isGroup
+           """)
+    List<Long> findAllChatRoomIdsBySiteUserIdAndIsGroup(@Param("siteUserId") long siteUserId, @Param("isGroup") boolean isGroup);
+
+    @Query("""
+           SELECT cp.id FROM ChatParticipant cp
+           WHERE cp.siteUserId = :siteUserId AND cp.chatRoom.isGroup = :isGroup
+           """)
+    List<Long> findAllIdsBySiteUserIdAndIsGroup(@Param("siteUserId") long siteUserId, @Param("isGroup") boolean isGroup);
 }

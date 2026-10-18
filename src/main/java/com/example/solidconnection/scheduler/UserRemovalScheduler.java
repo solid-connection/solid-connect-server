@@ -84,7 +84,7 @@ public class UserRemovalScheduler {
         commentRepository.deleteAllBySiteUserId(siteUserId);
         deletePosts(siteUserId);
 
-        deleteChatRooms(siteUserId);
+        deleteChatData(siteUserId);
         deleteMentorings(siteUserId);
         mentorApplicationRepository.deleteAllBySiteUserId(siteUserId);
 
@@ -124,12 +124,19 @@ public class UserRemovalScheduler {
     }
 
     /*
-     * 1:1 채팅방은 참여자 한 명이 사라지면 유지될 수 없으므로 방 전체를 삭제한다.
-     * - 신고로 가려진 메시지는 조회 필터에 걸리므로, 플래그를 되돌린 뒤 삭제한다.
-     * - 채팅방이 멘토링을 참조하므로 멘토링보다 먼저 삭제한다.
+     * 신고로 가려진 메시지는 조회 필터에 걸리므로, 플래그를 되돌린 뒤 삭제한다.
+     * 채팅방이 멘토링을 참조하므로 멘토링보다 먼저 삭제한다.
      * */
-    private void deleteChatRooms(long siteUserId) {
-        List<Long> chatRoomIds = chatParticipantRepository.findAllChatRoomIdsBySiteUserId(siteUserId);
+    private void deleteChatData(long siteUserId) {
+        deleteOneOnOneChatRooms(siteUserId);
+        deleteGroupChatParticipation(siteUserId);
+    }
+
+    /*
+     * 1:1 채팅방은 참여자 한 명이 사라지면 유지될 수 없으므로 방 전체를 삭제한다.
+     * */
+    private void deleteOneOnOneChatRooms(long siteUserId) {
+        List<Long> chatRoomIds = chatParticipantRepository.findAllChatRoomIdsBySiteUserIdAndIsGroup(siteUserId, false);
         if (chatRoomIds.isEmpty()) {
             return;
         }
@@ -138,6 +145,20 @@ public class UserRemovalScheduler {
         chatReadStatusRepository.deleteAllByChatRoomIdIn(chatRoomIds);
         chatParticipantRepository.deleteAllByChatRoomIdIn(chatRoomIds);
         chatRoomRepository.deleteAllById(chatRoomIds);
+    }
+
+    /*
+     * 그룹 채팅방은 남은 참여자들의 대화가 유지되어야 하므로 탈퇴자의 참여 기록만 삭제한다.
+     * */
+    private void deleteGroupChatParticipation(long siteUserId) {
+        List<Long> chatParticipantIds = chatParticipantRepository.findAllIdsBySiteUserIdAndIsGroup(siteUserId, true);
+        if (chatParticipantIds.isEmpty()) {
+            return;
+        }
+        chatMessageRepository.unmarkDeletedBySenderIdIn(chatParticipantIds);
+        chatMessageRepository.deleteAllBySenderIdIn(chatParticipantIds);
+        chatReadStatusRepository.deleteAllByChatParticipantIdIn(chatParticipantIds);
+        chatParticipantRepository.deleteAllById(chatParticipantIds);
     }
 
     /*
