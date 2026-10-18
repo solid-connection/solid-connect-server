@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -75,6 +76,7 @@ public class UnivApplyInfo extends BaseEntity {
     private Map<String, String> extraInfo;
 
     @OneToMany(mappedBy = "univApplyInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<LanguageRequirement> languageRequirements = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

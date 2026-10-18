@@ -15,10 +15,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UnivApplyInfoRepository extends JpaRepository<UnivApplyInfo, Long>, UnivApplyInfoFilterRepository {
 
+    // languageRequirements(1:N)는 필터링에 쓰이지 않아 fetch join하지 않는다(fan-out으로 인한
+    // 불필요한 임시테이블 생성을 피하기 위함). 필요 시 UnivApplyInfo.languageRequirements의
+    // @BatchSize로 지연 로딩된다.
     @Query("""
-               SELECT DISTINCT uai
+               SELECT uai
                FROM UnivApplyInfo uai
-               LEFT JOIN FETCH uai.languageRequirements lr
                LEFT JOIN FETCH uai.homeUniversity hu
                JOIN FETCH uai.university u
                LEFT JOIN FETCH u.country c

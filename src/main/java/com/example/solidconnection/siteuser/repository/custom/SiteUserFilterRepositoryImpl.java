@@ -30,6 +30,7 @@ import com.example.solidconnection.application.domain.Application;
 import com.example.solidconnection.application.domain.ApplicationChoice;
 import com.example.solidconnection.siteuser.domain.Role;
 import com.example.solidconnection.siteuser.domain.SiteUser;
+import com.example.solidconnection.siteuser.domain.UserBanDuration;
 import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
@@ -72,6 +73,8 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                     report.targetType,
                     report.reportType
             );
+
+    private static final ReportedInfoResponse EMPTY_REPORTED_INFO_RESPONSE = new ReportedInfoResponse(null, null, null);
 
     private static final ConstructorExpression<BannedInfoResponse> BANNED_INFO_RESPONSE_PROJECTION =
             Projections.constructor(
@@ -154,35 +157,15 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 );
     }
 
+    // siteUser를 먼저 페이징해 이 페이지에 필요한 id 목록을 확정한 뒤, report/userBan은 그 id 목록(IN절)에
+    // 대해서만 한 번씩 배치 조회한다. row마다 상관 서브쿼리로 대량 테이블을 반복 스캔하는 것을 피하기 위함이다.
     @Override
     public Page<RestrictedUserSearchResponse> searchRestrictedUsers(
             RestrictedUserSearchCondition condition,
             Pageable pageable
     ) {
-        List<RestrictedUserSearchResponse> content = queryFactory
-                .select(RESTRICTED_USER_SEARCH_RESPONSE_PROJECTION)
-                .from(siteUser)
-
-                // 최신 신고 내역 조회
-                .leftJoin(report).on(
-                        report.reportedId.eq(siteUser.id)
-                                .and(
-                                        report.id.eq(
-                                                JPAExpressions
-                                                        .select(report.id.max())
-                                                        .from(report)
-                                                        .where(report.reportedId.eq(siteUser.id))
-                                        )
-                                )
-                )
-
-                // 최신 차단 내역 조회
-                .leftJoin(userBan).on(
-                        userBan.bannedUserId.eq(siteUser.id)
-                                .and(userBan.isExpired.eq(false))
-                                .and(userBan.expiredAt.after(ZonedDateTime.now(UTC)))
-                )
-
+        List<SiteUser> siteUsers = queryFactory
+                .selectFrom(siteUser)
                 .where(
                         roleEq(condition.role()),
                         isRestrictedUser(),
@@ -194,9 +177,78 @@ public class SiteUserFilterRepositoryImpl implements SiteUserFilterRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<Long> siteUserIds = siteUsers.stream().map(SiteUser::getId).toList();
+
+        Map<Long, ReportedInfoResponse> latestReportedInfoBySiteUserId = findLatestReportedInfoBySiteUserIds(siteUserIds);
+        Map<Long, UserBanDuration> activeBanDurationBySiteUserId = findActiveBanDurationBySiteUserIds(siteUserIds);
+
+        List<RestrictedUserSearchResponse> content = siteUsers.stream()
+                .map(su -> new RestrictedUserSearchResponse(
+                        su.getId(),
+                        su.getNickname(),
+                        su.getRole(),
+                        su.getUserStatus(),
+                        latestReportedInfoBySiteUserId.getOrDefault(su.getId(), EMPTY_REPORTED_INFO_RESPONSE),
+                        new BannedInfoResponse(
+                                su.getUserStatus() == UserStatus.BANNED,
+                                activeBanDurationBySiteUserId.get(su.getId())
+                        )
+                ))
+                .toList();
+
         Long totalCount = createRestrictedUserCountQuery(condition).fetchOne();
 
         return new PageImpl<>(content, pageable, totalCount != null ? totalCount : 0L);
+    }
+
+    private Map<Long, ReportedInfoResponse> findLatestReportedInfoBySiteUserIds(List<Long> siteUserIds) {
+        if (siteUserIds.isEmpty()) {
+            return Map.of();
+        }
+        return queryFactory
+                .select(report.reportedId, REPORTED_INFO_RESPONSE_PROJECTION)
+                .from(report)
+                .where(
+                        report.reportedId.in(siteUserIds),
+                        report.id.in(
+                                JPAExpressions
+                                        .select(report.id.max())
+                                        .from(report)
+                                        .where(report.reportedId.in(siteUserIds))
+                                        .groupBy(report.reportedId)
+                        )
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(report.reportedId),
+                        tuple -> tuple.get(REPORTED_INFO_RESPONSE_PROJECTION)
+                ));
+    }
+
+    private Map<Long, UserBanDuration> findActiveBanDurationBySiteUserIds(List<Long> siteUserIds) {
+        if (siteUserIds.isEmpty()) {
+            return Map.of();
+        }
+        // user_ban에 유저당 활성 차단 1건 제약이 없어 동시 요청 등으로 활성 차단이 2건 이상 존재할 수 있다.
+        // 단순 toMap은 중복 키에서 IllegalStateException을 던지므로, expiredAt 내림차순으로 정렬해
+        // 가장 나중에 만료되는 차단을 남기는 merge function을 사용한다.
+        return queryFactory
+                .select(userBan.bannedUserId, userBan.duration)
+                .from(userBan)
+                .where(
+                        userBan.bannedUserId.in(siteUserIds),
+                        userBan.isExpired.eq(false),
+                        userBan.expiredAt.after(ZonedDateTime.now(UTC))
+                )
+                .orderBy(userBan.expiredAt.desc())
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(userBan.bannedUserId),
+                        tuple -> tuple.get(userBan.duration),
+                        (first, duplicate) -> first
+                ));
     }
 
 
