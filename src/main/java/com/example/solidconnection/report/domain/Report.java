@@ -30,8 +30,8 @@ public class Report extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "reporter_id", nullable = false)
-    private long reporterId;
+    @Column(name = "reporter_id", nullable = true)
+    private Long reporterId;
 
     @Column(name = "reported_id", nullable = false)
     private long reportedId;

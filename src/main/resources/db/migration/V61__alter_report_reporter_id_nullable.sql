@@ -1,0 +1,2 @@
+ALTER TABLE report
+    MODIFY COLUMN reporter_id BIGINT NULL;

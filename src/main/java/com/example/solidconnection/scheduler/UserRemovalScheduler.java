@@ -88,7 +88,7 @@ public class UserRemovalScheduler {
         deleteMentorings(siteUserId);
         mentorApplicationRepository.deleteAllBySiteUserId(siteUserId);
 
-        reportRepository.deleteAllByReporterId(siteUserId);
+        deleteReports(siteUserId);
         userBlockRepository.deleteAllByBlockerIdOrBlockedId(siteUserId, siteUserId);
         deleteUserBans(siteUserId);
 
@@ -171,6 +171,15 @@ public class UserRemovalScheduler {
             mentoringRepository.deleteAllByMentorIdIn(mentorIds);
         }
         mentorRepository.deleteAllBySiteUserId(siteUserId);
+    }
+
+    /*
+     * 탈퇴자를 대상으로 한 신고는 삭제한다.
+     * 탈퇴자가 접수한 신고는 신고당한 사용자의 이력이므로, 신고자 참조만 해제하고 보존한다.
+     * */
+    private void deleteReports(long siteUserId) {
+        reportRepository.deleteAllByReportedId(siteUserId);
+        reportRepository.clearReporter(siteUserId);
     }
 
     /*
