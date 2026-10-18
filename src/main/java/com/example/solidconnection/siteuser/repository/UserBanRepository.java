@@ -21,4 +21,14 @@ public interface UserBanRepository extends JpaRepository<UserBan, Long> {
     @Modifying
     @Query("UPDATE UserBan ub SET ub.isExpired = true WHERE ub.isExpired = false AND ub.expiredAt < :current")
     void bulkExpireUserBans(@Param("current") ZonedDateTime current);
+
+    void deleteAllByBannedUserId(long bannedUserId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE UserBan ub SET ub.bannedBy = null WHERE ub.bannedBy = :siteUserId")
+    void clearBannedBy(@Param("siteUserId") long siteUserId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE UserBan ub SET ub.unbannedBy = null WHERE ub.unbannedBy = :siteUserId")
+    void clearUnbannedBy(@Param("siteUserId") long siteUserId);
 }

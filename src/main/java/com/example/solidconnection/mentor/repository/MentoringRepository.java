@@ -41,4 +41,6 @@ public interface MentoringRepository extends JpaRepository<Mentoring, Long> {
     Slice<Mentoring> findApprovedMentoringsByMenteeId(long menteeId, @Param("verifyStatus") VerifyStatus verifyStatus, Pageable pageable);
 
     void deleteAllByMenteeId(long menteeId);
+
+    void deleteAllByMentorIdIn(List<Long> mentorIds);
 }

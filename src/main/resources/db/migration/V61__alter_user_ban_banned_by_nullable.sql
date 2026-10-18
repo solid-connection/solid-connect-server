@@ -1,0 +1,2 @@
+ALTER TABLE user_ban
+    MODIFY COLUMN banned_by BIGINT NULL;

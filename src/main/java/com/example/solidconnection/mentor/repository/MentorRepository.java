@@ -28,5 +28,8 @@ public interface MentorRepository extends JpaRepository<Mentor, Long> {
 
     List<Mentor> findAllBySiteUserIdIn(Set<Long> siteUserIds);
 
+    @Query("SELECT m.id FROM Mentor m WHERE m.siteUserId = :siteUserId")
+    List<Long> findAllIdsBySiteUserId(@Param("siteUserId") long siteUserId);
+
     void deleteAllBySiteUserId(long siteUserId);
 }

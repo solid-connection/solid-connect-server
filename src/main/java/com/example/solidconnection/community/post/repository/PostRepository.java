@@ -97,5 +97,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 .orElseThrow(() -> new CustomException(INVALID_POST_ID));
     }
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+                       UPDATE post p SET p.is_deleted = false
+                       WHERE p.site_user_id = :siteUserId
+                   """, nativeQuery = true)
+    void unmarkDeletedBySiteUserId(@Param("siteUserId") long siteUserId);
+
     void deleteAllBySiteUserId(long siteUserId);
 }
