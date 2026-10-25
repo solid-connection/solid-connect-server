@@ -10,8 +10,8 @@ import com.example.solidconnection.admin.dto.MentorApplicationRejectRequest;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchCondition;
 import com.example.solidconnection.admin.dto.MentorApplicationSearchResponse;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.discord.DiscordReviewMarker;
+import com.example.solidconnection.common.discord.event.DiscordReviewCompletedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.Mentor;
 import com.example.solidconnection.mentor.domain.MentorApplication;
@@ -25,6 +25,7 @@ import com.example.solidconnection.university.repository.HostUniversityRepositor
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class AdminMentorApplicationService {
     private final HostUniversityRepository hostUniversityRepository;
     private final SiteUserRepository siteUserRepository;
     private final MentorRepository mentorRepository;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<MentorApplicationSearchResponse> searchMentorApplications(
@@ -91,12 +92,12 @@ public class AdminMentorApplicationService {
     }
 
     private void publishReviewResult(long mentorApplicationId, String applicantInfo, String marker) {
-        discordNotifier.markReviewResult(
+        eventPublisher.publishEvent(new DiscordReviewCompletedEvent(
                 DiscordNotificationType.MENTOR_APPLICATION,
                 mentorApplicationId,
                 applicantInfo,
                 marker
-        );
+        ));
     }
 
     @Transactional(readOnly = true)

@@ -4,13 +4,10 @@ import com.example.solidconnection.common.discord.domain.DiscordNotification;
 import com.example.solidconnection.common.discord.service.DiscordNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
 @Component
-@EnableAsync
 @Slf4j
 public class DiscordNotifier {
 
@@ -33,7 +30,6 @@ public class DiscordNotifier {
         this.environment = environment;
     }
 
-    @Async
     public void notify(DiscordNotificationType type, String applicantInfo) {
         if (isNotifyDisabled()) {
             return;

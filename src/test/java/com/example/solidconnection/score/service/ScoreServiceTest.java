@@ -2,7 +2,11 @@ package com.example.solidconnection.score.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.discord.DiscordNotifier;
@@ -33,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestClientException;
 
 @TestContainerSpringBootTest
 @DisplayName("점수 서비스 테스트")
@@ -156,6 +161,22 @@ class ScoreServiceTest {
 
         // then
         assertThat(savedScore.getId()).isEqualTo(scoreId);
+    }
+
+    @Test
+    void 디스코드_알림에_실패해도_GPA_점수를_등록한다() {
+        // given
+        GpaScoreRequest request = createGpaScoreRequest();
+        MockMultipartFile file = createFile();
+        given(s3Service.uploadFile(file, UploadPath.GPA)).willReturn(new UploadedFileUrlResponse("/gpa-report.pdf"));
+        willThrow(new RestClientException("discord unavailable"))
+                .given(discordNotifier).notify(any(), anyLong(), anyString());
+
+        // when
+        long scoreId = scoreService.submitGpaScore(user.getId(), request, file);
+
+        // then
+        assertThat(gpaScoreRepository.findById(scoreId)).isPresent();
     }
 
     @Test
