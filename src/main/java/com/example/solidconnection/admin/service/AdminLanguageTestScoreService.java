@@ -10,14 +10,15 @@ import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.discord.DiscordReviewMarker;
+import com.example.solidconnection.common.discord.event.DiscordReviewCompletedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.LanguageTestScore;
 import com.example.solidconnection.score.repository.LanguageTestScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class AdminLanguageTestScoreService {
 
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<LanguageTestScoreSearchResponse> searchLanguageTestScores(ScoreSearchCondition scoreSearchCondition, Pageable pageable) {
@@ -64,11 +65,11 @@ public class AdminLanguageTestScoreService {
         }
         SiteUser siteUser = siteUserRepository.findById(languageTestScore.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        discordNotifier.markReviewResult(
+        eventPublisher.publishEvent(new DiscordReviewCompletedEvent(
                 DiscordNotificationType.LANGUAGE_TEST_SCORE,
                 languageTestScore.getId(),
                 siteUser.getNickname(),
                 marker
-        );
+        ));
     }
 }
