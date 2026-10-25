@@ -5,7 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FO
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.application.domain.LanguageTest;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.event.DiscordReviewRequestedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -26,6 +26,7 @@ import com.example.solidconnection.university.service.HomeUniversityQueryService
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +40,7 @@ public class ScoreService {
     private final LanguageTestScoreRepository languageTestScoreRepository;
     private final SiteUserRepository siteUserRepository;
     private final HomeUniversityQueryService homeUniversityQueryService;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long submitGpaScore(long siteUserId, GpaScoreRequest gpaScoreRequest, MultipartFile file) {
@@ -49,7 +50,11 @@ public class ScoreService {
         Gpa gpa = new Gpa(gpaScoreRequest.gpa(), gpaScoreRequest.gpaCriteria(), uploadedFile.fileUrl());
         GpaScore newGpaScore = new GpaScore(gpa, siteUser);
         GpaScore savedNewGpaScore = gpaScoreRepository.save(newGpaScore);
-        discordNotifier.notify(DiscordNotificationType.GPA_SCORE, savedNewGpaScore.getId(), siteUser.getNickname());
+        eventPublisher.publishEvent(new DiscordReviewRequestedEvent(
+                DiscordNotificationType.GPA_SCORE,
+                savedNewGpaScore.getId(),
+                siteUser.getNickname()
+        ));
         return savedNewGpaScore.getId();
     }
 
@@ -62,7 +67,11 @@ public class ScoreService {
                                                      languageTestScoreRequest.languageTestScore(), uploadedFile.fileUrl());
         LanguageTestScore newScore = new LanguageTestScore(languageTest, siteUser);
         LanguageTestScore savedNewScore = languageTestScoreRepository.save(newScore);
-        discordNotifier.notify(DiscordNotificationType.LANGUAGE_TEST_SCORE, savedNewScore.getId(), siteUser.getNickname());
+        eventPublisher.publishEvent(new DiscordReviewRequestedEvent(
+                DiscordNotificationType.LANGUAGE_TEST_SCORE,
+                savedNewScore.getId(),
+                siteUser.getNickname()
+        ));
         return savedNewScore.getId();
     }
 
