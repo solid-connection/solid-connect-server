@@ -10,14 +10,15 @@ import com.example.solidconnection.admin.dto.ScoreSearchCondition;
 import com.example.solidconnection.application.domain.Gpa;
 import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
 import com.example.solidconnection.common.discord.DiscordReviewMarker;
+import com.example.solidconnection.common.discord.event.DiscordReviewCompletedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class AdminGpaScoreService {
 
     private final GpaScoreRepository gpaScoreRepository;
     private final SiteUserRepository siteUserRepository;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<GpaScoreSearchResponse> searchGpaScores(ScoreSearchCondition scoreSearchCondition, Pageable pageable) {
@@ -64,11 +65,11 @@ public class AdminGpaScoreService {
         }
         SiteUser siteUser = siteUserRepository.findById(gpaScore.getSiteUserId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        discordNotifier.markReviewResult(
+        eventPublisher.publishEvent(new DiscordReviewCompletedEvent(
                 DiscordNotificationType.GPA_SCORE,
                 gpaScore.getId(),
                 siteUser.getNickname(),
                 marker
-        );
+        ));
     }
 }
