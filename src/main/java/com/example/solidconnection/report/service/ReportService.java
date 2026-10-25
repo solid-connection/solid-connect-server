@@ -4,8 +4,7 @@ import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatParticipantRepository;
-import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.event.DiscordReportCreatedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.common.exception.ErrorCode;
 import com.example.solidconnection.community.post.domain.Post;
@@ -19,6 +18,7 @@ import com.example.solidconnection.siteuser.domain.UserStatus;
 import com.example.solidconnection.siteuser.repository.SiteUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,7 +30,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatParticipantRepository chatParticipantRepository;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createReport(long reporterId, ReportRequest request) {
@@ -42,7 +42,7 @@ public class ReportService {
 
         Report report = new Report(reporterId, reportedId, request.reportType(), request.targetType(), request.targetId());
         reportRepository.save(report);
-        discordNotifier.notify(DiscordNotificationType.REPORT, "신고자 ID: " + reporterId);
+        eventPublisher.publishEvent(new DiscordReportCreatedEvent(reporterId));
     }
 
     private void validateReporterAndReportedExists(long reporterId, long reportedId) {
