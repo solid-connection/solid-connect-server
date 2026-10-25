@@ -10,10 +10,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-/*
- * - 커밋 이후 별도 스레드에서 전송하므로 디스코드 장애가 업무 트랜잭션에 영향을 주지 않는다.
- * - 예외 메시지에 webhook url 이 포함될 수 있으므로 예외 클래스명만 남긴다.
- * */
 @Component
 @EnableAsync
 @RequiredArgsConstructor
