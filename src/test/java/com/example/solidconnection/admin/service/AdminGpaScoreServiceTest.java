@@ -6,6 +6,10 @@ import static com.example.solidconnection.common.exception.ErrorCode.GPA_SCORE_N
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.willThrow;
 
 import com.example.solidconnection.admin.dto.GpaScoreResponse;
 import com.example.solidconnection.admin.dto.GpaScoreSearchResponse;
@@ -15,6 +19,7 @@ import com.example.solidconnection.common.VerifyStatus;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.score.domain.GpaScore;
 import com.example.solidconnection.score.fixture.GpaScoreFixture;
+import com.example.solidconnection.score.repository.GpaScoreRepository;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
@@ -28,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.client.RestClientException;
 
 @TestContainerSpringBootTest
 @DisplayName("학점 검증 관리자 서비스 테스트")
@@ -35,6 +41,9 @@ class AdminGpaScoreServiceTest {
 
     @Autowired
     private AdminGpaScoreService adminGpaScoreService;
+
+    @Autowired
+    private GpaScoreRepository gpaScoreRepository;
 
     /*
      * - 테스트 설정의 discord.webhook-url 이 비어 있지 않아 실제 요청이 나갈 수 있으므로 목으로 대체한다.
@@ -184,6 +193,26 @@ class AdminGpaScoreServiceTest {
             assertThatCode(() -> adminGpaScoreService.updateGpaScore(invalidGpaScoreId, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(GPA_SCORE_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 디스코드_검수_결과_표시에_실패해도_검증상태를_수정한다() {
+            // given
+            GpaScoreUpdateRequest request = new GpaScoreUpdateRequest(
+                    3.8,
+                    4.3,
+                    VerifyStatus.APPROVED,
+                    null
+            );
+            willThrow(new RestClientException("discord unavailable"))
+                    .given(discordNotifier).markReviewResult(any(), anyLong(), anyString(), anyString());
+
+            // when
+            adminGpaScoreService.updateGpaScore(gpaScore1.getId(), request);
+
+            // then
+            GpaScore updatedGpaScore = gpaScoreRepository.findById(gpaScore1.getId()).orElseThrow();
+            assertThat(updatedGpaScore.getVerifyStatus()).isEqualTo(VerifyStatus.APPROVED);
         }
     }
 }
