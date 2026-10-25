@@ -6,7 +6,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.TERM_NOT_FO
 import static com.example.solidconnection.common.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.solidconnection.common.discord.DiscordNotificationType;
-import com.example.solidconnection.common.discord.DiscordNotifier;
+import com.example.solidconnection.common.discord.event.DiscordReviewRequestedEvent;
 import com.example.solidconnection.common.exception.CustomException;
 import com.example.solidconnection.mentor.domain.MentorApplication;
 import com.example.solidconnection.mentor.domain.MentorApplicationStatus;
@@ -22,6 +22,7 @@ import com.example.solidconnection.term.repository.TermRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +38,7 @@ public class MentorApplicationService {
     private final SiteUserRepository siteUserRepository;
     private final S3Service s3Service;
     private final TermRepository termRepository;
-    private final DiscordNotifier discordNotifier;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void submitMentorApplication(
@@ -63,11 +64,11 @@ public class MentorApplicationService {
                 mentorApplicationRequest.exchangeStatus()
         );
         MentorApplication savedMentorApplication = mentorApplicationRepository.save(mentorApplication);
-        discordNotifier.notify(
+        eventPublisher.publishEvent(new DiscordReviewRequestedEvent(
                 DiscordNotificationType.MENTOR_APPLICATION,
                 savedMentorApplication.getId(),
                 siteUser.getNickname()
-        );
+        ));
     }
 
     private void ensureNoPendingOrApprovedMentorApplication(long siteUserId) {
