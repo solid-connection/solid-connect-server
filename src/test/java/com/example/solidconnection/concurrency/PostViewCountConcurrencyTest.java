@@ -8,6 +8,7 @@ import com.example.solidconnection.community.board.repository.BoardRepository;
 import com.example.solidconnection.community.post.domain.Post;
 import com.example.solidconnection.community.post.domain.PostCategory;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.community.post.repository.ViewCountStreamRepository;
 import com.example.solidconnection.community.post.service.PostRedisManager;
 import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
@@ -22,8 +23,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
 @TestContainerSpringBootTest
+@TestPropertySource(properties = "view.count.scheduling.enabled=true")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @DisplayName("게시글 조회수 동시성 테스트")
 class PostViewCountConcurrencyTest {
 
@@ -38,6 +43,9 @@ class PostViewCountConcurrencyTest {
 
     @Autowired
     private PostRedisManager postRedisManager;
+
+    @Autowired
+    private ViewCountStreamRepository viewCountStreamRepository;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -92,7 +100,7 @@ class PostViewCountConcurrencyTest {
         for (int i = 0; i < THREAD_NUMS; i++) {
             executorService.submit(() -> {
                 try {
-                    redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
+                    viewCountStreamRepository.increment(post.getId());
                 } finally {
                     doneSignal.countDown();
                 }
@@ -124,7 +132,7 @@ class PostViewCountConcurrencyTest {
                 try {
                     boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()), VALIDATE_VIEW_COUNT_TTL.getValue());
                     if (isFirstTime) {
-                        redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
+                        viewCountStreamRepository.increment(post.getId());
                     }
                 } finally {
                     doneSignal.countDown();
@@ -137,7 +145,7 @@ class PostViewCountConcurrencyTest {
                 try {
                     boolean isFirstTime = redisService.isPresent(postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId()), VALIDATE_VIEW_COUNT_TTL.getValue());
                     if (isFirstTime) {
-                        redisService.increaseViewCount(postRedisManager.getPostViewCountRedisKey(post.getId()));
+                        viewCountStreamRepository.increment(post.getId());
                     }
                 } finally {
                     doneSignal.countDown();

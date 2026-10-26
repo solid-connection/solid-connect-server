@@ -47,6 +47,7 @@ cloud:
 view:
   count:
     scheduling:
+      enabled: false
       delay: 3000
 websocket:
   thread-pool:

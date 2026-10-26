@@ -3,8 +3,11 @@ package com.example.solidconnection.community.post.service;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.solidconnection.community.post.domain.ViewCountEvent;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.community.post.repository.ViewCountFlushRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,33 +25,36 @@ class UpdateViewCountServiceTest {
     private PostRepository postRepository;
 
     @Mock
-    private PostRedisManager postRedisManager;
+    private ViewCountFlushRepository flushRepository;
 
-    @Test
-    void Redis_조회수_키가_이미_소비되었으면_DB_업데이트를_하지_않는다() {
-        // given
-        String key = "post:view:1";
-        given(postRedisManager.getPostIdFromPostViewCountRedisKey(key)).willReturn(1L);
-        given(postRedisManager.getAndDeleteViewCount(key)).willReturn(null);
+    @Nested
+    @DisplayName("처리 이력에 따른 조회수 반영")
+    class 이벤트_반영 {
 
-        // when
-        updateViewCountService.updateViewCount(key);
+        @Test
+        void 처리_이력이_있으면_DB_업데이트를_하지_않는다() {
+            // given
+            ViewCountEvent event = new ViewCountEvent("1-0", "flush-1", 1L, 2L);
+            given(flushRepository.recordIfNew("flush-1", 1L, 2L)).willReturn(false);
 
-        // then
-        then(postRepository).shouldHaveNoInteractions();
-    }
+            // when
+            updateViewCountService.apply(event);
 
-    @Test
-    void Redis_조회수가_있으면_DB_조회수를_증가시킨다() {
-        // given
-        String key = "post:view:1";
-        given(postRedisManager.getPostIdFromPostViewCountRedisKey(key)).willReturn(1L);
-        given(postRedisManager.getAndDeleteViewCount(key)).willReturn(2L);
+            // then
+            then(postRepository).shouldHaveNoInteractions();
+        }
 
-        // when
-        updateViewCountService.updateViewCount(key);
+        @Test
+        void 신규_처리_이력이면_DB_조회수를_증가시킨다() {
+            // given
+            ViewCountEvent event = new ViewCountEvent("1-0", "flush-1", 1L, 2L);
+            given(flushRepository.recordIfNew("flush-1", 1L, 2L)).willReturn(true);
 
-        // then
-        then(postRepository).should().increaseViewCount(1L, 2L);
+            // when
+            updateViewCountService.apply(event);
+
+            // then
+            then(postRepository).should().increaseViewCount(1L, 2L);
+        }
     }
 }

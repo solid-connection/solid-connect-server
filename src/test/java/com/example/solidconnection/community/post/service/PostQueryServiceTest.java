@@ -17,6 +17,7 @@ import com.example.solidconnection.community.post.dto.PostFindResponse;
 import com.example.solidconnection.community.post.dto.PostListResponse;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
+import com.example.solidconnection.community.post.repository.ViewCountStreamRepository;
 import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
@@ -28,10 +29,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 @TestContainerSpringBootTest
 @DisplayName("게시글 조회 서비스 테스트")
 class PostQueryServiceTest {
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private PostQueryService postQueryService;
@@ -227,7 +232,6 @@ class PostQueryServiceTest {
         List<Comment> comments = List.of(comment1, comment2);
 
         String validateKey = postRedisManager.getValidatePostViewCountRedisKey(user.getId(), post.getId());
-        String viewCountKey = postRedisManager.getPostViewCountRedisKey(post.getId());
 
         // when
         PostFindResponse response = postQueryService.findPostById(user.getId(), post.getId());
@@ -239,7 +243,9 @@ class PostQueryServiceTest {
                 () -> assertThat(response.postFindSiteUserResponse().id()).isEqualTo(user.getId()),
                 () -> assertThat(response.postFindPostImageResponses()).hasSize(imageUrls.size()),
                 () -> assertThat(response.postFindCommentResponses()).hasSize(comments.size()),
-                () -> assertThat(redisService.isKeyExists(viewCountKey)).isTrue(),
+                () -> assertThat(redisTemplate.opsForHash().hasKey(
+                        ViewCountStreamRepository.ACTIVE_KEY,
+                        post.getId().toString())).isTrue(),
                 () -> assertThat(redisService.isKeyExists(validateKey)).isTrue()
         );
     }
