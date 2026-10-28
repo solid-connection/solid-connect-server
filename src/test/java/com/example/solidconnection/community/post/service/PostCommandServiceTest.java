@@ -25,6 +25,7 @@ import com.example.solidconnection.community.post.dto.PostUpdateResponse;
 import com.example.solidconnection.community.post.fixture.PostFixture;
 import com.example.solidconnection.community.post.fixture.PostImageFixture;
 import com.example.solidconnection.community.post.repository.PostRepository;
+import com.example.solidconnection.community.post.repository.ViewCountStreamRepository;
 import com.example.solidconnection.redis.RedisService;
 import com.example.solidconnection.s3.domain.UploadPath;
 import com.example.solidconnection.s3.dto.UploadedFileUrlResponse;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +48,9 @@ import org.springframework.web.multipart.MultipartFile;
 @TestContainerSpringBootTest
 @DisplayName("게시글 생성/수정/삭제 서비스 테스트")
 class PostCommandServiceTest {
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private PostCommandService postCommandService;
@@ -304,8 +309,7 @@ class PostCommandServiceTest {
             // given
             String originImageUrl = "origin-image-url";
             postImageFixture.게시글_이미지(originImageUrl, post);
-            String viewCountKey = postRedisManager.getPostViewCountRedisKey(post.getId());
-            redisService.increaseViewCount(viewCountKey);
+            postRedisManager.incrementViewCountIfFirstAccess(user1.getId(), post.getId());
 
             // when
             PostDeleteResponse response = postCommandService.deletePostById(user1.getId(), post.getId());
@@ -314,7 +318,9 @@ class PostCommandServiceTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(post.getId()),
                     () -> assertThat(postRepository.findById(post.getId())).isEmpty(),
-                    () -> assertThat(redisService.isKeyExists(viewCountKey)).isFalse()
+                    () -> assertThat(redisTemplate.opsForHash().hasKey(
+                            ViewCountStreamRepository.ACTIVE_KEY,
+                            post.getId().toString())).isFalse()
             );
             then(s3Service).should().deletePostImage(originImageUrl);
         }

@@ -4,8 +4,8 @@ import static com.example.solidconnection.redis.RedisConstants.POST_CREATE_PREFI
 import static com.example.solidconnection.redis.RedisConstants.VALIDATE_POST_CREATE_TTL;
 import static com.example.solidconnection.redis.RedisConstants.VALIDATE_VIEW_COUNT_KEY_PREFIX;
 import static com.example.solidconnection.redis.RedisConstants.VALIDATE_VIEW_COUNT_TTL;
-import static com.example.solidconnection.redis.RedisConstants.VIEW_COUNT_KEY_PREFIX;
 
+import com.example.solidconnection.community.post.repository.ViewCountStreamRepository;
 import com.example.solidconnection.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,18 +15,10 @@ import org.springframework.stereotype.Component;
 public class PostRedisManager {
 
     private final RedisService redisService;
-
-    public Long getPostIdFromPostViewCountRedisKey(String key) {
-        return Long.parseLong(key.substring(VIEW_COUNT_KEY_PREFIX.getValue().length()));
-    }
-
-    public Long getAndDeleteViewCount(String key) {
-        return redisService.getAndDelete(key);
-    }
+    private final ViewCountStreamRepository streamRepository;
 
     public void deleteViewCountCache(Long postId) {
-        String key = getPostViewCountRedisKey(postId);
-        redisService.deleteKey(key);
+        streamRepository.deleteActive(postId);
     }
 
     public void incrementViewCountIfFirstAccess(long siteUserId, Long postId) {
@@ -34,13 +26,8 @@ public class PostRedisManager {
         boolean isFirstAccess = redisService.isPresent(validateKey, VALIDATE_VIEW_COUNT_TTL.getValue());
 
         if (isFirstAccess) {
-            String viewCountKey = getPostViewCountRedisKey(postId);
-            redisService.increaseViewCount(viewCountKey);
+            streamRepository.increment(postId);
         }
-    }
-
-    public String getPostViewCountRedisKey(Long postId) {
-        return VIEW_COUNT_KEY_PREFIX.getValue() + postId;
     }
 
     public String getValidatePostViewCountRedisKey(long siteUserId, Long postId) {

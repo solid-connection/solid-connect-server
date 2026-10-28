@@ -1,36 +1,25 @@
 package com.example.solidconnection.scheduler;
 
-import static com.example.solidconnection.redis.RedisConstants.VIEW_COUNT_KEY_PATTERN;
-
-import com.example.solidconnection.community.post.service.UpdateViewCountService;
-import com.example.solidconnection.util.RedisUtils;
-import java.util.List;
+import com.example.solidconnection.community.post.service.ViewCountConsumer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@EnableScheduling
-@EnableAsync
+@ConditionalOnProperty(name = "view.count.scheduling.enabled", havingValue = "true", matchIfMissing = true)
 public class UpdateViewCountScheduler {
 
-    private final RedisUtils redisUtils;
-    private final ThreadPoolTaskExecutor asyncExecutor;
-    private final UpdateViewCountService updateViewCountService;
+    private final ViewCountConsumer consumer;
 
-    @Async
     @Scheduled(fixedDelayString = "${view.count.scheduling.delay}")
     public void updateViewCount() {
-
-        List<String> itemViewCountKeys = redisUtils.getKeysOrderByExpiration(VIEW_COUNT_KEY_PATTERN.getValue());
-
-        itemViewCountKeys.forEach(key -> asyncExecutor.submit(() -> {
-            updateViewCountService.updateViewCount(key);
-        }));
+        try {
+            consumer.flushActiveCounters();
+        } finally {
+            // A failed flush must not prevent recovery of already persisted events.
+            consumer.consume();
+        }
     }
 }
