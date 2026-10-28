@@ -1,9 +1,11 @@
 package com.example.solidconnection.chat.config;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -45,7 +48,8 @@ class StompSessionManagerTest {
     @BeforeEach
     void setUp() {
         StompProperties stompProperties = new StompProperties(null, null, SUBSCRIPTION_TIMEOUT);
-        stompSessionManager = new StompSessionManager(scheduler, stompProperties);
+        TaskExecutor directExecutor = Runnable::run;
+        stompSessionManager = new StompSessionManager(scheduler, directExecutor, stompProperties);
 
         given(session.getId()).willReturn(SESSION_ID);
     }
@@ -64,6 +68,21 @@ class StompSessionManagerTest {
 
         // then
         then(session).should().close(any(CloseStatus.class));
+    }
+
+    @Test
+    void 세션_종료_실패는_타임아웃_작업으로_전파하지_않는다() throws Exception {
+        // given
+        given(session.isOpen()).willReturn(true);
+        doReturn(timeoutTask).when(scheduler).schedule(any(Runnable.class), any(Instant.class));
+        doThrow(new IllegalStateException("close failed"))
+                .when(session).close(any(CloseStatus.class));
+        stompSessionManager.registerSession(session);
+        ArgumentCaptor<Runnable> timeoutActionCaptor = ArgumentCaptor.forClass(Runnable.class);
+        then(scheduler).should().schedule(timeoutActionCaptor.capture(), any(Instant.class));
+
+        // when & then
+        assertThatCode(timeoutActionCaptor.getValue()::run).doesNotThrowAnyException();
     }
 
     @Test
