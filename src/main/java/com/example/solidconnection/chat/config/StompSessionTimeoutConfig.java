@@ -19,7 +19,7 @@ public class StompSessionTimeoutConfig {
         return scheduler;
     }
 
-    @Bean
+    @Bean(defaultCandidate = false)
     public TaskExecutor stompSessionCloseExecutor() {
         return new VirtualThreadTaskExecutor("stomp-session-close-");
     }
