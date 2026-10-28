@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
@@ -25,6 +26,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CorsProperties corsProperties;
     private final WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
     private final CustomHandshakeHandler customHandshakeHandler;
+    private final WebSocketSessionDecoratorFactory webSocketSessionDecoratorFactory;
     private final Optional<WebSocketLoggingInterceptor> webSocketLoggingInterceptor;
 
     @Override
@@ -53,6 +55,11 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientOutboundChannel(ChannelRegistration registration) {
         OutboundProperties outboundProperties = stompProperties.threadPool().outbound();
         registration.taskExecutor().corePoolSize(outboundProperties.corePoolSize()).maxPoolSize(outboundProperties.maxPoolSize());
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(webSocketSessionDecoratorFactory);
     }
 
     @Override

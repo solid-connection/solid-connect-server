@@ -1,9 +1,14 @@
 package com.example.solidconnection.chat.config;
 
+import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "websocket")
-public record StompProperties(ThreadPool threadPool, HeartbeatProperties heartbeat) {
+public record StompProperties(
+        ThreadPool threadPool,
+        HeartbeatProperties heartbeat,
+        Duration subscriptionTimeout
+) {
 
     public record ThreadPool(InboundProperties inbound, OutboundProperties outbound) {
 
