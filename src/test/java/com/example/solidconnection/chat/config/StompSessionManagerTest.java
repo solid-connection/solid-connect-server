@@ -103,7 +103,7 @@ class StompSessionManagerTest {
     }
 
     @Test
-    void STOMP_연결이_수립되면_구독_제한시간을_다시_계산하고_이전_작업은_무시한다() throws Exception {
+    void 첫_CONNECT에서만_구독_제한시간을_다시_계산한다() throws Exception {
         // given
         doReturn(timeoutTask, renewedTimeoutTask)
                 .when(scheduler).schedule(any(Runnable.class), any(Instant.class));
@@ -111,6 +111,7 @@ class StompSessionManagerTest {
         ArgumentCaptor<Runnable> timeoutActionCaptor = ArgumentCaptor.forClass(Runnable.class);
 
         // when
+        stompSessionManager.startSubscriptionTimeout(SESSION_ID);
         stompSessionManager.startSubscriptionTimeout(SESSION_ID);
         then(scheduler).should(times(2)).schedule(timeoutActionCaptor.capture(), any(Instant.class));
         timeoutActionCaptor.getAllValues().getFirst().run();
@@ -124,6 +125,21 @@ class StompSessionManagerTest {
 
         // then
         then(renewedTimeoutTask).should().cancel(false);
+    }
+
+    @Test
+    void 구독이_완료된_뒤에는_지연된_CONNECT가_타임아웃을_등록하지_않는다() {
+        // given
+        doReturn(timeoutTask).when(scheduler).schedule(any(Runnable.class), any(Instant.class));
+        stompSessionManager.registerSession(session);
+        stompSessionManager.completeSubscription(SESSION_ID);
+
+        // when
+        stompSessionManager.startSubscriptionTimeout(SESSION_ID);
+
+        // then
+        then(scheduler).should(times(1)).schedule(any(Runnable.class), any(Instant.class));
+        then(timeoutTask).should().cancel(false);
     }
 
     @Test

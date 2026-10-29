@@ -9,7 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 public class StompSessionTimeoutConfig {
 
-    @Bean
+    @Bean(defaultCandidate = false)
     public ThreadPoolTaskScheduler stompSubscriptionTimeoutScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(1);

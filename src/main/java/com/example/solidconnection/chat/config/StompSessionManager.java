@@ -3,6 +3,7 @@ package com.example.solidconnection.chat.config;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ public class StompSessionManager {
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, SubscriptionTimeoutTask> subscriptionTimeoutTasks = new ConcurrentHashMap<>();
+    private final Set<String> connectedSessions = ConcurrentHashMap.newKeySet();
+    private final Set<String> subscribedSessions = ConcurrentHashMap.newKeySet();
     private final TaskScheduler stompSubscriptionTimeoutScheduler;
     private final TaskExecutor stompSessionCloseExecutor;
     private final StompProperties stompProperties;
@@ -36,12 +39,24 @@ public class StompSessionManager {
         this.stompProperties = stompProperties;
     }
 
-    public void registerSession(WebSocketSession session) {
+    public synchronized void registerSession(WebSocketSession session) {
         sessions.put(session.getId(), session);
-        startSubscriptionTimeout(session.getId());
+        connectedSessions.remove(session.getId());
+        subscribedSessions.remove(session.getId());
+        scheduleSubscriptionTimeout(session.getId());
     }
 
-    public void startSubscriptionTimeout(String sessionId) {
+    public synchronized void startSubscriptionTimeout(String sessionId) {
+        if (!sessions.containsKey(sessionId)
+                || subscribedSessions.contains(sessionId)
+                || !connectedSessions.add(sessionId)) {
+            return;
+        }
+
+        scheduleSubscriptionTimeout(sessionId);
+    }
+
+    private void scheduleSubscriptionTimeout(String sessionId) {
         Object taskToken = new Object();
         Instant timeoutAt = Instant.now().plus(stompProperties.subscriptionTimeout());
         ScheduledFuture<?> timeoutTask = stompSubscriptionTimeoutScheduler.schedule(
@@ -56,19 +71,26 @@ public class StompSessionManager {
     }
 
     private void closeUnsubscribedSession(String sessionId, Object taskToken) {
-        SubscriptionTimeoutTask timeoutTask = subscriptionTimeoutTasks.get(sessionId);
-        if (timeoutTask == null
-                || timeoutTask.token() != taskToken
-                || !subscriptionTimeoutTasks.remove(sessionId, timeoutTask)) {
-            return;
-        }
-
-        WebSocketSession session = sessions.remove(sessionId);
+        WebSocketSession session = removeUnsubscribedSession(sessionId, taskToken);
         if (session == null || !session.isOpen()) {
             return;
         }
 
         stompSessionCloseExecutor.execute(() -> closeSession(sessionId, session));
+    }
+
+    private synchronized WebSocketSession removeUnsubscribedSession(String sessionId, Object taskToken) {
+        SubscriptionTimeoutTask timeoutTask = subscriptionTimeoutTasks.get(sessionId);
+        if (timeoutTask == null
+                || timeoutTask.token() != taskToken
+                || !subscriptionTimeoutTasks.remove(sessionId, timeoutTask)) {
+            return null;
+        }
+
+        WebSocketSession session = sessions.remove(sessionId);
+        connectedSessions.remove(sessionId);
+        subscribedSessions.remove(sessionId);
+        return session;
     }
 
     private void closeSession(String sessionId, WebSocketSession session) {
@@ -80,11 +102,16 @@ public class StompSessionManager {
         }
     }
 
-    public void completeSubscription(String sessionId) {
+    public synchronized void completeSubscription(String sessionId) {
+        if (sessions.containsKey(sessionId)) {
+            subscribedSessions.add(sessionId);
+        }
         cancel(subscriptionTimeoutTasks.remove(sessionId));
     }
 
-    public void removeSession(String sessionId) {
+    public synchronized void removeSession(String sessionId) {
+        connectedSessions.remove(sessionId);
+        subscribedSessions.remove(sessionId);
         cancel(subscriptionTimeoutTasks.remove(sessionId));
         sessions.remove(sessionId);
     }

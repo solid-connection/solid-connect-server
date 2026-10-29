@@ -12,6 +12,21 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
 class StompSessionTimeoutConfigTest {
 
     @Test
+    void 구독_타임아웃_스케줄러는_기본_실행기_후보에서_제외한다() {
+        // given
+        try (AnnotationConfigApplicationContext context =
+                     new AnnotationConfigApplicationContext(StompSessionTimeoutConfig.class)) {
+
+            // when
+            var beanDefinition = (AbstractBeanDefinition) context.getBeanFactory()
+                    .getBeanDefinition("stompSubscriptionTimeoutScheduler");
+
+            // then
+            assertThat(beanDefinition.isDefaultCandidate()).isFalse();
+        }
+    }
+
+    @Test
     void 세션_종료_실행기는_기본_실행기_후보에서_제외한다() {
         // given
         try (AnnotationConfigApplicationContext context =
