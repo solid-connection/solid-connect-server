@@ -50,6 +50,7 @@ view:
       enabled: false
       delay: 3000
 websocket:
+  subscription-timeout: 300ms
   thread-pool:
     inbound:
       core-pool-size: 8

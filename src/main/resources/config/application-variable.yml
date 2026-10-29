@@ -4,6 +4,7 @@ view:
       delay: 3000
 
 websocket:
+  subscription-timeout: 30s
   thread-pool:
     inbound:
       core-pool-size: 6
