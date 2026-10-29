@@ -1,5 +1,6 @@
 package com.example.solidconnection.chat.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -57,6 +58,12 @@ class StompSessionManagerTest {
     @Test
     void 제한시간까지_구독하지_않으면_세션을_종료한다() throws Exception {
         // given
+        RecordingTaskExecutor recordingTaskExecutor = new RecordingTaskExecutor();
+        stompSessionManager = new StompSessionManager(
+                scheduler,
+                recordingTaskExecutor,
+                new StompProperties(null, null, SUBSCRIPTION_TIMEOUT)
+        );
         given(session.isOpen()).willReturn(true);
         doReturn(timeoutTask).when(scheduler).schedule(any(Runnable.class), any(Instant.class));
         stompSessionManager.registerSession(session);
@@ -65,6 +72,13 @@ class StompSessionManagerTest {
 
         // when
         timeoutActionCaptor.getValue().run();
+
+        // then
+        assertThat(recordingTaskExecutor.task).isNotNull();
+        then(session).should(never()).close(any(CloseStatus.class));
+
+        // when
+        recordingTaskExecutor.task.run();
 
         // then
         then(session).should().close(any(CloseStatus.class));
@@ -109,11 +123,19 @@ class StompSessionManagerTest {
                 .when(scheduler).schedule(any(Runnable.class), any(Instant.class));
         stompSessionManager.registerSession(session);
         ArgumentCaptor<Runnable> timeoutActionCaptor = ArgumentCaptor.forClass(Runnable.class);
+        ArgumentCaptor<Instant> timeoutAtCaptor = ArgumentCaptor.forClass(Instant.class);
 
         // when
+        Instant beforeConnect = Instant.now();
         stompSessionManager.startSubscriptionTimeout(SESSION_ID);
+        Instant afterConnect = Instant.now();
         stompSessionManager.startSubscriptionTimeout(SESSION_ID);
-        then(scheduler).should(times(2)).schedule(timeoutActionCaptor.capture(), any(Instant.class));
+        then(scheduler).should(times(2)).schedule(timeoutActionCaptor.capture(), timeoutAtCaptor.capture());
+        assertThat(timeoutAtCaptor.getAllValues().getLast())
+                .isBetween(
+                        beforeConnect.plus(SUBSCRIPTION_TIMEOUT),
+                        afterConnect.plus(SUBSCRIPTION_TIMEOUT)
+                );
         timeoutActionCaptor.getAllValues().getFirst().run();
 
         // then
@@ -158,5 +180,15 @@ class StompSessionManagerTest {
         // then
         then(timeoutTask).should().cancel(false);
         then(session).should(never()).close(any(CloseStatus.class));
+    }
+
+    private static class RecordingTaskExecutor implements TaskExecutor {
+
+        private Runnable task;
+
+        @Override
+        public void execute(Runnable task) {
+            this.task = task;
+        }
     }
 }

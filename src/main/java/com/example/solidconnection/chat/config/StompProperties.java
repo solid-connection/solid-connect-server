@@ -10,6 +10,14 @@ public record StompProperties(
         Duration subscriptionTimeout
 ) {
 
+    public StompProperties {
+        if (subscriptionTimeout == null
+                || subscriptionTimeout.isZero()
+                || subscriptionTimeout.isNegative()) {
+            throw new IllegalArgumentException("websocket.subscription-timeout must be a positive duration");
+        }
+    }
+
     public record ThreadPool(InboundProperties inbound, OutboundProperties outbound) {
 
     }
