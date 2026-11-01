@@ -2,6 +2,8 @@
 
 이 파일은 Claude Code가 solid-connect-server 저장소에서 작업할 때 참고하는 가이드입니다.
 
+> 해당 지시문서가 위치한 폴더에 [CLAUDE.local.md](http://CLAUDE.local.md) 문서 파일이 있다면 해당 파일을 읽어 Claude Code 개인 지침을 확인하세요.
+
 ## 프로젝트 개요
 
 Solid Connect Server는 교환학생 준비생을 위해 대학 정보, 멘토 매칭, 모의지원 기능 등을 제공하는 교환학생 지원 통합 플랫폼입니다.
@@ -180,7 +182,7 @@ public class UserCreateResponse { ...
 - **Redis**: 캐싱 저장소
 - **Flyway**: 데이터베이스 버전 관리
 
-### 모니터링 & 보안
+### 모니터링 &amp; 보안
 
 - **Spring Boot Actuator**: 애플리케이션 모니터링
 - **Prometheus**: 메트릭 수집
@@ -319,14 +321,16 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
 ## 주요 파일 위치
 
+
 | 파일/폴더                                        | 설명            |
-|----------------------------------------------|---------------|
+| -------------------------------------------- | ------------- |
 | `src/main/java/com/example/solidconnection/` | 메인 소스 코드      |
 | `src/test/java/com/example/solidconnection/` | 테스트 코드        |
 | `src/main/resources/db/migration/`           | Flyway 마이그레이션 |
 | `src/main/resources/application.yml`         | 공통 설정         |
 | `docker-compose.*.yml`                       | 환경별 도커 설정     |
 | `build.gradle`                               | Gradle 빌드 설정  |
+
 
 ---
 
@@ -370,12 +374,12 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
 ## 참고 자료
 
-- **개발 컨벤션**: https://github.com/solid-connection/solid-connect-server/wiki/개발-컨벤션-정리
+- **개발 컨벤션**: [https://github.com/solid-connection/solid-connect-server/wiki/개발-컨벤션-정리](https://github.com/solid-connection/solid-connect-server/wiki/개발-컨벤션-정리)
 - **테스트 가이드**: `test.md` 파일 참고
-- **Spring Boot**: https://spring.io/projects/spring-boot
-- **JPA**: https://spring.io/projects/spring-data-jpa
-- **TestContainers**: https://www.testcontainers.org/
-- **Flyway**: https://flywaydb.org/
+- **Spring Boot**: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
+- **JPA**: [https://spring.io/projects/spring-data-jpa](https://spring.io/projects/spring-data-jpa)
+- **TestContainers**: [https://www.testcontainers.org/](https://www.testcontainers.org/)
+- **Flyway**: [https://flywaydb.org/](https://flywaydb.org/)
 
 ---
 

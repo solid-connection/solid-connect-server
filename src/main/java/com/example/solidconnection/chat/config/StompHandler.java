@@ -1,6 +1,7 @@
 package com.example.solidconnection.chat.config;
 
 import static com.example.solidconnection.common.exception.ErrorCode.AUTHENTICATION_FAILED;
+import static com.example.solidconnection.common.exception.ErrorCode.INVALID_INPUT;
 
 import com.example.solidconnection.chat.service.ChatService;
 import com.example.solidconnection.common.exception.CustomException;
@@ -40,6 +41,9 @@ public class StompHandler implements ChannelInterceptor {
             Principal user = accessor.getUser();
             if (user == null) {
                 throw new CustomException(AUTHENTICATION_FAILED);
+            }
+            if (accessor.getSubscriptionId() == null) {
+                throw new CustomException(INVALID_INPUT, "SUBSCRIBE id is required");
             }
 
             TokenAuthentication tokenAuthentication = (TokenAuthentication) user;
