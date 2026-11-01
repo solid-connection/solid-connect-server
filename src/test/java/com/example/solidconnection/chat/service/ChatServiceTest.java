@@ -44,6 +44,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @TestContainerSpringBootTest
@@ -432,6 +434,12 @@ class ChatServiceTest {
             transactionTemplate.executeWithoutResult(status -> {
                 chatService.sendChatMessage(request, sender.getId(), chatRoom.getId());
                 BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void beforeCommit(boolean readOnly) {
+                        BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                    }
+                });
             });
 
             // then
@@ -512,6 +520,12 @@ class ChatServiceTest {
             transactionTemplate.executeWithoutResult(status -> {
                 chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
                 BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void beforeCommit(boolean readOnly) {
+                        BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                    }
+                });
             });
 
             // then
