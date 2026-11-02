@@ -21,6 +21,30 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 class ChatMessageOutboxDispatcherConcurrencyTest {
 
     @Test
+    void 인터럽트된_스레드에서_디스패치하면_Outbox를_claim하지_않는다() {
+        // given
+        ChatMessageOutboxTransactionService transactionService =
+                BDDMockito.mock(ChatMessageOutboxTransactionService.class);
+        SimpMessageSendingOperations messagingOperations =
+                BDDMockito.mock(SimpMessageSendingOperations.class);
+        ChatMessageOutboxDispatcher dispatcher =
+                new ChatMessageOutboxDispatcher(transactionService, messagingOperations);
+        Thread.currentThread().interrupt();
+
+        try {
+            // when
+            dispatcher.dispatch(1L);
+
+            // then
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+            BDDMockito.then(transactionService).shouldHaveNoInteractions();
+            BDDMockito.then(messagingOperations).shouldHaveNoInteractions();
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
+    @Test
     void 동시_디스패치를_네_개로_제한하면서_대기_작업을_버리지_않는다() throws Exception {
         // given
         ChatMessageOutboxTransactionService transactionService =

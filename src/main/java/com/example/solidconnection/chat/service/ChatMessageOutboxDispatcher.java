@@ -25,7 +25,13 @@ public class ChatMessageOutboxDispatcher {
     private final Semaphore dispatchPermits = new Semaphore(MAX_CONCURRENT_DISPATCHES, true);
 
     public void dispatch(long outboxId) {
-        dispatchPermits.acquireUninterruptibly();
+        try {
+            dispatchPermits.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.info("채팅 메시지 Outbox 디스패치 대기 중 인터럽트되었습니다. outboxId={}", outboxId);
+            return;
+        }
         try {
             dispatchWithPermit(outboxId);
         } finally {
