@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.example.solidconnection.chat.domain.ChatAttachment;
 import com.example.solidconnection.chat.domain.ChatMessage;
+import com.example.solidconnection.chat.domain.ChatMessageOutbox;
+import com.example.solidconnection.chat.domain.ChatMessageOutboxCompletionType;
+import com.example.solidconnection.chat.domain.ChatMessageOutboxStatus;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatReadStatus;
 import com.example.solidconnection.chat.domain.ChatRoom;
@@ -24,6 +27,7 @@ import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatReadStatusFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
+import com.example.solidconnection.chat.repository.ChatMessageOutboxRepository;
 import com.example.solidconnection.chat.repository.ChatReadStatusRepositoryForTest;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -60,6 +64,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    private ChatMessageOutboxRepository chatMessageOutboxRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -219,12 +226,14 @@ class ChatServiceTest {
 
         private ChatRoom chatRoom;
         private Pageable pageable;
+        private ChatParticipant participant;
+        private ChatParticipant partnerParticipant;
 
         @BeforeEach
         void setUp() {
             chatRoom = chatRoomFixture.채팅방(false);
-            chatParticipantFixture.참여자(user.getId(), chatRoom);
-            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+            participant = chatParticipantFixture.참여자(user.getId(), chatRoom);
+            partnerParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
 
             pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         }
@@ -321,6 +330,46 @@ class ChatServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
         }
+
+        @Test
+        void 조회_응답에_포함된_상대방_메시지의_Outbox를_HISTORY_SERVED로_완료한다() {
+            // given
+            ChatMessage message = chatMessageFixture.메시지("조회 복구 메시지", partnerParticipant.getId(), chatRoom);
+            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+                    message,
+                    participant,
+                    ZonedDateTime.now().minusMinutes(1)
+            ));
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);
+
+            // then
+            ChatMessageOutbox saved = chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(saved.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)
+            );
+        }
+
+        @Test
+        void 송신자의_조회는_상대방_Outbox를_완료하지_않는다() {
+            // given
+            ChatMessage message = chatMessageFixture.메시지("내가 보낸 메시지", participant.getId(), chatRoom);
+            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+                    message,
+                    partnerParticipant,
+                    ZonedDateTime.now().minusMinutes(1)
+            ));
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);
+
+            // then
+            assertThat(chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow().getStatus())
+                    .isEqualTo(ChatMessageOutboxStatus.PENDING);
+        }
     }
 
     @Nested
@@ -414,6 +463,7 @@ class ChatServiceTest {
 
         private SiteUser sender;
         private ChatParticipant senderParticipant;
+        private ChatParticipant recipientParticipant;
         private ChatRoom chatRoom;
 
         @BeforeEach
@@ -421,6 +471,7 @@ class ChatServiceTest {
             sender = siteUserFixture.사용자(111, "sender");
             chatRoom = chatRoomFixture.채팅방(false);
             senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+            recipientParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
         }
 
         @Test
@@ -452,7 +503,10 @@ class ChatServiceTest {
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
                     () -> assertThat(payloadCaptor.getValue().content()).isEqualTo(content),
                     () -> assertThat(payloadCaptor.getValue().siteUserId()).isEqualTo(sender.getId()),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1),
+                    () -> assertThat(chatMessageOutboxRepository.findAll()).singleElement()
+                            .extracting(outbox -> outbox.getRecipient().getId())
+                            .isEqualTo(recipientParticipant.getId())
             );
         }
 
@@ -472,7 +526,8 @@ class ChatServiceTest {
             // then
             assertAll(
                     () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount),
+                    () -> assertThat(chatMessageOutboxRepository.count()).isZero()
             );
         }
 
@@ -497,6 +552,7 @@ class ChatServiceTest {
         private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
         private SiteUser sender;
         private ChatParticipant senderParticipant;
+        private ChatParticipant recipientParticipant;
         private ChatRoom chatRoom;
 
         @BeforeEach
@@ -504,6 +560,7 @@ class ChatServiceTest {
             sender = siteUserFixture.사용자(111, "sender");
             chatRoom = chatRoomFixture.채팅방(false);
             senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+            recipientParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
         }
 
         @Test
@@ -544,7 +601,10 @@ class ChatServiceTest {
                     () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
                     () -> assertThat(response.siteUserId()).isEqualTo(sender.getId()),
                     () -> assertThat(response.content()).isEmpty(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1),
+                    () -> assertThat(chatMessageOutboxRepository.findAll()).singleElement()
+                            .extracting(outbox -> outbox.getRecipient().getId())
+                            .isEqualTo(recipientParticipant.getId())
             );
         }
 
@@ -564,7 +624,8 @@ class ChatServiceTest {
             // then
             assertAll(
                     () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount),
+                    () -> assertThat(chatMessageOutboxRepository.count()).isZero()
             );
         }
 
