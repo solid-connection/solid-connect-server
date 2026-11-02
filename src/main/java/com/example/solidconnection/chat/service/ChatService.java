@@ -18,6 +18,7 @@ import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomData;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ChatRoomResponse;
+import com.example.solidconnection.chat.event.ChatMessageBroadcastEvent;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatParticipantRepository;
 import com.example.solidconnection.chat.repository.ChatReadStatusRepository;
@@ -34,10 +35,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -52,7 +52,7 @@ public class ChatService {
     private final SiteUserRepository siteUserRepository;
     private final MentorRepository mentorRepository;
 
-    private final SimpMessageSendingOperations simpMessageSendingOperations;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ChatService(ChatRoomRepository chatRoomRepository,
                        ChatMessageRepository chatMessageRepository,
@@ -60,14 +60,14 @@ public class ChatService {
                        ChatReadStatusRepository chatReadStatusRepository,
                        SiteUserRepository siteUserRepository,
                        MentorRepository mentorRepository,
-                       @Lazy SimpMessageSendingOperations simpMessageSendingOperations) {
+                       ApplicationEventPublisher eventPublisher) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.chatParticipantRepository = chatParticipantRepository;
         this.chatReadStatusRepository = chatReadStatusRepository;
         this.siteUserRepository = siteUserRepository;
         this.mentorRepository = mentorRepository;
-        this.simpMessageSendingOperations = simpMessageSendingOperations;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -230,7 +230,7 @@ public class ChatService {
 
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.of(chatMessage, siteUserId);
 
-        simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
+        eventPublisher.publishEvent(new ChatMessageBroadcastEvent(roomId, chatMessageResponse));
     }
 
     @Transactional
@@ -261,7 +261,7 @@ public class ChatService {
         chatMessageRepository.save(chatMessage);
 
         ChatMessageSendResponse chatMessageResponse = ChatMessageSendResponse.of(chatMessage, siteUserId);
-        simpMessageSendingOperations.convertAndSend("/topic/chat/" + roomId, chatMessageResponse);
+        eventPublisher.publishEvent(new ChatMessageBroadcastEvent(roomId, chatMessageResponse));
     }
 
     private String generateThumbnailUrl(String originalUrl) {

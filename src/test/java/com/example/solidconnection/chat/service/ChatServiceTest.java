@@ -23,6 +23,7 @@ import com.example.solidconnection.chat.fixture.ChatMessageFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatReadStatusFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
+import com.example.solidconnection.chat.repository.ChatMessageRepository;
 import com.example.solidconnection.chat.repository.ChatReadStatusRepositoryForTest;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -43,6 +44,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @TestContainerSpringBootTest
 @DisplayName("채팅 서비스 테스트")
@@ -53,6 +57,12 @@ class ChatServiceTest {
 
     @Autowired
     private ChatReadStatusRepositoryForTest chatReadStatusRepositoryForTest;
+
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     @Autowired
     private SiteUserFixture siteUserFixture;
@@ -418,9 +428,19 @@ class ChatServiceTest {
             // given
             final String content = "안녕하세요";
             ChatMessageSendRequest request = new ChatMessageSendRequest(content);
+            long messageCount = chatMessageRepository.count();
 
             // when
-            chatService.sendChatMessage(request, sender.getId(), chatRoom.getId());
+            transactionTemplate.executeWithoutResult(status -> {
+                chatService.sendChatMessage(request, sender.getId(), chatRoom.getId());
+                BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void beforeCommit(boolean readOnly) {
+                        BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                    }
+                });
+            });
 
             // then
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
@@ -431,7 +451,28 @@ class ChatServiceTest {
             assertAll(
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
                     () -> assertThat(payloadCaptor.getValue().content()).isEqualTo(content),
-                    () -> assertThat(payloadCaptor.getValue().siteUserId()).isEqualTo(sender.getId())
+                    () -> assertThat(payloadCaptor.getValue().siteUserId()).isEqualTo(sender.getId()),
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+            );
+        }
+
+        @Test
+        void 트랜잭션이_롤백되면_메시지를_저장하거나_방송하지_않는다() {
+            // given
+            ChatMessageSendRequest request = new ChatMessageSendRequest("롤백 메시지");
+            long messageCount = chatMessageRepository.count();
+
+            // when
+            transactionTemplate.executeWithoutResult(status -> {
+                chatService.sendChatMessage(request, sender.getId(), chatRoom.getId());
+                BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                status.setRollbackOnly();
+            });
+
+            // then
+            assertAll(
+                    () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
             );
         }
 
@@ -473,9 +514,19 @@ class ChatServiceTest {
                     TEST_IMAGE_URL2
             );
             ChatImageSendRequest request = new ChatImageSendRequest(imageUrls);
+            long messageCount = chatMessageRepository.count();
 
             // when
-            chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+            transactionTemplate.executeWithoutResult(status -> {
+                chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+                BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void beforeCommit(boolean readOnly) {
+                        BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                    }
+                });
+            });
 
             // then
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
@@ -492,7 +543,28 @@ class ChatServiceTest {
                     () -> assertThat(response.attachments().get(1).url()).isEqualTo(imageUrls.get(1)),
                     () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
                     () -> assertThat(response.siteUserId()).isEqualTo(sender.getId()),
-                    () -> assertThat(response.content()).isEmpty()
+                    () -> assertThat(response.content()).isEmpty(),
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+            );
+        }
+
+        @Test
+        void 트랜잭션이_롤백되면_이미지_메시지를_저장하거나_방송하지_않는다() {
+            // given
+            ChatImageSendRequest request = new ChatImageSendRequest(List.of(TEST_IMAGE_URL));
+            long messageCount = chatMessageRepository.count();
+
+            // when
+            transactionTemplate.executeWithoutResult(status -> {
+                chatService.sendChatImage(request, sender.getId(), chatRoom.getId());
+                BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions();
+                status.setRollbackOnly();
+            });
+
+            // then
+            assertAll(
+                    () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
             );
         }
 
