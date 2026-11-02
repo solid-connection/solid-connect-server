@@ -23,6 +23,7 @@ import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
@@ -72,52 +73,56 @@ class ChatMessageOutboxDispatcherTest {
         outbox = outboxRepository.save(new ChatMessageOutbox(message, recipient, now.minusSeconds(1)));
     }
 
-    @Test
-    void DB_트랜잭션_밖에서_방송하고_성공_상태를_별도_커밋한다() {
-        // given
-        BDDMockito.willAnswer(invocation -> {
-            assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
-            return null;
-        }).given(simpMessagingTemplate).convertAndSend(
-                BDDMockito.anyString(),
-                BDDMockito.any(ChatMessageSendResponse.class)
-        );
+    @Nested
+    class 메시지를_방송한다 {
 
-        // when
-        dispatcher.dispatch(outbox.getId());
+        @Test
+        void DB_트랜잭션_밖에서_방송하고_성공_상태를_별도_커밋한다() {
+            // given
+            BDDMockito.willAnswer(invocation -> {
+                assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+                return null;
+            }).given(simpMessagingTemplate).convertAndSend(
+                    BDDMockito.anyString(),
+                    BDDMockito.any(ChatMessageSendResponse.class)
+            );
 
-        // then
-        ArgumentCaptor<ChatMessageSendResponse> responseCaptor =
-                ArgumentCaptor.forClass(ChatMessageSendResponse.class);
-        BDDMockito.then(simpMessagingTemplate).should().convertAndSend(
-                BDDMockito.eq("/topic/chat/" + roomId),
-                responseCaptor.capture()
-        );
-        ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
-        assertAll(
-                () -> assertThat(responseCaptor.getValue().messageId())
-                        .isEqualTo(outbox.getChatMessage().getId()),
-                () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
-                () -> assertThat(saved.getCompletionType())
-                        .isEqualTo(ChatMessageOutboxCompletionType.BROKER_DISPATCHED)
-        );
-    }
+            // when
+            dispatcher.dispatch(outbox.getId());
 
-    @Test
-    void 방송에_실패하면_예외를_전파하지_않고_재시도를_예약한다() {
-        // given
-        BDDMockito.willThrow(new RuntimeException("broadcast failed"))
-                .given(simpMessagingTemplate)
-                .convertAndSend(BDDMockito.anyString(), BDDMockito.any(ChatMessageSendResponse.class));
+            // then
+            ArgumentCaptor<ChatMessageSendResponse> responseCaptor =
+                    ArgumentCaptor.forClass(ChatMessageSendResponse.class);
+            BDDMockito.then(simpMessagingTemplate).should().convertAndSend(
+                    BDDMockito.eq("/topic/chat/" + roomId),
+                    responseCaptor.capture()
+            );
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(responseCaptor.getValue().messageId())
+                            .isEqualTo(outbox.getChatMessage().getId()),
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(saved.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.BROKER_DISPATCHED)
+            );
+        }
 
-        // when & then
-        assertThatCode(() -> dispatcher.dispatch(outbox.getId())).doesNotThrowAnyException();
+        @Test
+        void 방송에_실패하면_예외를_전파하지_않고_재시도를_예약한다() {
+            // given
+            BDDMockito.willThrow(new RuntimeException("broadcast failed"))
+                    .given(simpMessagingTemplate)
+                    .convertAndSend(BDDMockito.anyString(), BDDMockito.any(ChatMessageSendResponse.class));
 
-        ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
-        assertAll(
-                () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.PENDING),
-                () -> assertThat(saved.getAttemptCount()).isEqualTo(1),
-                () -> assertThat(saved.getLastError()).contains("broadcast failed")
-        );
+            // when & then
+            assertThatCode(() -> dispatcher.dispatch(outbox.getId())).doesNotThrowAnyException();
+
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.PENDING),
+                    () -> assertThat(saved.getAttemptCount()).isEqualTo(1),
+                    () -> assertThat(saved.getLastError()).contains("broadcast failed")
+            );
+        }
     }
 }

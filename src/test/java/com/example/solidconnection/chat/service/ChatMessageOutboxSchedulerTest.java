@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 @DisplayName("채팅 메시지 Outbox 스케줄러 테스트")
@@ -34,8 +35,9 @@ class ChatMessageOutboxSchedulerTest {
         // then
         ArgumentCaptor<ZonedDateTime> cutoffCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
         ArgumentCaptor<ZonedDateTime> nowCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
-        then(transactionService).should().recoverStaleProcessing(cutoffCaptor.capture(), nowCaptor.capture());
-        then(transactionService).should().findDispatchableIds(nowCaptor.getValue());
+        InOrder inOrder = Mockito.inOrder(transactionService);
+        inOrder.verify(transactionService).recoverStaleProcessing(cutoffCaptor.capture(), nowCaptor.capture());
+        inOrder.verify(transactionService).findDispatchableIds(nowCaptor.getValue());
         then(dispatcher).should().dispatch(1L);
         then(dispatcher).should().dispatch(2L);
         org.assertj.core.api.Assertions.assertThat(Duration.between(

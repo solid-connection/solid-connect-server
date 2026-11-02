@@ -12,8 +12,8 @@ import com.example.solidconnection.chat.domain.ChatMessage;
 import com.example.solidconnection.chat.domain.ChatMessageOutbox;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
-import com.example.solidconnection.chat.dto.ChatAttachmentResponse;
 import com.example.solidconnection.chat.dto.ChatImageSendRequest;
+import com.example.solidconnection.chat.dto.ChatMessageHistoryResult;
 import com.example.solidconnection.chat.dto.ChatMessageResponse;
 import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
@@ -35,18 +35,15 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
+@Slf4j
 public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
@@ -58,6 +55,7 @@ public class ChatService {
     private final MentorRepository mentorRepository;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final ChatMessageHistoryQueryService chatMessageHistoryQueryService;
     private final ChatMessageOutboxTransactionService outboxTransactionService;
 
     public ChatService(ChatRoomRepository chatRoomRepository,
@@ -68,6 +66,7 @@ public class ChatService {
                        SiteUserRepository siteUserRepository,
                        MentorRepository mentorRepository,
                        ApplicationEventPublisher eventPublisher,
+                       ChatMessageHistoryQueryService chatMessageHistoryQueryService,
                        ChatMessageOutboxTransactionService outboxTransactionService) {
         this.chatRoomRepository = chatRoomRepository;
         this.chatMessageRepository = chatMessageRepository;
@@ -77,6 +76,7 @@ public class ChatService {
         this.siteUserRepository = siteUserRepository;
         this.mentorRepository = mentorRepository;
         this.eventPublisher = eventPublisher;
+        this.chatMessageHistoryQueryService = chatMessageHistoryQueryService;
         this.outboxTransactionService = outboxTransactionService;
     }
 
@@ -128,47 +128,20 @@ public class ChatService {
         );
     }
 
-    @Transactional(readOnly = true)
     public SliceResponse<ChatMessageResponse> getChatMessages(long siteUserId, long roomId, Pageable pageable) {
-        ChatParticipant participant = getChatParticipant(siteUserId, roomId);
-
-        Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdWithPaging(roomId, pageable);
-
-        Map<Long, ChatParticipant> participantIdToParticipant = buildParticipantIdToParticipantMap(chatMessages);
-        List<ChatMessageResponse> content = buildChatMessageResponses(chatMessages, participantIdToParticipant);
-        outboxTransactionService.markHistoryServed(
-                participant.getId(),
-                chatMessages.getContent().stream().map(ChatMessage::getId).toList(),
-                now()
-        );
-
-        return SliceResponse.of(content, chatMessages);
-    }
-
-    // senderId(chatParticipantId)로 chatParticipant 맵 생성
-    private Map<Long, ChatParticipant> buildParticipantIdToParticipantMap(Slice<ChatMessage> chatMessages) {
-        Set<Long> participantIds = chatMessages.getContent().stream()
-                .map(ChatMessage::getSenderId)
-                .collect(Collectors.toSet());
-
-        return chatParticipantRepository.findAllById(participantIds).stream()
-                .collect(Collectors.toMap(ChatParticipant::getId, Function.identity()));
-    }
-
-    private List<ChatMessageResponse> buildChatMessageResponses(
-            Slice<ChatMessage> chatMessages,
-            Map<Long, ChatParticipant> participantIdToParticipant
-    ) {
-        return chatMessages.getContent().stream()
-                .map(message -> {
-                    ChatParticipant senderParticipant = participantIdToParticipant.get(message.getSenderId());
-                    if (senderParticipant == null) {
-                        throw new CustomException(CHAT_PARTICIPANT_NOT_FOUND);
-                    }
-                    long externalSenderId = senderParticipant.getSiteUserId();
-                    return toChatMessageResponse(message, externalSenderId);
-                })
-                .toList();
+        ChatMessageHistoryResult result =
+                chatMessageHistoryQueryService.getChatMessages(siteUserId, roomId, pageable);
+        try {
+            outboxTransactionService.markHistoryServed(
+                    result.participantId(),
+                    result.messageIds(),
+                    now()
+            );
+        } catch (RuntimeException e) {
+            log.error("채팅 내역 조회 Outbox 완료 기록에 실패했습니다. participantId={}, roomId={}",
+                    result.participantId(), roomId, e);
+        }
+        return result.response();
     }
 
     @Transactional(readOnly = true)
@@ -199,26 +172,6 @@ public class ChatService {
     private ChatParticipant getChatParticipant(long siteUserId, long roomId) {
         return chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
-    }
-
-    private ChatMessageResponse toChatMessageResponse(ChatMessage message, long externalSenderId) {
-        List<ChatAttachmentResponse> attachments = message.getChatAttachments().stream()
-                .map(attachment -> ChatAttachmentResponse.of(
-                        attachment.getId(),
-                        attachment.getIsImage(),
-                        attachment.getUrl(),
-                        attachment.getThumbnailUrl(),
-                        attachment.getCreatedAt()
-                ))
-                .toList();
-
-        return ChatMessageResponse.of(
-                message.getId(),
-                message.getContent(),
-                externalSenderId,
-                message.getCreatedAt(),
-                attachments
-        );
     }
 
     @Transactional

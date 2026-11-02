@@ -46,7 +46,20 @@ public class ChatMessageOutboxTransactionService {
             return Optional.empty();
         }
 
-        ChatMessageOutbox outbox = outboxRepository.findWithMessageById(outboxId).orElseThrow();
+        Optional<ChatMessageOutbox> foundOutbox = outboxRepository.findWithMessageById(outboxId);
+        if (foundOutbox.isEmpty()) {
+            outboxRepository.recordFailure(
+                    outboxId,
+                    processingToken,
+                    ChatMessageOutboxStatus.PROCESSING,
+                    ChatMessageOutboxStatus.FAILED,
+                    null,
+                    "message unavailable",
+                    now
+            );
+            return Optional.empty();
+        }
+        ChatMessageOutbox outbox = foundOutbox.get();
         ChatMessage chatMessage = outbox.getChatMessage();
         ChatParticipant sender = chatParticipantRepository.findById(chatMessage.getSenderId()).orElseThrow();
         ChatMessageSendResponse response = ChatMessageSendResponse.of(chatMessage, sender.getSiteUserId());
@@ -165,11 +178,7 @@ public class ChatMessageOutboxTransactionService {
         return outboxRepository.markHistoryServed(
                 recipientParticipantId,
                 messageIds,
-                List.of(
-                        ChatMessageOutboxStatus.PENDING,
-                        ChatMessageOutboxStatus.PROCESSING,
-                        ChatMessageOutboxStatus.FAILED
-                ),
+                List.of(ChatMessageOutboxStatus.FAILED),
                 ChatMessageOutboxStatus.COMPLETED,
                 ChatMessageOutboxCompletionType.HISTORY_SERVED,
                 completedAt

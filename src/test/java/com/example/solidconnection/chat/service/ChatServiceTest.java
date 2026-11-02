@@ -21,6 +21,7 @@ import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
+import com.example.solidconnection.chat.dto.ClaimedChatMessageOutbox;
 import com.example.solidconnection.chat.fixture.ChatAttachmentFixture;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
@@ -67,6 +68,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatMessageOutboxRepository chatMessageOutboxRepository;
+
+    @Autowired
+    private ChatMessageOutboxTransactionService outboxTransactionService;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -335,11 +339,7 @@ class ChatServiceTest {
         void 조회_응답에_포함된_상대방_메시지의_Outbox를_HISTORY_SERVED로_완료한다() {
             // given
             ChatMessage message = chatMessageFixture.메시지("조회 복구 메시지", partnerParticipant.getId(), chatRoom);
-            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
-                    message,
-                    participant,
-                    ZonedDateTime.now().minusMinutes(1)
-            ));
+            ChatMessageOutbox outbox = failedOutbox(message);
 
             // when
             chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);
@@ -351,6 +351,80 @@ class ChatServiceTest {
                     () -> assertThat(saved.getCompletionType())
                             .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)
             );
+        }
+
+        @Test
+        void 조회_페이지에_포함되지_않은_메시지의_Outbox는_PENDING으로_유지한다() {
+            // given
+            ChatMessage olderMessage = chatMessageFixture.메시지(
+                    "페이지 밖 메시지",
+                    partnerParticipant.getId(),
+                    chatRoom
+            );
+            ChatMessageOutbox olderOutbox = pendingOutbox(olderMessage);
+            ChatMessage newerMessage = chatMessageFixture.메시지(
+                    "조회된 메시지",
+                    partnerParticipant.getId(),
+                    chatRoom
+            );
+            ChatMessageOutbox newerOutbox = failedOutbox(newerMessage);
+            Pageable firstMessageOnly = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), firstMessageOnly);
+
+            // then
+            ChatMessageOutbox savedOlder = chatMessageOutboxRepository.findById(olderOutbox.getId()).orElseThrow();
+            ChatMessageOutbox savedNewer = chatMessageOutboxRepository.findById(newerOutbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(savedOlder.getStatus()).isEqualTo(ChatMessageOutboxStatus.PENDING),
+                    () -> assertThat(savedNewer.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(savedNewer.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)
+            );
+        }
+
+        private ChatMessageOutbox failedOutbox(ChatMessage message) {
+            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+                    message,
+                    participant,
+                    ZonedDateTime.now().minusMinutes(1)
+            ));
+            ZonedDateTime attemptTime = ZonedDateTime.now();
+            for (int attempt = 1; attempt <= 3; attempt++) {
+                ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
+                        outbox.getId(),
+                        attemptTime
+                ).orElseThrow();
+                outboxTransactionService.recordFailure(
+                        outbox.getId(),
+                        claimed.processingToken(),
+                        "broadcast failed",
+                        attemptTime
+                );
+                attemptTime = chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow().getNextAttemptAt();
+            }
+            return outbox;
+        }
+
+        private ChatMessageOutbox pendingOutbox(ChatMessage message) {
+            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+                    message,
+                    participant,
+                    ZonedDateTime.now().minusMinutes(1)
+            ));
+            ZonedDateTime attemptTime = ZonedDateTime.now();
+            ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
+                    outbox.getId(),
+                    attemptTime
+            ).orElseThrow();
+            outboxTransactionService.recordFailure(
+                    outbox.getId(),
+                    claimed.processingToken(),
+                    "broadcast failed",
+                    attemptTime
+            );
+            return outbox;
         }
 
         @Test

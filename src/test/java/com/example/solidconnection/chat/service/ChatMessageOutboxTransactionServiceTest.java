@@ -21,11 +21,13 @@ import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @TestContainerSpringBootTest
 @DisplayName("채팅 메시지 Outbox 트랜잭션 서비스 테스트")
@@ -48,6 +50,9 @@ class ChatMessageOutboxTransactionServiceTest {
 
     @Autowired
     private ChatMessageFixture chatMessageFixture;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private ChatParticipant recipient;
     private ChatMessageOutbox outbox;
@@ -91,6 +96,28 @@ class ChatMessageOutboxTransactionServiceTest {
 
             // when & then
             assertThat(outboxTransactionService.claim(outbox.getId(), now)).isEmpty();
+        }
+
+        @Test
+        void 삭제되어_방송할_수_없는_메시지는_FAILED로_종료한다() {
+            // given
+            jdbcTemplate.update(
+                    "UPDATE chat_message SET is_deleted = true WHERE id = ?",
+                    outbox.getChatMessage().getId()
+            );
+
+            // when
+            Optional<ClaimedChatMessageOutbox> claimed =
+                    outboxTransactionService.claim(outbox.getId(), now);
+
+            // then
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(claimed).isEmpty(),
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.FAILED),
+                    () -> assertThat(saved.getAttemptCount()).isEqualTo(1),
+                    () -> assertThat(saved.getLastError()).contains("message unavailable")
+            );
         }
     }
 
@@ -144,6 +171,50 @@ class ChatMessageOutboxTransactionServiceTest {
                     () -> assertThat(saved.getLastError()).isEqualTo("broadcast failed"),
                     () -> assertThat(saved.getNextAttemptAt()).isAfter(now.plusSeconds(1))
             );
+        }
+
+        @Test
+        void 실패_메시지가_1000자를_넘으면_잘라서_기록한다() {
+            // given
+            ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(outbox.getId(), now)
+                    .orElseThrow();
+
+            // when
+            boolean updated = outboxTransactionService.recordFailure(
+                    outbox.getId(),
+                    claimed.processingToken(),
+                    "a".repeat(1001),
+                    now.plusSeconds(1)
+            );
+
+            // then
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(updated).isTrue(),
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.PENDING),
+                    () -> assertThat(saved.getLastError()).hasSize(1000)
+            );
+        }
+
+        @Test
+        void 다음_처리권을_획득해도_직전_실패_원인을_보존한다() {
+            // given
+            ClaimedChatMessageOutbox firstClaim = outboxTransactionService.claim(outbox.getId(), now)
+                    .orElseThrow();
+            outboxTransactionService.recordFailure(
+                    outbox.getId(),
+                    firstClaim.processingToken(),
+                    "first failure",
+                    now
+            );
+            ZonedDateTime nextAttemptAt = outboxRepository.findById(outbox.getId()).orElseThrow().getNextAttemptAt();
+
+            // when
+            outboxTransactionService.claim(outbox.getId(), nextAttemptAt).orElseThrow();
+
+            // then
+            assertThat(outboxRepository.findById(outbox.getId()).orElseThrow().getLastError())
+                    .isEqualTo("first failure");
         }
 
         @Test
@@ -248,7 +319,24 @@ class ChatMessageOutboxTransactionServiceTest {
     class 내역_조회로_완료한다 {
 
         @Test
-        void 처리_중인_메시지도_HISTORY_SERVED로_완료하고_늦은_worker가_되돌리지_못한다() {
+        void 방송을_한_번도_시도하지_않은_메시지는_내역_조회로_완료하지_않는다() {
+            // when
+            int completedCount = outboxTransactionService.markHistoryServed(
+                    recipient.getId(),
+                    List.of(outbox.getChatMessage().getId()),
+                    now
+            );
+
+            // then
+            assertAll(
+                    () -> assertThat(completedCount).isZero(),
+                    () -> assertThat(outboxRepository.findById(outbox.getId()).orElseThrow().getStatus())
+                            .isEqualTo(ChatMessageOutboxStatus.PENDING)
+            );
+        }
+
+        @Test
+        void 처리_중인_메시지는_내역_조회로_완료하지_않아_송신자_방송을_보존한다() {
             // given
             ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(outbox.getId(), now)
                     .orElseThrow();
@@ -259,18 +347,51 @@ class ChatMessageOutboxTransactionServiceTest {
                     List.of(outbox.getChatMessage().getId()),
                     now.plusSeconds(1)
             );
-            boolean staleUpdate = outboxTransactionService.recordFailure(
+            boolean workerCompleted = outboxTransactionService.markCompleted(
                     outbox.getId(),
                     claimed.processingToken(),
-                    "late failure",
+                    ChatMessageOutboxCompletionType.BROKER_DISPATCHED,
                     now.plusSeconds(2)
             );
 
             // then
             ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
             assertAll(
+                    () -> assertThat(completedCount).isZero(),
+                    () -> assertThat(workerCompleted).isTrue(),
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(saved.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.BROKER_DISPATCHED)
+            );
+        }
+
+        @Test
+        void 재시도_상한에_도달한_메시지는_HISTORY_SERVED로_완료한다() {
+            // given
+            ZonedDateTime attemptTime = now;
+            for (int attempt = 1; attempt <= 3; attempt++) {
+                ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(outbox.getId(), attemptTime)
+                        .orElseThrow();
+                outboxTransactionService.recordFailure(
+                        outbox.getId(),
+                        claimed.processingToken(),
+                        "failure-" + attempt,
+                        attemptTime
+                );
+                attemptTime = outboxRepository.findById(outbox.getId()).orElseThrow().getNextAttemptAt();
+            }
+
+            // when
+            int completedCount = outboxTransactionService.markHistoryServed(
+                    recipient.getId(),
+                    List.of(outbox.getChatMessage().getId()),
+                    now.plusMinutes(1)
+            );
+
+            // then
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
                     () -> assertThat(completedCount).isEqualTo(1),
-                    () -> assertThat(staleUpdate).isFalse(),
                     () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
                     () -> assertThat(saved.getCompletionType())
                             .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)

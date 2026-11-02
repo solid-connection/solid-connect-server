@@ -22,7 +22,6 @@ public interface ChatMessageOutboxRepository extends JpaRepository<ChatMessageOu
                o.processingToken = :processingToken,
                o.processingStartedAt = :now,
                o.attemptCount = o.attemptCount + 1,
-               o.lastError = null,
                o.updatedAt = :now
            WHERE o.id = :outboxId
              AND o.status = :pendingStatus
