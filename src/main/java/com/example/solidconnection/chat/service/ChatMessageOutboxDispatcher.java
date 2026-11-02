@@ -7,6 +7,7 @@ import com.example.solidconnection.chat.domain.ChatMessageOutboxCompletionType;
 import com.example.solidconnection.chat.dto.ClaimedChatMessageOutbox;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -17,10 +18,22 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ChatMessageOutboxDispatcher {
 
+    private static final int MAX_CONCURRENT_DISPATCHES = 4;
+
     private final ChatMessageOutboxTransactionService outboxTransactionService;
     private final SimpMessageSendingOperations simpMessageSendingOperations;
+    private final Semaphore dispatchPermits = new Semaphore(MAX_CONCURRENT_DISPATCHES, true);
 
     public void dispatch(long outboxId) {
+        dispatchPermits.acquireUninterruptibly();
+        try {
+            dispatchWithPermit(outboxId);
+        } finally {
+            dispatchPermits.release();
+        }
+    }
+
+    private void dispatchWithPermit(long outboxId) {
         Optional<ClaimedChatMessageOutbox> claim;
         try {
             claim = outboxTransactionService.claim(outboxId, now());
