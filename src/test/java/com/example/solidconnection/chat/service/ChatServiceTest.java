@@ -5,6 +5,7 @@ import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNE
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.timeout;
 
 import com.example.solidconnection.chat.domain.ChatAttachment;
 import com.example.solidconnection.chat.domain.ChatMessage;
@@ -571,7 +572,8 @@ class ChatServiceTest {
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
 
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
 
             assertAll(
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
@@ -663,7 +665,8 @@ class ChatServiceTest {
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
 
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 
@@ -716,7 +719,8 @@ class ChatServiceTest {
 
             // then
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 
@@ -753,7 +757,8 @@ class ChatServiceTest {
 
             // then
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 
