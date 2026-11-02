@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -63,25 +64,26 @@ public class ChatMessageOutbox extends BaseEntity {
     private ChatMessageOutboxStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "completion_type", length = 30)
+    @Column(name = "completion_type", nullable = true, length = 30)
     private ChatMessageOutboxCompletionType completionType;
 
+    @ColumnDefault("0")
     @Column(name = "attempt_count", nullable = false)
-    private int attemptCount;
+    private int attemptCount = 0;
 
-    @Column(name = "processing_token", length = 36)
+    @Column(name = "processing_token", nullable = true, length = 36)
     private String processingToken;
 
-    @Column(name = "processing_started_at")
+    @Column(name = "processing_started_at", nullable = true)
     private ZonedDateTime processingStartedAt;
 
-    @Column(name = "next_attempt_at")
+    @Column(name = "next_attempt_at", nullable = true)
     private ZonedDateTime nextAttemptAt;
 
-    @Column(name = "last_error", length = 1000)
+    @Column(name = "last_error", nullable = true, length = 1000)
     private String lastError;
 
-    @Column(name = "completed_at")
+    @Column(name = "completed_at", nullable = true)
     private ZonedDateTime completedAt;
 
     public ChatMessageOutbox(
@@ -92,7 +94,6 @@ public class ChatMessageOutbox extends BaseEntity {
         this.chatMessage = chatMessage;
         this.recipient = recipient;
         this.status = ChatMessageOutboxStatus.PENDING;
-        this.attemptCount = 0;
         this.nextAttemptAt = nextAttemptAt;
     }
 }

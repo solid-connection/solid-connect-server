@@ -14,6 +14,7 @@ import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatMessageOutboxFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.chat.repository.ChatMessageOutboxRepository;
@@ -54,6 +55,9 @@ class ChatMessageOutboxDispatcherTest {
     @Autowired
     private ChatMessageFixture chatMessageFixture;
 
+    @Autowired
+    private ChatMessageOutboxFixture chatMessageOutboxFixture;
+
     @MockitoBean
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -70,7 +74,7 @@ class ChatMessageOutboxDispatcherTest {
         ChatParticipant recipient = chatParticipantFixture.참여자(recipientUser.getId(), chatRoom);
         ChatMessage message = chatMessageFixture.메시지("메시지", sender.getId(), chatRoom);
         ZonedDateTime now = ZonedDateTime.now(UTC).truncatedTo(MICROS);
-        outbox = outboxRepository.save(new ChatMessageOutbox(message, recipient, now.minusSeconds(1)));
+        outbox = chatMessageOutboxFixture.아웃박스(message, recipient, now.minusSeconds(1));
     }
 
     @Nested

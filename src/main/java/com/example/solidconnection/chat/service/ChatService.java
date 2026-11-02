@@ -169,11 +169,6 @@ public class ChatService {
         getChatParticipant(siteUserId, roomId);
     }
 
-    private ChatParticipant getChatParticipant(long siteUserId, long roomId) {
-        return chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
-                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
-    }
-
     @Transactional
     public void markChatMessagesAsRead(long siteUserId, long roomId) {
         ChatParticipant participant = chatParticipantRepository
@@ -226,6 +221,28 @@ public class ChatService {
         publishOutboxEvent(chatMessage, findOutboxRecipient(roomId, siteUserId));
     }
 
+    private ChatParticipant getChatParticipant(long siteUserId, long roomId) {
+        return chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
+                .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
+    }
+
+    private String generateThumbnailUrl(String originalUrl) {
+        try {
+            String fileName = originalUrl.substring(originalUrl.lastIndexOf('/') + 1);
+
+            String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+            String extension = fileName.substring(fileName.lastIndexOf('.'));
+
+            String thumbnailFileName = nameWithoutExt + "_thumb" + extension;
+
+            return originalUrl.replace("chat/files/", "chat/thumbnails/")
+                    .replace(fileName, thumbnailFileName);
+
+        } catch (Exception e) {
+            return originalUrl;
+        }
+    }
+
     private ChatParticipant findOutboxRecipient(long roomId, long senderSiteUserId) {
         List<ChatParticipant> recipients =
                 chatParticipantRepository.findAllByChatRoomIdAndSiteUserIdNot(roomId, senderSiteUserId);
@@ -244,23 +261,6 @@ public class ChatService {
 
     private ZonedDateTime now() {
         return ZonedDateTime.now(UTC).truncatedTo(MICROS);
-    }
-
-    private String generateThumbnailUrl(String originalUrl) {
-        try {
-            String fileName = originalUrl.substring(originalUrl.lastIndexOf('/') + 1);
-
-            String nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
-            String extension = fileName.substring(fileName.lastIndexOf('.'));
-
-            String thumbnailFileName = nameWithoutExt + "_thumb" + extension;
-
-            return originalUrl.replace("chat/files/", "chat/thumbnails/")
-                    .replace(fileName, thumbnailFileName);
-
-        } catch (Exception e) {
-            return originalUrl;
-        }
     }
 
     @Transactional

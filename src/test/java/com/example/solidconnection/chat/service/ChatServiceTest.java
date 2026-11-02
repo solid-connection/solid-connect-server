@@ -25,6 +25,7 @@ import com.example.solidconnection.chat.dto.ChatRoomListResponse;
 import com.example.solidconnection.chat.dto.ClaimedChatMessageOutbox;
 import com.example.solidconnection.chat.fixture.ChatAttachmentFixture;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatMessageOutboxFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatReadStatusFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
@@ -87,6 +88,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatMessageFixture chatMessageFixture;
+
+    @Autowired
+    private ChatMessageOutboxFixture chatMessageOutboxFixture;
 
     @Autowired
     private ChatReadStatusFixture chatReadStatusFixture;
@@ -386,11 +390,11 @@ class ChatServiceTest {
         }
 
         private ChatMessageOutbox failedOutbox(ChatMessage message) {
-            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
                     message,
                     participant,
                     ZonedDateTime.now().minusMinutes(1)
-            ));
+            );
             ZonedDateTime attemptTime = ZonedDateTime.now();
             for (int attempt = 1; attempt <= 3; attempt++) {
                 ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
@@ -409,11 +413,11 @@ class ChatServiceTest {
         }
 
         private ChatMessageOutbox pendingOutbox(ChatMessage message) {
-            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
                     message,
                     participant,
                     ZonedDateTime.now().minusMinutes(1)
-            ));
+            );
             ZonedDateTime attemptTime = ZonedDateTime.now();
             ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
                     outbox.getId(),
@@ -432,11 +436,11 @@ class ChatServiceTest {
         void 송신자의_조회는_상대방_Outbox를_완료하지_않는다() {
             // given
             ChatMessage message = chatMessageFixture.메시지("내가 보낸 메시지", participant.getId(), chatRoom);
-            ChatMessageOutbox outbox = chatMessageOutboxRepository.save(new ChatMessageOutbox(
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
                     message,
                     partnerParticipant,
                     ZonedDateTime.now().minusMinutes(1)
-            ));
+            );
 
             // when
             chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);

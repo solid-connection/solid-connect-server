@@ -13,6 +13,7 @@ import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatRoom;
 import com.example.solidconnection.chat.dto.ClaimedChatMessageOutbox;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatMessageOutboxFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.chat.repository.ChatMessageOutboxRepository;
@@ -52,6 +53,9 @@ class ChatMessageOutboxTransactionServiceTest {
     private ChatMessageFixture chatMessageFixture;
 
     @Autowired
+    private ChatMessageOutboxFixture chatMessageOutboxFixture;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private ChatParticipant recipient;
@@ -67,7 +71,7 @@ class ChatMessageOutboxTransactionServiceTest {
         recipient = chatParticipantFixture.참여자(recipientUser.getId(), chatRoom);
         ChatMessage message = chatMessageFixture.메시지("메시지", sender.getId(), chatRoom);
         now = ZonedDateTime.now(UTC).truncatedTo(MICROS);
-        outbox = outboxRepository.save(new ChatMessageOutbox(message, recipient, now.minusMinutes(10)));
+        outbox = chatMessageOutboxFixture.아웃박스(message, recipient, now.minusMinutes(10));
     }
 
     @Nested

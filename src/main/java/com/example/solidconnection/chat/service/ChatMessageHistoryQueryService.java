@@ -30,7 +30,11 @@ public class ChatMessageHistoryQueryService {
     private final ChatParticipantRepository chatParticipantRepository;
 
     @Transactional(readOnly = true)
-    public ChatMessageHistoryResult getChatMessages(long siteUserId, long roomId, Pageable pageable) {
+    public ChatMessageHistoryResult getChatMessages(
+            long siteUserId,
+            long roomId,
+            Pageable pageable
+    ) {
         ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndSiteUserId(roomId, siteUserId)
                 .orElseThrow(() -> new CustomException(CHAT_PARTICIPANT_NOT_FOUND));
         Slice<ChatMessage> chatMessages = chatMessageRepository.findByRoomIdWithPaging(roomId, pageable);
