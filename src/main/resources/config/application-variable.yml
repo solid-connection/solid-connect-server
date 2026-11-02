@@ -11,7 +11,7 @@ chat:
     max-retry-delay: 1m
     processing-timeout: 1m
     scheduling:
-      enabled: true
+      enabled: false
       delay: 5000
 
 websocket:
