@@ -21,8 +21,13 @@ import com.example.solidconnection.siteuser.domain.SiteUser;
 import com.example.solidconnection.siteuser.fixture.SiteUserFixture;
 import com.example.solidconnection.support.TestContainerSpringBootTest;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -100,6 +105,51 @@ class ChatMessageOutboxTransactionServiceTest {
 
             // when & then
             assertThat(outboxTransactionService.claim(outbox.getId(), now)).isEmpty();
+        }
+
+        @Test
+        void 동일한_Outbox를_동시에_claim하면_하나의_worker만_처리권을_획득한다() throws Exception {
+            // given
+            CountDownLatch workersReady = new CountDownLatch(2);
+            CountDownLatch start = new CountDownLatch(1);
+
+            try (var executor = Executors.newFixedThreadPool(2)) {
+                try {
+                    List<Future<Optional<ClaimedChatMessageOutbox>>> claims = List.of(
+                            executor.submit(() -> claimAfterStart(workersReady, start)),
+                            executor.submit(() -> claimAfterStart(workersReady, start))
+                    );
+                    boolean allWorkersReady = workersReady.await(5, TimeUnit.SECONDS);
+
+                    // when
+                    start.countDown();
+
+                    // then
+                    assertThat(allWorkersReady).isTrue();
+                    List<Optional<ClaimedChatMessageOutbox>> claimResults = new ArrayList<>();
+                    for (Future<Optional<ClaimedChatMessageOutbox>> claim : claims) {
+                        claimResults.add(claim.get(10, TimeUnit.SECONDS));
+                    }
+                    long claimedCount = claimResults.stream().filter(Optional::isPresent).count();
+                    ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+                    assertAll(
+                            () -> assertThat(claimedCount).isEqualTo(1),
+                            () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.PROCESSING),
+                            () -> assertThat(saved.getAttemptCount()).isEqualTo(1)
+                    );
+                } finally {
+                    start.countDown();
+                }
+            }
+        }
+
+        private Optional<ClaimedChatMessageOutbox> claimAfterStart(
+                CountDownLatch workersReady,
+                CountDownLatch start
+        ) throws InterruptedException {
+            workersReady.countDown();
+            start.await();
+            return outboxTransactionService.claim(outbox.getId(), now);
         }
 
         @Test
@@ -315,6 +365,34 @@ class ChatMessageOutboxTransactionServiceTest {
                     () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
                     () -> assertThat(saved.getCompletionType())
                             .isEqualTo(ChatMessageOutboxCompletionType.BROKER_DISPATCHED)
+            );
+        }
+
+        @Test
+        void 회수된_이전_worker는_재획득된_Outbox를_완료할_수_없다() {
+            // given
+            ZonedDateTime firstAttemptAt = now.minusMinutes(2);
+            ClaimedChatMessageOutbox firstClaim = outboxTransactionService.claim(outbox.getId(), firstAttemptAt)
+                    .orElseThrow();
+            outboxTransactionService.recoverStaleProcessing(now.minusMinutes(1), now);
+            ClaimedChatMessageOutbox secondClaim = outboxTransactionService.claim(outbox.getId(), now)
+                    .orElseThrow();
+
+            // when
+            boolean staleUpdate = outboxTransactionService.markCompleted(
+                    outbox.getId(),
+                    firstClaim.processingToken(),
+                    ChatMessageOutboxCompletionType.BROKER_DISPATCHED,
+                    now.plusSeconds(1)
+            );
+
+            // then
+            ChatMessageOutbox saved = outboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(staleUpdate).isFalse(),
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.PROCESSING),
+                    () -> assertThat(saved.getProcessingToken()).isEqualTo(secondClaim.processingToken()),
+                    () -> assertThat(saved.getCompletionType()).isNull()
             );
         }
     }
