@@ -13,6 +13,8 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
 
     Optional<ChatParticipant> findByChatRoomIdAndSiteUserId(long chatRoomId, long siteUserId);
 
+    List<ChatParticipant> findAllByChatRoomIdAndSiteUserIdNot(long chatRoomId, long siteUserId);
+
     void deleteAllByChatRoomIdIn(List<Long> chatRoomIds);
 
     @Query("""

@@ -5,9 +5,13 @@ import static com.example.solidconnection.common.exception.ErrorCode.CHAT_PARTNE
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.timeout;
 
 import com.example.solidconnection.chat.domain.ChatAttachment;
 import com.example.solidconnection.chat.domain.ChatMessage;
+import com.example.solidconnection.chat.domain.ChatMessageOutbox;
+import com.example.solidconnection.chat.domain.ChatMessageOutboxCompletionType;
+import com.example.solidconnection.chat.domain.ChatMessageOutboxStatus;
 import com.example.solidconnection.chat.domain.ChatParticipant;
 import com.example.solidconnection.chat.domain.ChatReadStatus;
 import com.example.solidconnection.chat.domain.ChatRoom;
@@ -18,12 +22,15 @@ import com.example.solidconnection.chat.dto.ChatMessageSendRequest;
 import com.example.solidconnection.chat.dto.ChatMessageSendResponse;
 import com.example.solidconnection.chat.dto.ChatParticipantResponse;
 import com.example.solidconnection.chat.dto.ChatRoomListResponse;
+import com.example.solidconnection.chat.dto.ClaimedChatMessageOutbox;
 import com.example.solidconnection.chat.fixture.ChatAttachmentFixture;
 import com.example.solidconnection.chat.fixture.ChatMessageFixture;
+import com.example.solidconnection.chat.fixture.ChatMessageOutboxFixture;
 import com.example.solidconnection.chat.fixture.ChatParticipantFixture;
 import com.example.solidconnection.chat.fixture.ChatReadStatusFixture;
 import com.example.solidconnection.chat.fixture.ChatRoomFixture;
 import com.example.solidconnection.chat.repository.ChatMessageRepository;
+import com.example.solidconnection.chat.repository.ChatMessageOutboxRepository;
 import com.example.solidconnection.chat.repository.ChatReadStatusRepositoryForTest;
 import com.example.solidconnection.common.dto.SliceResponse;
 import com.example.solidconnection.common.exception.CustomException;
@@ -62,6 +69,12 @@ class ChatServiceTest {
     private ChatMessageRepository chatMessageRepository;
 
     @Autowired
+    private ChatMessageOutboxRepository chatMessageOutboxRepository;
+
+    @Autowired
+    private ChatMessageOutboxTransactionService outboxTransactionService;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @Autowired
@@ -75,6 +88,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatMessageFixture chatMessageFixture;
+
+    @Autowired
+    private ChatMessageOutboxFixture chatMessageOutboxFixture;
 
     @Autowired
     private ChatReadStatusFixture chatReadStatusFixture;
@@ -219,12 +235,14 @@ class ChatServiceTest {
 
         private ChatRoom chatRoom;
         private Pageable pageable;
+        private ChatParticipant participant;
+        private ChatParticipant partnerParticipant;
 
         @BeforeEach
         void setUp() {
             chatRoom = chatRoomFixture.채팅방(false);
-            chatParticipantFixture.참여자(user.getId(), chatRoom);
-            chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
+            participant = chatParticipantFixture.참여자(user.getId(), chatRoom);
+            partnerParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
 
             pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         }
@@ -321,6 +339,116 @@ class ChatServiceTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(CHAT_PARTICIPANT_NOT_FOUND.getMessage());
         }
+
+        @Test
+        void 조회_응답에_포함된_상대방_메시지의_Outbox를_HISTORY_SERVED로_완료한다() {
+            // given
+            ChatMessage message = chatMessageFixture.메시지("조회 복구 메시지", partnerParticipant.getId(), chatRoom);
+            ChatMessageOutbox outbox = failedOutbox(message);
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);
+
+            // then
+            ChatMessageOutbox saved = chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(saved.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(saved.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)
+            );
+        }
+
+        @Test
+        void 조회_페이지에_포함되지_않은_메시지의_Outbox는_PENDING으로_유지한다() {
+            // given
+            ChatMessage olderMessage = chatMessageFixture.메시지(
+                    "페이지 밖 메시지",
+                    partnerParticipant.getId(),
+                    chatRoom
+            );
+            ChatMessageOutbox olderOutbox = pendingOutbox(olderMessage);
+            ChatMessage newerMessage = chatMessageFixture.메시지(
+                    "조회된 메시지",
+                    partnerParticipant.getId(),
+                    chatRoom
+            );
+            ChatMessageOutbox newerOutbox = failedOutbox(newerMessage);
+            Pageable firstMessageOnly = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), firstMessageOnly);
+
+            // then
+            ChatMessageOutbox savedOlder = chatMessageOutboxRepository.findById(olderOutbox.getId()).orElseThrow();
+            ChatMessageOutbox savedNewer = chatMessageOutboxRepository.findById(newerOutbox.getId()).orElseThrow();
+            assertAll(
+                    () -> assertThat(savedOlder.getStatus()).isEqualTo(ChatMessageOutboxStatus.PENDING),
+                    () -> assertThat(savedNewer.getStatus()).isEqualTo(ChatMessageOutboxStatus.COMPLETED),
+                    () -> assertThat(savedNewer.getCompletionType())
+                            .isEqualTo(ChatMessageOutboxCompletionType.HISTORY_SERVED)
+            );
+        }
+
+        private ChatMessageOutbox failedOutbox(ChatMessage message) {
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
+                    message,
+                    participant,
+                    ZonedDateTime.now().minusMinutes(1)
+            );
+            ZonedDateTime attemptTime = ZonedDateTime.now();
+            for (int attempt = 1; attempt <= 3; attempt++) {
+                ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
+                        outbox.getId(),
+                        attemptTime
+                ).orElseThrow();
+                outboxTransactionService.recordFailure(
+                        outbox.getId(),
+                        claimed.processingToken(),
+                        "broadcast failed",
+                        attemptTime
+                );
+                attemptTime = chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow().getNextAttemptAt();
+            }
+            return outbox;
+        }
+
+        private ChatMessageOutbox pendingOutbox(ChatMessage message) {
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
+                    message,
+                    participant,
+                    ZonedDateTime.now().minusMinutes(1)
+            );
+            ZonedDateTime attemptTime = ZonedDateTime.now();
+            ClaimedChatMessageOutbox claimed = outboxTransactionService.claim(
+                    outbox.getId(),
+                    attemptTime
+            ).orElseThrow();
+            outboxTransactionService.recordFailure(
+                    outbox.getId(),
+                    claimed.processingToken(),
+                    "broadcast failed",
+                    attemptTime
+            );
+            return outbox;
+        }
+
+        @Test
+        void 송신자의_조회는_상대방_Outbox를_완료하지_않는다() {
+            // given
+            ChatMessage message = chatMessageFixture.메시지("내가 보낸 메시지", participant.getId(), chatRoom);
+            ChatMessageOutbox outbox = chatMessageOutboxFixture.아웃박스(
+                    message,
+                    partnerParticipant,
+                    ZonedDateTime.now().minusMinutes(1)
+            );
+
+            // when
+            chatService.getChatMessages(user.getId(), chatRoom.getId(), pageable);
+
+            // then
+            assertThat(chatMessageOutboxRepository.findById(outbox.getId()).orElseThrow().getStatus())
+                    .isEqualTo(ChatMessageOutboxStatus.PENDING);
+        }
     }
 
     @Nested
@@ -414,6 +542,7 @@ class ChatServiceTest {
 
         private SiteUser sender;
         private ChatParticipant senderParticipant;
+        private ChatParticipant recipientParticipant;
         private ChatRoom chatRoom;
 
         @BeforeEach
@@ -421,6 +550,7 @@ class ChatServiceTest {
             sender = siteUserFixture.사용자(111, "sender");
             chatRoom = chatRoomFixture.채팅방(false);
             senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+            recipientParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
         }
 
         @Test
@@ -446,13 +576,17 @@ class ChatServiceTest {
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
 
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
 
             assertAll(
                     () -> assertThat(destinationCaptor.getValue()).isEqualTo("/topic/chat/" + chatRoom.getId()),
                     () -> assertThat(payloadCaptor.getValue().content()).isEqualTo(content),
                     () -> assertThat(payloadCaptor.getValue().siteUserId()).isEqualTo(sender.getId()),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1),
+                    () -> assertThat(chatMessageOutboxRepository.findAll()).singleElement()
+                            .extracting(outbox -> outbox.getRecipient().getId())
+                            .isEqualTo(recipientParticipant.getId())
             );
         }
 
@@ -472,7 +606,8 @@ class ChatServiceTest {
             // then
             assertAll(
                     () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount),
+                    () -> assertThat(chatMessageOutboxRepository.count()).isZero()
             );
         }
 
@@ -497,6 +632,7 @@ class ChatServiceTest {
         private static final String EXPECTED_THUMBNAIL_URL = "https://bucket.s3.ap-northeast-2.amazonaws.com/chat/thumbnails/example_thumb.jpg";
         private SiteUser sender;
         private ChatParticipant senderParticipant;
+        private ChatParticipant recipientParticipant;
         private ChatRoom chatRoom;
 
         @BeforeEach
@@ -504,6 +640,7 @@ class ChatServiceTest {
             sender = siteUserFixture.사용자(111, "sender");
             chatRoom = chatRoomFixture.채팅방(false);
             senderParticipant = chatParticipantFixture.참여자(sender.getId(), chatRoom);
+            recipientParticipant = chatParticipantFixture.참여자(mentor1.getId(), chatRoom);
         }
 
         @Test
@@ -532,7 +669,8 @@ class ChatServiceTest {
             ArgumentCaptor<String> destinationCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
 
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(destinationCaptor.capture(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 
@@ -544,7 +682,10 @@ class ChatServiceTest {
                     () -> assertThat(response.messageType()).isEqualTo(MessageType.IMAGE),
                     () -> assertThat(response.siteUserId()).isEqualTo(sender.getId()),
                     () -> assertThat(response.content()).isEmpty(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount + 1),
+                    () -> assertThat(chatMessageOutboxRepository.findAll()).singleElement()
+                            .extracting(outbox -> outbox.getRecipient().getId())
+                            .isEqualTo(recipientParticipant.getId())
             );
         }
 
@@ -564,7 +705,8 @@ class ChatServiceTest {
             // then
             assertAll(
                     () -> BDDMockito.then(simpMessagingTemplate).shouldHaveNoInteractions(),
-                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount)
+                    () -> assertThat(chatMessageRepository.count()).isEqualTo(messageCount),
+                    () -> assertThat(chatMessageOutboxRepository.count()).isZero()
             );
         }
 
@@ -581,7 +723,8 @@ class ChatServiceTest {
 
             // then
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 
@@ -618,7 +761,8 @@ class ChatServiceTest {
 
             // then
             ArgumentCaptor<ChatMessageSendResponse> payloadCaptor = ArgumentCaptor.forClass(ChatMessageSendResponse.class);
-            BDDMockito.verify(simpMessagingTemplate).convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
+            BDDMockito.verify(simpMessagingTemplate, timeout(5000))
+                    .convertAndSend(BDDMockito.anyString(), payloadCaptor.capture());
 
             ChatMessageSendResponse response = payloadCaptor.getValue();
 

@@ -49,6 +49,15 @@ view:
     scheduling:
       enabled: false
       delay: 3000
+chat:
+  outbox:
+    max-attempts: 3
+    batch-size: 10
+    initial-retry-delay: 1s
+    max-retry-delay: 10s
+    processing-timeout: 1m
+    scheduling:
+      enabled: false
 websocket:
   subscription-timeout: 300ms
   thread-pool:
